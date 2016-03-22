@@ -1,0 +1,73 @@
+body {
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	background: #000;}
+.wrap {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+}
+
+.centered.alert {
+	text-align:center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#map, #pano {position:relative;}
+#pano {float:right;}
+.loading {
+	font-size:7em;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -56px 0 0 -56px;
+}
+
+.map-logo {
+	margin-left: -75px;
+	background: rgba(0,0,0,.7);
+	padding: 0 10px 0 75px;
+	font-size: 2em;
+}
+.map-logo a { color: #fbc93d; }
+
+.tim {
+	color: #000;
+	font-size: 12px;
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: rgba(255,255,255,.7);
+}
+
+.spd {
+	font-size: 32px;
+	height: 40px;}
+.spd-sign {
+	color: #000;
+	text-align: center;
+	padding: 5px;
+	border: 2px solid #000;
+	border-radius: 3px;
+	margin: 10px;
+	background-color: #FFF;
+}
+.alt-unit, .spd-unit { font-size:12px; }
+.alt-label, .spd-label {
+	font-size:18px;
+	height:18px;}
+.alt {
+	font-size: 32px;
+	height: 40px;}
+.alt-sign {
+	color: #FFF;
+	text-align: center;
+	padding: 5px;
+	border: 2px solid #FFF;
+	border-radius: 3px;
+	margin: 10px;
+	background-color: #009800;
+}

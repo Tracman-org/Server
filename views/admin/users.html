@@ -1,0 +1,61 @@
+{% extends 'templates/base.html' %}
+{% block title %}Tracman | Users{% endblock %}
+
+{% block main %}
+	{% include 'templates/header.html' %}
+	<style>
+		.container { max-width:90%; }
+	</style>
+
+	<section class='dark'>
+		<div class='container'>
+			<h1>Users</h1>
+
+			<table id='users-table' class='table table-hover'>
+				<thead><tr>
+					<th>Name</th>
+					<th>Slug</th>
+					<th>Joined</th>
+					<th>Last login</th>
+					<th>Moved</th>
+				</tr></thead>
+				<tbody>
+				{% for usr in users %}
+					<tr>
+						<td>{{ usr.name }}</td>
+						<td><a href="/trac/{{ usr.slug }}">/{{ usr.slug }}</a></td>
+						<td id='{{ usr.id }}-created'></td>
+						<td id='{{ usr.id }}-logged'></td>
+						<td id='{{ usr.id }}-moved'></td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+			
+		</div>
+	</section>
+	
+	<script src="/static/js/moment.min.js"></script>
+	<script>
+		{% for usr in users %}
+			{% if usr.created %}
+				$('#{{ usr.id }}-created').text(
+					moment("{{ usr.created }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").format('l')
+				);
+			{% endif %}
+			
+			{% if usr.lastLogin %}
+				$('#{{ usr.id }}-logged').text(
+					moment("{{ usr.lastLogin }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+				);
+			{% endif %}
+			
+			{% if usr.last %}
+				$('#{{ usr.id }}-moved').text(
+					moment("{{ usr.last.time }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+				);
+			{% endif %}
+		{% endfor %}
+	</script>
+
+{% endblock %}

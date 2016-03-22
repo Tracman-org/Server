@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{% block title %}Tracman{% endblock %}</title>
+
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+		<meta name="keywords" content="map, phone, gps, link, location, track, friends, app">
+		<meta name="description" content="Tracman lets you see and share your phone's exact realtime location">
+		<meta name="theme-color" content="#222">
+		<meta name="msapplication-navbutton-color" content="#222">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<link rel="shortcut icon" sizes="16x16 & 32x32 & 48x48" type="image/x-icon" href="/static/img/icon/by/16-32-48.ico">
+		<link rel="icon apple-touch-icon" sizes="32x32" type="image/png" href="/static/img/icon/by/32.png">
+		<link rel="icon apple-touch-icon" sizes="57x57" type="image/png" href="/static/img/icon/by/57.png">
+		<link rel="icon apple-touch-icon" sizes="72x72" type="image/png" href="/static/img/icon/by/72.png">
+		<link rel="icon apple-touch-icon" sizes="128x128" type="image/png" href="/static/img/icon/by/128.png">
+		<link rel="icon apple-touch-icon" sizes="152x152" type="image/png" href="/static/img/icon/by/152.png">
+		<link rel="icon apple-touch-icon" sizes="228x228" type="image/png" href="/static/img/icon/by/228.png">
+		<link rel="apple-touch-icon-precomposed" type="image/png" href="/static/img/icon/by/152.png">
+		
+		<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+		<link href="/static/css/base.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,600">
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Merriweather:300,700">
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	</head>
+	<body>
+
+		<noscript>
+			<div class='header alert alert-danger alert-dismissible'>
+				<strong>Uh-oh!</strong> You don't have javascript enabled!  This page won't load correctly without it.  You should really enable it, because many websites won't work properly.  Ask your grandchildren if you need help.  
+				<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
+			</div>
+		</noscript>
+		
+		{% block main %}Loading... {% endblock %}
+
+		<script>
+			(function(t,r,a,c,m,o,n){t['GoogleAnalyticsObject']=m;t[m]=t[m]||function(){
+			(t[m].q=t[m].q||[]).push(arguments)},t[m].l=1*new Date();o=r.createElement(a),
+			n=r.getElementsByTagName(a)[0];o.async=1;o.src=c;n.parentNode.insertBefore(o,n)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-44266909-3', 'auto');
+			ga('require', 'linkid');
+			ga('send', 'pageview');
+		</script>
+
+	</body>
+</html>

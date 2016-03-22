@@ -1,0 +1,47 @@
+{
+  "name": "tracman",
+  "version": "0.1.5",
+  "description": "Tracks user's GPS location",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.1",
+    "email-templates": "^2.1.0",
+    "express": "^4.13.3",
+    "express-crash": "0.0.2",
+    "express-session": "^1.13.0",
+    "kerberos": "0.0.17",
+    "mailgun-js": "^0.7.7",
+    "moment": "^2.12.0",
+    "mongodb": "^2.1.4",
+    "mongoose": "^4.3.5",
+    "nunjucks": "^2.3.0",
+    "passport": "^0.3.2",
+    "passport-google-id-token": "^0.4.0",
+    "passport-google-oauth2": "^0.1.6",
+    "slug": "^0.9.1",
+    "socket.io": "^1.4.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keith24/tracman-server.git"
+  },
+  "keywords": [
+    "tracking",
+    "location",
+    "map"
+  ],
+  "author": "Keith Irwin",
+  "license": "MIT",
+  "README": "README.md",
+  "bugs": {
+    "url": "https://github.com/keith24/tracman-server/issues"
+  },
+  "homepage": "http://tracman.org/"
+}

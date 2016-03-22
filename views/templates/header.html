@@ -1,0 +1,44 @@
+<link href="/static/css/header.css" rel="stylesheet">
+<script src="/static/js/header.js"></script>
+
+<header>
+	<a href="/"><h1 class='logo'><img src="/static/img/style/logo-28.png" class='icon'>Tracman</h1></a>
+	<div class='hamburger hamburger--slider' aria-label="Menu" aria-controls="navigation">
+		<div class='hamburger-box'>
+			<div class='hamburger-inner'></div>
+		</div>
+	</div>
+	<nav id='navigation'>
+	<ul>
+	{% if not user %}
+		<li><a href="/#overview">About</a></li>
+		<li><a href="/#get">Request Invite</a></li>
+		<li><a href="/login">Login</a></li>
+	{% else %}
+		{% if user.isAdmin %}
+		<li><a href="/admin/users">Users</a></li>
+		<li><a href="/admin/requests">Invite Requests</a></li>
+		{% endif %}
+		<li><a href="/dashboard">Dashboard</a></li>
+		<li><a href="/trac/{{ user.slug }}">Map</a></li>
+		<li><a href="/logout">Logout</a></li>
+	{% endif %}
+	</ul>
+	</nav>
+</header>
+
+{% if error %}
+<div class='header alert alert-danger alert-dismissible'>
+	<strong><i class="fa fa-exclamation-circle"></i> ERROR:</strong> {{ error | safe }}
+	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
+</div>
+{% elif success %}
+<div class='header alert alert-success alert-dismissible'>
+	<strong><i class="fa fa-check-circle"></i> Success!</strong> {{ success | safe }}
+	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
+</div>
+{% endif %}
+
+
+
+
