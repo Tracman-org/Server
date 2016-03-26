@@ -13,11 +13,18 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// Test authentication/admin
-function ensureAuthenticated(req,res,next) {
+function throwErr(req,err) {
+	console.log(err);
+	req.flash('error-message',err);
+	req.flash('error', (err.message||'')+'<br>Would you like to <a href="/bug">report this error</a>?');
+}
+function ensureAuth(req,res,next) {
 	if (req.isAuthenticated()) { return next(); }
-	else { req.flash('error', 'You must be signed in to do that.  <a href="/login">Click here to log in</a>.  ');
-		res.redirect('/'); }
+	else {
+		req.session.returnTo = req.path;
+		req.flash('error', 'You must be signed in to do that.  <a href="/login">Click here to log in</a>.  ');
+		res.redirect('/');
+	}
 }
 function ensureAdmin(req,res,next) {
 	if (req.user.isAdmin) { return next(); }
@@ -38,11 +45,10 @@ module.exports = function(app){
 		.all(function(req,res,next){
 			next();
 		}).get(function(req,res){
-			if (req.session.passport!=undefined) {
+			if (req.session.passport) {
 				User.findById(req.session.passport.user, function(err, user){
-					if (err){ console.log(err);
-						req.flash('error-message', err);
-						req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?'); }
+					if (err){ throwErr(req,err); }
+					if (!user){ next(); }
 					res.render('index.html', {
 						user: user,
 						error: req.flash('error')[0],
@@ -59,58 +65,49 @@ module.exports = function(app){
 			}
 		}).post(function(req,res){
 			Request.findOne({email:req.body.email}, function(err, request) {
-				if (err) { console.log(err);
-					req.flash('error-message', err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-					res.redirect('/');
-				} else if (!err && request == null) { // Send new request
+				if (err){ throwErr(req,err); }
+				if (request){ // Already requested with this email
+					req.flash('request-error', 'Invite already requested!  ');
+					res.redirect('/#get');
+				} else { // Send new request
 					request = new Request({
 						name: req.body.name,
 						email: req.body.email,
 						beg: req.body.why,
 						requestedTime: Date.now()
 					}); request.save(function(err) {
-						if (err) { console.log(err);
-							req.flash('error-message', err);
-							req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-							res.redirect('/');
-						} else {
-							mail.mailgun.messages().send({
-								from: 'Tracman Requests <requests@tracman.org>',
-								to: 'Keith Irwin <tracman@keithirwin.us>',
-								subject: 'New Tracman Invite request',
-								html: '<p>'+req.body.name+' requested a Tracman invite.  </p><p>'+req.body.why+'</p><p><a href="http://tracman.org/admin/requests">See all invites</a></p>',
-								text: '\n'+req.body.name+' requested a Tracman invite.  \n\n'+req.body.why+'\n\nhttp://tracman.org/admin/requests'
-							}, function(err,body){
-								if (err){ console.log(err);
-									req.flash('error-message', err);
-									req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-								}
-								req.flash('request-success', 'Invite requested!  ');
-								res.redirect('/#get');
-							});
-						}
+						if (err){ throwErr(req,err); }
+						mail.mailgun.messages().send({
+							from: 'Tracman Requests <requests@tracman.org>',
+							to: 'Keith Irwin <tracman@keithirwin.us>',
+							subject: 'New Tracman Invite request',
+							html: '<p>'+req.body.name+' requested a Tracman invite.  </p><p>'+req.body.why+'</p><p><a href="http://tracman.org/admin/requests">See all invites</a></p>',
+							text: '\n'+req.body.name+' requested a Tracman invite.  \n\n'+req.body.why+'\n\nhttp://tracman.org/admin/requests'
+						}, function(err,body){
+							if (err){ throwErr(req,err); }
+							else { req.flash('request-success', 'Invite requested!  '); }
+							res.redirect('/#get');
+						});
 					});
-				} else { // Already requested with this email
-					req.flash('request-error', 'Invite alreay requested!  ');
-					res.redirect('/#get');
 				}
 			});
 		});	
 
 	app.route('/dashboard')
-		.all(ensureAuthenticated, function(req,res,next){
+		.all(ensureAuth, function(req,res,next){
 			next();
 		}).get(function(req,res){
 			User.findById(req.session.passport.user, function(err, user){
-				if (err){ console.log(err);
-					req.flash('error-message',err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');}
-				res.render('dashboard.html', {
+				if (err){ throwErr(req,err); }
+				if (!user){ next(); }
+				else if (req.session.returnTo && req.query.rd) {
+					res.redirect(req.session.returnTo);
+					delete req.session.returnTo;
+				} else { res.render('dashboard.html', {
 					user: user,
 					success: req.flash('success')[0],
 					error: req.flash('error')[0]
-				});
+				}); }
 			});
 		}).post(function(req,res){
 			User.findByIdAndUpdate(req.session.passport.user, {$set:{
@@ -125,53 +122,46 @@ module.exports = function(app){
 					showStreetview: (req.body.showStreet)?true:false
 				}
 			}}, function(err, user){
-				if (err){ console.log(err);
-					req.flash('error-message',err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-				} else { req.flash('success', 'Settings updated.  '); }
+				if (err) { throwErr(req,err); }
+				else { req.flash('success', 'Settings updated.  '); }
 				res.redirect('/dashboard');
 			});
 		});
 	app.get('/validate', function(req,res){
 		if (req.query.slug) { // validate unique slug
-			User.findOne({slug:req.query.slug}, function(err, existingUser){
+			User.findOne({slug:slug(req.query.slug)}, function(err, existingUser){
 				if (existingUser && existingUser.id!==req.session.passport.user) { res.sendStatus(400); }
 				else { res.sendStatus(200); }
 			});
 		}
 	});
 
-	app.get('/trac', function(req,res,next){
+	app.get('/trac', ensureAuth, function(req,res,next){
 		User.findById(req.session.passport.user, function(err, user){
-			if (err) { console.log(err);
-				req.flash('error-message',err);
-				req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?'); }
-			if (user) { res.redirect('/trac/'+user.slug); }
-			else { next(); }
+			if (err){ throwErr(req,err); }
+			if (!user){ next(); }
+			else { res.redirect('/trac/'+user.slug+((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1]))); }
 		});
 	});
 	app.get('/trac/:slug', function(req,res,next){
 		User.findOne({slug:req.params.slug}, function(err, tracuser) {
-			if (err) { console.log(err);
-				req.flash('error-message',err);
-				req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?'); }
+			if (err){ throwErr(req,err); }
 			if (!tracuser){ next(); }
-			else {
-				res.render('trac.html', {
-					api: secret.mapAPI,
-					user: req.user,
-					tracuser: tracuser,
-					noHeader: req.query.noheader
-				});
-			}
+			else { res.render('trac.html',{
+				api: secret.mapAPI,
+				user: req.user,
+				tracuser: tracuser,
+				noFooter: '1',
+				noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:'',
+				disp: (req.query.disp)?req.query.disp.match(/\d/)[0]:'' // 0=map, 1=streetview, 2=both
+			}); }
 		});
 	});
 	app.get('/trac/id/:id', function(req,res){
 		User.findById(req.params.id, function(err, user){
-			if (err) { console.log(err);
-				req.flash('error-message',err);
-				req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?'); }
-			res.redirect('/trac/'+user.slug);
+			if (err){ throwErr(req,err); }
+			if (!user){ next(); }
+			else { res.redirect('/trac/'+user.slug+((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1]))); }
 		});
 	});
 	app.get('/invited/:invite', function(req,res,next){
@@ -180,8 +170,8 @@ module.exports = function(app){
 			if (existingUser) { res.redirect('/login'); }
 			else {
 				Request.findById(req.params.invite, function(err, request) { // Check for granted invite
-					if (err) { console.log('routes.js:125 ERROR: '+err); }
-					if (!request.granted) { next(); }
+					if (err) { throwErr(req,err); }
+					if (!request) { next(); }
 					else {
 						user = new User({ // Create new user
 							requestId: request._id,
@@ -197,19 +187,19 @@ module.exports = function(app){
 								showStreetview: true
 							}
 						}); user.save(function(err) {
-							if (err) { console.log('routes.js:141 ERROR: '+err); }
+							if (err) { throwErr(req,err); }
 							User.findOne({requestId:request._id}, function(err, user) {
-								if (err) { console.log('routes.js:143 ERROR: '+err); }
+								if (err) { throwErr(req,err); }
 								if (user) {
 									request.userId = user._id;
 									request.save(function(err, raw){
-										if (err) { console.log('routes.js:147 ERROR: '+err); }
+										if (err){ throwErr(req,err); }
 									});
 									req.logIn(user, function(err) {
-										if (err) { console.log('routes.js:150: logIn() ERROR: '+err); }
+										if (err) { throwErr(req,err); }
 										user.lastLogin = Date.now();
 										user.save(function(err, raw) {
-											if (err) { console.log('routes.js:153 ERROR: '+err); }
+											if (err) { throwErr(req,err); }
 											res.redirect('/login');
 										});
 									});
@@ -222,30 +212,27 @@ module.exports = function(app){
 		});
 	});
 
-	app.get('/android', ensureAuthenticated, function(req,res){
+	app.get('/android', ensureAuth, function(req,res){
 		res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
 	});
 	app.get('/license', function(req,res){
 		res.render('license.html', {user:req.user});
 	});
 	app.route('/pro')
-		.all(ensureAuthenticated, function(req,res,next){
+		.all(ensureAuth, function(req,res,next){
 			next();
 		}).get(function(req,res){
 			User.findById(req.session.passport.user, function(err, user){
-				if (err){ console.log(err);
-					req.flash('error-message',err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?'); }
-				res.render('pro.html', {user:user});
+				if (err){ throwErr(req,err); }
+				if (!user){ next(); }
+				else { res.render('pro.html', {user:user}); }
 			});
 		}).post(function(req,res){
 			User.findByIdAndUpdate(req.session.passport.user,
 				{$set:{ isPro:true }},
 				function(err, user){
-					if (err) { console.log(err);
-						req.flash('error-message', err);
-						req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-					} else { req.flash('success', 'You have been signed up for pro.  '); }
+					if (err){ throwErr(req,err); }
+					else { req.flash('success','You have been signed up for pro. '); }
 					res.redirect('/dashboard');
 				}
 			);
@@ -260,15 +247,13 @@ module.exports = function(app){
 				email: (req.body.email)?req.body.email:req.user.email,
 				suggestion: req.body.suggestion
 			}, function (err, raw) {
-				if (err) { console.log(err);
-					req.flash('error-message',err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-				} else { req.flash('success', 'Thanks for the suggestion!  '); }
+				if (err){ throwErr(req,err); }
+				else { req.flash('success','Thanks for the suggestion! '); }
 				res.redirect('/dashboard');
 			});
 		});
 	app.route('/bug')
-		.all(ensureAuthenticated, function(req,res,next){
+		.all(ensureAuth, function(req,res,next){
 			next();
 		}).get(function(req,res){
 			res.render('bug.html', {
@@ -284,27 +269,24 @@ module.exports = function(app){
 				recreation: req.body.recreation,
 				bug: req.body.bug
 			}, function (err, raw) {
-				if (err) { console.log(err);
-					req.flash('error-message', err);
-					req.flash('error', err.message+'<br>Would you like to <a href="/bug">report this error</a>?');
-				} else { req.flash('success', 'Thanks for the report!  '); }
+				if (err){ throwErr(req,err); }
+				else { req.flash('success','Thanks for the report! '); }
 				res.redirect('/dashboard');
 			});
 		});
 
 	// ADMIN
 	app.route('/admin/requests')
-		.all([ensureAuthenticated, ensureAdmin], function(req,res,next){
+		.all([ensureAuth, ensureAdmin], function(req,res,next){
 			next();
 		}).get(function(req,res){
 			User.findById(req.session.passport.user, function(err, user){
-				if (err){ console.log(err);
-					req.flash('error', err.message); }
+				if (err){ req.flash('error', err.message); }
 				Request.find({}, function(err, requests){
-					if (err) { console.log(err);
-						req.flash('error', err.message); }
+					if (err) { req.flash('error', err.message); }
 					res.render('admin/requests.html', {
 						user: user,
+						noFooter: '1',
 						requests: requests,
 						success:req.flash('success')[0],
 						error:req.flash('error')[0]
@@ -313,31 +295,27 @@ module.exports = function(app){
 			});
 		}).post(function(req,res){
 			Request.findById(req.body.invite, function(err, request){
-				if (err){ console.log(err);
-					req.flash('error', err.message); }
+				if (err){ req.flash('error', err.message); }
 				mail.sendInvite(request, function (err, raw) {
-					if (err) { console.log(err);
-						req.flash('error', err.message); }
+					if (err) { req.flash('error', err.message); }
 					request.granted = Date.now();
 					request.save(function(err) {
-						if (err) { console.log(err);
-							req.flash('error', err.message); }
+						if (err) { req.flash('error', err.message); }
 					});
 					req.flash('success', 'Invitation sent to <i>'+request.name+'</i>.');
 					res.redirect('/admin/requests');
 				});
 			});
 		});
-	app.get('/admin/users', [ensureAuthenticated, ensureAdmin], function(req,res){
+	app.get('/admin/users', [ensureAuth, ensureAdmin], function(req,res){
 		User.findById(req.session.passport.user, function(err, user){
-			if (err){ console.log(err);
-				req.flash('error', err.message); }
+			if (err){ req.flash('error', err.message); }
 			User.find({}, function(err, users){
-				if (err) { console.log(err);
-					req.flash('error', err.message); }
+				if (err) { req.flash('error', err.message); }
 				res.render('admin/users.html', {
 					user: user,
 					users: users,
+					noFooter: '1',
 					success:req.flash('success')[0],
 					error:req.flash('error')[0]
 				});
@@ -360,12 +338,12 @@ module.exports = function(app){
 	app.get('/auth/google/callback', passport.authenticate('google', {
 		failureRedirect: '/',
 		failureFlash: true,
-		successRedirect: '/dashboard',
+		successRedirect: '/dashboard?rd=1',
 		successFlash: true
 	} ));
 	app.get('/auth/google/idtoken', passport.authenticate('google-id-token'),	function (req,res) {
-		if (!req.user) {res.sendStatus(401);}
-		else {res.send(req.user);}
+		if (!req.user) { res.sendStatus(401); }
+		else { res.send(req.user); }
 	} );
 
 }

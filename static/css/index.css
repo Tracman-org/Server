@@ -174,8 +174,8 @@
 	position: relative;
 	z-index: 10;
 }
-.disclaimer a, disclaimer:hover {
-	color:inherit;
+.disclaimer a, .disclaimer a:hover {
+	color:#fb6e3d;
 }
 
 .get {

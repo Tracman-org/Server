@@ -1,14 +1,10 @@
 {% extends 'templates/base.html' %}
-{% block title %}Tracman | {{ code }} Error{% endblock %}
+{% block title %}{{ super() }} | {{ code }} Error{% endblock %}
 
 {% block main %}
-	{% include 'templates/header.html' %}
-
-	<section class='dark'>
-		<div class='container'>
-			<img style="width:100%;" src="https://http.cat/{{ code }}.jpg" />
-		</div>
-	</section>
-
-	{% include 'templates/footer.html' %}
+<section class='dark'>
+	<div class='container'>
+		<img style="width:100%;" src="https://http.cat/{{ code }}.jpg" />
+	</div>
+</section>
 {% endblock %}

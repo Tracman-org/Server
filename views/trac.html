@@ -1,51 +1,63 @@
 {% extends 'templates/base.html' %}
-{% block title %}Tracman | {{ tracuser.name }}{% endblock %}
+{% block title %}{{ super() }} | {{ tracuser.name }}{% endblock %}
 
-{% block main %}
-
-	<link href="/static/css/trac.css" rel="stylesheet">	
+{% block head %}
+	{{ super() }}
+	<link href="/static/css/trac.css" rel="stylesheet">
 	<style>
 		.wrap { top:{% if not noHeader %}58{% else %}0{% endif %}px;}
-		{% if tracuser.settings.showStreetview %}
-		#map, #pano {display:inline-block;}
+		img#panoImg { width:100%; height:100%; }
+		
+		{% if tracuser.settings.showStreetview and disp!='0' and disp!='1' %}
+		/* show both */
 		@media (orientation: landscape) {
-			#map, #pano {
-				width:50%;
-				height:99%;
+				#map, #pano {
+					display:inline-block;
+					width:50%;
+					height:99%;
+				}
+				#pano { float:right; }
 			}
-			#pano {float:right;}
-		}
-		@media (orientation: portrait) {
-			#map, #pano {
+			@media (orientation: portrait) {
+				#map, #pano {
+					width:100%;
+					height:50%;
+				}
+				#pano { bottom:0; }
+			}
+		{% elif tracuser.settings.showStreetview and disp=='1' %}
+		/* show streetview */
+			#pano {
 				width:100%;
-				height:50%;
-			}
-			#pano {bottom:0}
-		}
+				height:100%;}
+			#map {display:none;}
 		{% else %}
-		#map {
-			width:100%;
-			height:100%;}
-		#pano {display:none;}
+		/* show map */
+			#map {
+				width:100%;
+				height:100%;}
+			#pano {display:none;}
 		{% endif %}
 	</style>
+{% endblock %}
 
-	{% if not noHeader %}
-		{% include 'templates/header.html' %}
-	{% endif %}
-
+{% block main %}
 	<div class='wrap'>
 		
 		{% if not tracuser.last.time %}
 		<div class='centered alert alert-warning'>
-			<strong>No Location Found</strong>
-			<br>This user hasn't updated their location yet!
-			<br>If this is your page, maybe you want to <a href="/android">download the app</a>.  
+			<b>No Location Found</b>
+			{% if user.id == tracuser.id %}
+				<br>You can <a href="#" onclick="setLocation()">click here to set use this device's location</a>.  
+				<br>Maybe you also want to <a href="/android">download the android app</a>.
+			{% else %}
+				<br>This user hasn't updated their location yet!  
+			{% endif %}
 		</div>
 		{% else %}
 			<div id='map'><i class='loading fa fa-refresh fa-spin'></i></div>
-			{% if tracuser.settings.showStreetview %}
-			<div id='pano'><i class='loading fa fa-refresh fa-spin'></i></div>
+			{% if tracuser.settings.showStreetview and not noStreetview.length %}
+				<div id='pano'><img id='panoImg' src="https://maps.googleapis.com/maps/api/streetview?size=800x800&location={{ tracuser.last.lat }},{{ tracuser.last.lon }}&fov=90&heading={{ tracuser.last.dir|default(0) }}&key={{ api }}" alt="Street view image"></div>
 			{% endif %}
 		{% endif %}
 		
@@ -58,7 +70,25 @@
 		var tracuserid = {{ tracuser._id | dump | safe }},
 		 settings = JSON.parse('{{ tracuser.settings | dump | safe }}'),
 		 last = JSON.parse('{{ tracuser.last | dump | safe }}'),
-		 noHeader = '{{ noHeader | dump | safe }}';
+		 noHeader = {{ noHeader | dump | safe }},
+		 disp = {{ disp | dump | safe }};
+		
+		// Set location manually
+		function setLocation() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(pos){
+					socket.emit('app', {
+						usr: '{{ user.id }}',
+						lat: pos.coords.latitude,
+						lon: pos.coords.longitude,
+						spd: (pos.coords.speed||0)
+					});
+					alert('Location updated!  ');
+				}, function(err){
+					alert('ERROR: '+err);
+				}, { enableHighAccuracy:true });
+			} else { alert('Unable to set location.  '); }
+		}
 
 		var getAltitude = function(location, elevator, cb){
 			elevator = elevator || new google.maps.ElevationService;
@@ -71,140 +101,119 @@
 			});
 		}
 
-		var map, marker, pano, dir, lat, lon, spd, alt, newLocation, elevator;
+		var map, marker, elevator;
 		function initMap() {
-			map = new google.maps.Map(document.getElementById('map'),{
-				zoom: settings.defaultZoom,
-				streetViewControl: false,
-				zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
-				mapTypeId: (settings.defaultMap=='road')?google.maps.MapTypeId.ROADMAP:google.maps.MapTypeId.HYBRID
-			});
-			marker = new google.maps.Marker({
-				map: map,
-				draggable: false
-			});
-			if (settings.showStreetview) {
-				pano = new google.maps.StreetViewPanorama( document.getElementById('pano'), {
+			// Create map
+			if (disp!='1' || !settings.showStreetview) {
+				map = new google.maps.Map( document.getElementById('map'), {
+					center: new google.maps.LatLng( last.lat, last.lon ),
 					panControl: false,
-					zoomControl: false,
-					addressControl: false,
-					linksControl: false
+					draggable: false,
+					zoom: settings.defaultZoom,
+					streetViewControl: false,
+					zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
+					mapTypeId: (settings.defaultMap=='road')?google.maps.MapTypeId.ROADMAP:google.maps.MapTypeId.HYBRID
 				});
+				marker = new google.maps.Marker({
+					position: { lat:last.lat, lng:last.lon },
+					title: {{ tracuser.name | dump | safe }},
+					map: map,
+					draggable: false
+				});
+
+				// Create iFrame logo
+				if (noHeader.length) {
+					var logoDiv = document.createElement('div');
+					logoDiv.className = 'map-logo';
+					logoDiv.innerHTML = '<a href="https://tracman.org/">'+
+						'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
+						'Tracman</a>';
+					map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
+				}
+				
+				// Create update time block
+				var timeDiv = document.createElement('div');
+				timeDiv.className = 'tim';
+				if (last.time) {
+					timeDiv.innerHTML = 'location updated '+new Date(last.time).toLocaleString();
+				}
+				map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
+				
+				// Create speed block
+				if (settings.showSpeed) {
+					var speedSign = document.createElement('div'),
+						speedLabel = document.createElement('div'),
+						speedText = document.createElement('div'),
+						speedUnit = document.createElement('div');
+					speedLabel.className = 'spd-label';
+					speedText.className = 'spd';
+					speedUnit.className = 'spd-unit';
+					speedSign.className = 'spd-sign';
+					speedText.innerHTML = (settings.units=='imperial')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
+					speedLabel.innerHTML = 'SPEED';
+					speedUnit.innerHTML = (settings.units=='imperial')?'m.p.h.':'k.p.h.';
+					speedSign.appendChild(speedLabel);
+					speedSign.appendChild(speedText);
+					speedSign.appendChild(speedUnit);
+					map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign);
+				}
+				
+				// Create altitude block
+				if (settings.showAlt) {
+					var elevator = new google.maps.ElevationService;
+					var altitudeSign = document.createElement('div'),
+						altitudeLabel = document.createElement('div'),
+						altitudeText = document.createElement('div'),
+						altitudeUnit = document.createElement('div');
+					altitudeLabel.className = 'alt-label';
+					altitudeText.className = 'alt';
+					altitudeUnit.className = 'alt-unit';
+					altitudeSign.className = 'alt-sign';
+					altitudeText.innerHTML = '';
+					altitudeLabel.innerHTML = 'ALTITUDE';
+					getAltitude(new google.maps.LatLng(last.lat,last.lon), elevator, function(alt) {
+						if (alt) { altitudeText.innerHTML = (settings.units=='imperial')?(alt*3.28084).toFixed():alt.toFixed(); }
+					});
+					altitudeUnit.innerHTML = (settings.units=='imperial')?'feet above sea level':'meters above sea level';
+					altitudeSign.appendChild(altitudeLabel);
+					altitudeSign.appendChild(altitudeText);
+					altitudeSign.appendChild(altitudeUnit);
+					map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign);
+				}
 			}
 
-			// Create iFrame logo
-			if (noHeader) {
-				var logoDiv = document.createElement('div');
-				logoDiv.className = 'map-logo';
-				logoDiv.innerHTML = '<a href="https://tracman.org/">'+
-					'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
-					'Tracman</a>';
-				map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
-			}
-			
-			// Create update time block
-			var timeDiv = document.createElement('div');
-			timeDiv.className = 'tim';
-			if (last.time) {
-				timeDiv.innerHTML = 'location updated '+new Date(last.time).toLocaleString();
-			}
-			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
-			
-			// Create speed block
-			if (settings.showSpeed) {
-				var speedSign = document.createElement('div'),
-					speedLabel = document.createElement('div'),
-					speedText = document.createElement('div'),
-					speedUnit = document.createElement('div');
-				speedLabel.className = 'spd-label';
-				speedText.className = 'spd';
-				speedUnit.className = 'spd-unit';
-				speedSign.className = 'spd-sign';
-				speedText.innerHTML = '';
-				speedLabel.innerHTML = 'SPEED';
-				if (last.spd) {
-					speedText.innerHTML = (settings.units=='imperial')?
-					(parseFloat(last.spd)*2.23694).toFixed():last.spd;
+			// Create streetview
+			if (settings.showStreetview && disp!='0') {
+					document.getElementById('panoImg').src='https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').outerWidth()+'x'+$('#pano').outerHeight()+'&location='+last.lat+','+last.lon+'&fov=90&heading='+(last.dir||0)+'&key={{ api }}';
 				}
-				if (settings.units=='imperial') {
-					speedUnit.innerHTML = 'm.p.h.';
-				} else {
-					speedUnit.innerHTML = 'k.p.h.';}
-				speedSign.appendChild(speedLabel);
-				speedSign.appendChild(speedText);
-				speedSign.appendChild(speedUnit);
-				map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign);
-			}
-			
-			// Create altitude block
-			if (settings.showAlt) {
-				elevator = new google.maps.ElevationService;
-				var altitudeSign = document.createElement('div'),
-					altitudeLabel = document.createElement('div'),
-					altitudeText = document.createElement('div'),
-					altitudeUnit = document.createElement('div');
-				altitudeLabel.className = 'alt-label';
-				altitudeText.className = 'alt';
-				altitudeUnit.className = 'alt-unit';
-				altitudeSign.className = 'alt-sign';
-				altitudeText.innerHTML = '';
-				altitudeLabel.innerHTML = 'ALTITUDE';
-				if (last.lon && settings.showAlt) {
-					newLocation = new google.maps.LatLng(last.lat, last.lon);
-					getAltitude(newLocation, elevator, function(alt) {
-						if (alt) {
-							alt = (settings.units=='imperial')?alt*3.28084:alt;
-							altitudeText.innerHTML = alt.toFixed();
-						}
-					});
-				}
-				if (settings.units=='imperial') {
-					altitudeUnit.innerHTML = 'feet above sea level';
-				} else {
-					altitudeUnit.innerHTML = 'meters above sea level';}
-				altitudeSign.appendChild(altitudeLabel);
-				altitudeSign.appendChild(altitudeText);
-				altitudeSign.appendChild(altitudeUnit);
-				map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign);
-			}
+
 		}
 
+		// Sockets
 		socket.on('connect', function(){
 			socket.emit('room', tracuserid);
 		});
-
+		var dir, lat, lon, spd, alt, newLocation;
 		socket.on('trac', function(loc){
 			spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd);
 			dir = parseFloat(loc.dir);
 			lat = parseFloat(loc.lat);
 			lon = parseFloat(loc.lon);
-			newLocation = new google.maps.LatLng(loc.lat, loc.lon);
-			$('.tim').text('location updated '+new Date(loc.time).toLocaleString());
-			if (settings.showSpeed) {
-				$('.spd').text(spd.toFixed());
-			}
-			if (settings.showAlt) {
-				getAltitude(newLocation, elevator, function(alt) {
-					if (alt) {
-						alt = (settings.units=='imperial')?alt*3.28084:alt;
-						$('.alt').text(alt.toFixed());
-					}
-				});
-			}
-
-			map.setCenter(newLocation);
-			marker.setPosition(newLocation);
-			if (settings.showStreetview) {
-				if (pano.position != newLocation) {
-					pano.setPosition(newLocation);
-					if (spd>0) {
-						pano.setPov({pitch:0,heading:dir});
-					}
+			newLocation = new google.maps.LatLng(loc.lat,loc.lon)
+			if (disp!='1' || !settings.showStreetview) {
+				$('.tim').text('location updated '+new Date(loc.time).toLocaleString());
+				if (settings.showSpeed) { $('.spd').text(spd.toFixed()); }
+				if (settings.showAlt) {
+					getAltitude(newLocation, elevator, function(alt) {
+						if (alt) { $('.alt').text((settings.units=='imperial')?(alt*3.28084).toFixed():alt.toFixed()); }
+					});
 				}
+				map.setCenter(newLocation);
+				marker.setPosition(newLocation);
 			}
-			
+			if (settings.showStreetview && disp!='0') {
+				document.getElementById('panoImg').src='https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+loc.lat+','+loc.lon+'&fov=90&heading='+dir+'&key={{ api }}';
+			}
 		});
-
 	</script>
-
 {% endblock %}

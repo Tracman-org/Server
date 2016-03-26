@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+	{% block head %}
 		<title>{% block title %}Tracman{% endblock %}</title>
 
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -13,7 +14,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-		<link rel="shortcut icon" sizes="16x16 & 32x32 & 48x48" type="image/x-icon" href="/static/img/icon/by/16-32-48.ico">
+		<link rel="shortcut icon" sizes="16x16 32x32 48x48" type="image/x-icon" href="/static/img/icon/by/16-32-48.ico">
 		<link rel="icon apple-touch-icon" sizes="32x32" type="image/png" href="/static/img/icon/by/32.png">
 		<link rel="icon apple-touch-icon" sizes="57x57" type="image/png" href="/static/img/icon/by/57.png">
 		<link rel="icon apple-touch-icon" sizes="72x72" type="image/png" href="/static/img/icon/by/72.png">
@@ -30,6 +31,9 @@
 		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+	{% endblock %}
+	{% if not noHeader %}<link href="/static/css/header.css" rel="stylesheet">{% endif %}
+	{% if not noFooter %}<link href="/static/css/footer.css" rel="stylesheet">{% endif %}
 	</head>
 	<body>
 
@@ -39,8 +43,10 @@
 				<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
 			</div>
 		</noscript>
-		
+
+		{% if not noHeader %}{% include 'templates/header.html' %}{% endif %}
 		{% block main %}Loading... {% endblock %}
+		{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}
 
 		<script>
 			(function(t,r,a,c,m,o,n){t['GoogleAnalyticsObject']=m;t[m]=t[m]||function(){

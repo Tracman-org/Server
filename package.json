@@ -23,14 +23,17 @@
     "slug": "^0.9.1",
     "socket.io": "^1.4.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1"
+  },
   "scripts": {
     "test": "test.js",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keith24/tracman-server.git"
+    "url": "git+https://github.com/tracman-org/server.git"
   },
   "keywords": [
     "tracking",
@@ -41,7 +44,7 @@
   "license": "MIT",
   "README": "README.md",
   "bugs": {
-    "url": "https://github.com/keith24/tracman-server/issues"
+    "url": "https://tracman.org/bug"
   },
-  "homepage": "http://tracman.org/"
+  "homepage": "https://tracman.org/"
 }

@@ -22,7 +22,7 @@ passport.use(new GoogleStrategy({
 				});
 				done(null, user);
 			} else { // No existing user with google auth
-				if (req.session.passport.user) { // Creating new user
+				if (req.session.passport) { // Creating new user
 					User.findById(req.session.passport.user, function(err, user){
 						user.googleID = profile.id;
 						user.lastLogin = Date.now();

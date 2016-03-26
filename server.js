@@ -25,6 +25,7 @@ app.use(session({
 	saveUninitialized: true,
 	resave: true
 }));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
@@ -47,10 +48,12 @@ var handle404 = function(err,req,res,next) {
 var handle500 = function(err,req,res,next) {
 	res.render('error.html', {code:500});
 };
-app.use(crash.handle404(handle404));
-app.use(crash.handle500(handle500));
-crash.trapRoute(app);
-crash.handle(app, handle404, handle500);
+if (secret.url.substring(0,16)!='http://localhost') {
+	app.use(crash.handle404(handle404));
+	app.use(crash.handle500(handle500));
+	crash.trapRoute(app);
+	crash.handle(app, handle404, handle500);
+}
 
 // Check for tracking users
 function checkForUsers(room) {
@@ -68,6 +71,7 @@ function checkForUsers(room) {
 	}
 }
 
+// Sockets
 io.on('connection', function(socket) {
 	
 	socket.on('room', function(room) {
@@ -75,10 +79,7 @@ io.on('connection', function(socket) {
 		if (room.slice(0,4)!='app-'){
 			User.findById({_id:room}, function(err, user) {
 				if (err) { console.log(err); }
-				if (user) {
-					io.to(room).emit('trac', user.last);
-					io.to('app-'+room).emit('activate', 'true');
-				}
+				if (user) { io.to('app-'+room).emit('activate','true'); }
 			});
 		} else {
 			checkForUsers(room.slice(4));
@@ -122,8 +123,8 @@ passport.deserializeUser(function(id, done) {
 });
 
 // SERVE
-http.listen(secret.httpPort, function(){
-	console.log('Listening for http on port '+secret.httpPort.toString());
+http.listen(62054, function(){
+	console.log('Listening for http on port 62054');
 	checkForUsers();
 });
 

@@ -1,28 +1,34 @@
 {% extends 'templates/base.html' %}
-{% block title %}Tracman | Dashboard{% endblock %}
+{% block title %}{{ super() }} | Dashboard{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+	.google-play {
+		width:150px;
+		border: #fbc93d solid 1px;
+		border-radius:10px; }
+</style>
+{% endblock %}
 
 {% block main %}
-	{% include 'templates/header.html' %}
-	<style>
-		.google-play {
-			width:150px;
-			border: #fbc93d solid 1px;
-			border-radius:10px; }
-	</style>
-	
 	<section class='dark'>
 		<div class='container'>
 			<h1>Welcome{% if user.name %}, {{ user.name }}{% endif %}!</h1>
 			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">http://tracman.org/trac/{{ user.slug }}</a></p>
 			<p>You can also embed a map into your website with this code.  Be sure to set the width and height attributes to suit your circumstance.  </p>
 			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{ user.slug }}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
-			
+		</div>
+		<br>
+		<div class='container'>
 			<h2>App</h2>
 			<p>Click the button below to download the app from the google play store, if you haven't already.  </p>
 			<p><a href="https://play.google.com/store/apps/details?id=us.keithirwin.tracman&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class='google-play' alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a></p>
 			<p>Without the app running, your location won't update.  But you can also set your location to this device's geolocation by clicking the button below.  </p>
 			<p><button id='manual-set' class='btn' style="display:block; margin:auto;" onclick="setLocation()"><i class="fa fa-map-marker"></i>&emsp;Update location manually</button></p>
-			
+		</div>
+		<br>
+		<div class='container'>
 			<h2>Settings</h2>
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
@@ -130,11 +136,10 @@
 			
 			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?  It's free during beta testing.  </p>{% endif %}
 			<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?  </p>
-			
 		</div>
+		
 	</section>
 
-	{% include 'templates/footer.html' %}
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 	<script>
 		var socket = io.connect();
@@ -151,10 +156,11 @@
 						spd: (pos.coords.speed||0)
 					});
 					alert('Location updated!  ');
+					location.reload();
 				}, function(err){
 					alert('ERROR: '+err);
 				}, { enableHighAccuracy:true });
-			}
+			} else { alert('Unable to set location.  '); }
 		}
 	</script>
 {% endblock %}
