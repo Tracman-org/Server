@@ -1,0 +1,52 @@
+footer {
+	font-weight: 300;
+	width:100%;
+	overflow:auto;
+	background: #111;
+	color: #ccc;
+	padding: 0 20px;
+}
+footer .left {
+	float: left;
+	padding: 15px 0;
+}
+footer .left p {
+	margin: 0;
+}
+footer a {
+	font-weight:600;
+	color: #fff;
+}
+footer a:hover {
+	text-decoration: none;
+}
+footer .right {
+	text-align: right;
+	float: right;
+	padding: 15px 0;
+}
+footer a .fa {
+	margin-left: 5px;
+	font-size: 20px;
+	color: inherit;
+}
+footer .fa a:hover, footer .fa a:focus {
+	color: inherit;
+}
+
+@media (max-width: 800px) {
+	footer  {
+		padding: 0 10px;
+	}
+}
+@media (max-width: 600px) {
+	footer {
+		text-align: center;
+	}
+	footer .left, footer .right {
+		float: none;
+	}
+	footer .right {
+		padding-top: 0;
+	}
+}

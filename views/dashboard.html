@@ -1,0 +1,166 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{ super() }} | Dashboard{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+	.google-play {
+		width:150px;
+		border: #fbc93d solid 1px;
+		border-radius:10px; }
+</style>
+{% endblock %}
+
+{% block main %}
+	<section class='dark'>
+		<div class='container'>
+			<h1>Welcome{% if user.name %}, {{ user.name }}{% endif %}!</h1>
+			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">http://tracman.org/trac/{{ user.slug }}</a></p>
+			<p>You can also embed a map into your website with this code.  Be sure to set the width and height attributes to suit your circumstance.  </p>
+			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{ user.slug }}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
+		</div>
+		<br>
+		<div class='container'>
+			<h2>App</h2>
+			<p>Click the button below to download the app from the google play store, if you haven't already.  </p>
+			<p><a href="https://play.google.com/store/apps/details?id=us.keithirwin.tracman&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class='google-play' alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a></p>
+			<p>Without the app running, your location won't update.  But you can also set your location to this device's geolocation by clicking the button below.  </p>
+			<p><button id='manual-set' class='btn' style="display:block; margin:auto;" onclick="setLocation()"><i class="fa fa-map-marker"></i>&emsp;Update location manually</button></p>
+		</div>
+		<br>
+		<div class='container'>
+			<h2>Settings</h2>
+			<script src="/static/js/validator.min.js"></script>
+			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
+
+				<div class='form-group' id='name' title="This appears in your page's title.  ">
+					<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
+					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+						<input class='form-control' name="name" type="text" value="{{ user.name }}"
+							maxlength="160" data-error="Invalid input"><br>
+					</div>
+					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+				</div>
+				
+				<div class='form-group' id='slug' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+					<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
+					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+						<span class='input-group-addon'>tracman.org/trac/</span>
+						<input class='form-control' type="text" name="slug" value="{{ user.slug }}" required data-remote="/validate"
+							maxlength="160" data-remote-error="That URL is already taken.  " data-error="Invalid input"><br>
+					</div>
+					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+				</div>
+
+				<div class='form-group col-xs-12' id='units' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
+					<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
+					<div class='input-group col-sm-8 col-lg-9'>
+						<div class='radio-inline'><label>
+							<input type="radio" name="units" value="imperial" {% if user.settings.units == 'imperial' %}checked{% endif %}>
+							Imperial
+						</label></div>
+						<div class='radio-inline'><label>
+							<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>
+							Metric
+						</label></div>
+					</div>
+				</div>
+
+				<div class='form-group col-xs-12' id='defaultMap' title="Shows whether to show a satellite image or standard google road map as the default on your page.  Visitors will have the option to change this.  Note that satellite images load slower.  ">
+					<label class='control-label col-sm-4 col-lg-3' for="map">Default map</label>
+					<div class='input-group col-sm-8 col-lg-9'>
+						<div class='radio-inline'><label>
+							<input type="radio" name="map" value="road" {% if user.settings.defaultMap == 'road' %}checked{% endif %}>
+							Road
+						</label></div>
+						<div class='radio-inline'><label>
+							<input type="radio" name="map" value="sat" {% if user.settings.defaultMap == 'sat' %}checked{% endif %}>
+							Satellite
+						</label></div>
+					</div>
+				</div>
+
+				<div class='form-group col-xs-12' id='defaultZoom' title="Shows the initial map zoom level on your page.  A higher number means more zoom.  Note that the size of the viewing window will also have an effect on how much of the map a visitor can see.  ">
+					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="map">Default zoom</label>
+					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+						<select class='c-select' name="zoom">
+							<option {% if user.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
+							<option {% if user.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>
+							<option {% if user.settings.defaultZoom==3 %}selected {% endif %}value="3">3</option>
+							<option {% if user.settings.defaultZoom==4 %}selected {% endif %}value="4">4</option>
+							<option {% if user.settings.defaultZoom==5 %}selected {% endif %}value="5">5 Landmass</option>
+							<option {% if user.settings.defaultZoom==6 %}selected {% endif %}value="6">6</option>
+							<option {% if user.settings.defaultZoom==7 %}selected {% endif %}value="7">7</option>
+							<option {% if user.settings.defaultZoom==8 %}selected {% endif %}value="8">8</option>
+							<option {% if user.settings.defaultZoom==9 %}selected {% endif %}value="9">9</option>
+							<option {% if user.settings.defaultZoom==10 %}selected {% endif %}value="10">10 City</option>
+							<option {% if user.settings.defaultZoom==11 %}selected {% endif %}value="11">11</option>
+							<option {% if user.settings.defaultZoom==12 %}selected {% endif %}value="12">12</option>
+							<option {% if user.settings.defaultZoom==13 %}selected {% endif %}value="13">13</option>
+							<option {% if user.settings.defaultZoom==14 %}selected {% endif %}value="14">14</option>
+							<option {% if user.settings.defaultZoom==15 %}selected {% endif %}value="15">15 Streets</option>
+							<option {% if user.settings.defaultZoom==16 %}selected {% endif %}value="16">16</option>
+							<option {% if user.settings.defaultZoom==17 %}selected {% endif %}value="17">17</option>
+							<option {% if user.settings.defaultZoom==18 %}selected {% endif %}value="18">18</option>
+							<option {% if user.settings.defaultZoom==19 %}selected {% endif %}value="19">19</option>
+							<option {% if user.settings.defaultZoom==20 %}selected {% endif %}value="20">20 Buildings</option>
+						</select>
+					</div>
+				</div>
+				
+				<div class='form-group col-xs-12' id='showSpeed' title="PRO ONLY!  Shows a spedometer on the map.  ">
+					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+						<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
+					</div>
+				</div>
+
+				<div class='form-group col-xs-12' id='showAltitude' title="PRO ONLY!  Shows the current elevation on the map.  ">
+					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+						<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
+					</div>
+				</div>
+				
+				<div class='form-group col-xs-12' id='showStreet' title="PRO ONLY!  Shows a Google street view image from your current location, oriented in the direction of travel.  This feature is EXPERIMENTAL.  ">
+					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %} (experimental)</label>
+					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
+					</div>
+				</div>
+
+				<div class='form-group col-xs-12' style="margin: 30px 0;">
+					<input class='btn yellow col-xs-10 col-xs-offset-1 col-sm-offset-2 col-sm-4 col-lg-offset-3 col-lg-6' type="submit" value="Save">
+				</div>
+			</form>
+			
+			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?  It's free during beta testing.  </p>{% endif %}
+			<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?  </p>
+		</div>
+		
+	</section>
+
+	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+	<script>
+		var socket = io.connect();
+		socket.on('connect', function(){
+			socket.emit('room', 'app-{{ user.id }}');
+		});
+		function setLocation() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(pos){
+					socket.emit('app', {
+						usr: '{{ user.id }}',
+						lat: pos.coords.latitude,
+						lon: pos.coords.longitude,
+						spd: (pos.coords.speed||0)
+					});
+					alert('Location updated!  ');
+					location.reload();
+				}, function(err){
+					alert('ERROR: '+err);
+				}, { enableHighAccuracy:true });
+			} else { alert('Unable to set location.  '); }
+		}
+	</script>
+{% endblock %}

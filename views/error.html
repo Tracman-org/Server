@@ -1,0 +1,10 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{ super() }} | {{ code }} Error{% endblock %}
+
+{% block main %}
+<section class='dark'>
+	<div class='container'>
+		<img style="width:100%;" src="https://http.cat/{{ code }}.jpg" />
+	</div>
+</section>
+{% endblock %}

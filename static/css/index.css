@@ -1,0 +1,306 @@
+/* Animations */
+@keyframes pulse  {
+	0%    { transform: scale(1); }
+	50%  { transform: scale(0.8); }
+	100%  { transform: scale(1); }
+}
+@keyframes spin  {
+	0%    { transform: rotate(30deg); }
+	100%  { transform: rotate(210deg); }
+}
+@keyframes spin2  {
+	0%    { transform: rotate(150deg); }
+	100%  { transform: rotate(330deg); }
+}
+/* End Animations */
+
+.btn  { border-radius: 50px; }
+
+.splash {
+	background: #090909;
+	background-image: url("/static/img/style/map.jpg");
+	background-size: cover;
+	color: #FFF;
+	height: 100vh;
+	overflow: hidden;
+	position: relative;
+}
+.splash:after, .splash:before  {
+	content: "";
+	display: block;
+	position: absolute;
+	top: -40px; right: -40px; bottom: -40px; left: -40px;
+}
+.splash:after {
+	background: rgba(255,255,255,0.05);
+	transform: rotate(30deg);
+	animation: spin 60s infinite linear;
+}
+.splash:before {
+	background: rgba(0,0,0,0.5);
+	transform: rotate(150deg);
+	animation: spin2 50s infinite linear;
+}
+.splash .container {
+	position: relative;
+	top: 48%;
+	transform: translateY(-50%);
+	z-index: 5;
+}
+.splash h1 {
+	color: #fbc93d;
+}
+.splash h2 {
+	margin-bottom: 40px;
+}
+.splash .btn {
+	margin: 0 20px 10px 0;
+}
+.splash .btn:hover {
+	color:#fff;
+	background: rgba(0,0,0,0.5);
+}
+
+.overview {
+	text-align: center;
+}
+.overview > div > div {
+	float: left;
+	width: 33%;
+	padding: 0 40px 0 40px;
+}
+.overview .fa {
+	display: inline-block;
+	color:#222;
+	font-size: 50px;
+	width: 100px;
+	height: 100px;
+	border-radius: 50px;
+	background: #f6f6f6;
+	margin-bottom: 20px;
+	padding-top: 25px;
+}
+.overview p {
+	margin-bottom: 0;
+}
+
+.feature.app {
+	background: #111;
+}
+.feature {
+	position: relative;
+	overflow: hidden;
+}
+.feature img {
+	position: absolute;
+	top: 100px;
+	right: 55%;
+}
+.feature:nth-of-type(even) img {
+	right: auto;
+	left: 55%;
+}
+.feature > div > div {
+	width: 50%;
+	float: right;
+}
+.feature > div > div > p {
+	margin-bottom: 40px;
+}
+.feature:nth-of-type(even) > div > div {
+	float: left;
+}
+.feature ul {
+	margin: 0;
+	padding: 0;
+}
+.feature ul li {
+	display: block;
+	margin-bottom: 20px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #eee;
+}
+.feature ul li:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;  
+	border-bottom: 0;
+}
+.feature ul li h3 {
+	margin: 0 0 5px 0;
+}
+.feature ul li p:last-child {
+	margin: 0;
+}
+.feature ul li .fa {
+	float: left;
+	font-size: 30px;
+	background: #fbc93d;
+	color: #000;
+	width: 50px;
+	height: 50px;
+	display: inline-block;
+	text-align: center;
+	padding-top: 10px;
+	border-radius: 25px;
+	margin-right: 20px;
+	margin-top: 7px;
+}
+.feature ul li p {
+	overflow: hidden;
+}
+
+.light {
+	color:#222;
+	position: relative;
+	overflow: hidden;
+}
+.light:after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: -40px; right: -40px; bottom: -40px; left: -40px;
+	background: rgba(255,255,255,0.1);
+	transform: rotate(30deg);
+}
+.light h2 {
+	margin-bottom: 40px;
+}
+
+.disclaimer {
+	color: #fb6e3d;
+	background: #000;
+}
+.disclaimer .container {
+	position: relative;
+	z-index: 10;
+}
+.disclaimer a, .disclaimer a:hover {
+	color:#fb6e3d;
+}
+
+.get {
+	background: #fbc93d;
+}
+.get input, .get textarea {
+	color:#111;
+}
+.get .input {
+	width: 47%;
+	float: left;
+}
+.get .submit {
+	width: 47%;
+	float:right;
+}
+.get .input:nth-of-type(odd) {
+	margin-right: 6%;
+}
+.get .message {
+	display: block;
+	clear: both;
+	float: none;
+	padding-top: 10px;
+}
+.get .input input {
+	display: inline-block;
+	float: left;
+	width: 100%;
+	background: rgba(255,255,255,0.3);
+	border: 0;
+	padding: 10px 15px;
+}
+.get .message textarea {
+	display: block;
+	width: 100%;
+	height: 200px;
+	background: rgba(255,255,255,0.3);
+	border: 0;
+	padding: 10px 15px;
+	resize: vertical;
+}
+.get label {
+	position: relative;
+	z-index: 10;
+}
+.get label.input span, .get label.message span {
+	display: inline-block;
+	float: left;
+}
+.get .submit {
+	text-align: center;
+	padding-top: 10px;
+}
+.get .submit .btn, .get .submit .alert {
+	position:static;
+	float:right;
+}
+
+@media (max-width: 800px) {
+	section {
+		padding: 80px 10px;
+	}
+	.splash {
+		height: auto;
+		padding: 150px 10px 80px 10px;
+		text-align: center;
+	}
+	.splash .container {
+		position: relative;
+		top: 0;
+		transform: none;
+	}
+	.overview > div > div {
+		padding: 0 20px;
+	}
+	.feature img {
+		right: 65%;
+	}
+	.feature:nth-of-type(even) img {
+		left: 65%;
+	}
+	.feature > div > div {
+		width: 60%;
+	}
+}
+
+@media (max-width: 600px) {
+	section {
+		padding: 40px 10px;
+	}
+	.splash {
+		padding: 100px 10px 40px 10px;
+	}
+	.overview > div > div {
+		float: none;
+		width: 100%;
+		margin-bottom: 40px;
+		padding: 0;
+	}
+	.overview > div > div:last-child {
+		margin-bottom: 0;
+	}
+	.overview p {
+		overflow: hidden;
+	}
+	.feature img {
+		display: none;
+	}
+	.feature > div > div {
+		width: 100%;
+		float: none;
+	}
+	.get .input {
+		display: block;
+		width: 100%;
+		float: none;
+	}
+	.get .input:nth-of-type(odd) {
+		margin-right: 0;
+	}
+	.get label {
+		padding-top: 10px;
+	}
+	.get label:first-of-type {
+		padding-top: 0;
+	}
+}

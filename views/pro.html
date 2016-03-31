@@ -1,0 +1,43 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{ super() }} | Pro{% endblock %}
+
+{% block main %}
+<section class='dark'>
+	
+	<div class='container'>
+		<h1>Tracman Pro</h1>
+		<h3>A word from the developer</h3>
+
+		<p>Hi Folks, </p>
+
+		<p>Glad you're enjoying my website and app.  I made the whole thing, from front to backend,
+		and I'm really proud of it!  However, I'm a long-haul trucker by day and coding is just a hobby.
+		I don't make any money off this website, and I pay the server fees out of my own pocket.  Do you
+		pity me enough to donate some money by <a href="https://www.paypal.com/us/cgi-bin/webscr?cmd=_flow&SESSION=56toCNZRvXj-_J6kC_5D258zMwjyU7hLvxKFQXsIG5_nzVlAhEw2VLFf7K0&dispatch=5885d80a13c0db1f8e263663d3faee8defcd6970d4fd9d661117ac2649af92bb">paypal</a>
+		 or <a href="bitcoin:1GXbuM398Y2tYwSaQhNQHXWF1AN6GeRgQh?label=tracman">bitcoin</a>?  </p>
+
+		<p>To make a little money off this service, I'm going to be offering a pro version with more
+		features.  It'll be cheap, probably $1 or $2 per month.  However, while Tracman is in beta,
+		you can beta test the pro version too.  Be sure to inform me about any <a href="/bug">bugs</a>
+		you encounter or <a href="/suggestion">suggestions</a> you have.  And keep in mind that at some
+		point, when we launch out of beta, Tracman Pro will <em>not</em> be free and <strong>you will
+		lose your pro membership</strong> unless start paying for it.
+
+		<p>That said, just click the button below to test out the pro features.  Keep in mind, they are
+		as <a href="/#disclaimer">unstable</a> as the rest of this product.
+
+		<p>Cheers, <br>
+		<a href="https://keithirwin.us/">Keith Irwin</a></p>
+
+		<form class='row flexbox' action="#" method="POST">
+			{% if user.isPro %}
+				<div class='alert alert-success'><i class="fa fa-check-circle"></i> You are already pro! </div>
+			{% else %}
+				<button type="submit" class='btn yellow'>GO PRO</button>
+			{% endif %}
+			<a class='btn' href="/dashboard">go home</a>
+		</form>
+
+	</div>
+</section>
+{% endblock %}

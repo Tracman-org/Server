@@ -1,0 +1,139 @@
+{% extends 'templates/base.html' %}
+
+{% block head %}
+	{{ super() }}
+	<link href="/static/css/index.css" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+	<script src="/static/js/index.js"></script>
+		
+	<section class='splash dark' id='splash'>
+		<div class='container'>
+			<h1>Tracman</h1>
+			<h3>Let friends track your GPS location in realtime</h3>
+			<a class='btn' href="#" data-scrollto="overview">More info<i class='fa fa-angle-down'></i></a>
+			{% if not user %}
+				<a class='btn' href="#" data-scrollto="get">Request invite<i class='fa fa-angle-down'></i></a>
+			{% endif %}
+				<a class='btn' href="/trac/keith">View example<i class='fa fa-angle-right'></i></a>
+			{% if user %}
+				<a class='btn' href="/dashboard">Dashboard<i class='fa fa-angle-right'></i></a>
+			{% endif %}
+		</div>
+	</section>
+
+	<section class='overview dark' id='overview'>
+		<div class='container'>
+			<div>
+				<i class='fa fa-mobile'></i>
+				<h3>Easy-to-use</h3>
+				<p>Download the android app and log in.  Then send your friends a link with a map showing your live location.  </p>
+			</div>
+			<div>
+				<i class='fa fa-bolt'></i>
+				<h3>Realtime</h3>
+				<p>Your location updates every second for all the world to see.  </p>
+			</div>
+			<div>
+				<i class='fa fa-usd'></i>
+				<h3>Free</h3>
+				<p>It's free, but you can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=hypergeek14%40gmail%2ecom&lc=US&item_name=Tracman&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">donate</a> if you want to help with server expenses.  </p>
+			</div>
+		</div>
+	</section>
+
+	<section class='feature app dark' id='app'>
+		<div class='container'>
+			<img src="/static/img/style/phone.png" alt="Mobile phone">
+			<div>
+				<h2>The App</h2>
+				<p>Tracman uses an android app to recieve GPS location of your device.  Sorry, there's no iPhone version yet.  </p>
+				<ul>
+					<li>
+						<i class='fa fa-toggle-on'></i>
+						<h4>On/off switch</h4>
+						<p>If you need to go undercover, just turn tracman off with the flip of a switch.  </p>
+					</li>
+					<li>
+						<i class='fa fa-cog'></i>
+						<h4>Settings</h4>
+						<p>Change your settings to show a less accurate location, if you want an air of mystery.  </p>
+					</li>
+					<li>
+						<i class='fa fa-battery-3'></i>
+						<h4>Saves energy</h4>
+						<p>If nobody's tracking you, tracman won't needlessly drain your battery.  </p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class='feature tracpage dark' id='tracpage'>
+		<div class='container'>
+			<img src="/static/img/style/laptop.png" alt="Laptop">
+			<div>
+				<h2>The Map</h2>
+				<p>You'll get a simple webpage with a map to send to friends.  <a href="/trac/keith">Click here for a demo</a>.  </p>
+				<ul>
+					<li>
+						<i class='fa fa-hand-o-right'></i>
+						<h4>Easy</h4>
+						<p>Just send a link to whomever you want.  Bam, now they know exactly where you are.  </p>
+					</li>
+					<li>
+						<i class='fa fa-map-marker'></i>
+						<h4>Precise</h4>
+						<p>Map updates in realtime using the fancy-pants websockets protocol.  </p>
+					</li>
+					<li>
+						<i class='fa fa-cogs'></i>
+						<h4>Customizable</h4>
+						<p>You can change some things.  Not a lot yet, but I am always adding features.  </p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class='disclaimer light' id='disclaimer'>
+		<div class='container'>
+			<h2>Warning! </h2>
+			<h3>I assume no responsibility for anything whatsoever.  </h3>
+			<p>If you haven't realized it already, there are a lot of reasons why publishing your location online could be a bad idea.  </p>
+			<ul>
+				<li>You get caught cheating</li>
+				<li>Your boss knows you aren't at work</li>
+				<li>The FBI hunts you down</li>
+			</ul>
+			<p>I'm not taking any responsibilty for the code either.  Tracman is in beta and is very buggy.  If it stops working, don't blame me!  Heck, I could even accidentally delete all your data.  Or it could get hacked by Russians.  If using amateur software scares you, DON'T DO IT!  </p>
+			<p>For more information, you can read the <a href="/license">license and copyright information</a>.  </p>
+		</div>
+	</section>
+
+	{% if not user %}
+	<section class='get light' id='get'>
+		<div class='container'>
+			<h2>Hook me up!</h2>
+			<h3>Right now, Tracman is invite-only.  You can beg me for access here.  </h3>
+			<form id='invite-form' method="post">
+				<label class='input'><span>Name</span><input type="text" name="name" required></label>
+				<label class='input'><span>Email address</span><input type="email" name="email" required></label>
+				<label class='message'><span>Why you deserve beta access (optional)</span><textarea id='why' name="why"></textarea></label>
+				<label class='checkbox'><input type="checkbox" name="disclaimer" required><span>I've read the <a href="#" data-scrollto="disclaimer">scary warning</a>.  </span></label>
+				<label class='submit'>
+					{% if inviteSuccess.length > 0 %}
+						<div class='alert alert-success'><i class="fa fa-check-circle"></i> {{ inviteSuccess }}</div>
+					{% elif inviteError.length > 0 %}
+						<div class='alert alert-danger'><i class="fa fa-exclamation-circle"></i> {{ inviteError }}</div>
+					{% else %}
+						<button type="submit" class='btn'>Request Invite<i class='fa fa-angle-right'></i></button>
+					{% endif %}
+				</label>
+			</form>
+		</div>
+	</section>
+	{% endif %}
+	
+{% endblock %}
