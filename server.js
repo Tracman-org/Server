@@ -1,4 +1,4 @@
-express = require('express'),
+var express = require('express'),
 	crash = require('express-crash'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -8,7 +8,6 @@ express = require('express'),
 	passport = require('passport'),
 	flash = require('connect-flash'),
 	secret = require('./config/secrets.js'),
-	auth = require('./config/auth.js'),
 	User = require('./config/models/user.js'),
 	routes = require('./config/routes.js'),
 	app = express(),
@@ -33,22 +32,38 @@ app.use(cookieParser(secret.cookie));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/static', express.static(__dirname+'/static'));
-routes(app);
+require('./config/auth.js');
 mongoose.connect(secret.mongoSetup, {
-	server:{socketOptions:{ keepAlive:1, connectTimeoutMS:30000 }},
-	replset:{socketOptions:{ keepAlive:1, connectTimeoutMS:30000 }}
+	server:{socketOptions:{
+		keepAlive:1, connectTimeoutMS:30000 }},
+	replset:{socketOptions:{
+		keepAlive:1, connectTimeoutMS:30000 }}
 });
+
+// Routes
+app.use(
+	require('./config/routes/index.js'),
+	require('./config/routes/auth.js'),
+	require('./config/routes/feedback.js'),
+	require('./config/routes/misc.js')
+);
+app.use('/trac', require('./config/routes/trac.js'));
+app.use('/invited', require('./config/routes/invite.js'));
+app.use('/dashboard', require('./config/routes/dashboard.js'));
+app.use('/admin', require('./config/routes/admin.js'));
+app.use('/static', express.static(__dirname+'/static'));
 
 
 // Handle errors
-var handle404 = function(err,req,res,next) {
-	res.render('error.html', {code:404});
-};
-var handle500 = function(err,req,res,next) {
-	res.render('error.html', {code:500});
-};
-if (secret.url.substring(0,16)!='http://localhost') {
+if (secret.url=='https://tracman.org') {
+	var handle404 = function(err,req,res,next) {
+		if (err) { console.log(err); }
+		res.render('error.html', {code:404});
+	};
+	var handle500 = function(err,req,res,next) {
+		if (err) { console.log(err); }
+		res.render('error.html', {code:500});
+	};
 	app.use(crash.handle404(handle404));
 	app.use(crash.handle500(handle500));
 	crash.trapRoute(app);
@@ -79,7 +94,8 @@ io.on('connection', function(socket) {
 		if (room.slice(0,4)!='app-'){
 			User.findById({_id:room}, function(err, user) {
 				if (err) { console.log(err); }
-				if (user) { io.to('app-'+room).emit('activate','true'); }
+				if (user) {
+					io.to('app-'+room).emit('activate','true'); }
 			});
 		} else {
 			checkForUsers(room.slice(4));
@@ -102,7 +118,8 @@ io.on('connection', function(socket) {
 	});
 
 	socket.onclose = function(reason){
-		var closedroom = Object.keys(socket.adapter.sids[socket.id]).slice(1)[0];
+		var closedroom = Object.keys(
+			socket.adapter.sids[socket.id]).slice(1)[0];
 		setTimeout(function() {
 			checkForUsers(closedroom);
 		}, 3000);
@@ -123,8 +140,8 @@ passport.deserializeUser(function(id, done) {
 });
 
 // SERVE
-http.listen(62054, function(){
-	console.log('Listening for http on port 62054');
+http.listen(secret.port, function(){
+	console.log('Listening at '+secret.url);
 	checkForUsers();
 });
 

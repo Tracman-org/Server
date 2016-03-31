@@ -10,20 +10,21 @@ passport.use(new GoogleStrategy({
 	callbackURL: secret.url+'/auth/google/callback',
 	passReqToCallback: true
 }, function(req, accessToken, refreshToken, profile, done) {
-		User.findOne({googleID: profile.id}, function(err, user) {
-			if(err) {console.log(err);}
+		User.findOne({googleID: profile.id}, function(err, user){
+			if(err) { console.log(err); }
 			if (!err && user !== null) { // Log in
 				if (!user.name) {
 					user.name = profile.displayName;
 				}
 				user.lastLogin = Date.now();
 				user.save(function (err, raw) {
-					if (err) { console.log(err); }
+					if (err) { throwErr(req,err); }
 				});
 				done(null, user);
 			} else { // No existing user with google auth
 				if (req.session.passport) { // Creating new user
 					User.findById(req.session.passport.user, function(err, user){
+						if (err){ console.log(err); }
 						user.googleID = profile.id;
 						user.lastLogin = Date.now();
 						user.save(function(err){
@@ -37,6 +38,7 @@ passport.use(new GoogleStrategy({
 			}
 		});
 }));
+
 passport.use(new GoogleTokenStrategy({
 		clientID: secret.googleClientId
 }, function(parsedToken, googleId, done) {
