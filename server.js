@@ -33,14 +33,25 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/auth.js');
-app.use('/static', express.static(__dirname+'/static'));
-routes(app);
 mongoose.connect(secret.mongoSetup, {
 	server:{socketOptions:{
 		keepAlive:1, connectTimeoutMS:30000 }},
 	replset:{socketOptions:{
 		keepAlive:1, connectTimeoutMS:30000 }}
 });
+
+// Routes
+app.use(
+	require('./config/routes/index.js'),
+	require('./config/routes/auth.js'),
+	require('./config/routes/feedback.js'),
+	require('./config/routes/misc.js')
+);
+app.use('/trac', require('./config/routes/trac.js'));
+app.use('/invited', require('./config/routes/invite.js'));
+app.use('/dashboard', require('./config/routes/dashboard.js'));
+app.use('/admin', require('./config/routes/admin.js'));
+app.use('/static', express.static(__dirname+'/static'));
 
 
 // Handle errors
