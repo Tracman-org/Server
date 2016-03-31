@@ -32,6 +32,7 @@ app.use(cookieParser(secret.cookie));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+require('./config/auth.js');
 app.use('/static', express.static(__dirname+'/static'));
 routes(app);
 mongoose.connect(secret.mongoSetup, {
@@ -43,13 +44,15 @@ mongoose.connect(secret.mongoSetup, {
 
 
 // Handle errors
-var handle404 = function(req,res) {
-	res.render('error.html', {code:404});
-};
-var handle500 = function(req,res) {
-	res.render('error.html', {code:500});
-};
-if (secret.url.substring(0,16)!='http://localhost') {
+if (secret.url=='https://tracman.org') {
+	var handle404 = function(err,req,res,next) {
+		if (err) { console.log(err); }
+		res.render('error.html', {code:404});
+	};
+	var handle500 = function(err,req,res,next) {
+		if (err) { console.log(err); }
+		res.render('error.html', {code:500});
+	};
 	app.use(crash.handle404(handle404));
 	app.use(crash.handle500(handle500));
 	crash.trapRoute(app);
@@ -127,7 +130,7 @@ passport.deserializeUser(function(id, done) {
 
 // SERVE
 http.listen(secret.port, function(){
-	console.log('Listening for http on port '+secret.port);
+	console.log('Listening at '+secret.url);
 	checkForUsers();
 });
 

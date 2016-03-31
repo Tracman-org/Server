@@ -1,5 +1,4 @@
 var app = require('express')(),
-	server = require('../server.js'),
 	User = require('./models/user.js'),
 	Request = require('./models/request.js'),
 	bodyParser = require('body-parser'),
@@ -44,7 +43,7 @@ module.exports = function(app){
 	app.route('/')
 		.all(function(req,res,next){
 			next();
-		}).get(function(req,res){
+		}).get(function(req,res,next){
 			if (req.session.passport) {
 				User.findById(req.session.passport.user, function(err, user){
 					if (err){ throwErr(req,err); }
@@ -96,7 +95,7 @@ module.exports = function(app){
 	app.route('/dashboard')
 		.all(ensureAuth, function(req,res,next){
 			next();
-		}).get(function(req,res){
+		}).get(function(req,res,next){
 			User.findById(req.session.passport.user, function(err, user){
 				if (err){ throwErr(req,err); }
 				if (!user){ next(); }
@@ -130,6 +129,7 @@ module.exports = function(app){
 	app.get('/validate', function(req,res){
 		if (req.query.slug) { // validate unique slug
 			User.findOne({slug:slug(req.query.slug)}, function(err, existingUser){
+				if (err) { console.log('/validate error:',err); }
 				if (existingUser && existingUser.id!==req.session.passport.user) { res.sendStatus(400); }
 				else { res.sendStatus(200); }
 			});
@@ -157,7 +157,7 @@ module.exports = function(app){
 			}); }
 		});
 	});
-	app.get('/trac/id/:id', function(req,res){
+	app.get('/trac/id/:id', function(req,res,next){
 		User.findById(req.params.id, function(err, user){
 			if (err){ throwErr(req,err); }
 			if (!user){ next(); }
@@ -173,7 +173,7 @@ module.exports = function(app){
 					if (err) { throwErr(req,err); }
 					if (!request) { next(); }
 					else {
-						user = new User({ // Create new user
+						new User({ // Create new user
 							requestId: request._id,
 							email: '',
 							slug: request._id,
@@ -186,7 +186,7 @@ module.exports = function(app){
 								showAlt: false,
 								showStreetview: true
 							}
-						}); user.save(function(err) {
+						}).save(function(err) {
 							if (err) { throwErr(req,err); }
 							User.findOne({requestId:request._id}, function(err, user) {
 								if (err) { throwErr(req,err); }
@@ -221,7 +221,7 @@ module.exports = function(app){
 	app.route('/pro')
 		.all(ensureAuth, function(req,res,next){
 			next();
-		}).get(function(req,res){
+		}).get(function(req,res,next){
 			User.findById(req.session.passport.user, function(err, user){
 				if (err){ throwErr(req,err); }
 				if (!user){ next(); }
@@ -252,8 +252,7 @@ module.exports = function(app){
 				res.redirect('/dashboard');
 			});
 		});
-	app.route('/bug')
-		.all(ensureAuth, function(req,res,next){
+	app.route('/bug').all(ensureAuth, function(req,res,next){
 			next();
 		}).get(function(req,res){
 			res.render('bug.html', {
@@ -346,4 +345,4 @@ module.exports = function(app){
 		else { res.send(req.user); }
 	} );
 
-}
+};

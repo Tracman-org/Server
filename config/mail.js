@@ -12,7 +12,7 @@ var renderMail = function(template, params, next) {
 	.render(params, function (err, msg) {
 		if (err) { console.log(err); }
 		next(msg);
-	})
+	});
 }
 
 module.exports = {

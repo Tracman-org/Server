@@ -2,6 +2,7 @@
 {% block title %}Tracman | Users{% endblock %}
 
 {% block head %}
+	{{ super() }}
 	<style>
 		.container { max-width:90%; }
 	</style>
@@ -51,10 +52,12 @@
 				);
 			{% endif %}
 			
-			{% if usr.last %}
+			{% if usr.last.time %}
 				$('#{{ usr.id }}-moved').text(
 					moment("{{ usr.last.time }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
 				);
+			{% else %}
+				$('#{{ usr.id }}-moved').text("never");
 			{% endif %}
 		{% endfor %}
 	</script>
