@@ -1,3 +1,4 @@
+/* IMPORTS */
 var express = require('express'),
 	crash = require('express-crash'),
 	bodyParser = require('body-parser'),
@@ -13,11 +14,15 @@ var express = require('express'),
 	http = require('http').Server(app),
 	io = require('socket.io')(http);
 
-// SETUP
+/* SETUP */
+
+//  Templates
 nunjucks.configure(__dirname+'/views', {
 	autoescape: true,
 	express: app
 });
+
+//  Session
 app.use(session({
 	secret: secret.session,
 	saveUninitialized: true,
@@ -29,9 +34,22 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser(secret.cookie));
 app.use(flash());
+
+//  Auth
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/auth.js');
+passport.serializeUser(function(user,done) {
+	done(null, user.id);
+});
+passport.deserializeUser(function(id,done) {
+	User.findById(id, function(err, user) {
+		if(!err) done(null, user);
+		else done(err, null);
+	});
+});
+
+//  Database
 mongoose.connect(secret.mongoSetup, {
 	server:{socketOptions:{
 		keepAlive:1, connectTimeoutMS:30000 }},
@@ -39,7 +57,7 @@ mongoose.connect(secret.mongoSetup, {
 		keepAlive:1, connectTimeoutMS:30000 }}
 });
 
-// Routes
+//  Routes
 app.use(
 	require('./config/routes/index.js'),
 	require('./config/routes/auth.js'),
@@ -69,6 +87,8 @@ if (secret.url=='https://tracman.org') {
 	crash.handle(app, handle404, handle500);
 }
 
+/* RUNTIME */
+
 // Check for tracking users
 function checkForUsers(room) {
 	if (room) {
@@ -85,7 +105,7 @@ function checkForUsers(room) {
 	}
 }
 
-// Sockets
+// Websockets
 io.on('connection', function(socket) {
 	
 	socket.on('room', function(room) {
@@ -127,18 +147,7 @@ io.on('connection', function(socket) {
 
 });
 
-// Serialize and deserialize users
-passport.serializeUser(function(user, done) {
-	done(null, user.id);
-});
-passport.deserializeUser(function(id, done) {
-	User.findById(id, function(err, user) {
-		if(!err) done(null, user);
-		else done(err, null);
-	});
-});
-
-// SERVE
+// Listen
 http.listen(secret.port, function(){
 	console.log('Listening at '+secret.url+':'+secret.port);
 	checkForUsers();
