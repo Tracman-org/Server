@@ -141,7 +141,7 @@ passport.deserializeUser(function(id, done) {
 
 // SERVE
 http.listen(secret.port, function(){
-	console.log('Listening at '+secret.url);
+	console.log('Listening at '+secret.url+':'+secret.port);
 	checkForUsers();
 });
 
