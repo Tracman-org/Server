@@ -9,7 +9,6 @@ var express = require('express'),
 	flash = require('connect-flash'),
 	secret = require('./config/secrets.js'),
 	User = require('./config/models/user.js'),
-	routes = require('./config/routes.js'),
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http);
