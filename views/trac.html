@@ -120,6 +120,9 @@
 					map: map,
 					draggable: false
 				});
+				map.addListener('zoom_changed',function(){
+					map.setCenter(marker.getPosition());
+				});
 
 				// Create iFrame logo
 				if (noHeader.length) {
@@ -186,7 +189,6 @@
 			if (settings.showStreetview && disp!='0') {
 					document.getElementById('panoImg').src='https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').outerWidth()+'x'+$('#pano').outerHeight()+'&location='+last.lat+','+last.lon+'&fov=90&heading='+(last.dir||0)+'&key={{ api }}';
 				}
-
 		}
 
 		// Sockets
