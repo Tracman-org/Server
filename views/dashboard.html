@@ -15,7 +15,7 @@
 	<section class='dark'>
 		<div class='container'>
 			<h1>Welcome{% if user.name %}, {{ user.name }}{% endif %}!</h1>
-			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">http://tracman.org/trac/{{ user.slug }}</a></p>
+			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">https://tracman.org/trac/{{ user.slug }}</a></p>
 			<p>You can also embed a map into your website with this code.  Be sure to set the width and height attributes to suit your circumstance.  </p>
 			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{ user.slug }}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
 		</div>
@@ -33,7 +33,7 @@
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
 
-				<div class='form-group' id='name' title="This appears in your page's title.  ">
+				<div id='name'class='form-group' title="This appears in your page's title.  ">
 					<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<input class='form-control' name="name" type="text" value="{{ user.name }}"
@@ -42,7 +42,7 @@
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 				
-				<div class='form-group' id='slug' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+				<div id='slug'class='form-group'  title="This is the URL which shows your location.  Be careful whom you share it with!  ">
 					<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<span class='input-group-addon'>tracman.org/trac/</span>
@@ -52,7 +52,7 @@
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 
-				<div class='form-group col-xs-12' id='units' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
+				<div id='units' class='form-group col-xs-12' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
 					<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
 					<div class='input-group col-sm-8 col-lg-9'>
 						<div class='radio-inline'><label>
@@ -66,7 +66,7 @@
 					</div>
 				</div>
 
-				<div class='form-group col-xs-12' id='defaultMap' title="Shows whether to show a satellite image or standard google road map as the default on your page.  Visitors will have the option to change this.  Note that satellite images load slower.  ">
+				<div id='defaultMap' class='form-group col-xs-12' title="Shows whether to show a satellite image or standard google road map as the default on your page.  Visitors will have the option to change this.  Note that satellite images load slower.  ">
 					<label class='control-label col-sm-4 col-lg-3' for="map">Default map</label>
 					<div class='input-group col-sm-8 col-lg-9'>
 						<div class='radio-inline'><label>
@@ -80,7 +80,7 @@
 					</div>
 				</div>
 
-				<div class='form-group col-xs-12' id='defaultZoom' title="Shows the initial map zoom level on your page.  A higher number means more zoom.  Note that the size of the viewing window will also have an effect on how much of the map a visitor can see.  ">
+				<div id='defaultZoom' class='form-group col-xs-12' title="Shows the initial map zoom level on your page.  A higher number means more zoom.  Note that the size of the viewing window will also have an effect on how much of the map a visitor can see.  ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="map">Default zoom</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<select class='c-select' name="zoom">
@@ -108,28 +108,28 @@
 					</div>
 				</div>
 				
-				<div class='form-group col-xs-12' id='showSpeed' title="PRO ONLY!  Shows a spedometer on the map.  ">
+				<div id='showSpeed' class='form-group col-xs-12' title="PRO ONLY!  Shows a spedometer on the map.  ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 
-				<div class='form-group col-xs-12' id='showAltitude' title="PRO ONLY!  Shows the current elevation on the map.  ">
+				<div id='showAltitude' class='form-group col-xs-12' title="PRO ONLY!  Shows the current elevation on the map.  ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 				
-				<div class='form-group col-xs-12' id='showStreet' title="PRO ONLY!  Shows a Google street view image from your current location, oriented in the direction of travel.  This feature is EXPERIMENTAL.  ">
+				<div id='showStreet' class='form-group col-xs-12' title="PRO ONLY!  Shows a Google street view image from your current location, oriented in the direction of travel.  This feature is EXPERIMENTAL.  ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %} (experimental)</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 
-				<div class='form-group col-xs-12' style="margin: 30px 0;">
+				<div id='submit' class='form-group col-xs-12' style="margin: 30px 0;">
 					<input class='btn yellow col-xs-10 col-xs-offset-1 col-sm-offset-2 col-sm-4 col-lg-offset-3 col-lg-6' type="submit" value="Save">
 				</div>
 			</form>
