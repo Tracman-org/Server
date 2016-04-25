@@ -1,6 +1,15 @@
 /* Resets, Clears & Defaults */
 *, *:after, *:before  {
 	box-sizing: border-box;
+}::-webkit-scrollbar {
+	width: 5vw;
+	min-width:10px;
+	max-width:40px;
+}::-webkit-scrollbar-track {
+	background-color: #000;
+}::-webkit-scrollbar-thumb {
+	border-radius: 1vw;
+	background: #333;
 }
 
 body {
