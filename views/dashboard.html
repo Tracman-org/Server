@@ -1,8 +1,8 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{ super() }} | Dashboard{% endblock %}
+{% block title %}{{super()}} | Dashboard{% endblock %}
 
 {% block head %}
-{{ super() }}
+{{super()}}
 <style>
 	.google-play {
 		width:150px;
@@ -14,15 +14,15 @@
 {% block main %}
 	<section class='dark'>
 		<div class='container'>
-			<h1>Welcome{% if user.name %}, {{ user.name }}{% endif %}!</h1>
-			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">https://tracman.org/trac/{{ user.slug }}</a></p>
-			<p>You can also embed a map into your website with this code.  Be sure to set the width and height attributes to suit your circumstance.  </p>
-			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{ user.slug }}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
+			<h1>Welcome{% if user.name %}, {{user.name}}{% endif %}!</h1>
+			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">https://tracman.org/trac/{{user.slug}}</a></p>
+			<p>You can also embed a map into your website with this code.&ensp;Be sure to set the width and height attributes to suit your circumstance.&ensp;</p>
+			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{user.slug}}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
 		</div>
 		<br>
 		<div class='container'>
 			<h2>App</h2>
-			<p>Click the button below to download the app from the google play store, if you haven't already.  </p>
+			<p>Click the button below to download the app from the google play store, if you haven't already.&ensp;</p>
 			<p><a href="https://play.google.com/store/apps/details?id=us.keithirwin.tracman&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class='google-play' alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a></p>
 			<p>Without the app running, your location won't update.  But you can also set your location to this device's geolocation by clicking the button below.  </p>
 			<p><button id='manual-set' class='btn' style="display:block; margin:auto;" onclick="setLocation()"><i class="fa fa-map-marker"></i>&emsp;Update location manually</button></p>
@@ -36,17 +36,17 @@
 				<div id='name'class='form-group' title="This appears in your page's title.  ">
 					<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
-						<input class='form-control' name="name" type="text" value="{{ user.name }}"
+						<input class='form-control' name="name" type="text" value="{{user.name}}"
 							maxlength="160" data-error="Invalid input"><br>
 					</div>
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 				
-				<div id='slug'class='form-group'  title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+				<div id='slug'class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
 					<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<span class='input-group-addon'>tracman.org/trac/</span>
-						<input class='form-control' type="text" name="slug" value="{{ user.slug }}" required data-remote="/validate"
+						<input class='form-control' type="text" name="slug" value="{{user.slug}}" required data-remote="/validate"
 							maxlength="160" data-remote-error="That URL is already taken.  " data-error="Invalid input"><br>
 					</div>
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
@@ -108,21 +108,21 @@
 					</div>
 				</div>
 				
-				<div id='showSpeed' class='form-group col-xs-12' title="PRO ONLY!  Shows a spedometer on the map.  ">
+				<div id='showSpeed' class='form-group col-xs-12' title="PRO ONLY! Shows a spedometer on the map.">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 
-				<div id='showAltitude' class='form-group col-xs-12' title="PRO ONLY!  Shows the current elevation on the map.  ">
+				<div id='showAltitude' class='form-group col-xs-12' title="PRO ONLY! Shows the current elevation on the map. ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 				
-				<div id='showStreet' class='form-group col-xs-12' title="PRO ONLY!  Shows a Google street view image from your current location, oriented in the direction of travel.  This feature is EXPERIMENTAL.  ">
+				<div id='showStreet' class='form-group col-xs-12' title="PRO ONLY! Shows a Google street view image from your current location, oriented in the direction of travel. This feature is EXPERIMENTAL. ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %} (experimental)</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
@@ -134,8 +134,8 @@
 				</div>
 			</form>
 			
-			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?  It's free during beta testing.  </p>{% endif %}
-			<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?  </p>
+			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?&ensp;It's free during beta testing.&ensp;</p>{% endif %}
+			<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?&ensp;</p>
 		</div>
 		
 	</section>
@@ -144,13 +144,13 @@
 	<script>
 		var socket = io.connect();
 		socket.on('connect', function(){
-			socket.emit('room', 'app-{{ user.id }}');
+			socket.emit('room', 'app-{{user.id}}');
 		});
 		function setLocation() {
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(function(pos){
 					socket.emit('app', {
-						usr: '{{ user.id }}',
+						usr: '{{user.id}}',
 						lat: pos.coords.latitude,
 						lon: pos.coords.longitude,
 						spd: (pos.coords.speed||0)
@@ -160,7 +160,7 @@
 				}, function(err){
 					alert('ERROR: '+err);
 				}, { enableHighAccuracy:true });
-			} else { alert('Unable to set location.  '); }
+			} else { alert('Unable to set location. '); }
 		}
 	</script>
 {% endblock %}

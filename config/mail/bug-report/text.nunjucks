@@ -1,0 +1,16 @@
+BUG REPORT
+
+
+Source: {{ source }}
+
+Error message
+{{ errorMessage }}
+
+Recreation
+{{ recreation }}
+
+Bug details
+{{ bug }}
+
+{{ name }}
+{{ email }}

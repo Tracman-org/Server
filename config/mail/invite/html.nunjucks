@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<style>
+			.invite { text-align:center; }
+			img { float:left;
+				padding:5px;
+				margin-right: 5px; }
+			h1 { font-size:48px; }
+			p { font-family:sans-serif; }
+		</style>
+	</head>
+	
+	<body>
+		<img src="https://tracman.org/static/img/icon/by/48.png"><h1>Tracman</h1>
+		<p>Dear {{name}}, </p>
+		<p>After carefully reviewing your credentials over a glass of malt liquor, it has been determined that you are qualified to use <a href="https://tracman.org/">Tracman</a> during the super-exclusive, invite-only beta stage.  </p>
+		<p>Feel free to use this link to create an account.&ensp;Note that you will need a google account to continue.&ensp;You will also need an android phone to update your location.&ensp;</p>
+		<p class='invite'><a href="https://tracman.org/invited/{{id}}">http://tracman.org/invited/{{id}}</a></p>
+		<p>Please keep in mind that this is experimental software, and I am not responsible for it actually working properly, or anything else for that matter.&ensp;You have read the <a href="https://tracman.org/#disclaimer">disclaimer</a>, haven't you?&ensp;</p>
+		<p>Regards,
+		<br>Keith</p>
+	</body>
+</html>

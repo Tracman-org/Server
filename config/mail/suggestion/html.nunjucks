@@ -1,0 +1,7 @@
+<html>
+	<body>
+		<h1>Suggestion</h1>
+		<p>{{ suggestion }}</p>
+		<p>{{ name }}<br>{{ email }}</p>
+	</body>
+</html>

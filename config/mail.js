@@ -1,7 +1,7 @@
 var emailTemplate = require('email-templates').EmailTemplate,
 	path = require('path');
 var secret = require('./secrets.js'),
-	templateDir = path.join(__dirname, '..', 'res', 'mail');
+	templateDir = path.join(__dirname, 'mail');
 var mailgun = require('mailgun-js')({
 	apiKey: secret.mailgunAPI,
 	domain: 'tracman.org'

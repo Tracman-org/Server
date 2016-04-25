@@ -1,0 +1,13 @@
+<html>
+	<body>
+		<h1>Bug Report</h1>
+		<p>Source: {{ source }}</p>
+		<h2>Error message</h2>
+		<p>{{ errorMessage }}</p>
+		<h2>Recreation</h2>
+		<p>{{ recreation }}</p>
+		<h2>Bug details</h2>
+		<p>{{ bug }}</p>
+		<p><em>{{ name }}</em><br>{{ email }}</p>
+	</body>
+</html>
