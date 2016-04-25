@@ -44,8 +44,8 @@ router.route('/')
 					from: 'Tracman Requests <requests@tracman.org>',
 					to: 'Keith Irwin <tracman@keithirwin.us>',
 					subject: 'New Tracman Invite request',
-					html: '<p>'+req.body.name+' requested a Tracman invite.  </p><p>'+req.body.why+'</p><p><a href="http://tracman.org/admin/requests">See all invites</a></p>',
-					text: '\n'+req.body.name+' requested a Tracman invite.  \n\n'+req.body.why+'\n\nhttp://tracman.org/admin/requests'
+					html: '<p>'+req.body.name+' requested a Tracman invite.  </p><p>'+req.body.why+'</p><p><a href="https://tracman.org/admin/requests">See all invites</a></p>',
+					text: '\n'+req.body.name+' requested a Tracman invite.  \n\n'+req.body.why+'\n\nhttps://tracman.org/admin/requests'
 				}, function(err,body){
 					if (err){ mw.throwErr(req,err); }
 					else { req.flash('request-success', 'Invite requested!  '); }
