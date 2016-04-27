@@ -74,11 +74,11 @@ app.use('/static', express.static(__dirname+'/static'));
 // Handle errors
 if (secret.url=='https://tracman.org') {
 	var handle404 = function(err,req,res,next) {
-		if (err) { console.log(err); }
+		if (err) { console.log('404 handling error: '+err); }
 		res.render('error.html', {code:404});
 	};
 	var handle500 = function(err,req,res,next) {
-		if (err) { console.log(err); }
+		if (err) { console.log('500 handling error: '+err); }
 		res.render('error.html', {code:500});
 	};
 	app.use(crash.handle404(handle404));
@@ -97,7 +97,7 @@ function checkForUsers(room) {
 		);
 	} else {
 		User.find({}, function(err, users){
-			if (err) { console.log(err); }
+			if (err) { console.log('Sockets error finding all users in all rooms: '+err); }
 			users.forEach( function(user){
 				checkForUsers(user.id);
 			});
@@ -112,7 +112,7 @@ io.on('connection', function(socket) {
 		socket.join(room);
 		if (room.slice(0,4)!='app-'){
 			User.findById({_id:room}, function(err, user) {
-				if (err) { console.log(err); }
+				if (err) { console.log('Sockets error finding tracked user of room '+room+'\n'err); }
 				if (user) {
 					io.to('app-'+room).emit('activate','true'); }
 			});
@@ -131,7 +131,7 @@ io.on('connection', function(socket) {
 			spd: parseFloat(loc.spd||0),
 			time: Date.now()
 		}}, function(err, user) {
-			if (err) { console.log(err); }
+			if (err) { console.log('Could not update last location of user '+loc.user+'\n'+err); }
 			if (!user) { console.log("No user found: "+loc.user); }
 		});
 	});
