@@ -24,16 +24,16 @@ passport.use(new GoogleStrategy({
 			} else { // No existing user with google auth
 				if (req.session.passport) { // Creating new user
 					User.findById(req.session.passport.user, function(err, user){
-						if (err){
+						if (err) {
 							console.log('Error finding invited user with passport session ID: '+req.session.passport.user+'\n'+err);
 							var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?'; }
 						user.googleID = profile.id;
 						user.lastLogin = Date.now();
-						user.save(function(err){
+						user.save(function(err) {
 							if (err) { 
 								console.log('Error saving new (invited) user '+err);
 								var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
-							} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  '
+							} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
 							done(null, user, { success:successMessage, failure:failMessage });
 						});
 					});
