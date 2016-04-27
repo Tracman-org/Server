@@ -10,7 +10,7 @@ var mailgun = require('mailgun-js')({
 var renderMail = function(template, params, next) {
 	new emailTemplate(path.join(templateDir, template))
 	.render(params, function (err, msg) {
-		if (err) { console.log(err); }
+		if (err) { console.log('Error rendering mail.  Params: \n'+params+'\n'+err); }
 		next(msg);
 	});
 }

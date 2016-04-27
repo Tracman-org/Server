@@ -1,7 +1,7 @@
 module.exports = {
 
 	throwErr: function(req,err){
-		console.log(err);
+		console.log('Middleware error:'+err+'\nfor request:\n'+req);
 		req.flash('error-message',err);
 		req.flash('error', (err.message||'')+'<br>Would you like to <a href="/bug">report this error</a>?');
 	},

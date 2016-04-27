@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
 	passReqToCallback: true
 }, function(req, accessToken, refreshToken, profile, done) {
 		User.findOne({googleID: profile.id}, function(err, user){
-			if(err) { console.log(err); }
+			if(err) { console.log('Error finding user with google ID: '+profile.id+'\n'+err); }
 			if (!err && user !== null) { // Log in
 				if (!user.name) {
 					user.name = profile.displayName;
@@ -24,12 +24,17 @@ passport.use(new GoogleStrategy({
 			} else { // No existing user with google auth
 				if (req.session.passport) { // Creating new user
 					User.findById(req.session.passport.user, function(err, user){
-						if (err){ console.log(err); }
+						if (err){
+							console.log('Error finding invited user with passport session ID: '+req.session.passport.user+'\n'+err);
+							var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?'; }
 						user.googleID = profile.id;
 						user.lastLogin = Date.now();
 						user.save(function(err){
-							if (err) { console.log(err); }
-							done(null, user, {success: 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  '});
+							if (err) { 
+								console.log('Error saving new (invited) user '+err);
+								var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
+							} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  '
+							done(null, user, { success:successMessage, failure:failMessage });
 						});
 					});
 				} else { // User wasn't invited
@@ -43,11 +48,13 @@ passport.use(new GoogleTokenStrategy({
 		clientID: secret.googleClientId
 }, function(parsedToken, googleId, done) {
 	User.findOne({googleID:googleId}, function(err, user) {
-		if (err) { console.log(err); }
+		if (err) { 
+			console.log('Error finding user for gToken login with google profile ID: '+googleId+'\n'+err); }
 		if (!err && user !== null) { // Log in
 			user.lastLogin = Date.now();
 			user.save(function (err) {
-				if (err) { console.log(err); }
+				if (err) { 
+					console.log('Error saving user\'s lastLogin for gToken login with google profile ID: '+googleId+'\n'+err); }
 			});
 			return done(err, user);
 		} else { // No such user
