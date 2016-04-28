@@ -81,10 +81,10 @@ if (secret.url=='https://tracman.org') {
 		if (err) { console.log('500 handling error: '+err); }
 		res.render('error.html', {code:500});
 	};
-	app.use(crash.handle404(handle404));
+	// app.use(crash.handle404(handle404));
 	app.use(crash.handle500(handle500));
 	crash.trapRoute(app);
-	crash.handle(app, handle404, handle500);
+	crash.handle(app, /*handle404,*/ handle500);
 }
 
 /* RUNTIME */
