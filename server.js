@@ -73,10 +73,10 @@ app.use('/static', express.static(__dirname+'/static'));
 
 // Handle errors
 if (secret.url=='https://tracman.org') {
-	var handle404 = function(err,req,res,next) {
-		if (err) { console.log('404 handling error: '+err); }
-		res.render('error.html', {code:404});
-	};
+	// var handle404 = function(err,req,res,next) {
+	// 	if (err) { console.log('404 handling error: '+err); }
+	// 	res.render('error.html', {code:404});
+	// };
 	var handle500 = function(err,req,res,next) {
 		if (err) { console.log('500 handling error: '+err); }
 		res.render('error.html', {code:500});
