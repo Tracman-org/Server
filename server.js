@@ -112,7 +112,7 @@ io.on('connection', function(socket) {
 		socket.join(room);
 		if (room.slice(0,4)!='app-'){
 			User.findById({_id:room}, function(err, user) {
-				if (err) { console.log('Sockets error finding tracked user of room '+room+'\n'err); }
+				if (err) { console.log('Sockets error finding tracked user of room '+room+'\n'+err); }
 				if (user) {
 					io.to('app-'+room).emit('activate','true'); }
 			});
