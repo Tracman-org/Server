@@ -22,7 +22,7 @@ router.get('/validate', function(req,res){
 	}
 });
 
-router.get('/android', mw.ensureAuth, function(req,res){
+router.get('/android', function(req,res){
 	res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
 });
 
