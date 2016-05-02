@@ -80,9 +80,8 @@
 	
 	// Error Handlers
 	{
-		if (secret.url!=='https://tracman.org') {
+		if (!secret.env=='production') {
 		// Development
-		// if (app.get('env') === 'development') {
 			app.use(function(err,req,res,next) {
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
