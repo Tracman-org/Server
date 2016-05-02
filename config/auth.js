@@ -23,19 +23,21 @@ passport.use(new GoogleStrategy({
 				done(null, user);
 			} else { // No existing user with google auth
 				if (req.session.passport) { // Creating new user
-					User.findById(req.session.passport.user, function(err, user){
+					User.findById(req.session.passport.user, function(err,user){
 						if (err) {
 							console.log('Error finding invited user with passport session ID: '+req.session.passport.user+'\n'+err);
 							var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?'; }
-						user.googleID = profile.id; // TODO: TypeError: Cannot set property 'googleID' of null (logging in without account)
-						user.lastLogin = Date.now();
-						user.save(function(err) {
-							if (err) { 
-								console.log('Error saving new (invited) user '+err);
-								var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
-							} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
-							done(null, user, { success:successMessage, failure:failMessage });
-						});
+						else {
+							user.googleID = profile.id;
+							user.lastLogin = Date.now();
+							user.save(function(err) {
+								if (err) { 
+									console.log('Error saving new (invited) user '+err);
+									var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
+								} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
+								done(null, user, { success:successMessage, failure:failMessage });
+							});
+						}
 					});
 				} else { // User wasn't invited
 					done(null,false, {error: 'User not found.  Maybe you want to <a href="#" data-scrollto="get">request an invite</a>?  '});
