@@ -59,7 +59,7 @@
 	});
 	
 	//  Routes
-	app.use(
+	app.use('/', 
 		require('./config/routes/index.js'),
 		require('./config/routes/auth.js'),
 		require('./config/routes/feedback.js'),
@@ -71,9 +71,11 @@
 	app.use('/admin', require('./config/routes/admin.js'));
 	app.use('/static', express.static(__dirname+'/static'));
 	app.use(function(req,res,next) {
-		var err = new Error('Not Found');
-		err.status = 404;
-		next(err);
+		if (!res.headersSent) {
+			var err = new Error('404: Not found: '+req.url);
+			err.status = 404;
+			next(err);
+		}
 	});
 	
 	// Error Handlers
