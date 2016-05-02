@@ -9,7 +9,6 @@
     "cookie-parser": "^1.4.1",
     "email-templates": "^2.1.0",
     "express": "^4.13.3",
-    "express-crash": "0.0.2",
     "express-session": "^1.13.0",
     "kerberos": "0.0.17",
     "mailgun-js": "^0.7.7",

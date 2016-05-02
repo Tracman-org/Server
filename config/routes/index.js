@@ -5,9 +5,7 @@ var router = require('express').Router(),
   Request = require('../models/request.js');
 	
 router.route('/')
-.all(function(req,res,next){
-	next();
-}).get(function(req,res,next){
+.get(function(req,res,next){
 	if (req.session.passport) {
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
