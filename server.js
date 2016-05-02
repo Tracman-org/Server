@@ -96,8 +96,7 @@
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error.html', {
-					code: err.status,
-					message: err.message
+					code: err.status
 				});
 			});
 		}

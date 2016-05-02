@@ -4,9 +4,9 @@
 {% block main %}
 <section class='dark'>
 	<div class='container'>
-		<h2>{{message}}</h2>
-		<img style="width:100%;" src="https://http.cat/{{code}}.jpg" />
+		{% if message %}<h2>{{message}}</h2>{% endif %}
 		{% if error %}<p>{{error}}</p>{% endif %}
+		<img style="width:100%" src="https://http.cat/{{code}}.jpg">
 	</div>
 </section>
 {% endblock %}
