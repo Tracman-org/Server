@@ -64,7 +64,7 @@
 	</div>
 	
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key={{ api }}&callback=initMap" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=initMap" async defer></script>
 	<script>
 		var socket = io.connect();
 		var tracuserid = {{ tracuser._id | dump | safe }},
@@ -75,19 +75,22 @@
 		
 		// Set location manually
 		function setLocation() {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(function(pos){
-					socket.emit('app', {
-						usr: '{{ user.id }}',
-						lat: pos.coords.latitude,
-						lon: pos.coords.longitude,
-						spd: (pos.coords.speed||0)
-					});
-					alert('Location updated!  ');
-				}, function(err){
-					alert('ERROR: '+err);
-				}, { enableHighAccuracy:true });
-			} else { alert('Unable to set location.  '); }
+			if (!'{{user.id}}'==tracuserid) { alert('You are not logged in! '); }
+			else {
+				if (!navigator.geolocation) { alert('Geolocation not enabled. '); }
+				else {
+					navigator.geolocation.getCurrentPosition(function(pos){
+						socket.emit('app', {
+							usr: '{{user.id}}',
+							lat: pos.coords.latitude,
+							lon: pos.coords.longitude,
+							spd: (pos.coords.speed||0)
+						});
+					}, function(err){
+						if (err) { alert('ERROR: '+err); }
+						else { location.reload(); }
+					}, { enableHighAccuracy:true });
+				} else {  }
 		}
 
 		var getAltitude = function(location, elevator, cb){
