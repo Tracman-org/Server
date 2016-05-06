@@ -27,7 +27,7 @@ passport.use(new GoogleStrategy({
 						if (err) {
 							console.log('Error finding invited user with passport session ID: '+req.session.passport.user+'\n'+err);
 							var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?'; }
-						if (user) {
+						else {
 							user.googleID = profile.id;
 							user.lastLogin = Date.now();
 							user.save(function(err) {
