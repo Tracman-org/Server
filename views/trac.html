@@ -57,7 +57,7 @@
 		{% else %}
 			<div id='map'><i class='loading fa fa-refresh fa-spin'></i></div>
 			{% if tracuser.settings.showStreetview and not noStreetview.length %}
-				<div id='pano'><img id='panoImg' src="https://maps.googleapis.com/maps/api/streetview?size=800x800&location={{ tracuser.last.lat }},{{ tracuser.last.lon }}&fov=90&heading={{ tracuser.last.dir|default(0) }}&key={{ api }}" alt="Street view image"></div>
+				<div id='pano'></div>
 			{% endif %}
 		{% endif %}
 		
@@ -71,7 +71,8 @@
 		 settings = JSON.parse('{{ tracuser.settings | dump | safe }}'),
 		 last = JSON.parse('{{ tracuser.last | dump | safe }}'),
 		 noHeader = {{ noHeader | dump | safe }},
-		 disp = {{ disp | dump | safe }};
+		 disp = {{ disp | dump | safe }}, // 0=map, 1=streetview, 2=both
+		 panoElem = document.getElementById('pano');
 		
 		// Set location manually
 		function setLocation() {
@@ -90,7 +91,8 @@
 						if (err) { alert('ERROR: '+err); }
 						else { location.reload(); }
 					}, { enableHighAccuracy:true });
-				} else {  }
+				}
+			}
 		}
 
 		var getAltitude = function(location, elevator, cb){
@@ -188,37 +190,71 @@
 				}
 			}
 
-			// Create streetview
+			// Create/set streetview
+			updateStreet(last);
+		}
+		
+		// Parse location
+		function parseLoc(loc) {
+			loc.spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
+			loc.dir = parseFloat(loc.dir);
+			loc.lat = parseFloat(loc.lat);
+			loc.lon = parseFloat(loc.lon);
+			loc.time = new Date(loc.time).toLocaleString()
+			loc.glatlon = new google.maps.LatLng(loc.lat,loc.lon);
+			return loc;
+		}
+		
+		// Update streetview
+		function updateStreet(loc) {
+			var pano;
 			if (settings.showStreetview && disp!='0') {
-					document.getElementById('panoImg').src='https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').outerWidth()+'x'+$('#pano').outerHeight()+'&location='+last.lat+','+last.lon+'&fov=90&heading='+(last.dir||0)+'&key={{ api }}';
+				var imgElem = document.getElementById('panoImg');
+				if (loc.spd>1) {
+					if (!imgElem) {
+						pano = undefined;
+						$('#pano').empty();
+						$('#pano').append($('<img>',{
+							alt: 'Street view image',
+							src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
+							id: 'panoImg'
+						}));
+					}
+					$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}');
+				} else {
+					if (!pano) {
+						$('#pano').empty();
+						var panoOptions = {
+							panControl: false,
+							zoomControl: false,
+							addressControl: false,
+							linksControl: false,
+						};
+						pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
+					}
+					pano.setPosition(loc.glatlon);
 				}
+			}
 		}
 
 		// Sockets
-		socket.on('connect', function(){
+		socket.on('connect',function(){
 			socket.emit('room', tracuserid);
 		});
-		var dir, lat, lon, spd, alt, newLocation;
-		socket.on('trac', function(loc){
-			spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd);
-			dir = parseFloat(loc.dir);
-			lat = parseFloat(loc.lat);
-			lon = parseFloat(loc.lon);
-			newLocation = new google.maps.LatLng(loc.lat,loc.lon)
+		socket.on('trac',function(loc) {
+			loc = parseLoc(loc);
 			if (disp!='1' || !settings.showStreetview) {
-				$('.tim').text('location updated '+new Date(loc.time).toLocaleString());
-				if (settings.showSpeed) { $('.spd').text(spd.toFixed()); }
+				$('.tim').text('location updated '+loc.time);
+				if (settings.showSpeed) { $('.spd').text(loc.spd.toFixed()); }
 				if (settings.showAlt) {
-					getAltitude(newLocation, elevator, function(alt) {
+					getAltitude(loc.glatlon, elevator, function(alt) {
 						if (alt) { $('.alt').text((settings.units=='imperial')?(alt*3.28084).toFixed():alt.toFixed()); }
 					});
 				}
-				map.setCenter(newLocation);
-				marker.setPosition(newLocation);
+				map.setCenter(loc.glatlon);
+				marker.setPosition(loc.glatlon);
 			}
-			if (settings.showStreetview && disp!='0') {
-				document.getElementById('panoImg').src='https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+loc.lat+','+loc.lon+'&fov=90&heading='+dir+'&key={{ api }}';
-			}
+			updateStreet(loc);
 		});
 	</script>
 {% endblock %}
