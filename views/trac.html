@@ -74,7 +74,19 @@
 		 disp = {{ disp | dump | safe }}, // 0=map, 1=streetview, 2=both
 		 panoElem = document.getElementById('pano');
 		
+		// Parse location
+		function parseLoc(loc) {
+			loc.spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
+			loc.dir = parseFloat(loc.dir);
+			loc.lat = parseFloat(loc.lat);
+			loc.lon = parseFloat(loc.lon);
+			loc.time = new Date(loc.time).toLocaleString()
+			loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
+			return loc;
+		}
+		
 		// Set location manually
+		// TODO: Authenticate at server
 		function setLocation() {
 			if (!'{{user.id}}'==tracuserid) { alert('You are not logged in! '); }
 			else {
@@ -194,26 +206,14 @@
 			updateStreet(parseLoc(last));
 		}
 		
-		// Parse location
-		function parseLoc(loc) {
-			loc.spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
-			loc.dir = parseFloat(loc.dir);
-			loc.lat = parseFloat(loc.lat);
-			loc.lon = parseFloat(loc.lon);
-			loc.time = new Date(loc.time).toLocaleString()
-			loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
-			return loc;
-		}
-		
 		// Update streetview
-		var sv;
 		function updateStreet(loc) {
-			if (!sv) { sv=new google.maps.StreetViewService(); }
+			if (!sv) { var sv=new google.maps.StreetViewService(); }
 			if (settings.showStreetview && disp!='0') {
 				var imgElem = document.getElementById('panoImg');
-				sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:0},function(data,status){
-					// Use image
-					if (loc.spd>1 && status===google.maps.StreetViewStatus.OK) {
+				sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:999},function(data,status){
+					// Moving- use image
+					if (loc.spd>1) {
 						if (!imgElem) {
 							pano = undefined;
 							$('#pano').empty();
@@ -223,8 +223,8 @@
 								id: 'panoImg'
 							}));
 						}
-						$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}');
-					// Use panorama
+						$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
+					// Not moving- use panorama
 					} else {
 						if (!pano) {
 							$('#pano').empty();
@@ -236,12 +236,10 @@
 							};
 							var pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
 						}
-						sv.getPanorama({location: {lat:loc.lat,lng:loc.lon}, radius: 500}, function(data,status){
-							pano.setPano(data.location.pano);							
-							pano.setPov({
-								pitch: 0,
-								heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
-							});
+						pano.setPano(data.location.pano);							
+						pano.setPov({
+							pitch: 0,
+							heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
 						});
 					}
 				});
