@@ -4,7 +4,8 @@ var router = require('express').Router(),
 
 router.route('/suggestion')
 	.get(function(req,res){
-		res.render('suggestion.html', {user:req.user});
+		res.redirect('https://productpains.com/product/tracman');
+		// res.render('suggestion.html', {user:req.user});
 	}).post(function(req,res){
 		mail.sendSuggestion({
 			name: (req.body.name)?req.body.name:req.user.name,

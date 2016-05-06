@@ -16,10 +16,10 @@
 	{% else %}
 		{% if user.isAdmin %}
 		<li><a href="/admin/users">Users</a></li>
-		<li><a href="/admin/requests">Invite Requests</a></li>
+		<li><a href="/admin/requests">Requests</a></li>
 		{% endif %}
 		<li><a href="/dashboard">Dashboard</a></li>
-		<li><a href="/trac/{{ user.slug }}">Map</a></li>
+		<li><a href="/trac/{{user.slug}}">Map</a></li>
 		<li><a href="/logout">Logout</a></li>
 	{% endif %}
 	</ul>
