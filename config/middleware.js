@@ -1,9 +1,16 @@
+secret = require('./secrets.js');
+
 module.exports = {
 
 	throwErr: function(req,err){
 		console.log('Middleware error:'+err+'\nfor request:\n'+req);
-		req.flash('error-message',err);
-		req.flash('error', (err.message||'')+'<br>Would you like to <a href="/bug">report this error</a>?');
+		if (secret.env==='production') {
+			req.flash('error', 'An error occured. <br>Would you like to <a href="/bug">report it</a>?');
+			req.flash('error-message',err);
+		} else {
+			req.flash('error',err);
+			req.flash('error-message',err);
+		}
 	},
 	
 	ensureAuth: function(req,res,next){

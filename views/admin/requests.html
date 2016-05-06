@@ -26,20 +26,21 @@
 				<tbody>
 				{% for request in requests %}
 					<tr class="table-{% if request.userId %}success{% elif request.granted %}info{% else %}danger{% endif %}">
-						<td>{{ request.name }}</td>
-						<td>{{ request.email }}</td>
+						<td>{{request.name}}</td>
+						<td>{{request.email}}</td>
 						<td>{{ request.beg | replace("\r\n", "<br>") | safe }}</td>
-						<td id='{{ request.id }}-requested'></td>
-						<td id='{{ request.id }}-granted'>
-							{% if not request.granted %}
-								<form action="" method="POST">
-									<button type="submit" class='btn btn-block btn-default' name="invite" value="{{ request.id }}">INVITE</button>
-								</form>
-							{% endif %}
+						<td id='{{request.id}}-requested'></td>
+						<td id='{{request.id}}-edit'>
+							<form action="" method="POST">
+								{% if not request.granted %}
+									<button type="submit" class='btn btn-block btn-success' name="invite" value="{{request.id}}">INVITE</button>
+								{% endif %}
+								<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{request.id}}">DELETE</button>
+							</form>
 						</td>
 						<td>
 							{% if request.userId %}
-								User: <a href="/trac/id/{{ request.userId }}">{{ request.userId }}</a>
+								User: <a href="/trac/id/{{request.userId}}">{{request.userId}}</a>
 							{% endif %}
 						</td>
 					</tr>
@@ -53,13 +54,13 @@
 	<script src="/static/js/moment.min.js"></script>
 	<script>
 		{% for request in requests %}
-			$('#{{ request.id }}-requested').text(
-				moment("{{ request.requestedTime }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+			$('#{{request.id}}-requested').text(
+				moment("{{request.requestedTime}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
 				// Sun Mar 20 2016 19:21:55 GMT+0100 (CET)
 			);
 			{% if request.granted %}
-				$('#{{ request.id }}-granted').text(
-					moment("{{ request.granted }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+				$('#{{request.id}}-edit').text(
+					moment("{{request.granted}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
 				);
 			{% endif %}
 		{% endfor %}

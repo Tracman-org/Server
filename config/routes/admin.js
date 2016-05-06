@@ -22,34 +22,53 @@ router.route('/requests')
 			});
 		});
 	}).post(function(req,res){
-		Request.findById(req.body.invite, function(err, request){
-			if (err){ req.flash('error', err.message); }
-			mail.sendInvite(request, function (err, raw) {
-				if (err) { req.flash('error', err.message); }
-				request.granted = Date.now();
-				request.save(function(err) {
+		if (req.body.invite) {
+			Request.findById(req.body.invite, function(err,request){
+				if (err){ req.flash('error', err.message); }
+				mail.sendInvite(request, function (err, raw) {
 					if (err) { req.flash('error', err.message); }
+					request.granted = Date.now();
+					request.save(function(err) {
+						if (err) { req.flash('error', err.message); }
+					});
+					req.flash('success', 'Invitation sent to <i>'+request.name+'</i>.');
+					res.redirect('/admin/requests');
 				});
-				req.flash('success', 'Invitation sent to <i>'+request.name+'</i>.');
+			});
+		} else if (req.body.delete) {
+			Request.findOneAndRemove({'_id':req.body.delete}, function(err,request){
+				if (err){ req.flash('error', err.message); }
+				else { req.flash('success', 'Request deleted.'); }
 				res.redirect('/admin/requests');
 			});
-		});
+		} else { console.log('ERROR! POST without action sent.  '); next(); }
 	});
 
-router.get('/users', [mw.ensureAuth, mw.ensureAdmin], function(req,res){
-	User.findById(req.session.passport.user, function(err, user){
-		if (err){ req.flash('error', err.message); }
-		User.find({}, function(err, users){
-			if (err) { req.flash('error', err.message); }
-			res.render('admin/users.html', {
-				user: user,
-				users: users,
-				noFooter: '1',
-				success:req.flash('success')[0],
-				error:req.flash('error')[0]
+router.route('/users')
+	.all([mw.ensureAuth, mw.ensureAdmin], function(req,res,next) {
+		next();
+	}).get(function(req,res){
+		User.findById(req.session.passport.user, function(err, user){
+			if (err){ req.flash('error', err.message); }
+			User.find({}, function(err, users){
+				if (err) { req.flash('error', err.message); }
+				res.render('admin/users.html', {
+					user: user,
+					users: users,
+					noFooter: '1',
+					success:req.flash('success')[0],
+					error:req.flash('error')[0]
+				});
 			});
 		});
+	}).post(function(req,res){
+		if (req.body.delete) {
+			User.findOneAndRemove({'_id':req.body.delete}, function(err,user){
+				if (err){ req.flash('error', err.message); }
+				else { req.flash('success', '<i>'+user.name+'</i> deleted.'); }
+				res.redirect('/admin/users');
+			});
+		} else { console.log('ERROR! POST without action sent.  '); next(); }
 	});
-});
   
 module.exports = router;

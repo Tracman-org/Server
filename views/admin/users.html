@@ -20,15 +20,19 @@
 					<th>Joined</th>
 					<th>Last login</th>
 					<th>Moved</th>
+					<th>Edit</th>
 				</tr></thead>
 				<tbody>
 				{% for usr in users %}
 					<tr>
-						<td>{{ usr.name }}</td>
-						<td><a href="/trac/{{ usr.slug }}">/{{ usr.slug }}</a></td>
-						<td id='{{ usr.id }}-created'></td>
-						<td id='{{ usr.id }}-logged'></td>
-						<td id='{{ usr.id }}-moved'></td>
+						<td>{{usr.name}}</td>
+						<td><a href="/trac/{{usr.slug}}">/{{usr.slug}}</a></td>
+						<td id='{{usr.id}}-created'></td>
+						<td id='{{usr.id}}-logged'></td>
+						<td id='{{usr.id}}-moved'></td>
+						<td id='{{usr.id}}-edit'><form action="" method="POST">
+							<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{usr.id}}">DELETE</button>
+						</form></td>
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -41,23 +45,23 @@
 	<script>
 		{% for usr in users %}
 			{% if usr.created %}
-				$('#{{ usr.id }}-created').text(
-					moment("{{ usr.created }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").format('l')
+				$('#{{usr.id}}-created').text(
+					moment("{{usr.created}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").format('l')
 				);
 			{% endif %}
 			
 			{% if usr.lastLogin %}
-				$('#{{ usr.id }}-logged').text(
-					moment("{{ usr.lastLogin }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+				$('#{{usr.id}}-logged').text(
+					moment("{{usr.lastLogin}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
 				);
 			{% endif %}
 			
 			{% if usr.last.time %}
-				$('#{{ usr.id }}-moved').text(
-					moment("{{ usr.last.time }}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
+				$('#{{usr.id}}-moved').text(
+					moment("{{usr.last.time}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
 				);
 			{% else %}
-				$('#{{ usr.id }}-moved').text("never");
+				$('#{{usr.id}}-moved').text("never");
 			{% endif %}
 		{% endfor %}
 	</script>
