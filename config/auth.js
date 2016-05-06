@@ -31,7 +31,7 @@ passport.use(new GoogleStrategy({
 							user.googleID = profile.id;
 							user.lastLogin = Date.now();
 							user.save(function(err) {
-								if (err) { 
+								if (err) {
 									console.log('Error saving new (invited) user '+err);
 									var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
 								} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
