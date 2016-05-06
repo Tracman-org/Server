@@ -203,44 +203,46 @@
 			}
 
 			// Create/set streetview
-			updateStreet(parseLoc(last));
+			updateStreet(parseLoc(last),10);
 		}
 		
 		// Update streetview
-		function updateStreet(loc) {
+		function updateStreet(loc,rad) {
 			if (!sv) { var sv=new google.maps.StreetViewService(); }
 			if (settings.showStreetview && disp!='0') {
 				var imgElem = document.getElementById('panoImg');
-				sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:999},function(data,status){
-					// Moving- use image
-					if (loc.spd>1) {
-						if (!imgElem) {
-							pano = undefined;
-							$('#pano').empty();
-							$('#pano').append($('<img>',{
-								alt: 'Street view image',
-								src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-								id: 'panoImg'
-							}));
+				sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:rad},function(data,status){
+					if (status===google.maps.StreetViewStatus.ZERO_RESULTS){ updateStreet(loc,rad*2); }
+					else if (status!==google.maps.StreetViewStatus.OK){ console.log('Street view not available: '+status); }
+					else {
+						if (loc.spd>1) { // Moving- use image
+							if (!imgElem) {
+								pano = undefined;
+								$('#pano').empty();
+								$('#pano').append($('<img>',{
+									alt: 'Street view image',
+									src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
+									id: 'panoImg'
+								}));
+							}
+							$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
+						} else { // Not moving- use panorama
+							if (!pano) {
+								$('#pano').empty();
+								var panoOptions = {
+									panControl: false,
+									zoomControl: false,
+									addressControl: false,
+									linksControl: false,
+								};
+								var pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
+							}
+							pano.setPano(data.location.pano);							
+							pano.setPov({
+								pitch: 0,
+								heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
+							});
 						}
-						$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
-					// Not moving- use panorama
-					} else {
-						if (!pano) {
-							$('#pano').empty();
-							var panoOptions = {
-								panControl: false,
-								zoomControl: false,
-								addressControl: false,
-								linksControl: false,
-							};
-							var pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
-						}
-						pano.setPano(data.location.pano);							
-						pano.setPov({
-							pitch: 0,
-							heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
-						});
 					}
 				});
 			}
@@ -263,7 +265,7 @@
 				map.setCenter({lat:loc.lat,lng:loc.lon});
 				marker.setPosition({lat:loc.lat,lng:loc.lon});
 			}
-			updateStreet(loc);
+			updateStreet(loc,10);
 		});
 	</script>
 {% endblock %}
