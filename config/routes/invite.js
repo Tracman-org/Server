@@ -33,7 +33,7 @@ router.get('/:invite', function(req,res,next){
 						(function checkSlug(s,cb) {
 							console.log('checking ',s);
 							User.findOne({slug:s}, function(err, existingUser){
-								if (err) { console.log('Slug check error for ',slug(request.name),+':',err); }
+								if (err) { console.log('Slug check error for ',slug(request.name).toLowerCase(),+':',err); }
 								if (existingUser){
 									s = '';
 									while (s.length<6) {
@@ -42,8 +42,8 @@ router.get('/:invite', function(req,res,next){
 									checkSlug(s,cb);
 								} else { cb(s); }
 							});
-						})(slug(request.name), function(newSlug){
-							new User({ // Create new user
+						})(slug(request.name).toLowerCase(), function(newSlug){
+							newUser = new User({ // Create new user
 								requestId: request._id,
 								email: '',
 								slug: newSlug,
@@ -56,14 +56,10 @@ router.get('/:invite', function(req,res,next){
 									showAlt: false,
 									showStreetview: true
 								}
-							}).save(function(err) {
+							})
+							newUser.save(function(err) {
 								if (err) { mw.throwErr(req,err); }
-								User.findOne({requestId:request._id}, function(err, user) {
-									if (err) { mw.throwErr(req,err); }
-									if (user) {
-										associateUser(request,user);
-									}
-								});
+								associateUser(request,newUser);
 							});
 						});
 					}
