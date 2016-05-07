@@ -4,7 +4,9 @@ After carefully reviewing your credentials over a glass of malt liquor, it has b
 
 Feel free to use this link to create an account.&ensp;Note that you will need a google account to continue.&ensp;You will also need an android phone to update your location.&ensp;
 
-http://tracman.org/invited/{{id}}
+https://tracman.org/invited/{{id}}
+
+You will be asked to sign into google and authorize the Tracman app.  
 
 Please keep in mind that this is experimental software, and I am not responsible for it actually working properly, or anything else for that matter.&ensp;
 

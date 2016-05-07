@@ -1,5 +1,5 @@
 # Tracman
-###### v 0.1.2
+###### v 0.1.3
 
 node.js application to display a map with user's location.  Live at [tracman.org](https://tracman.org/).
 The github for the associated android app is [Tracman-org/Android](https://github.com/tracman-org/android).  
