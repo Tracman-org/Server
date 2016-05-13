@@ -17,7 +17,7 @@ module.exports = {
 		if (req.isAuthenticated()) { return next(); }
 		else {
 			req.session.returnTo = req.path;
-			console.log('mw.ensureAuth: redirect to '+req.path+' after login.');
+			console.log('mw.ensureAuth: Going to redirect to '+req.path+' after login.'); // TODO: Correct next path
 			req.flash('error', 'You must be signed in to do that.  <a href="/login">Click here to log in</a>.  ');
 			res.redirect('/');
 		}

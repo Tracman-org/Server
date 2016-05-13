@@ -7,6 +7,7 @@ header {
 	z-index: 200;
 }
 header .logo {
+	
 	float: left;
 	font-family: 'Open Sans', sans-serif;
 	padding: 13px 23px;

@@ -4,30 +4,66 @@
 {% block head %}
 {{super()}}
 <style>
+	.sharebuttons .fa {
+		text-align: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		padding-top: 8px;
+		background: rgba(255,255,255,.2);
+		-moz-box-shadow: 2px 2px 4px #000;
+		-webkit-box-shadow: 2px 2px 4px #000;
+		box-shadow: 2px 2px 4px #000;
+	}.sharebuttons .fa:hover {
+		background: rgba(255,255,255,.4);
+	}.sharebuttons .fa:active {
+		-moz-box-shadow: 0;
+		-webkit-box-shadow: 0;
+		box-shadow: 0;
+	}
 	.google-play {
-		width:150px;
+		width: 150px;
 		border: #fbc93d solid 1px;
-		border-radius:10px; }
+		border-radius: 10px; }
+	.locate {
+		background: #111;
+	}
 </style>
 {% endblock %}
 
 {% block main %}
-	<section class='dark'>
+	<section class='share dark'>
 		<div class='container'>
-			<h1>Welcome{% if user.name %}, {{user.name}}{% endif %}!</h1>
-			<p>To view your location, use this link: <a href="/trac/{{ user.slug }}">https://tracman.org/trac/{{user.slug}}</a></p>
+			<h1>Dashboard</h1>
+			<p class='sharebuttons'>
+				To view your location, use this link: 
+				<a href="/trac/{{user.slug}}">https://tracman.org/trac/{{user.slug}}</a>.&ensp;
+				You can share your map with these buttons:&emsp;
+				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/trac/{{user.slug}}" target="_blank"><i class="fa fa-twitter"></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/trac/{{user.slug}}" target="_blank"><i class="fa fa-facebook"></i></a>
+        <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/trac/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/trac/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="fa fa-linkedin"></i></a>
+			</p>
 			<p>You can also embed a map into your website with this code.&ensp;Be sure to set the width and height attributes to suit your circumstance.&ensp;</p>
-			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{user.slug}}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh;&quot;&gt;&lt;/iframe&gt;</pre>
+			<pre>&lt;iframe src=&quot;https://tracman.org/trac/{{user.slug}}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh&quot;&gt;&lt;/iframe&gt;</pre>
 		</div>
-		<br>
+	</section>
+	
+	<section class='locate dark'>
 		<div class='container'>
-			<h2>App</h2>
-			<p>Click the button below to download the app from the google play store, if you haven't already.&ensp;</p>
+			<h2>Set location</h2>
+			<p>You can set your location to this device's geolocation by clicking the button below.&ensp;You can also track this device's location by clicking &ldquo;Start tracking&rdquo;.&ensp;Your location will update as long as you keep this window open.&ensp;For accuracy, try it on your smartphone, but be careful, because it will drain the battery quickly.&ensp;</p>
+			<p class='flexbox'>
+				<button id='manual-set' class='btn' style="min-width:40%" onclick="setLocation()"><i class="fa fa-map-marker"></i>&emsp;Set location</button>
+				<button id='tracking' class='btn' style="min-width:40%" onclick="trackLocation()"><i class="fa fa-crosshairs"></i>&emsp;Start tracking</button>
+			</p>
+			<h3>Android</h3>
+			<p>The android app lets you update your location in the background, and will conserve battery life.&ensp;Note that it's <a href="https://github.com/Tracman-org/Android/issues" target="_blank">kind of buggy</a> at the moment.&ensp;</p>
 			<p><a href="https://play.google.com/store/apps/details?id=us.keithirwin.tracman&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img class='google-play' alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a></p>
-			<p>Without the app running, your location won't update.  But you can also set your location to this device's geolocation by clicking the button below.  </p>
-			<p><button id='manual-set' class='btn' style="display:block; margin:auto;" onclick="setLocation()"><i class="fa fa-map-marker"></i>&emsp;Update location manually</button></p>
-		</div>
-		<br>
+			</div>
+	</section>
+	
+	<section class='settings dark'>
 		<div class='container'>
 			<h2>Settings</h2>
 			<script src="/static/js/validator.min.js"></script>
@@ -108,46 +144,73 @@
 					</div>
 				</div>
 				
-				<div id='showSpeed' class='form-group col-xs-12' title="PRO ONLY! Shows a spedometer on the map.">
+				<div id='showSpeed' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 
-				<div id='showAltitude' class='form-group col-xs-12' title="PRO ONLY! Shows the current elevation on the map. ">
+				<div id='showAltitude' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
 					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 				
-				<div id='showStreet' class='form-group col-xs-12' title="PRO ONLY! Shows a Google street view image from your current location, oriented in the direction of travel. This feature is EXPERIMENTAL. ">
-					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %} (experimental)</label>
+				<div id='showStreet' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image from your current location, oriented in the direction of travel. This feature is EXPERIMENTAL. ">
+					<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %}</label>
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
 
-				<div id='submit' class='form-group col-xs-12' style="margin: 30px 0;">
-					<input class='btn yellow col-xs-10 col-xs-offset-1 col-sm-offset-2 col-sm-4 col-lg-offset-3 col-lg-6' type="submit" value="Save">
+				<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
+					<input class='btn yellow' style="min-width:50%;" type="submit" value="Save">
 				</div>
 			</form>
 			
 			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?&ensp;It's free during beta testing.&ensp;</p>{% endif %}
 			<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?&ensp;</p>
 		</div>
-		
 	</section>
 
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 	<script>
 		var socket = io.connect();
 		socket.on('connect', function(){
+			// TODO: Security! 
 			socket.emit('room', 'app-{{user.id}}');
 		});
+		
+		var wpid;
+		function trackLocation() {
+			if (wpid) { // Stop tracking
+				$('#tracking').html('<i class="fa fa-crosshairs"></i>&emsp;Start tracking');
+				navigator.geolocation.clearWatch(wpid);
+				wpid = undefined;
+			} else { // Start tracking
+				$('#tracking').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop tracking');				
+				if (!navigator.geolocation) { alert('Unable to track location. '); }
+				else {
+					wpid = navigator.geolocation.watchPosition(function(pos) {
+						socket.emit('app', {
+							usr: '{{user.id}}',
+							lat: pos.coords.latitude,
+							lon: pos.coords.longitude,
+							spd: (pos.coords.speed||0)
+						});
+						console.log('Sent location:',pos.coords.latitude.toFixed(2)+','+pos.coords.longitude.toFixed(2));
+					}, function(err){
+						alert('Failed to track: \n'+err);
+					}, { enableHighAccuracy:true });
+				}
+			}
+		}
+		
 		function setLocation() {
-			if (navigator.geolocation) {
+			if (!navigator.geolocation) { alert('Unable to set location. '); }
+			else {
 				navigator.geolocation.getCurrentPosition(function(pos){
 					socket.emit('app', {
 						usr: '{{user.id}}',
@@ -156,11 +219,10 @@
 						spd: (pos.coords.speed||0)
 					});
 					alert('Location updated!  ');
-					location.reload();
 				}, function(err){
 					alert('ERROR: '+err);
 				}, { enableHighAccuracy:true });
-			} else { alert('Unable to set location. '); }
+			}
 		}
 	</script>
 {% endblock %}
