@@ -25,6 +25,6 @@ $ npm start
 
 ## What's new
 
-## v 0.2.0
+### v 0.2.0
 
 Now you can track your location in the browser using [watchPosition](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition).
