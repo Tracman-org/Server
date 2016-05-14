@@ -151,6 +151,7 @@
 			}}, function(err, user) {
 				if (err) { console.log('Could not update last location of user '+loc.user+'\n'+err); }
 				if (!user) { console.log("No user found: "+loc.user); }
+				// TODO: Fix this error always being thrown with loc.user = undefined
 			});
 		});
 	
