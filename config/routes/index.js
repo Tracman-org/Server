@@ -1,22 +1,35 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
   mail = require('../mail.js'),
+  secret = require('../secrets.js'),
   User = require('../models/user.js'),
   Request = require('../models/request.js');
 	
 router.route('/')
 .get(function(req,res,next){
+	
+	// Logged in
 	if (req.session.passport) {
+		// Get user
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
 			if (!user){ next(); }
-			res.render('index.html', {
-				user: user,
-				error: req.flash('error')[0],
-				success: req.flash('succcess')[0]
-			});
+			// If user found: 
+			else {
+				// Redirect user to map
+				//res.redirect('/trac/'+user.slug+ /*querystring:*/((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1])) );
+				// Open logged-in index
+				res.render('index.html', {
+					user: user,
+					error: req.flash('error')[0],
+					success: req.flash('succcess')[0]
+				});
+			}
+			
 		});
+	// Not logged in
 	} else {
+		 // Show index
 		res.render('index.html', {
 			error: req.flash('error')[0],
 			success: req.flash('success')[0],
@@ -24,7 +37,7 @@ router.route('/')
 			inviteError: req.flash('request-error')[0]
 		});
 	}
-}).post(function(req,res){
+}).post(function(req,res){ // Create request
 	Request.findOne({email:req.body.email}, function(err, request) {
 		if (err){ mw.throwErr(req,err); }
 		if (request){ // Already requested with this email

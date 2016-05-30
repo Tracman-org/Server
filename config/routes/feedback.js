@@ -14,7 +14,7 @@ router.route('/suggestion')
 		}, function (err, raw) {
 			if (err){ mw.throwErr(req,err); }
 			else { req.flash('success','Thanks for the suggestion! '); }
-			res.redirect('/dashboard');
+			res.redirect('/trac');
 		});
 	});
 
@@ -37,7 +37,7 @@ router.route('/bug')
 		}, function (err, raw) {
 			if (err){ mw.throwErr(req,err); }
 			else { req.flash('success','Thanks for the report! '); }
-			res.redirect('/dashboard');
+			res.redirect('/trac');
 		});
 	});
 

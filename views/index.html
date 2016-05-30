@@ -13,12 +13,11 @@
 			<h1>Tracman</h1>
 			<h3>Display your realtime GPS location on a map</h3>
 			<a class='btn' href="#" data-scrollto="overview">More info<i class='fa fa-angle-down'></i></a>
-			{% if not user %}
-				<a class='btn' href="#" data-scrollto="get">Request invite<i class='fa fa-angle-down'></i></a>
-			{% endif %}
-				<a class='btn' href="/trac/keith">View example<i class='fa fa-angle-right'></i></a>
 			{% if user %}
-				<a class='btn' href="/dashboard">Dashboard<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/trac">Map<i class='fa fa-angle-right'></i></a>
+			{% else %}
+				<a class='btn' href="#" data-scrollto="get">Request invite<i class='fa fa-angle-down'></i></a>
+				<a class='btn' href="/trac/keith">View example<i class='fa fa-angle-right'></i></a>
 			{% endif %}
 		</div>
 	</section>

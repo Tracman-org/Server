@@ -67,7 +67,7 @@
 	);
 	app.use('/trac', require('./config/routes/trac.js'));
 	app.use('/invited', require('./config/routes/invite.js'));
-	app.use('/dashboard', require('./config/routes/dashboard.js'));
+	// app.use('/dashboard', require('./config/routes/dashboard.js'));
 	app.use('/admin', require('./config/routes/admin.js'));
 	app.use('/static', express.static(__dirname+'/static'));
 	app.use(function(req,res,next) {

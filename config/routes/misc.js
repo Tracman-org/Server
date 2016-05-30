@@ -7,7 +7,6 @@ router.get('/robots.txt', function(req,res){
 	res.type('text/plain');
 	res.send("User-agent: *\n"+
 		"Disallow: /trac\n"+
-		"Disallow: /dashboard\n"+
 		"Disallow: /invited"
 	);
 });
@@ -45,7 +44,7 @@ router.route('/pro')
 			function(err, user){
 				if (err){ mw.throwErr(req,err); }
 				else { req.flash('success','You have been signed up for pro. '); }
-				res.redirect('/dashboard');
+				res.redirect('/trac');
 			}
 		);
 	});

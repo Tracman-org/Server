@@ -16,7 +16,7 @@ router.get('/auth/google', passport.authenticate('google', { scope: [
 router.get('/auth/google/callback', passport.authenticate('google', {
 	failureRedirect: '/',
 	failureFlash: true,
-	successRedirect: '/dashboard?rd=1',
+	successRedirect: '/trac',
 	successFlash: true
 } ));
 

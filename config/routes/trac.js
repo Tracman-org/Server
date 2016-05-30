@@ -18,15 +18,16 @@ router.get('/:slug', function(req,res,next){
 	});
 });
 
-router.get('/', mw.ensureAuth, function(req,res,next){
-	User.findById(req.session.passport.user, function(err, user){
+router.get('/id/:id', function(req,res,next){
+	User.findById(req.params.id, function(err, user){
 		if (err){ mw.throwErr(req,err); }
 		if (!user){ next(); }
 		else { res.redirect('/trac/'+user.slug+((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1]))); }
 	});
 });
-router.get('/id/:id', function(req,res,next){
-	User.findById(req.params.id, function(err, user){
+
+router.get('/', mw.ensureAuth, function(req,res,next){
+	User.findById(req.session.passport.user, function(err, user){
 		if (err){ mw.throwErr(req,err); }
 		if (!user){ next(); }
 		else { res.redirect('/trac/'+user.slug+((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1]))); }
