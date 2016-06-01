@@ -1,5 +1,4 @@
-/* IMPORTS */
-{ var
+/* IMPORTS */ { var 
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -12,77 +11,83 @@
 	User = require('./config/models/user.js'),
 	app = express(),
 	http = require('http').Server(app),
-	io = require('socket.io')(http); }
+	io = require('socket.io')(http);
+}
 
-/* SETUP */
-
-{
-	//  Templates
-	nunjucks.configure(__dirname+'/views', {
-		autoescape: true,
-		express: app
-	});
-	
-	//  Session
-	app.use(session({
-		secret: secret.session,
-		saveUninitialized: true,
-		resave: true
-	}));
-	app.use(bodyParser.json());
-	app.use(bodyParser.urlencoded({
-		extended: true
-	}));
-	app.use(cookieParser(secret.cookie));
-	app.use(flash());
-	
-	//  Auth
-	app.use(passport.initialize());
-	app.use(passport.session());
-	require('./config/auth.js');
-	passport.serializeUser(function(user,done) {
-		done(null, user.id);
-	});
-	passport.deserializeUser(function(id,done) {
-		User.findById(id, function(err, user) {
-			if(!err) done(null, user);
-			else done(err, null);
-		});
-	});
-	
-	//  Database
-	mongoose.connect(secret.mongoSetup, {
+/* SETUP */ {
+	/* Database */ mongoose.connect(secret.mongoSetup, {
 		server:{socketOptions:{
 			keepAlive:1, connectTimeoutMS:30000 }},
 		replset:{socketOptions:{
 			keepAlive:1, connectTimeoutMS:30000 }}
 	});
 	
-	//  Routes
-	app.use('/', 
-		require('./config/routes/index.js'),
-		require('./config/routes/auth.js'),
-		require('./config/routes/feedback.js'),
-		require('./config/routes/misc.js')
-	);
-	app.use('/trac', require('./config/routes/trac.js'));
-	app.use('/invited', require('./config/routes/invite.js'));
-	// app.use('/dashboard', require('./config/routes/dashboard.js'));
-	app.use('/admin', require('./config/routes/admin.js'));
-	app.use('/static', express.static(__dirname+'/static'));
-	app.use(function(req,res,next) {
-		if (!res.headersSent) {
-			var err = new Error('404: Not found: '+req.url);
-			err.status = 404;
-			next(err);
-		}
+	/* Templates */ nunjucks.configure(__dirname+'/views', {
+		autoescape: true,
+		express: app
 	});
 	
-	// Error Handlers
-	{
-		if (!secret.env=='production') {
-		// Development
+	/* Session */ {
+		app.use(session({
+			secret: secret.session,
+			saveUninitialized: true,
+			resave: true
+		}));
+		app.use(bodyParser.json());
+		app.use(bodyParser.urlencoded({
+			extended: true
+		}));
+		app.use(cookieParser(secret.cookie));
+		app.use(flash());
+	}
+	
+	/* Auth */ {
+		app.use(passport.initialize());
+		app.use(passport.session());
+		require('./config/auth.js');
+		passport.serializeUser(function(user,done) {
+			done(null, user.id);
+		});
+		passport.deserializeUser(function(id,done) {
+			User.findById(id, function(err, user) {
+				if(!err) done(null, user);
+				else done(err, null);
+			});
+		});
+	}
+	
+	/* Routes	*/ {
+		app.use('/', 
+			require('./config/routes/index.js'),
+			require('./config/routes/auth.js'),
+			require('./config/routes/feedback.js'),
+			require('./config/routes/misc.js')
+		);
+		app.use('/map', require('./config/routes/map.js'));
+		app.use('/invited', require('./config/routes/invite.js'));
+		app.use('/admin', require('./config/routes/admin.js'));
+		app.use('/static', express.static(__dirname+'/static'));
+		app.use(function(req,res,next) {
+			if (!res.headersSent) {
+				var err = new Error('404: Not found: '+req.url);
+				err.status = 404;
+				next(err);
+			}
+		});
+	}
+	
+	/* Error Handlers */	{
+		if (secret.env=='production') {
 			app.use(function(err,req,res,next) {
+				if (res.headersSent) { return next(err); }
+				res.status(err.status||500);
+				res.render('error.html', {
+					code: err.status
+				});
+			});
+		} else { // Development
+			app.use(function(err,req,res,next) {
+				console.log(err);
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error.html', {
@@ -92,21 +97,11 @@
 				});
 			});
 		}
-		else { // Production
-			app.use(function(err,req,res,next) {
-				if (res.headersSent) { return next(err); }
-				res.status(err.status||500);
-				res.render('error.html', {
-					code: err.status
-				});
-			});
-		}
 	}
 	
 }
 
-/* RUNTIME */
-{
+/* RUNTIME */ {
 	// Check for tracking users
 	function checkForUsers(room) {
 		if (room) {

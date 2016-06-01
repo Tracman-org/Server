@@ -1,23 +1,49 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{ super() }} | {{ tracuser.name }}{% endblock %}
+{% block title %}{{super()}} | {{mapuser.name}}{% endblock %}
 
 {% block head %}
 	{{ super() }}
-	<link href="/static/css/trac.css" rel="stylesheet">
+	<link href="/static/css/map.css" rel="stylesheet">
 	<style>
+		section { display: none; }
+		
+		#controls {
+			width: 100vw;
+			position: absolute;
+			bottom: 50px;
+			display: flex;
+			justify-content: space-around;
+		}#controls .btn {
+			background: #222;
+			width: 30vw;
+		}#controls .btn:hover {
+			background: #333;
+		}#controls #track {
+			width:35vw;
+		}
+		{% if mapuser.settings.showStreetview and disp!='0' %}
+		@media (orientation: portrait) {
+			#controls { bottom:30px }
+		}
+		{% endif %}
+		
+		/*TODO: Smaller signs on mobile*/
+		/*.spd-sign {}*/
+		/*.alt-sign {}*/
+
 		.wrap { top:{% if not noHeader %}58{% else %}0{% endif %}px;}
 		img#panoImg { width:100%; height:100%; }
 		
-		{% if tracuser.settings.showStreetview and disp!='0' and disp!='1' %}
+		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
 		/* show both */
-		@media (orientation: landscape) {
-				#map, #pano {
-					display:inline-block;
-					width:50%;
-					height:99%;
+			@media (orientation: landscape) {
+					#map, #pano {
+						display:inline-block;
+						width:50%;
+						height:99%;
+					}2
+					#pano { float:right; }
 				}
-				#pano { float:right; }
-			}
 			@media (orientation: portrait) {
 				#map, #pano {
 					width:100%;
@@ -25,7 +51,7 @@
 				}
 				#pano { bottom:0; }
 			}
-		{% elif tracuser.settings.showStreetview and disp=='1' %}
+		{% elif mapuser.settings.showStreetview and disp=='1' %}
 		/* show streetview */
 			#pano {
 				width:100%;
@@ -44,35 +70,47 @@
 {% block main %}
 	<div class='wrap'>
 		
-		{% if not tracuser.last.time %}
-		<div class='centered alert alert-warning'>
-			<b>No Location Found</b>
-			{% if user.id == tracuser.id %}
-				<br>You can <a href="#" onclick="setLocation()">click here to set use this device's location</a>.  
-				<br>Maybe you also want to <a href="/android">download the android app</a>.
-			{% else %}
-				<br>This user hasn't updated their location yet!  
-			{% endif %}
-		</div>
+		{% if not mapuser.last.time %}
+			<div class='centered alert alert-warning'>
+				<b>No Location Found</b>
+				{% if user.id == mapuser.id %}
+					<br>You can <a href="#" onclick="setLocation()">click here to use this device's location</a>.  
+					<br>Maybe you also want to <a href="/android">download the android app</a>.
+				{% else %}
+					<br>This user hasn't updated their location yet!  
+				{% endif %}
+			</div>
 		{% else %}
-			<div id='map'><i class='loading fa fa-refresh fa-spin'></i></div>
-			{% if tracuser.settings.showStreetview and not noStreetview.length %}
+				<div id='map'><i class='loading fa fa-refresh fa-spin'></i></div>
+			{% if mapuser.settings.showStreetview and not noStreetview.length %}
 				<div id='pano'><i class='loading fa fa-refresh fa-spin'></i></div>
 			{% endif %}
 		{% endif %}
 		
+		{% if user.id == mapuser.id %}
+			<div id='controls'>
+				<button class='btn' id='set' onclick="setLocation()">Set</button>
+				<button class='btn' id='track' onclick="trackLocation()" data-toggle="tooltop" title="Tracking location..." data-trigger="manual"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
+				<button class='btn' id='clear' onclick="clearLocation()">Clear</button>
+			</div>			
+		{% endif %}
+		
+
 	</div>
 	
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=initMap" async defer></script>
 	<script>
-		var socket = io.connect();
-		var tracuserid = {{ tracuser._id |dump|safe }},
-		 settings = JSON.parse('{{ tracuser.settings |dump|safe }}'),
-		 last = JSON.parse('{{ tracuser.last |dump|safe }}'),
-		 noHeader = {{ noHeader |dump|safe }},
-		 disp = {{ disp |dump|safe }}, // 0=map, 1=streetview, 2=both
-		 panoElem = document.getElementById('pano');
+		{ var wpid, map, pano, sv, marker, elevator,
+			socket = io.connect(),
+			mapuserid = {{mapuser._id |dump|safe}},
+			userid{% if user._id %} = {{user._id |dump|safe}}{% endif %},
+			settings = JSON.parse('{{mapuser.settings |dump|safe}}'),
+			last = JSON.parse('{{mapuser.last |dump|safe}}'),
+			noHeader = {{noHeader |dump|safe}},
+			disp = {{disp |dump|safe}}, // 0=map, 1=streetview, 2=both
+			panoElem = document.getElementById('pano');
+		}
 		
 		// Parse location
 		function parseLoc(loc) {
@@ -85,16 +123,46 @@
 			return loc;
 		}
 		
-		// Set location manually
-		// TODO: Authenticate at server
+		// Track location
+		function trackLocation() {
+			if (!userid==mapuserid) { alert('You are not logged in! '); }
+			else {
+				// Stop tracking
+				if (wpid) {
+					$('#controls > #track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
+					navigator.geolocation.clearWatch(wpid);
+					wpid = undefined;
+				// Start tracking
+				} else {
+					$('#controls > #track').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop').tooltip('show');
+					if (!navigator.geolocation) { alert('Unable to track location. '); }
+					else {
+						wpid = navigator.geolocation.watchPosition(function(pos) {
+							socket.emit('app', {
+								usr: '{{user.id}}',
+								lat: pos.coords.latitude,
+								lon: pos.coords.longitude,
+								spd: (pos.coords.speed||0)
+							});
+							// console.log('Sent location:',pos.coords.latitude.toFixed(2)+','+pos.coords.longitude.toFixed(2));
+						}, function(err){
+							alert('Failed to track: \n'+err);
+						}, { enableHighAccuracy:true });
+					}
+				}
+				}
+		}
+		
+		// Set location once
 		function setLocation() {
-			if (!'{{user.id}}'==tracuserid) { alert('You are not logged in! '); }
+			// TODO: Authenticate at server
+			if (!userid==mapuserid) { alert('You are not logged in! '); }
 			else {
 				if (!navigator.geolocation) { alert('Geolocation not enabled. '); }
 				else {
 					navigator.geolocation.getCurrentPosition(function(pos){
 						socket.emit('app', {
-							usr: '{{user.id}}',
+							usr: userid,
 							lat: pos.coords.latitude,
 							lon: pos.coords.longitude,
 							spd: (pos.coords.speed||0)
@@ -104,6 +172,15 @@
 						else { location.reload(); }
 					}, { enableHighAccuracy:true });
 				}
+			}
+		}
+		
+		// Clear location
+		function clearLocation() {
+			if (!userid==mapuserid) { alert('You are not logged in! '); }
+			else {
+				alert('Location clearing goes here');
+				//TODO: Delete user.last from db via AJAX
 			}
 		}
 
@@ -118,7 +195,6 @@
 			});
 		}
 
-		var map, marker, elevator;
 		function initMap() {
 			// Create map
 			if (disp!='1' || !settings.showStreetview) {
@@ -133,7 +209,7 @@
 				});
 				marker = new google.maps.Marker({
 					position: { lat:last.lat, lng:last.lon },
-					title: {{ tracuser.name | dump | safe }},
+					title: {{ mapuser.name | dump | safe }},
 					map: map,
 					draggable: false
 				});
@@ -166,12 +242,12 @@
 						speedText = document.createElement('div'),
 						speedUnit = document.createElement('div');
 					speedLabel.className = 'spd-label';
-					speedText.className = 'spd';
-					speedUnit.className = 'spd-unit';
-					speedSign.className = 'spd-sign';
-					speedText.innerHTML = (settings.units=='imperial')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
 					speedLabel.innerHTML = 'SPEED';
+					speedText.className = 'spd';
+					speedText.innerHTML = (settings.units=='imperial')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
+					speedUnit.className = 'spd-unit';
 					speedUnit.innerHTML = (settings.units=='imperial')?'m.p.h.':'k.p.h.';
+					speedSign.className = 'spd-sign';
 					speedSign.appendChild(speedLabel);
 					speedSign.appendChild(speedText);
 					speedSign.appendChild(speedUnit);
@@ -206,7 +282,6 @@
 			updateStreet(parseLoc(last),10);
 		}
 		
-		var sv;
 		function getStreetViewData(loc,rad,cb) {
 			if (!sv) { var sv=new google.maps.StreetViewService(); }
 			sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:rad},function(data,status){
@@ -217,7 +292,6 @@
 		}
 		
 		// Update streetview
-		var pano;
 		function updateStreet(loc) {
 			if (loc.spd>1) { // moving
 				if (settings.showStreetview && disp!='0') {
@@ -260,7 +334,9 @@
 
 		// Sockets
 		socket.on('connect',function(){
-			socket.emit('room', tracuserid);
+			socket.emit('room',
+				(userid)? 'app-'+userid :mapuserid
+			);
 		});
 		socket.on('trac',function(loc) {
 			loc = parseLoc(loc);

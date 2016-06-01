@@ -9,18 +9,17 @@
 	</div>
 	<nav id='navigation'>
 	<ul>
-	{% if not user %}
+	{% if user %}
+		<li><a href="/map/{{user.slug}}">Map</a></li>
+		<li><a href="/map#share">Share</a></li>
+		<li><a href="/map#settings">Settings</a></li>
+		{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
+		<li><a href="/logout">Logout</a></li>
+	{% else %}
 		<li><a href="/#overview">About</a></li>
+		<li><a href="/map/keith">Demo</a></li>
 		<li><a href="/#get">Request Invite</a></li>
 		<li><a href="/login">Login</a></li>
-	{% else %}
-		{% if user.isAdmin %}
-		<li><a href="/admin/users">Users</a></li>
-		<li><a href="/admin/requests">Requests</a></li>
-		{% endif %}
-		<li><a href="/dashboard">Dashboard</a></li>
-		<li><a href="/trac/{{user.slug}}">Map</a></li>
-		<li><a href="/logout">Logout</a></li>
 	{% endif %}
 	</ul>
 	</nav>
@@ -37,7 +36,3 @@
 	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
 </div>
 {% endif %}
-
-
-
-

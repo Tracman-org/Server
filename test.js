@@ -23,9 +23,9 @@ describe('Routes', function() {
 			done();
 		});
 	});
-	it('Displays a tracpage', function(done){
+	it('Displays a map', function(done){
 	chai.request(server)
-		.get('/trac/keith')
+		.get('/map/keith')
 		.end(function(err,res){
 			res.should.have.status(200);
 			done();

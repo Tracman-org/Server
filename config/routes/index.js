@@ -16,9 +16,7 @@ router.route('/')
 			if (!user){ next(); }
 			// If user found: 
 			else {
-				// Redirect user to map
-				//res.redirect('/trac/'+user.slug+ /*querystring:*/((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1])) );
-				// Open logged-in index
+				// Open index
 				res.render('index.html', {
 					user: user,
 					error: req.flash('error')[0],

@@ -47,7 +47,7 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.use(new GoogleTokenStrategy({
-		clientID: secret.googleClientId
+	clientID: secret.googleClientId
 }, function(parsedToken, googleId, done) {
 	User.findOne({googleID:googleId}, function(err, user) {
 		if (err) { 

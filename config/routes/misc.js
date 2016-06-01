@@ -6,7 +6,7 @@ var router = require('express').Router(),
 router.get('/robots.txt', function(req,res){ 
 	res.type('text/plain');
 	res.send("User-agent: *\n"+
-		"Disallow: /trac\n"+
+		"Disallow: /map\n"+
 		"Disallow: /invited"
 	);
 });
@@ -44,7 +44,7 @@ router.route('/pro')
 			function(err, user){
 				if (err){ mw.throwErr(req,err); }
 				else { req.flash('success','You have been signed up for pro. '); }
-				res.redirect('/trac');
+				res.redirect('/map');
 			}
 		);
 	});
