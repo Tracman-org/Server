@@ -1,0 +1,110 @@
+<section class='settings dark container'>
+	<h2>Settings</h2>
+	
+	<script src="/static/js/validator.min.js"></script>
+	<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
+
+		<div id='name'class='form-group' title="This appears in your page's title.  ">
+			<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
+			<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+				<input class='form-control' name="name" type="text" value="{{user.name}}"
+					maxlength="160" data-error="Invalid input"><br>
+			</div>
+			<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+		</div>
+		
+		<div id='slug'class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+			<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
+			<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+				<span class='input-group-addon'>tracman.org/map/</span>
+				<input class='form-control' type="text" name="slug" value="{{user.slug}}" required data-remote="/validate"
+					maxlength="160" data-remote-error="That URL is already taken.  " data-error="Invalid input"><br>
+			</div>
+			<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+		</div>
+
+		<div id='units' class='form-group col-xs-12' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
+			<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
+			<div class='input-group col-sm-8 col-lg-9'>
+				<div class='radio-inline'><label>
+					<input type="radio" name="units" value="imperial" {% if user.settings.units == 'imperial' %}checked{% endif %}>
+					Imperial
+				</label></div>
+				<div class='radio-inline'><label>
+					<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>
+					Metric
+				</label></div>
+			</div>
+		</div>
+
+		<div id='defaultMap' class='form-group col-xs-12' title="Shows whether to show a satellite image or standard google road map as the default on your page.  Visitors will have the option to change this.  Note that satellite images load slower.  ">
+			<label class='control-label col-sm-4 col-lg-3' for="map">Default map</label>
+			<div class='input-group col-sm-8 col-lg-9'>
+				<div class='radio-inline'><label>
+					<input type="radio" name="map" value="road" {% if user.settings.defaultMap == 'road' %}checked{% endif %}>
+					Road
+				</label></div>
+				<div class='radio-inline'><label>
+					<input type="radio" name="map" value="sat" {% if user.settings.defaultMap == 'sat' %}checked{% endif %}>
+					Satellite
+				</label></div>
+			</div>
+		</div>
+
+		<div id='defaultZoom' class='form-group col-xs-12' title="Shows the initial map zoom level on your page.  A higher number means more zoom.  Note that the size of the viewing window will also have an effect on how much of the map a visitor can see.  ">
+			<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="map">Default zoom</label>
+			<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+				<select class='c-select' name="zoom">
+					<option {% if user.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
+					<option {% if user.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>
+					<option {% if user.settings.defaultZoom==3 %}selected {% endif %}value="3">3</option>
+					<option {% if user.settings.defaultZoom==4 %}selected {% endif %}value="4">4</option>
+					<option {% if user.settings.defaultZoom==5 %}selected {% endif %}value="5">5 Landmass</option>
+					<option {% if user.settings.defaultZoom==6 %}selected {% endif %}value="6">6</option>
+					<option {% if user.settings.defaultZoom==7 %}selected {% endif %}value="7">7</option>
+					<option {% if user.settings.defaultZoom==8 %}selected {% endif %}value="8">8</option>
+					<option {% if user.settings.defaultZoom==9 %}selected {% endif %}value="9">9</option>
+					<option {% if user.settings.defaultZoom==10 %}selected {% endif %}value="10">10 City</option>
+					<option {% if user.settings.defaultZoom==11 %}selected {% endif %}value="11">11</option>
+					<option {% if user.settings.defaultZoom==12 %}selected {% endif %}value="12">12</option>
+					<option {% if user.settings.defaultZoom==13 %}selected {% endif %}value="13">13</option>
+					<option {% if user.settings.defaultZoom==14 %}selected {% endif %}value="14">14</option>
+					<option {% if user.settings.defaultZoom==15 %}selected {% endif %}value="15">15 Streets</option>
+					<option {% if user.settings.defaultZoom==16 %}selected {% endif %}value="16">16</option>
+					<option {% if user.settings.defaultZoom==17 %}selected {% endif %}value="17">17</option>
+					<option {% if user.settings.defaultZoom==18 %}selected {% endif %}value="18">18</option>
+					<option {% if user.settings.defaultZoom==19 %}selected {% endif %}value="19">19</option>
+					<option {% if user.settings.defaultZoom==20 %}selected {% endif %}value="20">20 Buildings</option>
+				</select>
+			</div>
+		</div>
+		
+		<div id='showSpeed' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
+			<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+			<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+				<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
+			</div>
+		</div>
+
+		<div id='showAltitude' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
+			<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+			<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+				<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
+			</div>
+		</div>
+		
+		<div id='showStreet' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image from your current location, oriented in the direction of travel. This feature is EXPERIMENTAL. ">
+			<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %}</label>
+			<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
+				<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
+			</div>
+		</div>
+
+		<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
+			<input class='btn yellow' style="min-width:50%;" type="submit" value="Save">
+		</div>
+	</form>
+	
+	{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>?&ensp;It's free during beta testing.&ensp;</p>{% endif %}
+	<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>?&ensp;</p>
+</section>

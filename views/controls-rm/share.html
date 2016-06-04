@@ -1,0 +1,34 @@
+<style>
+	.sharebuttons .fa {
+		text-align: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		padding-top: 8px;
+		background: rgba(255,255,255,.2);
+		-moz-box-shadow: 2px 2px 4px #000;
+		-webkit-box-shadow: 2px 2px 4px #000;
+		box-shadow: 2px 2px 4px #000;
+	}.sharebuttons .fa:hover {
+		background: rgba(255,255,255,.4);
+	}.sharebuttons .fa:active {
+		-moz-box-shadow: 0;
+		-webkit-box-shadow: 0;
+		box-shadow: 0;
+	}
+</style>
+
+<section class='share dark container'>
+	<h1>Share</h1>
+	<p class='sharebuttons'>
+		To view your location, use this link: 
+		<a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>.&ensp;
+		You can share your map with these buttons:&emsp;
+		<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-twitter"></i></a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-facebook"></i></a>
+    <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/map/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="fa fa-linkedin"></i></a>
+	</p>
+	<p>You can also embed a map into your website with this code.&ensp;Be sure to set the width and height attributes to suit your circumstance.&ensp;</p>
+	<pre>&lt;iframe src=&quot;https://tracman.org/map/{{user.slug}}?noheader=1&quot; width=&quot;90%&quot; style=&quot;height:90vh&quot;&gt;&lt;/iframe&gt;</pre>
+</section>
