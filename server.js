@@ -61,7 +61,6 @@
 		app.use('/', 
 			require('./config/routes/index.js'),
 			require('./config/routes/auth.js'),
-			require('./config/routes/feedback.js'),
 			require('./config/routes/misc.js')
 		);
 		app.use('/map', require('./config/routes/map.js'));
