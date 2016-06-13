@@ -13,7 +13,7 @@ router.route('/')
 		// Get user
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
-			if (!user){ next(); }
+			if (!user){ console.log(req.session.passport); next(); }
 			// If user found: 
 			else {
 				// Open index

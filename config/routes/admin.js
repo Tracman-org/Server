@@ -1,11 +1,23 @@
 var router = require('express').Router(),
+	fs= require('fs'),
   mw = require('../middleware.js'),
   mail = require('../mail.js'),
   User = require('../models/user.js'),
   Request = require('../models/request.js');
 
+router.route('/')
+	.all(mw.ensureAdmin, function(req,res,next){
+		fs.readFile(__dirname+'/../../adminMongo/config/app.json', 'utf-8', function(err,data) {
+			if (err) {console.log('Couldn\'t find adminMongo\'s config/app.json due to an error:',err);}
+			if (!data) {console.log('Couldn\'t find adminMongo\'s config/app.json');}
+			else {
+				res.redirect( req.protocol +'://'+ req.get('host') +':'+ JSON.parse(data).app['port'] +'/Local/tracman' );
+			}
+		});
+	});
+
 router.route('/requests')
-	.all([mw.ensureAuth, mw.ensureAdmin], function(req,res,next){
+	.all(mw.ensureAdmin, function(req,res,next){
 		next();
 	}).get(function(req,res){
 		User.findById(req.session.passport.user, function(err, user){
@@ -45,7 +57,7 @@ router.route('/requests')
 	});
 
 router.route('/users')
-	.all([mw.ensureAuth, mw.ensureAdmin], function(req,res,next) {
+	.all(mw.ensureAdmin, function(req,res,next) {
 		next();
 	}).get(function(req,res){
 		User.findById(req.session.passport.user, function(err, user){

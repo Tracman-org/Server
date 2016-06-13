@@ -1,6 +1,7 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
   secret = require('../secrets.js'),
+  slug = require('slug'),
   User = require('../models/user.js');
 
 // Show map
@@ -42,7 +43,7 @@ router.get('/:slug?', function(req,res,next){
 		if (mapuser==''&&user=='') {
 			res.redirect('/');
 		} else {
-			if (mapuser==''&&user!='') { mapuser = user; }
+			if (user!=''&&mapuser=='') { mapuser = user; }
 			res.render('map.html', {
 				api: secret.mapAPI,
 				mapuser: mapuser,
@@ -55,6 +56,26 @@ router.get('/:slug?', function(req,res,next){
 	}
 		
 });
+
+router.post('/:slug?', mw.ensureAuth, function(req,res,next){
+	// Set new user settings
+	User.findByIdAndUpdate(req.session.passport.user, {$set:{name: req.body.name,
+		slug: slug(req.body.slug),
+		settings: {
+			units: req.body.units,
+			defaultMap: req.body.map,
+			defaultZoom: req.body.zoom,
+			showSpeed: (req.body.showSpeed)?true:false,
+			showAlt: (req.body.showAlt)?true:false,
+			showStreetview: (req.body.showStreet)?true:false
+		}
+	}}, function(err, user){
+		if (err) { console.log('Error updating user settings:',err); mw.throwErr(req,err); }
+		else { req.flash('success', 'Settings updated.  '); }
+		res.redirect('/map#');
+	});		
+});
+
 
 // Redirect /id/ to /slug/
 router.get('/id/:id', function(req,res,next){

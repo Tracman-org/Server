@@ -5,6 +5,7 @@
 	{{super()}}
 	<link href="/static/css/map.css" rel="stylesheet">
 	<style>
+		#notset {display:none}
 		.popup {
 			padding: 5vw;
 			border-radius: 5vw;
@@ -15,9 +16,11 @@
 			-moz-box-shadow: 3px 4px 6px #000;
 			-webkit-box-shadow: 3px 4px 6px #000;
 			box-shadow: 3px 4px 6px #000;
-			top: 10vh; bottom: 10vh;
-			left:10vw; right: 10vw;
+			top: calc(60px + 5vw);
+			bottom: calc(30px + 5vw);
+			left:5vw; right: 5vw;
 			overflow-y: auto;
+			overflow-x: hidden;
 		}.popup .close {
 			position: relative;
 			top: -15px;
@@ -100,7 +103,7 @@
 			</div>
 			<h2>Share</h2>
 			<p>This link will display the map of your location: 
-			<br><a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>
+			<a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>
 			<br>Here are some buttons for your convienence: 
 				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-twitter"></i></a>
 	      <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-facebook"></i></a>
@@ -225,8 +228,8 @@
 				</div>
 			</form>
 			
-			<!--{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}-->
-			<!--<p style="clear:both">Would you like to submit a <a href="/suggestion">suggestion</a> or <a href="/bug">bug report</a>? </p>-->
+			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}
+			<p style="clear:both">Would you like to submit a <a href="https://productpains.com/create/tracman">suggestion</a> or <a href="https://github.com/Tracman-org/Server/issues/new">bug report</a>? </p>
 		</div>
 		
 	{% endif %}
@@ -254,6 +257,7 @@
 					display: flex;
 					justify-content: space-around;
 				}#controls .btn {
+					padding: 15px 0;
 					background: #222;
 					width: 30vw;
 				}#controls .btn:hover {
@@ -276,11 +280,12 @@
 	</div>
 	
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+	<script src="/static/js/bundle.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=gmapsCb" async defer></script>
 	<script>
 		// Variables
 		{ var wpid, map, pano, sv, marker, elevator,
-			socket = io.connect(),
+			sock = io.connect(),
 			mapuserid = {{mapuser._id |dump|safe}},
 			userid{% if user._id %} = {{user._id |dump|safe}}{% endif %},
 			settings = JSON.parse('{{mapuser.settings |dump|safe}}'),
@@ -292,12 +297,16 @@
 		}
 		
 		// Connect to socket.io
-		socket.on('connect', function(){
-			socket.emit('room',
+		sock.on('connect', function(){
+			sock.emit('room',
 				(userid)? 'app-'+userid :mapuserid
 			);
-		});
-		
+		// }).on('data', function (data) {
+      // console.log(data);
+    }).on('error', function (err){
+      console.error('Unable to connect Socket.IO', err);
+    });
+      
 		// Check for location.hash capability (IE9+)
 		if (!'onhashchange' in window) {
     	alert("location.hash won't work in IE<9. If you don't know how to fix this, google 'how to update browser'. ");
@@ -421,26 +430,21 @@
 		
 		// Open popups
 		function setPopups() {
-			console.log('Setting popups');
 			if (location.hash === "#share") {
-				console.log('Setting popups to share');
 				$('.settings.popup').hide();
 				$('.share.popup').show();
 			} else if (location.hash === "#settings") {
-				console.log('Setting popups to settings');
 				$('.share.popup').hide();
 				$('.settings.popup').show();
-			} else { 
-				console.log('Setting popups to default');
+			} else {
 				$('.settings.popup').hide();
-				$('.share.popup').hide;
+				$('.share.popup').hide();
 			}
 		} setPopups(); // Execute immediately
 		window.onhashchange = setPopups; // Execute on change
 		
 		// Get location
-		socket.on('trac', function(loc) {
-			console.log('recieved location');
+		sock.on('trac', function(loc) {
 			loc = parseLoc(loc);
 			if (disp!='1' || !settings.showStreetview) {
 				$('.tim').text('location updated '+loc.time);
@@ -457,69 +461,86 @@
 			updateStreetView(loc,10);
 		});
 		
-		// Set location
-		function setLocation() {
-			if (!userid==mapuserid) {alert('You are not logged in! ');}
-			else {
-				if (!navigator.geolocation) {alert('Geolocation not enabled. ');}
+		{% if user %}
+			var token = '{{user.sk32}}';
+			
+			// Set location
+			function setLocation() {
+				if (!userid==mapuserid) {alert('You are not logged in! '); next();}
 				else {
-					navigator.geolocation.getCurrentPosition(function(pos){
-						console.log('Emitting location');
-						socket.emit('app',{
-							usr: userid,
-							lat: pos.coords.latitude,
-							lon: pos.coords.longitude,
-							spd: (pos.coords.speed||0)
-						});
-					}, function(err) {
-						if (err) { alert('ERROR: '+err); }
-						else { location.reload(); }
-					}, { enableHighAccuracy:true });
-				}
-			}
-		}
-		
-		// Track location
-		function trackLocation() {
-			if (!userid==mapuserid) { alert('You are not logged in! '); }
-			else {
-				// Stop tracking
-				if (wpid) {
-					$('#controls > .track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
-					navigator.geolocation.clearWatch(wpid);
-					wpid = undefined;
-				// Start tracking
-				} else {
-					$('#controls > .track').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop').tooltip('show');
-					if (!navigator.geolocation) { alert('Unable to track location. '); }
+					if (!navigator.geolocation) {alert('Geolocation not enabled. ');}
 					else {
-						wpid = navigator.geolocation.watchPosition(function(pos) {
-							socket.emit('app', {
-								usr: '{{user.id}}',
+						navigator.geolocation.getCurrentPosition(function(pos){
+							newloc = {
+								tok: token,
+								usr: userid,
 								lat: pos.coords.latitude,
 								lon: pos.coords.longitude,
 								spd: (pos.coords.speed||0)
-							});
-							// console.log('Sent location:',pos.coords.latitude.toFixed(2)+','+pos.coords.longitude.toFixed(2));
-						}, function(err){
-							alert('Failed to track: \n'+err);
+							}
+							sock.emit('app',newloc);
+							toggleMaps(newloc);
+						}, function(err) {
+							console.log('done getting position');
+							if (err) { console.log('ERROR: '+err); }
 						}, { enableHighAccuracy:true });
 					}
 				}
-				}
-		}
-		
-		// Clear location
-		function clearLocation() {
-			if (!userid==mapuserid) { alert('You are not logged in! '); }
-			else {
-				socket.emit('app', {
-					usr: userid,
-					lat:0, lon:0, spd:0
-				});
-				location.reload();
 			}
-		}
+			
+			// Track location
+			function trackLocation() {
+				if (!userid==mapuserid) { alert('You are not logged in! '); }
+				else {
+					// Stop tracking
+					if (wpid) {
+						$('#controls > .track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
+						navigator.geolocation.clearWatch(wpid);
+						wpid = undefined;
+					// Start tracking
+					} else {
+						$('#controls > .track').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop').tooltip('show');
+						if (!navigator.geolocation) { alert('Unable to track location. '); }
+						else {
+							wpid = navigator.geolocation.watchPosition(function(pos) {
+								newloc = {
+									tok: token,
+									usr: '{{user.id}}',
+									lat: pos.coords.latitude,
+									lon: pos.coords.longitude,
+									spd: (pos.coords.speed||0)
+								};
+								sock.emit('app',newloc);
+								toggleMaps(newloc);
+							}, function(err){
+								alert('Failed to track: \n'+err);
+							}, { enableHighAccuracy:true });
+						}
+					}
+					}
+			}
+			
+			// Clear location
+			function clearLocation() {
+				if (!userid==mapuserid) { alert('You are not logged in! '); }
+				else {
+					// Stop tracking
+					if (wpid) {
+						$('#controls > .track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
+						navigator.geolocation.clearWatch(wpid);
+						wpid = undefined;
+					} 
+					newloc = {
+						tok: token,
+						usr: userid,
+						lat:0, lon:0, spd:0
+					}
+					sock.emit('app',newloc);
+					toggleMaps(newloc);
+				}
+			}
+			
+		{% endif %}
 		
 		// Check altitude
 		function getAltitude(loc,elev,cb){
@@ -586,4 +607,5 @@
 		}
 		
 	</script>
+	
 {% endblock %}

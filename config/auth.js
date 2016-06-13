@@ -1,4 +1,5 @@
 var passport = require('passport'),
+	crypto = require('crypto'),
 	secret = require('./secrets.js'),
 	User = require('./models/user.js'),
 	GoogleStrategy = require('passport-google-oauth2').Strategy,
@@ -30,12 +31,19 @@ passport.use(new GoogleStrategy({
 						else {
 							user.googleID = profile.id;
 							user.lastLogin = Date.now();
-							user.save(function(err) {
-								if (err) { 
-									console.log('Error saving new (invited) user '+err);
-									var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
-								} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
-								done(null, user, { success:successMessage, failure:failMessage });
+							crypto.randomBytes(32, function(err,buf) {
+								if (err) {console.log('Unable to get random bytes:',err);}
+								if (!buf) {console.log('Unable to get random buffer');}
+								else {
+									user.sk32 = buf.toString('hex');
+									user.save(function(err) {
+										if (err) {
+											console.log('Error saving new (invited) user '+err);
+											var failMessage = 'Something went wrong finding your session.  Would you like to <a href="/bug">report this error</a>?';
+										} else { successMessage = 'Your account has been created.  Next maybe you should download the <a href="/android">android app</a>.  ' }
+										done(null, user, { success:successMessage, failure:failMessage });
+									});
+								}
 							});
 						}
 					});

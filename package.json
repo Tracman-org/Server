@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "browserify": "^13.0.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.1",
     "email-templates": "^2.1.0",
@@ -15,6 +16,7 @@
     "moment": "^2.12.0",
     "mongodb": "^2.1.4",
     "mongoose": "^4.3.5",
+    "node-jose": "^0.8.0",
     "nunjucks": "^2.3.0",
     "passport": "^0.3.2",
     "passport-google-id-token": "^0.4.0",

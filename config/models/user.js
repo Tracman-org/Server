@@ -26,5 +26,6 @@ module.exports = mongoose.model('User', {
 		dir: Number,
 		alt: Number,
 		spd: Number
-	}
+	},
+	sk32: {type:String, required:true, unique:true}
 });
