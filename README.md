@@ -14,6 +14,9 @@ $ git clone https://github.com/Tracman-org/Server.git && (cd server && exec npm 
 $ npm start
 ```
 
-## What's new in 3.0
+## Changelog
 
-Unified map and dashboard UI
+#### v0.3.0
+
+* Unified map and dashboard UI
+* Security updates
