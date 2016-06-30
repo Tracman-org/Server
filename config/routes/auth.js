@@ -16,7 +16,7 @@ router.get('/auth/google', passport.authenticate('google', { scope: [
 router.get('/auth/google/callback', passport.authenticate('google', {
 	failureRedirect: '/',
 	failureFlash: true,
-	successRedirect: '/map',
+	successRedirect: '/',
 	successFlash: true
 } ));
 
@@ -24,5 +24,5 @@ router.get('/auth/google/idtoken', passport.authenticate('google-id-token'),	fun
 	if (!req.user) { res.sendStatus(401); }
 	else { res.send(req.user); }
 } );
-  
+
 module.exports = router;

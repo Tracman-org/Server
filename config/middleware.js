@@ -1,11 +1,12 @@
-secret = require('./secrets.js');
+var secret = require('./secrets.js');
 
 var throwErr = function(req,err){
+	console.log('middleware.js:5 '+typeof err);
 	console.log('Middleware error:'+err+'\nfor request:\n'+req);
 	if (secret.env==='production') {
 		req.flash('error', 'An error occured. <br>Would you like to <a href="/bug">report it</a>?');
 		req.flash('error-message',err);
-	} else {
+	} else { // development
 		req.flash('error',err);
 		req.flash('error-message',err);
 	}
@@ -13,17 +14,24 @@ var throwErr = function(req,err){
 
 var ensureAuth = function(req,res,next){
 	if (req.isAuthenticated()) { return next(); }
-	else {
-		// req.session.returnTo = req.path;
-		// console.log('mw.ensureAuth: Going to redirect to '+req.path+' after login.'); // TODO: Correct next path
-		req.flash('error', 'You must be signed in to do that.  <a href="/login">Click here to log in</a>.  ');
-		res.redirect(req.path);
+	else { 
+		req.flash('last',req.path);
+		res.redirect('/login');
 	}
 };
 
 var ensureAdmin = function(req,res,next){
-	if (req.isAuthenticated()&&req.user.isAdmin) { return next(); }
-	else { res.sendStatus(401); }
+	ensureAuth(req,res,function(){
+		if (req.user.isAdmin){ return next(); }
+		else { next(); }
+		// else if (!res.headersSent) { // 404 to users (not admin)
+		// 	var err = new Error('404: Not found: '+req.url);
+		// 	err.status = 404;
+		// 	res.render('error.html', {
+		// 		code: err.status
+		// 	});
+		// }
+	});
 };
 
 module.exports = {

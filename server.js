@@ -67,6 +67,10 @@
 		app.use('/invited', require('./config/routes/invite.js'));
 		app.use('/admin', require('./config/routes/admin.js'));
 		app.use('/static', express.static(__dirname+'/static'));
+	}
+	
+	/* Errors */	{
+		// Catch-all for 404s
 		app.use(function(req,res,next) {
 			if (!res.headersSent) {
 				var err = new Error('404: Not found: '+req.url);
@@ -74,9 +78,8 @@
 				next(err);
 			}
 		});
-	}
-	
-	/* Error Handlers */	{
+		
+		// Handlers
 		if (secret.env=='production') {
 			app.use(function(err,req,res,next) {
 				if (res.headersSent) { return next(err); }
@@ -85,7 +88,8 @@
 					code: err.status
 				});
 			});
-		} else { // Development
+		}
+		else /* Development */{
 			app.use(function(err,req,res,next) {
 				console.log(err);
 				if (res.headersSent) { return next(err); }
@@ -186,7 +190,11 @@
 	
 	// Listen
 	http.listen(secret.port, function(){
-		console.log('Listening at '+secret.url+':'+secret.port);
+		console.log(
+			'==========================================\n'+
+			'Listening at '+secret.url+
+			'\n=========================================='
+		);
 		checkForUsers();
 	});
 }

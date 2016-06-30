@@ -309,7 +309,9 @@
       
 		// Check for location.hash capability (IE9+)
 		if (!'onhashchange' in window) {
-    	alert("location.hash won't work in IE<9. If you don't know how to fix this, google 'how to update browser'. ");
+			if (!confirm("location.hash won't work in IE<9. If you don't know how to fix this, click cancel. ")){
+				window.open("https://whatbrowser.org/");
+			}
 		}
 		
 		// Parse location

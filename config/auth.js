@@ -11,9 +11,14 @@ passport.use(new GoogleStrategy({
 	callbackURL: secret.url+'/auth/google/callback',
 	passReqToCallback: true
 }, function(req, accessToken, refreshToken, profile, done) {
+		// Check for user
 		User.findOne({googleID: profile.id}, function(err, user){
-			if(err) { console.log('Error finding user with google ID: '+profile.id+'\n'+err); }
-			if (!err && user !== null) { // Log in
+			
+			// error
+			if (err) { console.log('Error finding user with google ID: '+profile.id+'\n'+err); }
+			
+			// User found
+			if (!err && user !== null) {
 				if (!user.name) {
 					user.name = profile.displayName;
 				}
@@ -22,8 +27,12 @@ passport.use(new GoogleStrategy({
 					if (err) { throwErr(req,err); }
 				});
 				done(null, user);
-			} else { // No existing user with google auth
-				if (req.session.passport) { // Creating new user
+			}
+			
+			// User not found
+			else {
+				
+				if (req.session.passport) /* create new user */ {
 					User.findById(req.session.passport.user, function(err,user){
 						if (err) {
 							console.log('Error finding invited user with passport session ID: '+req.session.passport.user+'\n'+err);
@@ -47,11 +56,16 @@ passport.use(new GoogleStrategy({
 							});
 						}
 					});
-				} else { // User wasn't invited
+				}
+				
+				else /* user wasn't invited */ {
 					done(null,false, {error: 'User not found.  Maybe you want to <a href="#" data-scrollto="get">request an invite</a>?  '});
 				}
+			
 			}
+			
 		});
+		
 }));
 
 passport.use(new GoogleTokenStrategy({
