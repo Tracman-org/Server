@@ -3,7 +3,7 @@
 
 {% block head %}
 	{{ super() }}
-	<!--<link rel="stylesheet" type="text/css" href="/static/js/jquery-ui-tabs/jquery-ui.min.css">-->
+	<link rel="stylesheet" type="text/css" href="/static/js/jquery-ui-tabs/jquery-ui.min.css">
 	<style>
 		.container { max-width:90%; }
 	</style>
@@ -119,7 +119,7 @@
 			$('#tabs').tabs({
 				active: (location.hash=='#requests')?1:0,
 				beforeActivate: function(event,ui){
-					location.hash = '#'+ui.newTab.attr('id');
+					location.hash = '#'+ui.newPanel.attr('id');
 					setActive();
 				}
 			});
