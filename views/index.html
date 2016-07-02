@@ -20,7 +20,7 @@
 				{% endif %}
 			{% else %}
 				<a class='btn' href="/map/keith">View example<i class='fa fa-angle-right'></i></a>
-				<a class='btn' href="#" data-scrollto="get">Request invite<i class='fa fa-angle-down'></i></a>
+				<a class='btn' href="#" data-scrollto="join">Join<i class='fa fa-angle-down'></i></a>
 				<a class='btn' href="/login">Login<i class='fa fa-angle-right'></i></a>
 			{% endif %}
 		</div>
@@ -110,24 +110,12 @@
 	</section>
 
 	{% if not user %}
-	<section class='get light' id='get'>
+	<section class='join light' id='join'>
 		<div class='container'>
 			<h2>Hook me up!</h2>
-			<h3>Right now, Tracman is invite-only.&ensp;You can beg me for access here.&ensp;</h3>
-			<form id='invite-form' method="post">
-				<label class='input'><span>Name</span><input type="text" name="name" required></label>
-				<label class='input'><span>Email address</span><input type="email" name="email" required></label>
-				<label class='message'><span>Why you deserve beta access</span><textarea id='why' name="why"></textarea></label>
-				<label class='submit'>
-					{% if inviteSuccess.length > 0 %}
-						<div class='alert alert-success'><i class="fa fa-check-circle"></i> {{ inviteSuccess }}</div>
-					{% elif inviteError.length > 0 %}
-						<div class='alert alert-danger'><i class="fa fa-exclamation-circle"></i> {{ inviteError }}</div>
-					{% else %}
-						<button type="submit" class='btn'>Request Invite<i class='fa fa-angle-right'></i></button>
-					{% endif %}
-				</label>
-			</form>
+			<h3>Right now, Tracman is in beta testing.&ensp;Things may break.&ensp;</h3>
+			<p>You will need a google account to join tracman and log in.&ensp;</p>
+			<a class='btn btn-lg ' href="/login">Join Tracman</a>
 		</div>
 	</section>
 	{% endif %}

@@ -14,16 +14,14 @@ var throwErr = function(req,err){
 
 var ensureAuth = function(req,res,next){
 	if (req.isAuthenticated()) { return next(); }
-	else { 
-		req.flash('last',req.path);
-		res.redirect('/login');
-	}
+	else { res.redirect('/login'); }
 };
 
 var ensureAdmin = function(req,res,next){
 	ensureAuth(req,res,function(){
 		if (req.user.isAdmin){ return next(); }
 		else { next(); }
+		//TODO: test this by logging in as !isAdmin and go to /admin
 		// else if (!res.headersSent) { // 404 to users (not admin)
 		// 	var err = new Error('404: Not found: '+req.url);
 		// 	err.status = 404;
