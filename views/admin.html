@@ -1,5 +1,5 @@
 {% extends 'templates/base.html' %}
-{% block title %}Tracman | Invite Requests{% endblock %}
+{% block title %}{{super()}} | Admin{% endblock %}
 
 {% block head %}
 	{{ super() }}
@@ -13,6 +13,7 @@
 	<section class='dark'>
 		<div class='container' id='tabs'>
 			<ul class='nav nav-tabs'>
+			<!--TODO: Why is bootstrap not formatting .nav-tabs -->
 				<li><a href="#users">Users</a></li>
 				<li><a href="#requests">Requests</a></li>
 			</ul>
@@ -36,7 +37,7 @@
 								<td id='{{usr.id}}-created'></td>
 								<td id='{{usr.id}}-logged'></td>
 								<td id='{{usr.id}}-moved'></td>
-								<td id='{{usr.id}}-edit'><form action="" method="POST">
+								<td id='{{usr.id}}-edit'><form action="/users" method="POST">
 									<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{usr.id}}">DELETE</button>
 								</form></td>
 							</tr>
@@ -65,7 +66,7 @@
 							<td>{{ request.beg | replace("\r\n", "<br>") | safe }}</td>
 							<td id='{{request.id}}-requested'></td>
 							<td id='{{request.id}}-edit'>
-								<form action="" method="POST">
+								<form action="/requests" method="POST">
 									{% if not request.granted %}
 										<button type="submit" class='btn btn-block btn-success' name="invite" value="{{request.id}}">INVITE</button>
 									{% endif %}

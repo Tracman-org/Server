@@ -40,7 +40,6 @@ router.route('/')
 		
 	});
 	
-	
 router.route('/requests')
 	.all(mw.ensureAdmin, function(req,res,next){
 		if (err) {

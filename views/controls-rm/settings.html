@@ -23,12 +23,12 @@
 			<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 		</div>
 
-		<div id='units' class='form-group col-xs-12' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
+		<div id='units' class='form-group col-xs-12' title="Select standard units for feet and miles/hour.  Select metric units if you are a commie.  ">
 			<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
 			<div class='input-group col-sm-8 col-lg-9'>
 				<div class='radio-inline'><label>
-					<input type="radio" name="units" value="imperial" {% if user.settings.units == 'imperial' %}checked{% endif %}>
-					Imperial
+					<input type="radio" name="units" value="standard" {% if user.settings.units == 'standard' %}checked{% endif %}>
+					Standard
 				</label></div>
 				<div class='radio-inline'><label>
 					<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>

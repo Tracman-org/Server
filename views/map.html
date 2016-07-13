@@ -145,12 +145,12 @@
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 	
-				<div id='units' class='form-group col-xs-12' title="Select imperial units for feet and miles/hour.  Select metric units if you are a commie.  ">
+				<div id='units' class='form-group col-xs-12' title="Select standard units for feet and miles/hour.  Select metric units if you are a commie.  ">
 					<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
 					<div class='input-group col-sm-8 col-lg-9'>
 						<div class='radio-inline'><label>
-							<input type="radio" name="units" value="imperial" {% if user.settings.units == 'imperial' %}checked{% endif %}>
-							Imperial
+							<input type="radio" name="units" value="standard" {% if user.settings.units == 'standard' %}checked{% endif %}>
+							Standard
 						</label></div>
 						<div class='radio-inline'><label>
 							<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>
@@ -316,7 +316,7 @@
 		
 		// Parse location
 		function parseLoc(loc) {
-			loc.spd = (settings.units=='imperial')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
+			loc.spd = (settings.units=='standard')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
 			loc.dir = parseFloat(loc.dir);
 			loc.lat = parseFloat(loc.lat);
 			loc.lon = parseFloat(loc.lon);
@@ -392,9 +392,9 @@
 					speedLabel.className = 'spd-label';
 					speedLabel.innerHTML = 'SPEED';
 					speedText.className = 'spd';
-					speedText.innerHTML = (settings.units=='imperial')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
+					speedText.innerHTML = (settings.units=='standard')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
 					speedUnit.className = 'spd-unit';
-					speedUnit.innerHTML = (settings.units=='imperial')?'m.p.h.':'k.p.h.';
+					speedUnit.innerHTML = (settings.units=='standard')?'m.p.h.':'k.p.h.';
 					speedSign.className = 'spd-sign';
 					speedSign.appendChild(speedLabel);
 					speedSign.appendChild(speedText);
@@ -416,9 +416,9 @@
 					altitudeText.innerHTML = '';
 					altitudeLabel.innerHTML = 'ALTITUDE';
 					getAltitude(new google.maps.LatLng(last.lat,last.lon), elevator, function(alt) {
-						if (alt) { altitudeText.innerHTML = (settings.units=='imperial')?(alt*3.28084).toFixed():alt.toFixed(); }
+						if (alt) { altitudeText.innerHTML = (settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
 					});
-					altitudeUnit.innerHTML = (settings.units=='imperial')?'feet above sea level':'meters above sea level';
+					altitudeUnit.innerHTML = (settings.units=='standard')?'feet above sea level':'meters above sea level';
 					altitudeSign.appendChild(altitudeLabel);
 					altitudeSign.appendChild(altitudeText);
 					altitudeSign.appendChild(altitudeUnit);
@@ -453,7 +453,7 @@
 				if (settings.showSpeed) { $('.spd').text(loc.spd.toFixed()); }
 				if (settings.showAlt) {
 					getAltitude({lat:loc.lat,lng:loc.lon}, elevator, function(alt) {
-						if (alt) { $('.alt').text((settings.units=='imperial')?(alt*3.28084).toFixed():alt.toFixed()); }
+						if (alt) { $('.alt').text((settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed()); }
 					});
 				}
 				toggleMaps(loc);
