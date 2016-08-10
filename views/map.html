@@ -6,6 +6,12 @@
 	<link href="/static/css/map.css" rel="stylesheet">
 	<style>
 		#notset {display:none}
+		
+		.btn {
+			background: #222;
+		} .btn:hover {
+			background: #333;
+		}
 		.popup {
 			padding: 5vw;
 			border-radius: 5vw;
@@ -256,11 +262,11 @@
 			
 			<h2>Help</h2>
 			
-			<p><b>Set</b> sets your location once using this device's geolocation.  If you're using a GPS-enabled phone, the location will be set to its coordinates.  </p>
+			<p><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </p>
 			
-			<p><b>Track</b> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
+			<p><u>Track</u> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
 			
-			<p><b>Clear</b> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to go undercover.  </p>
+			<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to go undercover.  </p>
 			
 			<a href="#" class='btn' style="width:100%">OK</a>
 		</div>
@@ -291,9 +297,6 @@
 					justify-content: space-around;
 				} #controls .btn {
 					padding: 15px 0;
-					background: #222;
-				} #controls .btn:hover {
-					background: #333;
 				} #controls .btn.set, #controls .btn.clear {
 					width: 30vw;
 				} #controls .btn.track {
