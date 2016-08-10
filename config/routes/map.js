@@ -61,6 +61,7 @@ router.post('/:slug?', mw.ensureAuth, function(req,res,next){
 	// Set new user settings
 	User.findByIdAndUpdate(req.session.passport.user, {$set:{name: req.body.name,
 		slug: slug(req.body.slug),
+		email: req.body.email,
 		settings: {
 			units: req.body.units,
 			defaultMap: req.body.map,

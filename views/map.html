@@ -127,7 +127,7 @@
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
 	
-				<div id='name'class='form-group' title="This appears in your page's title.  ">
+				<div id='name' class='form-group' title="This appears in your page's title.  ">
 					<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<input class='form-control' name="name" type="text" value="{{user.name}}"
@@ -136,7 +136,16 @@
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 				
-				<div id='slug'class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+				<div id='email' class='form-group' title="For account stuff, no dumb newsletters.  ">
+					<label class='control-label col-sm-2 col-lg-3' for="email">Email</label>
+					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+						<input class='form-control' name="email" type="email" value="{{user.email}}"
+							maxlength="160" data-error="Invalid input"><br>
+					</div>
+					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+				</div>
+				
+				<div id='slug' class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
 					<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<span class='input-group-addon'>tracman.org/map/</span>
