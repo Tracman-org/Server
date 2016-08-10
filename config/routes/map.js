@@ -76,6 +76,16 @@ router.post('/:slug?', mw.ensureAuth, function(req,res,next){
 	});		
 });
 
+router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
+	// Delete user account
+	User.findByIdAndRemove(
+		req.session.passport.user,
+		function(err) {
+			if (err) { console.log('Error deleting user:',err); mw.throwErr(req,err); }
+			else { req.flash('success', 'Your account has been deleted.  '); }
+			res.redirect('/');
+		}
+	)
 
 // Redirect /id/ to /slug/
 router.get('/id/:id', function(req,res,next){

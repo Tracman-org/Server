@@ -18,7 +18,8 @@ $ npm start
 
 #### v0.4.1
 
-* added linked accounts to admin
+* Users can view/change email address
+* Added linked accounts to admin
 
 #### v0.4.0
 

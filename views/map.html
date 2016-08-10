@@ -122,6 +122,7 @@
 			<div class='close'>
 				<a href="#" title="close"><i class='fa fa-times'></i></a>
 			</div>
+			
 			<h2>Settings</h2>
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
@@ -220,6 +221,10 @@
 					<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
 						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
 					</div>
+				</div>
+
+				<div id='delete' class='form-group col-xs-12'>
+					<button class='btn' style='width:20%;float:right;' onclick="deleteAccount()"></button>
 				</div>
 	
 				<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
@@ -337,6 +342,7 @@
 				$('#notset').hide();
 			}
 		}
+		
 		// execute on page load
 		$(function() {
 			toggleMaps(last);
@@ -539,6 +545,16 @@
 					}
 					sock.emit('app',newloc);
 					toggleMaps(newloc);
+				}
+			}
+			
+			// Delete account
+			function deleteAccount() {
+				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
+					$.ajax({
+						url: "/",
+						type: "DELETE",
+					})
 				}
 			}
 			
