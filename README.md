@@ -18,7 +18,7 @@ $ npm start
 
 #### v0.4.1
 
-* 
+* added linked accounts to admin
 
 #### v0.4.0
 
