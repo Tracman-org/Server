@@ -81,9 +81,13 @@ router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
 	User.findByIdAndRemove(
 		req.session.passport.user,
 		function(err) {
-			if (err) { console.log('Error deleting user:',err); mw.throwErr(req,err); }
-			else { req.flash('success', 'Your account has been deleted.  '); }
-			res.redirect('/');
+			if (err) { 
+				console.log('Error deleting user:',err);
+				mw.throwErr(req,err);
+			} else { 
+				req.flash('success', 'Your account has been deleted.  ');
+				res.sendStatus(200);
+			}
 		}
 	)
 });

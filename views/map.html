@@ -224,7 +224,7 @@
 				</div>
 
 				<div id='delete' class='form-group col-xs-12'>
-					<button class='btn' style='width:20%;float:right;' onclick="deleteAccount()"></button>
+					<a class='btn red col-xs-5 col-md-3' style='margin-bottom:5px;float:right;' onclick="deleteAccount()">Delete account</a>
 				</div>
 	
 				<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
@@ -552,8 +552,11 @@
 			function deleteAccount() {
 				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
 					$.ajax({
-						url: "/",
+						url: "/map",
 						type: "DELETE",
+						success: function(){
+							location.reload();
+						}
 					})
 				}
 			}
