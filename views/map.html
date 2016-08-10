@@ -80,7 +80,7 @@
 		
 		<div class='share popup'>
 			<style>
-				.share.fa {
+				.share .fa {
 					text-align: center;
 					width: 30px;
 					height: 30px;
@@ -90,9 +90,9 @@
 					-moz-box-shadow: 2px 2px 4px #000;
 					-webkit-box-shadow: 2px 2px 4px #000;
 					box-shadow: 2px 2px 4px #000;
-				}.share.fa:hover {
+				}.share .fa:hover {
 					background: rgba(255,255,255,.4);
-				}.share.fa:active {
+				}.share .fa:active {
 					-moz-box-shadow: 0;
 					-webkit-box-shadow: 0;
 					box-shadow: 0;
@@ -101,13 +101,15 @@
 			<div class='close'>
 				<a href="#" title="close"><i class='fa fa-times'></i></a>
 			</div>
+			
 			<h2>Share</h2>
+			
 			<p>This link will display the map of your location: 
 			<a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>
 			<br>Here are some buttons for your convienence: 
-				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-twitter"></i></a>
+				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-twitter"></i></a>
 	      <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-facebook"></i></a>
-	      <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-reddit-alien"></i></a>
+	      <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
 	      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/map/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="share fa fa-linkedin"></i></a>
 			</p>
 			
@@ -124,6 +126,7 @@
 			</div>
 			
 			<h2>Settings</h2>
+			
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
 	
@@ -244,6 +247,22 @@
 			
 			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}
 			<p style="clear:both">Would you like to submit a <a href="https://productpains.com/create/tracman">suggestion</a> or <a href="https://github.com/Tracman-org/Server/issues/new">bug report</a>? </p>
+		</div>
+		
+		<div class='help popup'>
+			<div class='close'>
+				<a href="#" title="close"><i class='fa fa-times'></i></a>
+			</div>
+			
+			<h2>Help</h2>
+			
+			<p><b>Set</b> sets your location once using this device's geolocation.  If you're using a GPS-enabled phone, the location will be set to its coordinates.  </p>
+			
+			<p><b>Track</b> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
+			
+			<p><b>Clear</b> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to go undercover.  </p>
+			
+			<a href="#" class='btn' style="width:100%">OK</a>
 		</div>
 		
 	{% endif %}
@@ -451,12 +470,19 @@
 			if (location.hash === "#share") {
 				$('.settings.popup').hide();
 				$('.share.popup').show();
+				$('.help.popup').hide();
 			} else if (location.hash === "#settings") {
-				$('.share.popup').hide();
 				$('.settings.popup').show();
+				$('.share.popup').hide();
+				$('.help.popup').hide();
+			} else if (location.hash === "#help") {
+				$('.settings.popup').hide();
+				$('.share.popup').hide();
+				$('.help.popup').show();
 			} else {
 				$('.settings.popup').hide();
 				$('.share.popup').hide();
+				$('.help.popup').hide();
 			}
 		} setPopups(); // Execute immediately
 		window.onhashchange = setPopups; // Execute on change
