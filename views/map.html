@@ -270,14 +270,17 @@
 					bottom: 50px;
 					display: flex;
 					justify-content: space-around;
-				}#controls .btn {
+				} #controls .btn {
 					padding: 15px 0;
 					background: #222;
-					width: 30vw;
-				}#controls .btn:hover {
+				} #controls .btn:hover {
 					background: #333;
-				}#controls .track {
-					width:35vw;
+				} #controls .btn.set, #controls .btn.clear {
+					width: 25vw;
+				} #controls .btn.track {
+					width: 30vw;
+				} #controls .track {
+					width: 10vw;
 				}
 				{% if mapuser.settings.showStreetview and disp!='0' %}
 				@media (orientation: portrait) {
@@ -288,6 +291,7 @@
 				<button class='btn set' onclick="setLocation()">Set</button>
 				<button class='btn track' onclick="trackLocation()" data-toggle="tooltop" title="Tracking location..." data-trigger="manual"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
 				<button class='btn clear' onclick="clearLocation()">Clear</button>
+				<button class='btn help' onclick="showHelp()">?</button>
 			</div>
 		{% endif %}
 		
