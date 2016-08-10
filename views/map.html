@@ -327,7 +327,7 @@
 		
 		// Show/hide map if location is set/unset
 		function toggleMaps(loc) {
-			if (loc.lat=='0'||loc.lon=='0') {
+			if (loc.lat===0&&loc.lon===0) {
 				$('#map').hide();
 				$('#pano').hide();
 				$('#notset').show();
@@ -338,14 +338,14 @@
 			}
 		}
 		// execute on page load
-		$(function() { if (last.time) {
+		$(function() {
 			toggleMaps(last);
-		} });
+		});
 		
 		// Google maps API callback
 		function gmapsCb() {
 			// Create map
-			if (disp!='1' || !settings.showStreetview) {
+			if (disp!='1'||!settings.showStreetview) {
 				map = new google.maps.Map( mapElem, {
 					center: new google.maps.LatLng( last.lat, last.lon ),
 					panControl: false,

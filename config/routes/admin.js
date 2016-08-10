@@ -40,41 +40,9 @@ router.route('/')
 		
 	});
 	
-router.route('/requests')
-	.all(mw.ensureAdmin, function(req,res,next){
-		if (err) {
-			req.flash('error',err);
-			req.flash('error-message',err);
-		}
-	}).post(function(req,res){
-		if (req.body.invite) {
-			Request.findById(req.body.invite, function(err,request){
-				if (err){ req.flash('error', err.message); }
-				mail.sendInvite(request, function (err, raw) {
-					if (err) { req.flash('error', err.message); }
-					request.granted = Date.now();
-					request.save(function(err) {
-						if (err) { req.flash('error', err.message); }
-					});
-					req.flash('success', 'Invitation sent to <i>'+request.name+'</i>.');
-					res.redirect('/admin#requests');
-				});
-			});
-		} else if (req.body.delete) {
-			Request.findOneAndRemove({'_id':req.body.delete}, function(err,request){
-				if (err){ req.flash('error', err.message); }
-				else { req.flash('success', 'Request deleted.'); }
-				res.redirect('/admin#requests');
-			});
-		} else { console.log('ERROR! POST without action sent.  '); next(); }
-	});
-
 router.route('/users')
 	.all(mw.ensureAdmin, function(req,res,next){
-		if (err) {
-			req.flash('error',err);
-			req.flash('error-message',err);
-		}
+		next();
 	}).post(function(req,res){
 		if (req.body.delete) {
 			User.findOneAndRemove({'_id':req.body.delete}, function(err,user){

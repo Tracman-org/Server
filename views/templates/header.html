@@ -18,7 +18,7 @@
 	{% else %}
 		<li><a href="/#overview">About</a></li>
 		<li><a href="/map/keith">Demo</a></li>
-		<li><a href="/#get">Request Invite</a></li>
+		<li><a href="/#join">Join</a></li>
 		<li><a href="/login">Login</a></li>
 	{% endif %}
 	</ul>
@@ -27,7 +27,7 @@
 
 {% if error %}
 <div class='header alert alert-danger alert-dismissible'>
-	<strong><i class="fa fa-exclamation-circle"></i> ERROR:</strong> {{ error | safe }}
+	<strong><i class="fa fa-exclamation-circle"></i> ERROR:</strong> {{error|safe}}
 	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
 </div>
 {% elif success %}

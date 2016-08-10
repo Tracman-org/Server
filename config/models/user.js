@@ -21,11 +21,11 @@ module.exports = mongoose.model('User', {
 	},
 	last: {
 		time: Date,
-		lat: Number,
-		lon: Number,
-		dir: Number,
-		alt: Number,
-		spd: Number
+		lat: {type:Number, default:0},
+		lon: {type:Number, default:0},
+		dir: {type:Number, default:0},
+		alt: {type:Number, default:0},
+		spd: {type:Number, default:0}
 	},
 	sk32: {type:String, required:true, unique:true}
 });

@@ -5,7 +5,7 @@ router.get('/login', function(req,res){
 	res.redirect('/auth/google');
 });
 router.get('/logout', function(req,res){
-	req.logout();
+	req.logout(); // Needs to clear cookies?
 	res.redirect('/');
 });
 

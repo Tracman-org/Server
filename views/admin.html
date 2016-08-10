@@ -3,7 +3,7 @@
 
 {% block head %}
 	{{ super() }}
-	<link rel="stylesheet" type="text/css" href="/static/js/jquery-ui-tabs/jquery-ui.min.css">
+	<!--<link rel="stylesheet" type="text/css" href="/static/js/jquery-ui-tabs/jquery-ui.min.css">-->
 	<style>
 		.container { max-width:90%; }
 	</style>
@@ -12,11 +12,6 @@
 {% block main %}
 	<section class='dark'>
 		<div class='container' id='tabs'>
-			<ul class='nav nav-tabs'>
-			<!--TODO: Why is bootstrap not formatting .nav-tabs -->
-				<li><a href="#users">Users</a></li>
-				<li><a href="#requests">Requests</a></li>
-			</ul>
 			
 			<div id='users'>
 				<h1>Users</h1>
@@ -27,6 +22,7 @@
 							<th>Joined</th>
 							<th>Last login</th>
 							<th>Moved</th>
+							<th>Accounts</th>
 							<th>Edit</th>
 						</tr></thead>
 						<tbody>
@@ -37,7 +33,12 @@
 								<td id='{{usr.id}}-created'></td>
 								<td id='{{usr.id}}-logged'></td>
 								<td id='{{usr.id}}-moved'></td>
-								<td id='{{usr.id}}-edit'><form action="/users" method="POST">
+								<td id='{{usr.id}}-accounts'>
+									{% if usr.googleID %}
+										<a href="https://plus.google.com/{{usr.googleID}}/">Google</a>
+									{% endif %}
+								</td>
+								<td id='{{usr.id}}-edit'><form action="/admin/users" method="POST">
 									<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{usr.id}}">DELETE</button>
 								</form></td>
 							</tr>
@@ -46,85 +47,46 @@
 					</table>
 			</div>
 			
-			<div id='requests'>		
-				<h1>Requests</h1>
-				<table id='requests-table' class='table table-hover'>
-					<thead><tr>
-						<th>Name</th>
-						<th>Email</th>
-						<th>Message</th>
-	
-						<th>Requested</th>
-						<th>Invited</th>
-						<th>User</th>
-					</tr></thead>
-					<tbody>
-					{% for request in requests %}
-						<tr class="table-{% if request.userId %}success{% elif request.granted %}info{% else %}danger{% endif %}">
-							<td>{{request.name}}</td>
-							<td>{{request.email}}</td>
-							<td>{{ request.beg | replace("\r\n", "<br>") | safe }}</td>
-							<td id='{{request.id}}-requested'></td>
-							<td id='{{request.id}}-edit'>
-								<form action="/requests" method="POST">
-									{% if not request.granted %}
-										<button type="submit" class='btn btn-block btn-success' name="invite" value="{{request.id}}">INVITE</button>
-									{% endif %}
-									<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{request.id}}">DELETE</button>
-								</form>
-							</td>
-							<td>
-								{% if request.userId %}
-									<a href="/map/id/{{request.userId}}">{{request.userId}}</a>
-								{% endif %}
-							</td>
-						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
-			</div>
-			
 		</div>
 	</section>
 
 	<script src="/static/js/moment.min.js"></script>
-	<script src="/static/js/jquery-ui-tabs/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 	
-		/* TABS */ {
+		// /* TABS */ {
 			
-			// Check for location.hash capability (IE9+)
-			if (!'onhashchange' in window) {
-				if (!confirm("location.hash won't work in IE<9. If you don't know how to fix this, click cancel. ")){
-					window.open("https://whatbrowser.org/");
-				}
-			}
+		// 	// Check for location.hash capability (IE9+)
+		// 	if (!'onhashchange' in window) {
+		// 		if (!confirm("location.hash won't work in IE<9. If you don't know how to fix this, click cancel. ")){
+		// 			window.open("https://whatbrowser.org/");
+		// 		}
+		// 	}
 			
-			// Match jQuery's .ui-tabs-active with bootstrap's .active
-			function setActive() {
-				$('.nav-tabs > .active').removeClass('active');
-				$('.ui-tabs-active').addClass('active');
-			}
+		// 	// Match jQuery's .ui-tabs-active with bootstrap's .active
+		// 	function setActive() {
+		// 		$('.nav-tabs > .active').removeClass('active');
+		// 		$('.ui-tabs-active').addClass('active');
+		// 	}
 			
-			// Set tab on hash change
-			$(window).on('hashchange', function (){
-				$('#tabs > ul > li > a').each(function (index, a) {
-					if ($(a).attr('href') == location.hash) {
-						$('#tabs').tabs('option', 'active', index);
-						setActive();
-					}
-				});
-			});
+		// 	// Set tab on hash change
+		// 	$(window).on('hashchange', function (){
+		// 		$('#tabs > ul > li > a').each(function (index, a) {
+		// 			if ($(a).attr('href') == location.hash) {
+		// 				$('#tabs').tabs('option', 'active', index);
+		// 				setActive();
+		// 			}
+		// 		});
+		// 	});
 						
-			// Setup tabs
-			$('#tabs').tabs({
-				active: (location.hash=='#requests')?1:0,
-				beforeActivate: function(event,ui){
-					location.hash = '#'+ui.newPanel.attr('id');
-					setActive();
-				}
-			});
-		}
+		// 	// Setup tabs
+		// 	$('#tabs').tabs({
+		// 		active: (location.hash=='#requests')?1:0,
+		// 		beforeActivate: function(event,ui){
+		// 			location.hash = '#'+ui.newPanel.attr('id');
+		// 			setActive();
+		// 		}
+		// 	});
+		// }
 		
 		/* DATE/TIME FORMATS */ {
 			
@@ -148,18 +110,6 @@
 					);
 				{% else %}
 					$('#{{usr.id}}-moved').text("never");
-				{% endif %}
-			{% endfor %}
-			
-			// Requests
-			{% for request in requests %}
-				$('#{{request.id}}-requested').text(
-					moment("{{request.requestedTime}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
-				);
-				{% if request.granted %}
-					$('#{{request.id}}-edit').text(
-						moment("{{request.granted}}", "ddd MMM DD YYYY HH:mm:ss [GMT]ZZ").fromNow()
-					);
 				{% endif %}
 			{% endfor %}
 			

@@ -16,6 +16,10 @@ $ npm start
 
 ## Changelog
 
+#### v0.4.1
+
+* 
+
 #### v0.4.0
 
 * Opened registration
