@@ -86,6 +86,7 @@ router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
 			res.redirect('/');
 		}
 	)
+});
 
 // Redirect /id/ to /slug/
 router.get('/id/:id', function(req,res,next){
