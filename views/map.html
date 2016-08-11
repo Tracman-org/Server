@@ -262,11 +262,15 @@
 			
 			<h2>Help</h2>
 			
+			{% if newuser %}<p><i>Welcome to Tracman!  Here's how to get started.  </i></p>{% endif %}
+			
 			<p><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </p>
 			
 			<p><u>Track</u> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
 			
-			<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to go undercover.  </p>
+			<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to hide your location.  </p>
+			
+			{% if newuser %}<p>Share your location by sending the URL to anyone.  They won't need an account to view the map.  </p>{% endif %}
 			
 			<a href="#" class='btn' style="width:100%">OK</a>
 		</div>
