@@ -1,9 +1,7 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
-  mail = require('../mail.js'),
   secret = require('../secrets.js'),
-  User = require('../models/user.js'),
-  Request = require('../models/request.js');
+  User = require('../models/user.js');
 	
 router.route('/')
 .get(function(req,res,next){

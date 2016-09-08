@@ -48,7 +48,7 @@ passport.use(new GoogleStrategy({
 			(function checkSlug(s,cb) {
 				//console.log('checking ',s);
 				User.findOne({slug:s}, function(err, existingUser){
-					if (err) { console.log('Slug check error for ',slug(request.name).toLowerCase(),+':',err); }
+					if (err) { console.log('No user found for ',slug,':',err); }
 					if (existingUser){
 						s = '';
 						while (s.length<6) {

@@ -11,8 +11,7 @@ router.get('/:slug?', function(req,res,next){
 	// Confirm sucessful queries
 	function checkQuery(err,found) {	
 		if (err){ mw.throwErr(req,err); }
-		if (!found){ next(); }
-		else { return found; }
+		if (found){ return found; }
 	}
 	
 	// Call renderMap() on completion
@@ -40,10 +39,10 @@ router.get('/:slug?', function(req,res,next){
 	// Show map
 	function renderMap() {
 		// GET /map shows logged-in user's map
-		if (mapuser==''&&user=='') {
+		if (!mapuser && !user) {
 			res.redirect('/');
 		} else {
-			if (user!=''&&mapuser=='') { mapuser = user; }
+			if (user!==''&&mapuser==='') { mapuser = user; }
 			res.render('map.html', {
 				api: secret.mapAPI,
 				mapuser: mapuser,

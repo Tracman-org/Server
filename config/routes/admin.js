@@ -1,9 +1,7 @@
 var router = require('express').Router(),
 	fs= require('fs'),
   mw = require('../middleware.js'),
-  mail = require('../mail.js'),
-  User = require('../models/user.js'),
-  Request = require('../models/request.js');
+  User = require('../models/user.js');
 
 router.route('/')
 	.all(mw.ensureAdmin, function(req,res,next){
@@ -27,12 +25,7 @@ router.route('/')
 			res.locals.user = found;
 			checkCBC(req,res,err);
 		});
-		
-		Request.find({}).sort({requestedTime:-1}).exec(function(err, found){
-			res.locals.requests = found;
-			checkCBC(req,res,err);
-		});
-		
+
 		User.find({}).sort({lastLogin:-1}).exec(function(err, found){
 			res.locals.users = found;
 			checkCBC(req,res,err);
