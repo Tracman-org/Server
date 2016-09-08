@@ -64,7 +64,6 @@
 			require('./config/routes/misc.js')
 		);
 		app.use(['/map','/trac'], require('./config/routes/map.js'));
-		app.use('/invited', require('./config/routes/invite.js'));
 		app.use('/admin', require('./config/routes/admin.js'));
 		app.use('/static', express.static(__dirname+'/static'));
 	}

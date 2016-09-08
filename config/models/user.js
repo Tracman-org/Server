@@ -11,7 +11,7 @@ module.exports = mongoose.model('User', {
 	lastLogin: Date,
 	googleID: {type:Number, unique:true},
 	settings: {
-		units: {type:String, default:'imperial'},
+		units: {type:String, default:'standard'},
 		defaultMap: {type:String, default:'road'},
 		defaultZoom: {type:Number, default:11},
 		showSpeed: {type:Boolean, default:false},
@@ -21,11 +21,11 @@ module.exports = mongoose.model('User', {
 	},
 	last: {
 		time: Date,
-		lat: Number,
-		lon: Number,
-		dir: Number,
-		alt: Number,
-		spd: Number
+		lat: {type:Number, default:0},
+		lon: {type:Number, default:0},
+		dir: {type:Number, default:0},
+		alt: {type:Number, default:0},
+		spd: {type:Number, default:0}
 	},
 	sk32: {type:String, required:true, unique:true}
 });

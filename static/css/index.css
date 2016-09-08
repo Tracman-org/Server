@@ -178,30 +178,30 @@
 	color:#fb6e3d;
 }
 
-.get {
+.join {
 	background: #fbc93d;
 }
-.get input, .get textarea {
+.join input, .join textarea {
 	color:#111;
 }
-.get .input {
+.join .input {
 	width: 47%;
 	float: left;
 }
-.get .submit {
+.join .submit {
 	width: 47%;
 	float:right;
 }
-.get .input:nth-of-type(odd) {
+.join .input:nth-of-type(odd) {
 	margin-right: 6%;
 }
-.get .message {
+.join .message {
 	display: block;
 	clear: both;
 	float: none;
 	padding-top: 10px;
 }
-.get .input input {
+.join .input input {
 	display: inline-block;
 	float: left;
 	width: 100%;
@@ -209,7 +209,7 @@
 	border: 0;
 	padding: 10px 15px;
 }
-.get .message textarea {
+.join .message textarea {
 	display: block;
 	width: 100%;
 	height: 200px;
@@ -218,19 +218,19 @@
 	padding: 10px 15px;
 	resize: vertical;
 }
-.get label {
+.join label {
 	position: relative;
 	z-index: 10;
 }
-.get label.input span, .get label.message span {
+.join label.input span, .join label.message span {
 	display: inline-block;
 	float: left;
 }
-.get .submit {
+.join .submit {
 	text-align: center;
 	padding-top: 10px;
 }
-.get .submit .btn, .get .submit .alert {
+.join .submit .btn, .join .submit .alert {
 	position:static;
 	float:right;
 }
@@ -289,18 +289,18 @@
 		width: 100%;
 		float: none;
 	}
-	.get .input {
+	.join .input {
 		display: block;
 		width: 100%;
 		float: none;
 	}
-	.get .input:nth-of-type(odd) {
+	.join .input:nth-of-type(odd) {
 		margin-right: 0;
 	}
-	.get label {
+	.join label {
 		padding-top: 10px;
 	}
-	.get label:first-of-type {
+	.join label:first-of-type {
 		padding-top: 0;
 	}
 }
