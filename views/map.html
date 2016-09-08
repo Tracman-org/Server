@@ -6,6 +6,13 @@
 	<link href="/static/css/map.css" rel="stylesheet">
 	<style>
 		#notset {display:none}
+		
+		.btn {
+			z-index: 50;
+			background: #222;
+		} .btn:hover {
+			background: #333;
+		}
 		.popup {
 			padding: 5vw;
 			border-radius: 5vw;
@@ -80,7 +87,7 @@
 		
 		<div class='share popup'>
 			<style>
-				.share.fa {
+				.share .fa {
 					text-align: center;
 					width: 30px;
 					height: 30px;
@@ -90,9 +97,9 @@
 					-moz-box-shadow: 2px 2px 4px #000;
 					-webkit-box-shadow: 2px 2px 4px #000;
 					box-shadow: 2px 2px 4px #000;
-				}.share.fa:hover {
+				}.share .fa:hover {
 					background: rgba(255,255,255,.4);
-				}.share.fa:active {
+				}.share .fa:active {
 					-moz-box-shadow: 0;
 					-webkit-box-shadow: 0;
 					box-shadow: 0;
@@ -101,13 +108,15 @@
 			<div class='close'>
 				<a href="#" title="close"><i class='fa fa-times'></i></a>
 			</div>
+			
 			<h2>Share</h2>
+			
 			<p>This link will display the map of your location: 
 			<a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>
 			<br>Here are some buttons for your convienence: 
-				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-twitter"></i></a>
+				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-twitter"></i></a>
 	      <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-facebook"></i></a>
-	      <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-reddit-alien"></i></a>
+	      <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
 	      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/map/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="share fa fa-linkedin"></i></a>
 			</p>
 			
@@ -122,11 +131,13 @@
 			<div class='close'>
 				<a href="#" title="close"><i class='fa fa-times'></i></a>
 			</div>
+			
 			<h2>Settings</h2>
+			
 			<script src="/static/js/validator.min.js"></script>
 			<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
 	
-				<div id='name'class='form-group' title="This appears in your page's title.  ">
+				<div id='name' class='form-group' title="This appears in your page's title.  ">
 					<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<input class='form-control' name="name" type="text" value="{{user.name}}"
@@ -135,7 +146,16 @@
 					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
 				</div>
 				
-				<div id='slug'class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
+				<div id='email' class='form-group' title="For account stuff, no dumb newsletters.  ">
+					<label class='control-label col-sm-2 col-lg-3' for="email">Email</label>
+					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
+						<input class='form-control' name="email" type="email" value="{{user.email}}"
+							maxlength="160" data-error="Invalid input"><br>
+					</div>
+					<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+				</div>
+				
+				<div id='slug' class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
 					<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
 					<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
 						<span class='input-group-addon'>tracman.org/map/</span>
@@ -221,6 +241,10 @@
 						<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
 					</div>
 				</div>
+
+				<div id='delete' class='form-group col-xs-12'>
+					<a class='btn red col-xs-5 col-md-3' style='margin-bottom:5px;float:right;' onclick="deleteAccount()">Delete account</a>
+				</div>
 	
 				<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
 					<input class='btn yellow' style="width:50%;" type="submit" value="Save">
@@ -230,6 +254,26 @@
 			
 			{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}
 			<p style="clear:both">Would you like to submit a <a href="https://productpains.com/create/tracman">suggestion</a> or <a href="https://github.com/Tracman-org/Server/issues/new">bug report</a>? </p>
+		</div>
+		
+		<div class='help popup'>
+			<div class='close'>
+				<a href="#" title="close"><i class='fa fa-times'></i></a>
+			</div>
+			
+			<h2>Help</h2>
+			
+			{% if newuser %}<p><i>Welcome to Tracman!  Here's how to get started.  </i></p>{% endif %}
+			
+			<p><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </p>
+			
+			<p><u>Track</u> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
+			
+			<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to hide your location.  </p>
+			
+			{% if newuser %}<p>Share your location by sending the URL to anyone.  They won't need an account to view the map.  </p>{% endif %}
+			
+			<a href="#" class='btn' style="width:100%">OK</a>
 		</div>
 		
 	{% endif %}
@@ -256,14 +300,12 @@
 					bottom: 50px;
 					display: flex;
 					justify-content: space-around;
-				}#controls .btn {
+				} #controls .btn {
 					padding: 15px 0;
-					background: #222;
+				} #controls .btn.set, #controls .btn.clear {
 					width: 30vw;
-				}#controls .btn:hover {
-					background: #333;
-				}#controls .track {
-					width:35vw;
+				} #controls .btn.track {
+					width: 35vw;
 				}
 				{% if mapuser.settings.showStreetview and disp!='0' %}
 				@media (orientation: portrait) {
@@ -327,7 +369,7 @@
 		
 		// Show/hide map if location is set/unset
 		function toggleMaps(loc) {
-			if (loc.lat=='0'||loc.lon=='0') {
+			if (loc.lat===0&&loc.lon===0) {
 				$('#map').hide();
 				$('#pano').hide();
 				$('#notset').show();
@@ -337,15 +379,16 @@
 				$('#notset').hide();
 			}
 		}
+		
 		// execute on page load
-		$(function() { if (last.time) {
+		$(function() {
 			toggleMaps(last);
-		} });
+		});
 		
 		// Google maps API callback
 		function gmapsCb() {
 			// Create map
-			if (disp!='1' || !settings.showStreetview) {
+			if (disp!='1'||!settings.showStreetview) {
 				map = new google.maps.Map( mapElem, {
 					center: new google.maps.LatLng( last.lat, last.lon ),
 					panControl: false,
@@ -435,12 +478,19 @@
 			if (location.hash === "#share") {
 				$('.settings.popup').hide();
 				$('.share.popup').show();
+				$('.help.popup').hide();
 			} else if (location.hash === "#settings") {
-				$('.share.popup').hide();
 				$('.settings.popup').show();
+				$('.share.popup').hide();
+				$('.help.popup').hide();
+			} else if (location.hash === "#help") {
+				$('.settings.popup').hide();
+				$('.share.popup').hide();
+				$('.help.popup').show();
 			} else {
 				$('.settings.popup').hide();
 				$('.share.popup').hide();
+				$('.help.popup').hide();
 			}
 		} setPopups(); // Execute immediately
 		window.onhashchange = setPopups; // Execute on change
@@ -539,6 +589,19 @@
 					}
 					sock.emit('app',newloc);
 					toggleMaps(newloc);
+				}
+			}
+			
+			// Delete account
+			function deleteAccount() {
+				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
+					$.ajax({
+						url: "/map",
+						type: "DELETE",
+						success: function(){
+							location.reload();
+						}
+					})
 				}
 			}
 			

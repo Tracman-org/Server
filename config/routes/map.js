@@ -11,8 +11,7 @@ router.get('/:slug?', function(req,res,next){
 	// Confirm sucessful queries
 	function checkQuery(err,found) {	
 		if (err){ mw.throwErr(req,err); }
-		if (!found){ next(); }
-		else { return found; }
+		if (found){ return found; }
 	}
 	
 	// Call renderMap() on completion
@@ -40,10 +39,10 @@ router.get('/:slug?', function(req,res,next){
 	// Show map
 	function renderMap() {
 		// GET /map shows logged-in user's map
-		if (mapuser==''&&user=='') {
+		if (!mapuser && !user) {
 			res.redirect('/');
 		} else {
-			if (user!=''&&mapuser=='') { mapuser = user; }
+			if (user!==''&&mapuser==='') { mapuser = user; }
 			res.render('map.html', {
 				api: secret.mapAPI,
 				mapuser: mapuser,
@@ -61,6 +60,7 @@ router.post('/:slug?', mw.ensureAuth, function(req,res,next){
 	// Set new user settings
 	User.findByIdAndUpdate(req.session.passport.user, {$set:{name: req.body.name,
 		slug: slug(req.body.slug),
+		email: req.body.email,
 		settings: {
 			units: req.body.units,
 			defaultMap: req.body.map,
@@ -76,6 +76,21 @@ router.post('/:slug?', mw.ensureAuth, function(req,res,next){
 	});		
 });
 
+router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
+	// Delete user account
+	User.findByIdAndRemove(
+		req.session.passport.user,
+		function(err) {
+			if (err) { 
+				console.log('Error deleting user:',err);
+				mw.throwErr(req,err);
+			} else { 
+				req.flash('success', 'Your account has been deleted.  ');
+				res.sendStatus(200);
+			}
+		}
+	)
+});
 
 // Redirect /id/ to /slug/
 router.get('/id/:id', function(req,res,next){

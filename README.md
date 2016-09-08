@@ -1,5 +1,5 @@
 # Tracman
-###### v 0.4.0
+###### v 0.4.2
 
 node.js application to display a map with user's location.  
 
@@ -15,6 +15,16 @@ $ npm start
 ```
 
 ## Changelog
+
+#### v0.4.2
+
+* Fixed Streetview covering buttons
+* Fixed error when viewing map of nonexistant user
+
+#### v0.4.1
+
+* Users can view/change email address
+* Added linked accounts to admin
 
 #### v0.4.0
 

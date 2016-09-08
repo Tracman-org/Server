@@ -1,15 +1,13 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
-  mail = require('../mail.js'),
   secret = require('../secrets.js'),
-  User = require('../models/user.js'),
-  Request = require('../models/request.js');
+  User = require('../models/user.js');
 	
 router.route('/')
 .get(function(req,res,next){
 	
 	// Logged in
-	if (req.session.passport) {
+	if (req.session.passport&&req.session.passport.user) {
 		// Get user
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
@@ -32,9 +30,7 @@ router.route('/')
 	else {
 		res.render('index.html', {
 			error: req.flash('error')[0],
-			success: req.flash('success')[0],
-			inviteSuccess: req.flash('request-success')[0],
-			inviteError: req.flash('request-error')[0]
+			success: req.flash('success')[0]
 		});
 	}
 	
