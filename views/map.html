@@ -325,8 +325,9 @@
 	<script src="/static/js/bundle.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=gmapsCb" async defer></script>
 	<script>
-		// Variables
-		{ var wpid, map, pano, sv, marker, elevator,
+	
+		/* Variables */ {
+			var wpid, map, pano, sv, marker, elevator,
 			sock = io.connect(),
 			mapuserid = {{mapuser._id |dump|safe}},
 			userid{% if user._id %} = {{user._id |dump|safe}}{% endif %},
@@ -659,6 +660,8 @@
 						zoomControl: false,
 						addressControl: false,
 						linksControl: false,
+						motionTracking: false,
+						motionTrackingControl: false
 					};
 					pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
 					// Set panorama

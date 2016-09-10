@@ -2,7 +2,6 @@
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
-	// expressSession = require('express-session'),
 	cookieSession = require('cookie-session'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
