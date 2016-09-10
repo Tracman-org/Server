@@ -1,5 +1,5 @@
 # Tracman
-###### v 0.4.2
+###### v 0.4.3
 
 node.js application to display a map with user's location.  
 
@@ -15,6 +15,10 @@ $ npm start
 ```
 
 ## Changelog
+
+#### v0.4.3
+
+* Fixed memory store [#21](https://github.com/Tracman-org/Server/issues/21)
 
 #### v0.4.2
 

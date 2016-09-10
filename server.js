@@ -2,7 +2,8 @@
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
-	session = require('express-session'),
+	// expressSession = require('express-session'),
+	cookieSession = require('cookie-session'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
@@ -11,7 +12,6 @@
 	User = require('./config/models/user.js'),
 	app = express(),
 	http = require('http').Server(app),
-	// mongo_express = require('mongo-express/lib/middleware'),
 	io = require('socket.io')(http);
 }
 
@@ -29,7 +29,10 @@
 	});
 	
 	/* Session */ {
-		app.use(session({
+		app.use(cookieParser(secret.cookie));
+		// app.use(expressSession({
+		app.use(cookieSession({
+			cookie: {maxAge:60000},
 			secret: secret.session,
 			saveUninitialized: true,
 			resave: true
@@ -38,7 +41,6 @@
 		app.use(bodyParser.urlencoded({
 			extended: true
 		}));
-		app.use(cookieParser(secret.cookie));
 		app.use(flash());
 	}
 	
