@@ -42,7 +42,7 @@ router.get('/:slug?', function(req,res,next){
 		if (!mapuser && !user) {
 			res.redirect('/');
 		} else {
-			if (user!==''&&mapuser==='') { mapuser = user; }
+			if (user && !mapuser) { mapuser = user; }
 			res.render('map.html', {
 				api: secret.mapAPI,
 				mapuser: mapuser,
