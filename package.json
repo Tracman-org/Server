@@ -5,7 +5,6 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.15.0",
-    "browserify": "^13.0.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.1",
     "cookie-session": "^2.0.0-alpha.1",
@@ -37,7 +36,13 @@
   "scripts": {
     "test": "mocha test.js",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "deploy": "rsync -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git /srv/c9/tracman/ ubs:~/sites/tracman && ssh ubs svcdu tracman",
+    "drydeploy": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git /srv/c9/tracman/ ubs:~/sites/tracman",
+    "revert": "rsync -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git ubs:~/sites/tracman/ /srv/c9/tracman && ssh ubs svcdu tracman",
+    "dryrevert": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git ubs:~/sites/tracman/ /srv/c9/tracman",
+    "log": "ssh ubs log tracman",
+    "restart": "ssh ubs svcdu tracman"
   },
   "repository": {
     "type": "git",
