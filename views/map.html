@@ -387,7 +387,7 @@
 		});
 		
 		// Google maps API callback
-		function gmapsCb() {
+		window.gmapsCb = function() {
 			// Create map
 			if (disp!='1'||!settings.showStreetview) {
 				map = new google.maps.Map( mapElem, {
