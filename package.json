@@ -41,8 +41,8 @@
     "drydeploy": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git /srv/c9/tracman/ khp:/srv/tracman",
     "revert": "ssh khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git /srv/tracman/ kptow:/srv/c9/tracman && sudo systemctl reload-or-restart tracman'",
     "dryrevert": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git khp:/srv/tracman/ /srv/c9/tracman",
-    "log": "ssh khp 'journalctl -u tracman'",
-    "restart": "ssh khp 'sudo systemctl reload-or-restart tracman'"
+    "log": "ssh -t khp 'journalctl -u tracman'",
+    "restart": "ssh -t khp 'sudo systemctl reload-or-restart tracman'"
   },
   "repository": {
     "type": "git",
