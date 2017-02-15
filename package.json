@@ -37,9 +37,9 @@
     "test": "mocha test.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "deploy": "ssh khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git kptow:/srv/c9/tracman/ /srv/tracman && sudo systemctl reload-or-restart tracman'",
+    "deploy": "ssh -t khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git kptow:/srv/c9/tracman/ /srv/tracman && sudo systemctl reload-or-restart tracman'",
     "drydeploy": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git /srv/c9/tracman/ khp:/srv/tracman",
-    "revert": "ssh khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git /srv/tracman/ kptow:/srv/c9/tracman && sudo systemctl reload-or-restart tracman'",
+    "revert": "ssh -t khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git /srv/tracman/ kptow:/srv/c9/tracman && sudo systemctl reload-or-restart tracman'",
     "dryrevert": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git khp:/srv/tracman/ /srv/c9/tracman",
     "log": "ssh -t khp 'journalctl -u tracman'",
     "restart": "ssh -t khp 'sudo systemctl reload-or-restart tracman'"
