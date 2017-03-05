@@ -1,6 +1,5 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
-  secret = require('../secrets.js'),
   User = require('../models/user.js');
 	
 router.route('/')

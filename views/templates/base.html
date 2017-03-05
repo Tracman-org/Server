@@ -49,6 +49,7 @@
 		{% block main %}Loading... {% endblock %}
 		{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}
 
+		<!-- Google Analytics -->
 		<script>
 			(function(t,r,a,c,m,o,n){t['GoogleAnalyticsObject']=m;t[m]=t[m]||function(){
 			(t[m].q=t[m].q||[]).push(arguments);},t[m].l=1*new Date();o=r.createElement(a),
@@ -58,6 +59,18 @@
 			ga('create','UA-44266909-3','auto');
 			ga('require','linkid');
 			ga('send','pageview');
+		</script>
+		
+		<!-- Firebase -->
+		<script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+		<script>
+			firebase.initializeApp({
+				apiKey: "AIzaSyDPYY_Fw3FXLm0hKfIfc8qlrc98zZiN4IY",
+				authDomain: "tracman-b894f.firebaseapp.com",
+				databaseURL: "https://tracman-b894f.firebaseio.com",
+				storageBucket: "tracman-b894f.appspot.com",
+				messagingSenderId: "483494341936"
+			});
 		</script>
 
 	</body>
