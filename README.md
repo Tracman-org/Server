@@ -1,11 +1,11 @@
 # Tracman
-###### v 0.4.3
+###### v 0.4.5
 
 node.js application to display a map with user's location.  
 
 ## Installation
 ```sh
-$ git clone https://github.com/Tracman-org/Server.git && (cd server && exec npm install)
+$ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
 ## Running
@@ -15,6 +15,10 @@ $ npm start
 ```
 
 ## Changelog
+
+#### v0.4.5
+
+* 
 
 #### v0.4.3
 
