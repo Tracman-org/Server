@@ -1,6 +1,5 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
-  secret = require('../secrets.js'),
   slug = require('slug'),
   User = require('../models/user.js');
 
@@ -44,7 +43,6 @@ router.get('/:slug?', function(req,res,next){
 		} else {
 			if (user && !mapuser) { mapuser = user; }
 			res.render('map.html', {
-				api: secret.mapAPI,
 				mapuser: mapuser,
 				user: user,
 				noFooter: '1',
@@ -56,8 +54,8 @@ router.get('/:slug?', function(req,res,next){
 		
 });
 
+// Set new user settings
 router.post('/:slug?', mw.ensureAuth, function(req,res,next){
-	// Set new user settings
 	User.findByIdAndUpdate(req.session.passport.user, {$set:{name: req.body.name,
 		slug: slug(req.body.slug),
 		email: req.body.email,
@@ -76,8 +74,8 @@ router.post('/:slug?', mw.ensureAuth, function(req,res,next){
 	});		
 });
 
+// Delete user account
 router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
-	// Delete user account
 	User.findByIdAndRemove(
 		req.session.passport.user,
 		function(err) {
@@ -90,15 +88,6 @@ router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
 			}
 		}
 	)
-});
-
-// Redirect /id/ to /slug/
-router.get('/id/:id', function(req,res,next){
-	User.findById(req.params.id, function(err, user){
-		if (err){ mw.throwErr(req,err); }
-		if (!user){ next(); }
-		else { res.redirect('/map/'+user.slug+((req.url.indexOf('?')<0)?'':('?'+req.url.split('?')[1]))); }
-	});
 });
 
 module.exports = router;
