@@ -110,10 +110,12 @@
 	// Check for tracking users
 	function checkForUsers(room) {
 		if (room) {
+			// Check this room
 			io.to('app-'+room).emit('activate',
 				(io.of("/").adapter.rooms[room])?'true':'false'
 			);
 		} else {
+			// Check all rooms
 			User.find({}, function(err, users){
 				if (err) { console.log('Sockets error finding all users in all rooms: '+err); }
 				users.forEach( function(user){
