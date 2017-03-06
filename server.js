@@ -59,7 +59,7 @@
 	}
 	
 	/* Routes	*/ {
-		app.route('/favicon.ico', function(req,res){
+		app.get('/favicon.ico', function(req,res){
 			res.redirect('/static/img/icon/by/16-32-48.ico');
 		});
 		app.use('/', 
