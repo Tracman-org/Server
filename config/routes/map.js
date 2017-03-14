@@ -1,6 +1,7 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
   slug = require('slug'),
+  secrets = require('../secrets.js'),
   User = require('../models/user.js');
 
 // Show map
@@ -44,6 +45,7 @@ router.get('/:slug?', function(req,res,next){
 			if (user && !mapuser) { mapuser = user; }
 			res.render('map.html', {
 				mapuser: mapuser,
+				mapApi: secrets.googleMapsAPI,
 				user: user,
 				noFooter: '1',
 				noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:'',

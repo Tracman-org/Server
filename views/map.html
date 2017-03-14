@@ -115,9 +115,9 @@
 			<a href="/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>
 			<br>Here are some buttons for your convienence: 
 				<a href="https://twitter.com/home?status=A%20map%20of%20my%20realtime%20location:%20https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-twitter"></i></a>
-	      <a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-facebook"></i></a>
-	      <a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
-	      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/map/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="share fa fa-linkedin"></i></a>
+				<a href="https://www.facebook.com/sharer/sharer.php?u=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="share fa fa-facebook"></i></a>
+				<a href="https://www.reddit.com/submit?title=A%20map%20of%20my%20realtime%20location&url=https://tracman.org/map/{{user.slug}}" target="_blank"><i class="fa fa-reddit-alien"></i></a>
+				<a href="https://www.linkedin.com/shareArticle?mini=true&url=https://tracman.org/map/{{user.slug}}&title=A%20map%20of%20my%20realtime%20location" target="_blank"><i class="share fa fa-linkedin"></i></a>
 			</p>
 			
 			<p>You can also embed a map into your website with this code. Be sure to set the width and height attributes to suit your circumstance. 
@@ -323,12 +323,13 @@
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
 	<!--<script src="/static/js/bundle.js"></script>-->
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvhjcHCt7_zufmaWhvplhPTm65ruhJJEY&callback=gmapsCb" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
 	<script>
 	
 		/* Variables */ {
-			var wpid, map, pano, sv, marker, elevator,
-			sock = io.connect(),
+		var wpid, map, pano, sv, marker, elevator,
+			// socket = io.connect(),
+			socket = io('//'+window.location.hostname),
 			mapuserid = {{mapuser._id |dump|safe}},
 			userid{% if user._id %} = {{user._id |dump|safe}}{% endif %},
 			settings = JSON.parse('{{mapuser.settings |dump|safe}}'),
@@ -339,17 +340,31 @@
 			panoElem = document.getElementById('pano');
 		}
 		
+		function onConnect(socket,userid,mapuserid){
+			
+			// Can get location
+			socket.emit('can-get', mapuserid );
+			console.log(`Receiving updates for ${mapuserid}.`);
+			
+			// Can set location too
+			if (mapuserid==userid){ 
+				socket.emit('can-set', userid );
+				console.log(`Sending updates for ${userid}.`);
+			}
+			
+		}
+		
 		// Connect to socket.io
-		sock.on('connect', function(){
-			sock.emit('room',
-				(userid)? 'app-'+userid :mapuserid
-			);
-		// }).on('data', function (data) {
-      // console.log(data);
-    }).on('error', function (err){
-      console.error('Unable to connect Socket.IO', err);
-    });
-      
+		socket.on('connect', function(){
+			console.log(`Connected... `);
+			onConnect(socket,userid,mapuserid);
+		}).on('reconnect', function(){
+			console.log(`Reconnected... `);
+			onConnect(socket,userid,mapuserid);
+		}).on('error', function (err){
+			console.error(`Unable to connect because of: ${err.message}`);
+		});
+			
 		// Check for location.hash capability (IE9+)
 		if (!'onhashchange' in window) {
 			if (!confirm("location.hash won't work in IE<9. If you don't know how to fix this, click cancel. ")){
@@ -497,7 +512,7 @@
 		window.onhashchange = setPopups; // Execute on change
 		
 		// Get location
-		sock.on('trac', function(loc) {
+		socket.on('get', function(loc) {
 			loc = parseLoc(loc);
 			if (disp!='1' || !settings.showStreetview) {
 				$('.tim').text('location updated '+loc.time);
@@ -531,11 +546,14 @@
 								lon: pos.coords.longitude,
 								spd: (pos.coords.speed||0)
 							}
-							sock.emit('app',newloc);
+							socket.broadcast.emit('app', newloc);
 							toggleMaps(newloc);
 						}, function(err) {
-							console.log('done getting position');
-							if (err) { console.log('ERROR: '+err); }
+							if (err) { 
+								alert("Unable to set location.");
+								io.emit('log',err.message);
+								console.log(err.message); }
+							else { console.log('Got position',pos); }
 						}, { enableHighAccuracy:true });
 					}
 				}
@@ -563,10 +581,13 @@
 									lon: pos.coords.longitude,
 									spd: (pos.coords.speed||0)
 								};
-								sock.emit('app',newloc);
+								socket.broadcast.emit('app',newloc);
 								toggleMaps(newloc);
 							}, function(err){
-								alert('Failed to track: \n'+err);
+								if (err) {
+									alert("Unable to track location.");
+									console.log(err.message);
+								}
 							}, { enableHighAccuracy:true });
 						}
 					}
@@ -588,7 +609,7 @@
 						usr: userid,
 						lat:0, lon:0, spd:0
 					}
-					sock.emit('app',newloc);
+					socket.broadcast.emit('app',newloc);
 					toggleMaps(newloc);
 				}
 			}
