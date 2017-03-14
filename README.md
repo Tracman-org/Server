@@ -18,7 +18,9 @@ $ npm start
 
 #### v0.4.5
 
-* 
+* Updated libraries
+* Fixed recognition of attached clients [#34](https://github.com/Tracman-org/Server/issues/21)
+* Moved socket.io code to own file. 
 
 #### v0.4.3
 
