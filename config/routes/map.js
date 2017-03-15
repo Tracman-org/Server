@@ -1,6 +1,5 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
-  slug = require('slug'),
   secrets = require('../secrets.js'),
   User = require('../models/user.js');
 
@@ -54,42 +53,6 @@ router.get('/:slug?', function(req,res,next){
 		}
 	}
 		
-});
-
-// Set new user settings
-router.post('/:slug?', mw.ensureAuth, function(req,res,next){
-	User.findByIdAndUpdate(req.session.passport.user, {$set:{name: req.body.name,
-		slug: slug(req.body.slug),
-		email: req.body.email,
-		settings: {
-			units: req.body.units,
-			defaultMap: req.body.map,
-			defaultZoom: req.body.zoom,
-			showSpeed: (req.body.showSpeed)?true:false,
-			showAlt: (req.body.showAlt)?true:false,
-			showStreetview: (req.body.showStreet)?true:false
-		}
-	}}, function(err, user){
-		if (err) { console.log('Error updating user settings:',err); mw.throwErr(req,err); }
-		else { req.flash('success', 'Settings updated.  '); }
-		res.redirect('/map#');
-	});		
-});
-
-// Delete user account
-router.delete('/:slug?', mw.ensureAuth, function(req,res,next){
-	User.findByIdAndRemove(
-		req.session.passport.user,
-		function(err) {
-			if (err) { 
-				console.log('Error deleting user:',err);
-				mw.throwErr(req,err);
-			} else { 
-				req.flash('success', 'Your account has been deleted.  ');
-				res.sendStatus(200);
-			}
-		}
-	)
 });
 
 module.exports = router;

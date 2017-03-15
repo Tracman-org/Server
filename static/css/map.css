@@ -9,6 +9,7 @@ body {
 	width: 100%;
 }
 
+/* Alerts */
 .centered.alert {
 	text-align:center;
 	position: absolute;
@@ -17,16 +18,13 @@ body {
 	transform: translate(-50%, -50%);
 }
 
+/* Map and streetview */
 #map, #pano {position:relative;}
 #pano {float:right;}
-.loading {
-	font-size:7em;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin: -56px 0 0 -56px;
-}
+img#panoImg { width:100%; height:100%; }
+#notset {display:none}
 
+/* Tracman logo */
 .map-logo {
 	margin-left: -75px;
 	background: rgba(0,0,0,.7);
@@ -35,6 +33,7 @@ body {
 }
 .map-logo a { color: #fbc93d; }
 
+/* Timestamp */
 .tim {
 	color: #000;
 	font-size: 12px;
@@ -43,6 +42,9 @@ body {
 	background-color: rgba(255,255,255,.7);
 }
 
+/*TODO: Make signs smaller on mobile */
+
+/* Speed sign */
 .spd {
 	font-size: 32px;
 	height: 40px;}
@@ -55,6 +57,7 @@ body {
 	margin: 10px;
 	background-color: #FFF;
 }
+/* Altitude sign */
 .alt-unit, .spd-unit { font-size:12px; }
 .alt-label, .spd-label {
 	font-size:18px;
@@ -70,4 +73,12 @@ body {
 	border-radius: 3px;
 	margin: 10px;
 	background-color: #009800;
+}
+
+/* Control buttons */
+.btn {
+	z-index: 50;
+	background: #222;
+} .btn:hover {
+	background: #333;
 }
