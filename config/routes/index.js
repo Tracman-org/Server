@@ -13,7 +13,7 @@ router.route('/')
 	.get(function(req,res,next){
 	
 	// Logged in
-	if (req.session.passport&&req.session.passport.user) {
+	if ( req.session.passport && req.session.passport.user ){
 		// Get user
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
@@ -27,9 +27,7 @@ router.route('/')
 					success: req.flash('succcess')[0]
 				});
 			}
-			
 		});
-	// Not logged in
 	}
 	
 	// Not logged in
