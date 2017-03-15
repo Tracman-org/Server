@@ -1,7 +1,10 @@
 var router = require('express').Router(),
   mw = require('../middleware.js'),
   User = require('../models/user.js');
-	
+
+router.get('/favicon.ico', function(req,res){
+	res.redirect('/static/img/icon/by/16-32-48.ico');
+});	
 router.route('/')
 .get(function(req,res,next){
 	
