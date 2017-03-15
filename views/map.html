@@ -106,22 +106,22 @@
 			
 			// Can get location
 			socket.emit('can-get', mapuserid );
-			console.log(`Receiving updates for ${mapuserid}.`);
+			//console.log(`Receiving updates for ${mapuserid}.`);
 			
 			// Can set location too
 			if (mapuserid==userid){ 
 				socket.emit('can-set', userid );
-				console.log(`Sending updates for ${userid}.`);
+				//console.log(`Sending updates for ${userid}.`);
 			}
 			
 		}
 		
 		// Connect to socket.io
 		socket.on('connect', function(){
-			console.log(`Connected... `);
+			//console.log(`Connected... `);
 			onConnect(socket,userid,mapuserid);
 		}).on('reconnect', function(){
-			console.log(`Reconnected... `);
+			//console.log(`Reconnected... `);
 			onConnect(socket,userid,mapuserid);
 		}).on('error', function (err){
 			console.error(`Unable to connect because of: ${err.message}`);
@@ -246,6 +246,8 @@
 		
 		// Get location
 		socket.on('get', function(loc) {
+			//console.log(`Received location: ${loc.lat}, ${loc.lon}`);
+			
 			loc = parseLoc(loc);
 			if (disp!='1' || !settings.showStreetview) {
 				$('.tim').text('location updated '+loc.time);
@@ -285,8 +287,10 @@
 							if (err) { 
 								alert("Unable to set location.");
 								io.emit('log',err.message);
-								console.log(err.message); }
-							else { console.log('Got position',pos); }
+								console.error(err.message); }
+							else { 
+								//console.log('Set position',pos);
+							}
 						}, { enableHighAccuracy:true });
 					}
 				}

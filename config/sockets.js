@@ -5,7 +5,7 @@ const User = require('./models/user.js');
 
 // Check for tracking clients
 function checkForUsers(io, user) {
-	console.log(`Checking for clients receiving updates for ${user}`);
+	//console.log(`Checking for clients receiving updates for ${user}`);
 	
 	// Checks if any sockets are getting updates for this user
 	//TODO: Use Object.values() after upgrading to node v7
@@ -14,10 +14,10 @@ function checkForUsers(io, user) {
 	}).some( function(socket){
 		return socket.gets==user;
 	})) {
-		console.log(`Activating updates for ${user}.`);
+		//console.log(`Activating updates for ${user}.`);
 		io.to(user).emit('activate','true');
 	} else {
-		console.log(`Deactivating updates for ${user}.`);
+		//console.log(`Deactivating updates for ${user}.`);
 		io.to(user).emit('activate', 'false');
 	}
 }
@@ -28,13 +28,18 @@ module.exports = {
 	
 	init: function(io){
 		io.on('connection', function(socket) {
-			console.log(`${socket.id} connected.`);
+			//console.log(`${socket.id} connected.`);
+			
+			// Log
+			//socket.on('log', function(text){
+				//console.log(`LOG: ${text}`);
+			//});
 			
 			// This socket can set location (app)
 			socket.on('can-set', function(userId){
-				console.log(`${socket.id} can set updates for ${userId}.`);
+				//console.log(`${socket.id} can set updates for ${userId}.`);
 				socket.join(userId, function(){
-					console.log(`${socket.id} joined ${userId}`);
+					//console.log(`${socket.id} joined ${userId}`);
 				});
 				checkForUsers( io, userId );
 			});
@@ -42,9 +47,9 @@ module.exports = {
 			// This socket can receive location (map)
 			socket.on('can-get', function(userId){
 				socket.gets = userId;
-				console.log(`${socket.id} can get updates for ${userId}.`);
+				//console.log(`${socket.id} can get updates for ${userId}.`);
 				socket.join(userId, function(){
-					console.log(`${socket.id} joined ${userId}`);
+					//console.log(`${socket.id} joined ${userId}`);
 					socket.to(userId).emit('activate', 'true');
 				});
 			});
@@ -92,11 +97,11 @@ module.exports = {
 			
 			// Shutdown (check for remaining clients)
 			socket.on('disconnect', function(reason){
-				console.log(`${socket.id} disconnected because of a ${reason}.`);
+				//console.log(`${socket.id} disconnected because of a ${reason}.`);
 				
 				// Check if client was receiving updates
 				if (socket.gets){
-					console.log(`${socket.id} left ${socket.gets}`);
+					//console.log(`${socket.id} left ${socket.gets}`);
 					checkForUsers( io, socket.gets );
 				}
 				
