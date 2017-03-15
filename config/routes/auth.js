@@ -1,4 +1,6 @@
-var router = require('express').Router(),
+'use strict';
+
+const router = require('express').Router(),
   passport = require('passport');
   
 router.get('/login', function(req,res){

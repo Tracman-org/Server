@@ -1,6 +1,8 @@
-var mongoose = require('mongoose');
+'use strict';
 
-module.exports = mongoose.model('User', {
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
 	name: {type:String, required:true},
 	email: String,
 	slug: {type:String, required:true, unique:true},
@@ -29,3 +31,5 @@ module.exports = mongoose.model('User', {
 	},
 	sk32: {type:String, required:true, unique:true}
 });
+
+module.exports = mongoose.model('User', userSchema);

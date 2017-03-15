@@ -1,4 +1,7 @@
-/* IMPORTS */ { var 
+'use strict';
+
+/* IMPORTS */ 
+const 
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -11,8 +14,9 @@
 	User = require('./config/models/user.js'),
 	app = express(),
 	http = require('http').Server(app),
-	io = require('socket.io')(http);
-}
+	io = require('socket.io')(http),
+	sockets = require('./config/sockets.js');
+
 
 /* SETUP */ {
 	/* Database */ mongoose.connect(secret.mongoSetup, {
@@ -59,6 +63,9 @@
 	}
 	
 	/* Routes	*/ {
+		app.get('/favicon.ico', function(req,res){
+			res.redirect('/static/img/icon/by/16-32-48.ico');
+		});
 		app.use('/', 
 			require('./config/routes/index.js'),
 			require('./config/routes/auth.js'),
@@ -103,90 +110,13 @@
 		}
 	}
 	
+	/* Sockets */ {
+		sockets.init(io);
+	}
+	
 }
 
 /* RUNTIME */ {
-	
-	// Check for tracking users
-	function checkForUsers(room) {
-		if (room) {
-			io.to('app-'+room).emit('activate',
-				(io.of("/").adapter.rooms[room])?'true':'false'
-			);
-		} else {
-			User.find({}, function(err, users){
-				if (err) { console.log('Sockets error finding all users in all rooms: '+err); }
-				users.forEach( function(user){
-					checkForUsers(user.id);
-				});
-			});
-		}
-	}
-	
-	// Websockets	
-	io.on('connection', function(sock) {
-		
-		// Set room to map user ID
-		sock.on('room', function(room) {
-			sock.join(room);
-			if (room.slice(0,4)!='app-'){
-				// External user
-				User.findById({_id:room}, function(err, user) {
-					if (err) { console.log('Sockets error finding tracked user of room '+room+'\n'+err); }
-					if (user) {
-						io.to('app-'+room).emit('activate','true'); }
-				});
-			} else { // Sets location
-				checkForUsers(room.slice(4));
-			}
-		});
-		
-		// Recieving beacon
-		sock.on('app', function(loc){
-			loc.time = Date.now();
-			
-			// Check for sk32 token
-			if (loc.tok) {
-				// Get loc.usr
-				User.findById(loc.usr, function(err, user) {
-					if (err) { console.log('Error finding user:',err); }
-					if (!user) { console.log('User not found'); }
-					else {
-						// Confirm sk32 token
-						if (loc.tok!=user.sk32) { console.log('loc.tok!=user.sk32 || ',loc.tok,'!=',user.sk32); }
-						else {
-							// Broadcast location to spectators
-							io.to(loc.usr).emit('trac', loc);
-							// Echo broadcast to transmittors
-							io.to('app-'+loc.usr).emit('trac', loc);
-							// Save in db as last seen
-							user.last = {
-								lat: parseFloat(loc.lat),
-								lon: parseFloat(loc.lon),
-								dir: parseFloat(loc.dir||0),
-								spd: parseFloat(loc.spd||0),
-								time: loc.time
-							};
-							user.save(function(err) {
-								if (err) { console.log('Error saving user last location:'+loc.user+'\n'+err); }
-							});
-						}
-					}
-				});
-			}
-		});
-		
-		// Shutdown (check for users)
-		sock.onclose = function(reason){
-			var closedroom = Object.keys(
-				sock.adapter.sids[sock.id]).slice(1)[0];
-			setTimeout(function() {
-				checkForUsers(closedroom);
-			}, 3000);
-			Object.getPrototypeOf(this).onclose.call(this,reason);
-		};
-	
-	});
 	
 	// Listen
 	http.listen(secret.port, function(){
@@ -195,7 +125,15 @@
 			'Listening at '+secret.url+
 			'\n=========================================='
 		);
-		checkForUsers();
+		
+		// Check for clients for each user
+		User.find({}, function(err, users){
+			if (err) { console.log(`DB error finding all users: ${err.message}`); }
+			users.forEach( function(user){
+				sockets.checkForUsers( io, user.id );
+			});
+		});
+		
 	});
 }
 

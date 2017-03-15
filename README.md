@@ -1,11 +1,11 @@
 # Tracman
-###### v 0.4.3
+###### v 0.5.0
 
 node.js application to display a map with user's location.  
 
 ## Installation
 ```sh
-$ git clone https://github.com/Tracman-org/Server.git && (cd server && exec npm install)
+$ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
 ## Running
@@ -14,7 +14,18 @@ $ git clone https://github.com/Tracman-org/Server.git && (cd server && exec npm 
 $ npm start
 ```
 
+## Contributing
+
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model). 
+
 ## Changelog
+
+#### v0.5.0
+
+* Updated libraries
+* Fixed recognition of attached clients [#34](https://github.com/Tracman-org/Server/issues/21)
+* Moved socket.io code to own file. 
+* Many minor fixes
 
 #### v0.4.3
 

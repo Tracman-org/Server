@@ -1,18 +1,18 @@
 {
   "name": "tracman",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
-    "body-parser": "^1.15.0",
+    "body-parser": "^1.17.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.1",
     "cookie-session": "^2.0.0-alpha.1",
-    "express": "^4.13.3",
+    "express": "^4.15.2",
     "kerberos": "0.0.17",
     "moment": "^2.12.0",
     "mongodb": "^2.1.4",
-    "mongoose": "^4.3.5",
+    "mongoose": "^4.9.0",
     "node-jose": "^0.8.0",
     "nunjucks": "^2.3.0",
     "passport": "^0.3.2",
@@ -37,12 +37,7 @@
     "test": "mocha test.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "deploy": "ssh -t khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git kptow:/srv/c9/tracman/ /srv/tracman && sudo systemctl reload-or-restart tracman'",
-    "drydeploy": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git /srv/c9/tracman/ khp:/srv/tracman",
-    "revert": "ssh -t khp 'rsync -aP --delete --exclude-from /srv/tracman/.gitignore --exclude .git /srv/tracman/ kptow:/srv/c9/tracman && sudo systemctl reload-or-restart tracman'",
-    "dryrevert": "rsync --dry-run -vaP --delete --exclude-from /srv/c9/tracman/.gitignore --exclude .git khp:/srv/tracman/ /srv/c9/tracman",
-    "log": "ssh -t khp 'journalctl -u tracman'",
-    "restart": "ssh -t khp 'sudo systemctl reload-or-restart tracman'"
+    "update": "sudo n stable && sudo npm update --save && sudo npm prune"
   },
   "repository": {
     "type": "git",

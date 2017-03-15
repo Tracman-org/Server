@@ -1,4 +1,6 @@
-var router = require('express').Router(),
+'use strict';
+
+const router = require('express').Router(),
   mw = require('../middleware.js'),
   User = require('../models/user.js');
 

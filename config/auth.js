@@ -1,4 +1,6 @@
-var passport = require('passport'),
+'use strict';
+
+const passport = require('passport'),
 	slug = require('slug'),
 	crypto = require('crypto'),
 	secret = require('./secrets.js'),
@@ -30,7 +32,7 @@ passport.use(new GoogleStrategy({
 		
 		// User not found
 		else /* create user */ {
-			var user = new User();
+			user = new User();
 			user.googleID = profile.id;
 			user.name = profile.displayName;
 			user.email = profile.emails[0].value;
@@ -42,7 +44,7 @@ passport.use(new GoogleStrategy({
 			// user.isPro = false;
 			// user.isAdmin = false;
 			var cbc = 2;
-			var successMessage, failMessage
+			var successMessage, failMessage;
 			
 			// Generate slug
 			(function checkSlug(s,cb) {
