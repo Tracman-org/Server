@@ -1,0 +1,48 @@
+{
+	"name": "Tracman",
+	"short_name": "Tracman",
+	"author": "Keith Irwin",
+	"description": "GPS tracking service",
+	"homepage_url": "https://github.com/Tracman-org/Server",
+	
+	"theme_color": "#222222",
+	"background_color": "#080808",
+	"display": "standalone",
+	"icons": [{
+		"src": "static/img/icon/by/228.png",
+		"sizes": "228x228",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/152.png",
+		"sizes": "152x152",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/128.png",
+		"sizes": "128x128",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/72.png",
+		"sizes": "72x72",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/57.png",
+		"sizes": "57x57",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/48.png",
+		"sizes": "48x48",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/32.png",
+		"sizes": "32x32",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/16.png",
+		"sizes": "16x16",
+		"type": "image/png"
+	}, {
+		"src": "static/img/icon/by/16-32-48.ico",
+		"sizes": "16x16 32x32 48x48",
+		"type": "image/ico"
+	}]
+}
