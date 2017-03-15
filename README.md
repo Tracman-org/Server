@@ -20,6 +20,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 ## Changelog
 
+#### v0.5.1
+
+
 #### v0.5.0
 
 * Updated libraries
