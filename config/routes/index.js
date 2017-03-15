@@ -90,7 +90,7 @@ router.route('/settings')
 	
 router.route('/help')
 	.get(mw.ensureAuth, function(req,res){
-		res.render('help.html');
+		res.render('help.html', {user:req.session.passport.user});
 	});
 
 module.exports = router;

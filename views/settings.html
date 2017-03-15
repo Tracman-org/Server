@@ -1,15 +1,6 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{super()}} | Settings{% endblock %}
 
-{% block head %}
-	{{super()}}
-	<style>
-		form .btn {
-			background: #333;
-		}
-	</style>
-{% endblock %}
-
 {% block main %}
 
 	<section class='container'>
@@ -129,8 +120,8 @@
 			</div>
 			
 			<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
-				<input class='btn yellow' style="width:50%;" type="submit" value="Save">
-				<a href="#" class='btn' style="width:50%">cancel</a>
+				<input class='btn yellow' style="width:50%; background:#333" type="submit" value="Save">
+				<a href="#" class='btn' style="width:50%; background:#333">cancel</a>
 			</div>
 			
 		</form>
