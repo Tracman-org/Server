@@ -1,3 +1,5 @@
+'use strict';
+
 jQuery.extend(jQuery.easing,{
 	easeInOutExpo: function(x, t, b, c, d){
 		if (t==0) return b;

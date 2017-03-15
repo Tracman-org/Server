@@ -1,3 +1,5 @@
+'use strict';
+
 // Imports
 const User = require('./models/user.js');
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var secret = require('./secrets.js');
 
 var throwErr = function(req,err){

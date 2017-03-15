@@ -1,3 +1,5 @@
+'use strict';
+
 /* IMPORTS */ { var 
 	express = require('express'),
 	bodyParser = require('body-parser'),

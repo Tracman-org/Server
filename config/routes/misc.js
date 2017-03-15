@@ -1,3 +1,5 @@
+'use strict';
+
 var router = require('express').Router(),
   mw = require('../middleware.js'),
   slug = require('slug'),
