@@ -1,6 +1,6 @@
 'use strict';
 
-var secret = require('./secrets.js');
+const secret = require('./secrets.js');
 
 var throwErr = function(req,err){
 	console.log('middleware.js:5 '+typeof err);

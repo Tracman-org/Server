@@ -1,6 +1,6 @@
 'use strict';
 
-var router = require('express').Router(),
+const router = require('express').Router(),
   passport = require('passport');
   
 router.get('/login', function(req,res){

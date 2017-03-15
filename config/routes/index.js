@@ -1,9 +1,9 @@
 'use strict';
 
-var router = require('express').Router(),
-	slug = require('slug'),
-  mw = require('../middleware.js'),
-  User = require('../models/user.js');
+const slug = require('slug'),
+	mw = require('../middleware.js'),
+	User = require('../models/user.js'),
+	router = require('express').Router();
 
 // Shortcut to favicon.ico
 router.get('/favicon.ico', function(req,res){

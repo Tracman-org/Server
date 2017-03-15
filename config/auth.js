@@ -1,6 +1,6 @@
 'use strict';
 
-var passport = require('passport'),
+const passport = require('passport'),
 	slug = require('slug'),
 	crypto = require('crypto'),
 	secret = require('./secrets.js'),

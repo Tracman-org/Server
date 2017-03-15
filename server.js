@@ -1,6 +1,7 @@
 'use strict';
 
-/* IMPORTS */ { var 
+/* IMPORTS */ 
+const 
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -15,7 +16,7 @@
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
 	sockets = require('./config/sockets.js');
-}
+
 
 /* SETUP */ {
 	/* Database */ mongoose.connect(secret.mongoSetup, {
