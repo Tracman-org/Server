@@ -46,7 +46,7 @@ router.get('/:slug?', function(req,res,next){
 			if (user && !mapuser) { mapuser = user; }
 			res.render('map.html', {
 				mapuser: mapuser,
-				mapApi: secrets.googleMapsAPI,
+				mapApi: secrets.mapAPI,
 				user: user,
 				noFooter: '1',
 				noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:'',
