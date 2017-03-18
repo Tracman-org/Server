@@ -4,8 +4,39 @@
 node.js application to display a map with user's location.  
 
 ## Installation
+
 ```sh
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
+```
+
+You will need to set up a configuration file at `config/secrets.js`.  It should contain the following information: 
+
+```javascript
+'use strict';
+
+module.exports = {
+
+	env: 'development', // or 'production'
+	
+	// Random strings to prevent hijacking
+	session: 'this is a secret',
+	cookie: 'shhhhh',
+	
+	// Client IDs for authentication
+	googleClientId: '############-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com',
+	googleClientSecret: 'XXXXXXXXX_XXXXXXXXXXXXXX',
+	
+	// A google maps API
+	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX',
+	
+	// Location of your mongoDB
+	mongoSetup: 'mongodb://localhost/tracman',
+	
+	// URL and port where Tracman will be run. 
+	url: 'http://localhost:8080',
+	port: 8080
+	
+};
 ```
 
 ## Running
