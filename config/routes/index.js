@@ -5,30 +5,10 @@ const slug = require('slug'),
 	User = require('../models/user.js'),
 	router = require('express').Router();
 
-// Index route
-router.route('/')
-	.get(function(req,res,next){
-		
-		// Logged in
-		if ( req.session.passport && req.session.passport.user ){
-			// Get user
-			User.findById(req.session.passport.user, function(err, user){
-				if (err){ mw.throwErr(req,err); }
-				if (!user){ console.log('Already logged in user not found:', req.session.passport); next(); }
-				// If user found: 
-				else {
-					// Open index
-					res.render('index.html');
-				}
-			});
-		}
-		
-		// Not logged in
-		else {
-			res.render('index.html');
-		}
-		
-	});
+// Index
+router.get('/', function(req,res,next){
+	res.render('index.html');
+});
 
 // Settings
 router.route('/settings').all(mw.ensureAuth, function(req,res,next){
@@ -39,7 +19,7 @@ router.route('/settings').all(mw.ensureAuth, function(req,res,next){
 	.get(function(req,res,next){
 		User.findById(req.session.passport.user, function(err,user){
 			if (err){ console.log('Error finding settings for user:',err); mw.throwErr(req,err); }
-			res.render('settings.html', {user:user});
+			res.render('settings.html');
 		});
 	})
 	
@@ -60,7 +40,7 @@ router.route('/settings').all(mw.ensureAuth, function(req,res,next){
 		}}, function(err, user){
 			if (err) { console.log('Error updating user settings:',err); mw.throwErr(req,err); }
 			else { req.flash('success', 'Settings updated.  '); }
-			res.redirect('/map#');
+			res.redirect('/settings');
 		});		
 	})
 
@@ -79,7 +59,6 @@ router.route('/settings').all(mw.ensureAuth, function(req,res,next){
 		);
 	});
 
-
 // Tracman pro
 router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 		next();
@@ -90,7 +69,7 @@ router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
 			if (!user){ next(); }
-			else { res.render('pro.html', {user:user}); }
+			else { res.render('pro.html'); }
 		});
 	})
 	
@@ -108,12 +87,12 @@ router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 
 // Help
 router.route('/help').get(mw.ensureAuth, function(req,res){
-		res.render('help.html', {user:req.user});
+		res.render('help.html');
 	});
 
 // Terms of Service
 router.get('/terms', function(req,res){
-	res.render('terms.html', {user:req.user});
+	res.render('terms.html');
 });
 
 module.exports = router;
