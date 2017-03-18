@@ -188,7 +188,7 @@
 				
 				// Create speed block
 				if (settings.showSpeed) {
-					var speedSign = document.createElement('div'),
+					const speedSign = document.createElement('div'),
 						speedLabel = document.createElement('div'),
 						speedText = document.createElement('div'),
 						speedUnit = document.createElement('div');
@@ -208,7 +208,7 @@
 				// Create altitude block
 				if (settings.showAlt) {
 					var elevator = new google.maps.ElevationService;
-					var altitudeSign = document.createElement('div'),
+					const altitudeSign = document.createElement('div'),
 						altitudeLabel = document.createElement('div'),
 						altitudeText = document.createElement('div'),
 						altitudeUnit = document.createElement('div');
@@ -221,7 +221,7 @@
 					getAltitude(new google.maps.LatLng(last.lat,last.lon), elevator, function(alt) {
 						if (alt) { altitudeText.innerHTML = (settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
 					});
-					altitudeUnit.innerHTML = (settings.units=='standard')?'feet above sea level':'meters above sea level';
+					altitudeUnit.innerHTML = (settings.units=='standard')?'feet':'meters';
 					altitudeSign.appendChild(altitudeLabel);
 					altitudeSign.appendChild(altitudeText);
 					altitudeSign.appendChild(altitudeUnit);
