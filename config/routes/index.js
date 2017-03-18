@@ -1,6 +1,7 @@
 'use strict';
 
 const slug = require('slug'),
+	xss = require('xss'),
 	mw = require('../middleware.js'),
 	User = require('../models/user.js'),
 	router = require('express').Router();
@@ -26,8 +27,8 @@ router.route('/settings').all(mw.ensureAuth, function(req,res,next){
 	// Set new settings
 	.post(function(req,res,next){
 		User.findByIdAndUpdate(req.session.passport.user, {$set:{
-			name: req.body.name,
-			slug: slug(req.body.slug),
+			name: xss(req.body.name),
+			slug: slug(xss(req.body.slug)),
 			email: req.body.email,
 			settings: {
 				units: req.body.units,
