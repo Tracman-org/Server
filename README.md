@@ -39,10 +39,18 @@ module.exports = {
 };
 ```
 
+You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
+
 ## Running
 
 ```sh
 $ npm start
+```
+
+Or with [nodemon](https://nodemon.io/):
+
+```sh
+$ npm dev
 ```
 
 ## Contributing
