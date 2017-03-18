@@ -57,29 +57,18 @@
 		
 		{% if user.id == mapuser.id %}
 			<div id='controls'>
-			<style>
-				#controls {
-					width: 100vw;
-					position: absolute;
-					bottom: 50px;
-					display: flex;
-					justify-content: space-around;
-				} #controls .btn {
-					padding: 15px 0;
-				} #controls .btn.set, #controls .btn.clear {
-					width: 30vw;
-				} #controls .btn.track {
-					width: 35vw;
-				}
-				{% if mapuser.settings.showStreetview and disp!='0' %}
-				@media (orientation: portrait) {
-					#controls { bottom:30px }
-				}
-				{% endif %}
-		</style>
+			{% if mapuser.settings.showStreetview and disp!='0' %}
+				<style>
+					@media (orientation: portrait) {
+						#controls { bottom:30px }
+					}
+				</style>
+			{% endif %}
+				
 				<button class='btn set' onclick="setLocation()">Set</button>
 				<button class='btn track' onclick="trackLocation()" data-toggle="tooltop" title="Tracking location..." data-trigger="manual"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
 				<button class='btn clear' onclick="clearLocation()">Clear</button>
+				
 			</div>
 		{% endif %}
 		
@@ -199,7 +188,7 @@
 				
 				// Create speed block
 				if (settings.showSpeed) {
-					var speedSign = document.createElement('div'),
+					const speedSign = document.createElement('div'),
 						speedLabel = document.createElement('div'),
 						speedText = document.createElement('div'),
 						speedUnit = document.createElement('div');
@@ -219,7 +208,7 @@
 				// Create altitude block
 				if (settings.showAlt) {
 					var elevator = new google.maps.ElevationService;
-					var altitudeSign = document.createElement('div'),
+					const altitudeSign = document.createElement('div'),
 						altitudeLabel = document.createElement('div'),
 						altitudeText = document.createElement('div'),
 						altitudeUnit = document.createElement('div');
@@ -232,7 +221,7 @@
 					getAltitude(new google.maps.LatLng(last.lat,last.lon), elevator, function(alt) {
 						if (alt) { altitudeText.innerHTML = (settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
 					});
-					altitudeUnit.innerHTML = (settings.units=='standard')?'feet above sea level':'meters above sea level';
+					altitudeUnit.innerHTML = (settings.units=='standard')?'feet':'meters';
 					altitudeSign.appendChild(altitudeLabel);
 					altitudeSign.appendChild(altitudeText);
 					altitudeSign.appendChild(altitudeUnit);
