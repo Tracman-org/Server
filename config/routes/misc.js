@@ -26,8 +26,8 @@ router.get('/android', function(req,res){
 	res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
 });
 
-router.get('/license', function(req,res){
-	res.render('license.html', {user:req.user});
+router.get('/terms', function(req,res){
+	res.render('terms.html', {user:req.user});
 });
 
 router.route('/pro')
