@@ -95,4 +95,3 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * Unified map and dashboard UI
 * Security updates
 * New admin UI
-* 
