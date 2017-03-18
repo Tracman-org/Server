@@ -1,5 +1,5 @@
 # Tracman
-###### v 0.5.0
+###### v 0.5.1
 
 node.js application to display a map with user's location.  
 
@@ -20,8 +20,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 ## Changelog
 
-#### v0.5.1
+#### v 0.5.1
 
+* Fixed broken controls
 
 #### v0.5.0
 
