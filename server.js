@@ -64,18 +64,24 @@ const
 	
 	/* Routes	*/ {
 		
-		// Default locals
-		app.get('*', function(req,res,next){
+		// Static files (keep this before setting default locals)
+		app.use('/static', express.static(__dirname+'/static'));
 		
-		  // User account
-		  res.locals.user = req.user;
-		
-		  // Flash messages
-		  res.locals.successes = req.flash('success');
-		  res.locals.dangers = req.flash('danger');
-		  res.locals.warnings = req.flash('warning');
-		
-		  next();
+		// Set default locals (keep this after static files)
+		app.get('/*', function(req,res,next){
+			// console.log(`Setting local variables for request to ${req.path}.`);
+				
+			// User account
+			res.locals.user = req.user;
+			// console.log(`User set as ${res.locals.user}. `);
+			
+			// Flash messages
+			res.locals.successes = req.flash('success');
+			res.locals.dangers = req.flash('danger');
+			res.locals.warnings = req.flash('warning');
+			// console.log(`Flash messages set as:\nSuccesses: ${res.locals.successes}\nWarnings: ${res.locals.warnings}\nDangers: ${res.locals.dangers}`);
+			
+			next();
 		});
 		
 		// Main routes
@@ -91,8 +97,6 @@ const
 		// Admin
 		app.use('/admin', require('./config/routes/admin.js'));
 		
-		// Static files
-		app.use('/static', express.static(__dirname+'/static'));
 	}
 	
 	/* Errors */	{

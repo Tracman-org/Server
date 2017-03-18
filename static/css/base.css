@@ -64,8 +64,19 @@ input[type="checkbox"] {
 	display: inline-block;
 }
 .help-block {margin-top:-20px;}
+
 .alert {
 	z-index:10;
+}
+.alert-header {
+	position: relative;
+	top: 58px;
+} .alert-header.alert-danger {
+	z-index: 103;
+} .alert-header.alert-warning {
+	z-index: 102;
+} .alert-header.alert-success {
+	z-index: 101;
 }
 .alert:not(.alert-dismissible) {
 	text-align: center;
@@ -78,6 +89,7 @@ input[type="checkbox"] {
 	color: inherit;
 	text-decoration: none;
 }
+
 input:focus, textarea:focus {
 	outline: 0;
 }
@@ -99,6 +111,15 @@ h3 { font-size: 28px; }
 h4 { font-size: 20px; }
 
 .red { color: #fb6e3d; }
+.shadow {
+  -moz-box-shadow: .18vw .18vw .36vw #000;
+  -webkit-box-shadow: .18vw .18vw .36vw #000;
+  box-shadow: .18vw .18vw .36vw #000;
+} .shadow:active {
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
 
 a {
 	color: #fbc93d;

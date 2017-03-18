@@ -39,13 +39,6 @@
 	</head>
 	<body>
 
-		<noscript>
-			<div class='header alert alert-danger alert-dismissible'>
-				<strong>Uh-oh!</strong> You don't have javascript enabled!  This page won't load correctly without it.  You should really enable it, because many websites won't work properly.  Ask your grandchildren if you need help.  
-				<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a> 
-			</div>
-		</noscript>
-
 		{% if not noHeader %}{% include 'templates/header.html' %}{% endif %}
 		{% block main %}Loading... {% endblock %}
 		{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}

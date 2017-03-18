@@ -7,7 +7,7 @@ const slug = require('slug'),
 	router = require('express').Router();
 
 // Index
-router.get('/', function(req,res,next){
+router.get('/', function(req,res,next) {
 	res.render('index.html');
 });
 
