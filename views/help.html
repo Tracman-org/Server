@@ -4,17 +4,45 @@
 {% block main %}
 	<section class='container'>
 		
-		<h2>Help</h2>
+		<h1>Help</h1>
 		
-		<p><i>Welcome to Tracman!  Here's how to get started.  </i></p>
+			<p><i>Welcome to Tracman!  Here's how to get started.  </i></p>
 		
-		<p><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </p>
+		<h2>Website map controls</h2>
 		
-		<p><u>Track</u> sets your location as above, but continues to track your location as long as you keep this window open.  On a phone, this can drain the battery fast, so be careful!  </p>
+			<p><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </p>
+			
+			<p><u>Track</u> sets your location as above, but continues to track your location as long as you keep this window open.  To track your location in the background, check out the <a href="/android">android app</a>. </p>
+			
+			<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to hide your location.  </p>
 		
-		<p><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to hide your location.  </p>
+		<h2>Website settings</h2>
 		
-		<p>Share your location by sending the URL to anyone.  They won't need an account to view the map.  </p>
+			<p></p>
+			
+		<h2>Android app</h2>
+		
+			<p></p>
+		
+		<h2>FAQ</h2>
+		
+			<ul>
+				<li>How do I share my location?</li>
+				<li>How accurate is the location?</li>
+				<li>Can I contribute to Tracman?</li>
+			</ul>
+			
+			<h3>How do I share my location?</h3>
+			
+				<p>You can share your map's url with anyone.  The URL is {% if user %}<a href="https://tracman.org/map/{{user.slug}}">https://tracman.org/map/{{user.slug}}</a>{% else %}<u>https://tracman.org/map/&gt;your-slug&lt;</u>{% endif %}. </p>
+			
+			<h3>How accurate is the location?</h3>
+			
+				<p></p>
+			
+			<h3>Can I contribute to Tracman?</h3>
+			
+				<p></p>
 		
 		<a href="/map" class='btn' style="width:60%; position:relative; left:20%; background:#333">Go to map <i class='fa fa-angle-right'></i></a>
 		

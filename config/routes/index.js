@@ -5,11 +5,6 @@ const slug = require('slug'),
 	User = require('../models/user.js'),
 	router = require('express').Router();
 
-// Shortcut to favicon.ico
-router.get('/favicon.ico', function(req,res){
-	res.redirect('/static/img/icon/by/16-32-48.ico');
-});	
-
 // Index route
 router.route('/')
 	.get(function(req,res,next){
@@ -87,10 +82,38 @@ router.route('/settings')
 			}
 		);
 	});
-	
+
+
+// Tracman pro
+router.route('/pro')
+	.all(mw.ensureAuth, function(req,res,next){
+		next();
+	}).get(function(req,res,next){
+		User.findById(req.session.passport.user, function(err, user){
+			if (err){ mw.throwErr(req,err); }
+			if (!user){ next(); }
+			else { res.render('pro.html', {user:user}); }
+		});
+	}).post(function(req,res){
+		User.findByIdAndUpdate(req.session.passport.user,
+			{$set:{ isPro:true }},
+			function(err, user){
+				if (err){ mw.throwErr(req,err); }
+				else { req.flash('success','You have been signed up for pro. '); }
+				res.redirect('/map');
+			}
+		);
+	});
+
+// Help
 router.route('/help')
 	.get(mw.ensureAuth, function(req,res){
-		res.render('help.html', {user:req.session.passport.user});
+		res.render('help.html', {user:req.user});
 	});
+
+// Terms of Service
+router.get('/terms', function(req,res){
+	res.render('terms.html', {user:req.user});
+});
 
 module.exports = router;

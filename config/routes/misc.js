@@ -1,17 +1,23 @@
 'use strict';
 
 const router = require('express').Router(),
-  mw = require('../middleware.js'),
   slug = require('slug'),
   User = require('../models/user.js');
 
+// robots.txt
 router.get('/robots.txt', function(req,res){ 
 	res.type('text/plain');
 	res.send("User-agent: *\n"+
-		"Disallow: /map\n"
+		"Disallow: /map/*\n"
 	);
 });
 
+// favicon.ico
+router.get('/favicon.ico', function(req,res){
+	res.redirect('/static/img/icon/by/16-32-48.ico');
+});	
+
+// Endpoint to validate forms
 router.get('/validate', function(req,res){
 	if (req.query.slug) { // validate unique slug
 		User.findOne({slug:slug(req.query.slug)}, function(err, existingUser){
@@ -22,32 +28,9 @@ router.get('/validate', function(req,res){
 	}
 });
 
+// Link to android app in play store
 router.get('/android', function(req,res){
 	res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
 });
-
-router.get('/terms', function(req,res){
-	res.render('terms.html', {user:req.user});
-});
-
-router.route('/pro')
-	.all(mw.ensureAuth, function(req,res,next){
-		next();
-	}).get(function(req,res,next){
-		User.findById(req.session.passport.user, function(err, user){
-			if (err){ mw.throwErr(req,err); }
-			if (!user){ next(); }
-			else { res.render('pro.html', {user:user}); }
-		});
-	}).post(function(req,res){
-		User.findByIdAndUpdate(req.session.passport.user,
-			{$set:{ isPro:true }},
-			function(err, user){
-				if (err){ mw.throwErr(req,err); }
-				else { req.flash('success','You have been signed up for pro. '); }
-				res.redirect('/map');
-			}
-		);
-	});
 
 module.exports = router;
