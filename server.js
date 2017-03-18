@@ -63,16 +63,35 @@ const
 	}
 	
 	/* Routes	*/ {
-		app.get('/favicon.ico', function(req,res){
-			res.redirect('/static/img/icon/by/16-32-48.ico');
+		
+		// Default locals
+		app.get('*', function(req,res,next){
+		
+		  // User account
+		  res.locals.user = req.user;
+		
+		  // Flash messages
+		  res.locals.successes = req.flash('success');
+		  res.locals.dangers = req.flash('danger');
+		  res.locals.warnings = req.flash('warning');
+		
+		  next();
 		});
+		
+		// Main routes
 		app.use('/', 
 			require('./config/routes/index.js'),
 			require('./config/routes/auth.js'),
 			require('./config/routes/misc.js')
 		);
+		
+		// Map
 		app.use(['/map','/trac'], require('./config/routes/map.js'));
+		
+		// Admin
 		app.use('/admin', require('./config/routes/admin.js'));
+		
+		// Static files
 		app.use('/static', express.static(__dirname+'/static'));
 	}
 	

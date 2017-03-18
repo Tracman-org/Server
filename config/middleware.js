@@ -3,14 +3,12 @@
 const secret = require('./secrets.js');
 
 var throwErr = function(req,err){
-	console.log('middleware.js:5 '+typeof err);
-	console.log('Middleware error:'+err+'\nfor request:\n'+req);
+	console.error('middleware.js:5 '+typeof err);
+	console.error('Middleware error:'+err+'\nfor request:\n'+req);
 	if (secret.env==='production') {
-		req.flash('error', 'An error occured. <br>Would you like to <a href="/bug">report it</a>?');
-		req.flash('error-message',err);
+		req.flash('danger', 'An error occured. <br>Would you like to <a href="https://github.com/Tracman-org/Server/issues/new">report it</a>?');
 	} else { // development
-		req.flash('error',err);
-		req.flash('error-message',err);
+		req.flash('danger', err);
 	}
 };
 

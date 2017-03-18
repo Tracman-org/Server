@@ -8,47 +8,43 @@ const slug = require('slug'),
 // Index route
 router.route('/')
 	.get(function(req,res,next){
-	
-	// Logged in
-	if ( req.session.passport && req.session.passport.user ){
-		// Get user
-		User.findById(req.session.passport.user, function(err, user){
-			if (err){ mw.throwErr(req,err); }
-			if (!user){ console.log('Already logged in user not found:', req.session.passport); next(); }
-			// If user found: 
-			else {
-				// Open index
-				res.render('index.html', {
-					user: user,
-					error: req.flash('error')[0],
-					success: req.flash('succcess')[0]
-				});
-			}
-		});
-	}
-	
-	// Not logged in
-	else {
-		res.render('index.html', {
-			error: req.flash('error')[0],
-			success: req.flash('success')[0]
-		});
-	}
-	
-});
+		
+		// Logged in
+		if ( req.session.passport && req.session.passport.user ){
+			// Get user
+			User.findById(req.session.passport.user, function(err, user){
+				if (err){ mw.throwErr(req,err); }
+				if (!user){ console.log('Already logged in user not found:', req.session.passport); next(); }
+				// If user found: 
+				else {
+					// Open index
+					res.render('index.html');
+				}
+			});
+		}
+		
+		// Not logged in
+		else {
+			res.render('index.html');
+		}
+		
+	});
 
 // Settings
-router.route('/settings')
+router.route('/settings').all(mw.ensureAuth, function(req,res,next){
+		next();
+	})
 	
 	// Get settings form
-	.get(mw.ensureAuth, function(req,res,next){
+	.get(function(req,res,next){
 		User.findById(req.session.passport.user, function(err,user){
 			if (err){ console.log('Error finding settings for user:',err); mw.throwErr(req,err); }
 			res.render('settings.html', {user:user});
 		});
-		
+	})
+	
 	// Set new settings
-	}).post(mw.ensureAuth, function(req,res,next){
+	.post(function(req,res,next){
 		User.findByIdAndUpdate(req.session.passport.user, {$set:{
 			name: req.body.name,
 			slug: slug(req.body.slug),
@@ -69,7 +65,7 @@ router.route('/settings')
 	})
 
 	// Delete user account
-	.delete(mw.ensureAuth, function(req,res,next){
+	.delete(function(req,res,next){
 		User.findByIdAndRemove( req.session.passport.user,
 			function(err) {
 				if (err) { 
@@ -85,16 +81,21 @@ router.route('/settings')
 
 
 // Tracman pro
-router.route('/pro')
-	.all(mw.ensureAuth, function(req,res,next){
+router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 		next();
-	}).get(function(req,res,next){
+	})
+	
+	// Get info about pro
+	.get(function(req,res,next){
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
 			if (!user){ next(); }
 			else { res.render('pro.html', {user:user}); }
 		});
-	}).post(function(req,res){
+	})
+	
+	// Join Tracman pro
+	.post(function(req,res){
 		User.findByIdAndUpdate(req.session.passport.user,
 			{$set:{ isPro:true }},
 			function(err, user){
@@ -106,8 +107,7 @@ router.route('/pro')
 	});
 
 // Help
-router.route('/help')
-	.get(mw.ensureAuth, function(req,res){
+router.route('/help').get(mw.ensureAuth, function(req,res){
 		res.render('help.html', {user:req.user});
 	});
 
