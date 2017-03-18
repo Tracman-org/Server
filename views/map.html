@@ -281,12 +281,11 @@
 								lon: pos.coords.longitude,
 								spd: (pos.coords.speed||0)
 							}
-							socket.broadcast.emit('app', newloc);
+							socket.emit('set', newloc);
 							toggleMaps(newloc);
 						}, function(err) {
 							if (err) { 
 								alert("Unable to set location.");
-								io.emit('log',err.message);
 								console.error(err.message); }
 							else { 
 								//console.log('Set position',pos);
@@ -318,12 +317,14 @@
 									lon: pos.coords.longitude,
 									spd: (pos.coords.speed||0)
 								};
-								socket.broadcast.emit('app',newloc);
+								socket.emit('set',newloc);
 								toggleMaps(newloc);
 							}, function(err){
 								if (err) {
 									alert("Unable to track location.");
-									console.log(err.message);
+									console.error(err.message);
+								} else {
+									// console.log('Tracking position...');
 								}
 							}, { enableHighAccuracy:true });
 						}
@@ -346,7 +347,7 @@
 						usr: userid,
 						lat:0, lon:0, spd:0
 					}
-					socket.broadcast.emit('app',newloc);
+					socket.emit('set',newloc);
 					toggleMaps(newloc);
 				}
 			}
