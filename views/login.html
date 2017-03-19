@@ -1,0 +1,38 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{ super() }} | Login{% endblock %}
+
+{% block main %}
+<section class='dark'>
+	
+	<div class='container wrap'>
+		
+		<h1>Login</h1>
+		
+		<ul>
+			<li><a id='google-login' style="cursor:pointer">Google</a></li>
+		</ul>
+		
+	</div>
+	
+	<script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+	<script>
+		firebase.initializeApp({
+			apiKey: "AIzaSyDPYY_Fw3FXLm0hKfIfc8qlrc98zZiN4IY",
+			authDomain: "tracman-b894f.firebaseapp.com",
+			databaseURL: "https://tracman-b894f.firebaseio.com",
+			storageBucket: "tracman-b894f.appspot.com",
+			messagingSenderId: "483494341936"
+		});
+		$('#google-login').click(function() {
+			var googleProvider = new firebase.auth.GoogleAuthProvider();
+			firebase.auth().signInWithPopup(googleProvider).then(function(result) {
+				console.log(`Successfully logged in ${result.user}`);
+			}).catch(function(error) {
+				console.error(error.message);
+			});
+		});
+		
+	</script>
+	
+</section>
+{% endblock %}
