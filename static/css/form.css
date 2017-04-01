@@ -1,0 +1,59 @@
+
+
+form label {
+	font-size: 1.2em;
+	margin-right: 3%;
+}
+
+form input, form textarea, form select {
+	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	color: #eee;
+	background-color: rgba(255,255,255,0.1);
+	padding: 1% 1.5%;
+	border: 1px solid #666;
+	border-radius: .3vw;
+}
+form input:active, form textarea:active, form select:active,
+form input:focus, form textarea:focus, form select:focus {
+	outline: none;
+	border: 1px solid #fbc93d;
+}
+
+::-webkit-input-placeholder {
+	color: #666;
+}:-moz-placeholder {
+	color: #666;
+	opacity: 1;
+}::-moz-placeholder {
+	color: #666;
+	opacity: 1;
+}:-ms-input-placeholder {
+	color: #666;
+}
+
+form select {
+	-moz-box-shadow: inset 0 1px 6px rgba(255,255,255,.2),
+		inset -.11vw -.18vw .52vw rgba(0,0,0,.4);
+	-webkit-box-shadow: inset -.11vw -.18vw .52vw rgba(255,255,255,.2),
+		inset -.11vw -.18vw .52vw rgba(0,0,0,.4);
+	box-shadow: inset 0 .11vw .52vw rgba(255,255,255,.2),
+		inset 0 .11vw .52vw rgba(0,0,0,.4);
+}
+form select > option {
+	color: #000;
+}
+
+form input[type="checkbox"], form input[type="radio"] {
+	width: auto;
+	margin: 8px 8px 8px 0;
+}
+form input[type="checkbox"]:active, form input[type="radio"]:active,
+form input[type="checkbox"]:focus, form input[type="radio"]:focus {
+	outline: 1px solid #fbc93d;
+}
+
+form .btn {
+	font-size: 1.5em;
+}
