@@ -1,7 +1,7 @@
 'use strict';
 
 // Imports
-const User = require('./models/user.js');
+const User = require('./models.js').user;
 
 // Check for tracking clients
 function checkForUsers(io, user) {

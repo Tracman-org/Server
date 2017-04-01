@@ -10,8 +10,8 @@ const
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
 	flash = require('connect-flash'),
-	secret = require('./config/secrets.js'),
-	User = require('./config/models/user.js'),
+	env = require('./config/env.js'),
+	User = require('./config/models.js').user,
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
@@ -19,24 +19,27 @@ const
 
 
 /* SETUP */ {
-	/* Database */ mongoose.connect(secret.mongoSetup, {
+	
+	/* Database */ mongoose.connect(env.mongoSetup, {
 		server:{socketOptions:{
 			keepAlive:1, connectTimeoutMS:30000 }},
 		replset:{socketOptions:{
 			keepAlive:1, connectTimeoutMS:30000 }}
 	});
 	
-	/* Templates */ nunjucks.configure(__dirname+'/views', {
-		autoescape: true,
-		express: app
-	});
+	/* Templates */ {
+		nunjucks.configure(__dirname+'/views', {
+			autoescape: true,
+			express: app
+		});
+		app.set('view engine','html');
+	}
 	
 	/* Session */ {
-		app.use(cookieParser(secret.cookie));
-		// app.use(expressSession({
+		app.use(cookieParser(env.cookie));
 		app.use(cookieSession({
 			cookie: {maxAge:60000},
-			secret: secret.session,
+			secret: env.session,
 			saveUninitialized: true,
 			resave: true
 		}));
@@ -48,18 +51,22 @@ const
 	}
 	
 	/* Auth */ {
+		require('./config/passport.js')(passport);
 		app.use(passport.initialize());
 		app.use(passport.session());
-		require('./config/auth.js');
-		passport.serializeUser(function(user,done) {
-			done(null, user.id);
-		});
-		passport.deserializeUser(function(id,done) {
-			User.findById(id, function(err, user) {
-				if(!err) done(null, user);
-				else done(err, null);
-			});
-		});
+		require('./config/auth.js')(app, passport);
+		// app.use(passport.initialize());
+		// app.use(passport.session());
+		// require('./config/auth.js');
+		// passport.serializeUser(function(user,done) {
+		// 	done(null, user.id);
+		// });
+		// passport.deserializeUser(function(id,done) {
+		// 	User.findById(id, function(err, user) {
+		// 		if(!err) done(null, user);
+		// 		else done(err, null);
+		// 	});
+		// });
 	}
 	
 	/* Routes	*/ {
@@ -87,7 +94,6 @@ const
 		// Main routes
 		app.use('/', 
 			require('./config/routes/index.js'),
-			require('./config/routes/auth.js'),
 			require('./config/routes/misc.js')
 		);
 		
@@ -110,11 +116,11 @@ const
 		});
 		
 		// Handlers
-		if (secret.env=='production') {
+		if (env.mode=='production') {
 			app.use(function(err,req,res,next) {
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
-				res.render('error.html', {
+				res.render('error', {
 					code: err.status
 				});
 			});
@@ -124,7 +130,7 @@ const
 				console.log(err);
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
-				res.render('error.html', {
+				res.render('error', {
 					code: err.status,
 					message: err.message,
 					error: err
@@ -141,11 +147,17 @@ const
 
 /* RUNTIME */ {
 	
+	// Check mail transporter
+	require('./config/mail.js').verify(function(err, success) {
+		if (err){ console.error(`SMTP Error: ${err}`); }
+		console.log(success?'SMTP ready...':'SMTP not ready!');
+	});
+	
 	// Listen
-	http.listen(secret.port, function(){
+	http.listen(env.port, function(){
 		console.log(
 			'==========================================\n'+
-			'Listening at '+secret.url+
+			'Listening at '+env.url+
 			'\n=========================================='
 		);
 		
@@ -158,6 +170,7 @@ const
 		});
 		
 	});
+	
 }
 
 module.exports = app;

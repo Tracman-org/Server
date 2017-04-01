@@ -2,8 +2,13 @@
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
-  secrets = require('../secrets.js'),
-  User = require('../models/user.js');
+  env = require('../env.js'),
+  User = require('../models.js').user;
+
+// Redirect to real slug
+router.get('/', mw.ensureAuth, function(req,res){
+	res.redirect(`/map/${req.user.slug}`);
+});
 
 // Show map
 router.get('/:slug?', function(req,res,next){
@@ -44,9 +49,9 @@ router.get('/:slug?', function(req,res,next){
 			res.redirect('/');
 		} else {
 			if (user && !mapuser) { mapuser = user; }
-			res.render('map.html', {
+			res.render('map', {
 				mapuser: mapuser,
-				mapApi: secrets.googleMapsAPI,
+				mapApi: env.googleMapsAPI,
 				user: user,
 				noFooter: '1',
 				noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:'',

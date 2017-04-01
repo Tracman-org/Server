@@ -2,7 +2,7 @@
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
-  User = require('../models/user.js');
+  User = require('../models.js').user;
 
 router.route('/')
 	.all(mw.ensureAdmin, function(req,res,next){
@@ -17,7 +17,7 @@ router.route('/')
 			}
 			if (cbc<1){ cbc++; }
 			else { // done
-				res.render('admin.html', {
+				res.render('admin', {
 					noFooter: '1',
 					success:req.flash('success')[0],
 					error:req.flash('error')[0]

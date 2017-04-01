@@ -3,12 +3,12 @@
 const slug = require('slug'),
 	xss = require('xss'),
 	mw = require('../middleware.js'),
-	User = require('../models/user.js'),
+	User = require('../models.js').user,
 	router = require('express').Router();
 
 // Index
 router.get('/', function(req,res,next) {
-	res.render('index.html');
+	res.render('index');
 });
 
 // Settings
@@ -20,7 +20,7 @@ router.route('/settings').all(mw.ensureAuth, function(req,res,next){
 	.get(function(req,res,next){
 		User.findById(req.session.passport.user, function(err,user){
 			if (err){ console.log('Error finding settings for user:',err); mw.throwErr(req,err); }
-			res.render('settings.html');
+			res.render('settings');
 		});
 	})
 	
@@ -70,7 +70,7 @@ router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 		User.findById(req.session.passport.user, function(err, user){
 			if (err){ mw.throwErr(req,err); }
 			if (!user){ next(); }
-			else { res.render('pro.html'); }
+			else { res.render('pro'); }
 		});
 	})
 	
@@ -87,13 +87,15 @@ router.route('/pro').all(mw.ensureAuth, function(req,res,next){
 	});
 
 // Help
-router.route('/help').get(mw.ensureAuth, function(req,res){
-		res.render('help.html');
+router.get('/help', mw.ensureAuth, function(req,res){
+		res.render('help');
 	});
 
-// Terms of Service
+// Terms of Service and Privacy Policy
 router.get('/terms', function(req,res){
-	res.render('terms.html');
+	res.render('terms');
+}).get('/privacy', function(req,res){
+	res.render('privacy');
 });
 
 module.exports = router;

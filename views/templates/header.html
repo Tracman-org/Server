@@ -13,28 +13,25 @@
 	</div>
 	
 	<!-- Navigation -->
-	<nav id='navigation'>
-	<ul>
-	{% if user %}
-		<li><a href="/map/{{user.slug}}">Map</a></li>
-		<li><a href="/settings">Settings</a></li>
-		{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
-		<li><a href="/help">Help</a></li>
-		<li><a href="/logout">Logout</a></li>
-	{% else %}
-		<li><a href="/#overview">About</a></li>
-		<li><a href="/map/keith">Demo</a></li>
-		<li><a href="/#join">Join</a></li>
-		<li><a href="/login">Login</a></li>
-	{% endif %}
-	</ul>
-	</nav>
+	<nav id='navigation'><ul>
+		{% if user %}
+			<li><a href="/map">Map</a></li>
+			<li><a href="/settings">Settings</a></li>
+			{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
+			<li><a href="/help">Help</a></li>
+			<li><a href="/logout">Logout</a></li>
+		{% else %}
+			<li><a href="/">About</a></li>
+			<li><a href="/map/keith">Demo</a></li>
+			<li><a href="/login">Login</a></li>
+		{% endif %}
+	</ul></nav>
 	
 </header>
 
 <!-- Flash messages -->
 <noscript>
-<div class='alert alert-header alert-danger alert-dismissible shadow'>
+	<div class='alert alert-header alert-danger alert-dismissible shadow'>
 	<strong>Uh-oh!</strong> You don't have javascript enabled!  This page won't load correctly without it.  You should really enable it, because many websites won't work properly.  Ask your grandchildren if you need help.
 	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a>
 </div>

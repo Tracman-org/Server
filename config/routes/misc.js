@@ -2,7 +2,7 @@
 
 const router = require('express').Router(),
   slug = require('slug'),
-  User = require('../models/user.js');
+  User = require('../models.js').user;
 
 // robots.txt
 router.get('/robots.txt', function(req,res){ 

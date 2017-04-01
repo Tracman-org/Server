@@ -9,14 +9,14 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/secrets.js`.  It should contain the following information: 
+You will need to set up a configuration file at `config/env.js`.  It should contain the following information: 
 
 ```javascript
 'use strict';
 
 module.exports = {
 
-	env: 'development', // or 'production'
+	mode: 'development', // or 'production'
 	
 	// Random strings to prevent hijacking
 	session: 'this is a secret',
@@ -25,8 +25,12 @@ module.exports = {
 	// Client IDs for authentication
 	googleClientId: '############-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com',
 	googleClientSecret: 'XXXXXXXXX_XXXXXXXXXXXXXX',
+	facebookAppId: 'XXXXXXXXXXXXXXXX',
+	facebookAppSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+	twitterConsumerKey: 'XXXXXXXXXXXXXXXXXXXXXXXXX',
+	twitterConsumerSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
 	
-	// A google maps API
+	// A google maps API key
 	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX',
 	
 	// Location of your mongoDB
@@ -38,6 +42,8 @@ module.exports = {
 	
 };
 ```
+
+Use `config/env-sample.js` for help.  
 
 You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
 

@@ -1,38 +1,59 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{ super() }} | Login{% endblock %}
+{% block head %}
+	{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/form.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/login.css">
+	<style>
+		p, input, #social-login {
+			margin-bottom: 5vh;
+		}
+	</style>
+{% endblock %}
 
 {% block main %}
-<section class='dark'>
+
+	<section class='container'>
+		
+		<h1>Welcome!</h1>
 	
-	<div class='container wrap'>
-		
-		<h1>Login</h1>
-		
-		<ul>
-			<li><a id='google-login' style="cursor:pointer">Google</a></li>
-		</ul>
-		
-	</div>
+		<div class='flex'>
+			
+			<div class='login'>
 	
-	<script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
-	<script>
-		firebase.initializeApp({
-			apiKey: "AIzaSyDPYY_Fw3FXLm0hKfIfc8qlrc98zZiN4IY",
-			authDomain: "tracman-b894f.firebaseapp.com",
-			databaseURL: "https://tracman-b894f.firebaseio.com",
-			storageBucket: "tracman-b894f.appspot.com",
-			messagingSenderId: "483494341936"
-		});
-		$('#google-login').click(function() {
-			var googleProvider = new firebase.auth.GoogleAuthProvider();
-			firebase.auth().signInWithPopup(googleProvider).then(function(result) {
-				console.log(`Successfully logged in ${result.user}`);
-			}).catch(function(error) {
-				console.error(error.message);
-			});
-		});
+				<h3>Login</h3>
+				<form method="post">
+					
+					<div id='social-login' class='flex'>
+						<a href="/login/google" class='gp btn'><i class="fa fa-google-plus"></i></a>
+						<a href="/login/facebook" class='fb btn'><i class="fa fa-facebook"></i></a>
+						<a href="/login/twitter" class='tw btn'><i class="fa fa-twitter"></i></a>
+					</div>
+					
+					<input type="email" placeholder="Email" name="email" required>
+					<input type="password" placeholder="Password" name="password" required>
+					
+					<input type="submit" value="Sign in" class='btn main'>
+					
+					<p><a href="/login/forgot">Forgot your password?</a></p>
+				</form>
+			</div>
+			
+			<hr class='hide'>
+			
+			<div class='signup'>
+				<h3>Create account</h3>
+				<p>Welcome aboard!  </p>
+				<form action="/signup" method="POST">
+					<input type="email" name="email" placeholder="Your Email" required>
+					<p>You will be sent an email confrimation with a link to create a password. </p>
+					<p>By signing up, you agree to our <a href="/terms">terms of service</a> and <a href="/privacy">privacy policy</a>. </p>
+					<input type="submit" value="Sign up" class='btn'>
+				</form>
+			</div>
+			
+		</div>
 		
-	</script>
+	</section>
 	
-</section>
 {% endblock %}
