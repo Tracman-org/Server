@@ -50,13 +50,13 @@ You can get API keys at the [google developer's console](https://console.develop
 ## Running
 
 ```sh
-$ npm start
+$ node server.js
 ```
 
-Or with [nodemon](https://nodemon.io/):
+or
 
 ```sh
-$ npm dev
+$ npm start
 ```
 
 ## Contributing

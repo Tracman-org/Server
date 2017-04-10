@@ -1,26 +1,28 @@
 'use strict';
 
-const mw = require('./middleware.js'),
+const
+	mw = require('./middleware.js'),
 	mail = require('./mail.js'),
 	User = require('./models.js').user,
 	env = require('./env.js');
 
 module.exports = function(app, passport) {
-
+	
 	// Methods for success and failure
-	var loginOutcome = {
+	const
+		loginOutcome = {
 		failureRedirect: '/login',
 		failureFlash: true
-	};
-	var connectOutcome = {
-		failureRedirect: '/account',
+	},
+		connectOutcome = {
+		failureRedirect: '/settings',
 		failureFlash: true
-	};
-	var loginCallback = function(req,res){
-		res.redirect( req.session.returnTo || '/settings' );
-		delete req.session.returnTo;
-	};
-
+	},
+		loginCallback = function(req,res){
+			res.redirect( req.session.returnTo || '/settings' );
+			delete req.session.returnTo;
+		};
+	
 	// Login/-out
 	app.route('/login')
 		.get( function(req,res){
@@ -115,7 +117,7 @@ module.exports = function(app, passport) {
 			});
 
 		});
-
+	
 	// Social
 	app.get('/login/:service', function(req,res,next){
 		var service = req.params.service;

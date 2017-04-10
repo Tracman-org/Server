@@ -4,6 +4,7 @@
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.1",
@@ -14,6 +15,7 @@
     "moment": "^2.12.0",
     "mongodb": "^2.1.4",
     "mongoose": "^4.9.0",
+    "mongoose-unique-validator": "^1.0.5",
     "node-jose": "^0.8.0",
     "nodemailer": "^3.1.8",
     "nunjucks": "^2.3.0",

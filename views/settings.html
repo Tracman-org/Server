@@ -1,75 +1,72 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{super()}} | Settings{% endblock %}
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/form.css">
+	<style>
+		/*#slug-input {*/
+		/*	padding-left: calc(146px + 1.6%);*/
+		/*}*/
+	</style>
+{% endblock %}
 
 {% block main %}
 
 	<section class='container'>
-			
-		<h2>Settings</h2>
-			
-		<script src="/static/js/validator.min.js"></script>
-		<form id='settings-form' class='col-lg-10 col-lg-offset-1 form-horizontal' data-toggle="validator" role="form" method="post">
+		
+		<h1>Settings</h1>
+		
+		<form id='settings-form' role="form" method="post">
 
-			<div id='name' class='form-group' title="This appears in your page's title.  ">
-				<label class='control-label col-sm-2 col-lg-3' for="name">Name</label>
-				<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
-					<input class='form-control' name="name" type="text" value="{{user.name}}"
-						maxlength="160" data-error="Invalid input"><br>
-				</div>
-				<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+			<div id='name' class='form-group' title="This appears in your page's title. ">
+				<label for="name">Name</label>
+				<input class='form-control' name="name" type="text" value="{{user.name}}" maxlength="160">
 			</div>
 			
 			<div id='email' class='form-group' title="For account stuff, no dumb newsletters.  ">
-				<label class='control-label col-sm-2 col-lg-3' for="email">Email</label>
-				<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
-					<input class='form-control' name="email" type="email" value="{{user.email}}"
-						maxlength="160" data-error="Invalid input"><br>
-				</div>
-				<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
+				<label for="email">Email</label>
+				<input class='form-control' name="email" type="email" value="{{user.email}}" maxlength="160">
 			</div>
 			
-			<div id='slug' class='form-group' title="This is the URL which shows your location.  Be careful whom you share it with!  ">
-				<label class='control-label col-sm-2 col-lg-3' for="slug">URL</label>
-				<div class='input-group col-xs-12 col-sm-10 col-lg-9'>
-					<span class='input-group-addon'>tracman.org/map/</span>
-					<input class='form-control' type="text" name="slug" value="{{user.slug}}" required data-remote="/validate"
-						maxlength="160" data-remote-error="That URL is already taken.  " data-error="Invalid input"><br>
-				</div>
-				<div class='help-block with-errors col-xs-12 col-sm-10 col-sm-offset-2 col-lg-9 col-lg-offset-3'></div>
-			</div>
-
-			<div id='units' class='form-group col-xs-12' title="Select standard units for feet and miles/hour.  Select metric units if you are a commie.  ">
-				<label class='control-label col-sm-4 col-lg-3' for="units">Units</label>
-				<div class='input-group col-sm-8 col-lg-9'>
-					<div class='radio-inline'><label>
-						<input type="radio" name="units" value="standard" {% if user.settings.units == 'standard' %}checked{% endif %}>
-						Standard
-					</label></div>
-					<div class='radio-inline'><label>
-						<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>
-						Metric
-					</label></div>
+			<div id='slug' class='form-group' title="This is the URL which shows your location. Be careful whom you share it with! ">
+				<label for="slug">URL</label>
+				<div class='input-with-addon-group'>
+					<input type="text" class='input-addon' size="13" value="tracman.org/map/" disabled readonly>
+					<input type="text" class='input-with-addon' name="slug" value="{{user.slug}}" maxlength="160" required>
 				</div>
 			</div>
 
-			<div id='defaultMap' class='form-group col-xs-12' title="Shows whether to show a satellite image or standard google road map as the default on your page.  Visitors will have the option to change this.  Note that satellite images load slower.  ">
-				<label class='control-label col-sm-4 col-lg-3' for="map">Default map</label>
-				<div class='input-group col-sm-8 col-lg-9'>
-					<div class='radio-inline'><label>
+			<div id='units' class='form-group' title="Select standard units for feet and miles/hour. Select metric units if you are a commie. ">
+				<label for="units">Units</label>
+					<div class='radio-group'>
+						<div class='radio'>
+							<label>Standard</label>
+							<input type="radio" name="units" value="standard" {% if user.settings.units == 'standard' %}checked{% endif %}>
+						</div>
+						<div class='radio'>
+							<label>Metric</label>
+							<input type="radio" name="units" value="metric" {% if user.settings.units == 'metric' %}checked{% endif %}>
+						</div>
+					</div>
+			</div>
+
+			<div id='defaultMap' class='form-group' title="Shows whether to show a satellite image or standard google road map as the default on your page. Visitors will have the option to change this. Note that satellite images load slower. ">
+				<label for="map">Default map</label>
+				<div class='radio-group'>
+					<div class='radio'>
+						<label>Road</label>
 						<input type="radio" name="map" value="road" {% if user.settings.defaultMap == 'road' %}checked{% endif %}>
-						Road
-					</label></div>
-					<div class='radio-inline'><label>
+					</div>
+					<div class='radio'>
+						<label>Satellite</label>
 						<input type="radio" name="map" value="sat" {% if user.settings.defaultMap == 'sat' %}checked{% endif %}>
-						Satellite
-					</label></div>
+					</div>
 				</div>
 			</div>
 			
-			<div id='defaultZoom' class='form-group col-xs-12' title="Shows the initial map zoom level on your page.  A higher number means more zoom.  Note that the size of the viewing window will also have an effect on how much of the map a visitor can see.  ">
-				<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="map">Default zoom</label>
-				<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
-					<select class='c-select' name="zoom">
+			<div id='defaultZoom' class='form-group' title="Shows the initial map zoom level on your page. A higher number means more zoom. Note that the size of the viewing window will also have an effect on how much of the map a visitor can see. ">
+				<label for="map">Default zoom</label>
+				<select name="zoom">
 						<option {% if user.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
 						<option {% if user.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>
 						<option {% if user.settings.defaultZoom==3 %}selected {% endif %}value="3">3</option>
@@ -91,35 +88,28 @@
 						<option {% if user.settings.defaultZoom==19 %}selected {% endif %}value="19">19</option>
 						<option {% if user.settings.defaultZoom==20 %}selected {% endif %}value="20">20 Buildings</option>
 					</select>
-				</div>
 			</div>
 			
-			<div id='showSpeed' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
-				<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
-				<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
-					<input class='form-control' name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}><br>
-				</div>
+			<div id='showSpeed' class='form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
+				<label for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}>
 			</div>
 			
-			<div id='showAltitude' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
-				<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
-				<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
-					<input class='form-control' name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}><br>
-				</div>
+			<div id='showAltitude' class='form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
+				<label for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showAlt %}checked{% else %}{% endif %}>
 			</div>
 			
-			<div id='showStreet' class='form-group col-xs-12' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image at or near your current location, oriented in the direction of travel. ">
-				<label class='control-label col-xs-6 col-sm-4 col-lg-3' for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span><br>{% endif %}</label>
-				<div class='input-group col-xs-6 col-sm-8 col-lg-9'>
-					<input class='form-control' name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}><br>
-				</div>
+			<div id='showStreet' class='form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image at or near your current location, oriented in the direction of travel. ">
+				<label for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}>
 			</div>
 			
-			<div id='delete' class='form-group col-xs-12'>
-				<a class='btn red col-xs-5 col-md-3' style='margin-bottom:5px;float:right;' onclick="deleteAccount()">Delete account</a>
+			<div id='delete' class='form-group' title="Permently delete your Tracman account. ">
+				<a class='red' style='width:100%; text-align:right' href="" onclick="deleteAccount()">Delete account</a>
 			</div>
 			
-			<div id='submit' class='form-group col-xs-12 flexbox' style="padding:0 0 60px">
+			<div id='submit-group' class='form-group flexbox' style="padding:0 0 60px">
 				<input class='btn yellow' style="width:50%; background:#333" type="submit" value="Save">
 				<a href="#" class='btn' style="width:50%; background:#333">cancel</a>
 			</div>

@@ -86,8 +86,9 @@ pre {
 	word-wrap: break-word;
 }
 
-.hide { display:none }
-.red { color: #fb6e3d; }
+.hide { display: none !important; }
+.red, .red:hover { color: #fb6e3d !important; }
+.yellow, .yellow:hover { color: #fbc93d !important; }
 .shadow {
 	-moz-box-shadow: .18vw .18vw .36vw #000;
 	-webkit-box-shadow: .18vw .18vw .36vw #000;

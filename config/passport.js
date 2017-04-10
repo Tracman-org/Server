@@ -1,11 +1,13 @@
 'use strict';
 
-var vars = require('./env.js'),
-	User = require('./models.js').user,
+const
 	LocalStrategy = require('passport-local').Strategy,
 	GoogleStrategy = require('passport-google-oauth20').Strategy,
 	FacebookStrategy = require('passport-facebook').Strategy,
-	TwitterStrategy = require('passport-twitter').Strategy;
+	TwitterStrategy = require('passport-twitter').Strategy,
+	env = require('./env.js'),
+	mw = require('./middleware.js'),
+	User = require('./models.js').user;
 	
 module.exports = function(passport) {
 	
@@ -87,28 +89,66 @@ module.exports = function(passport) {
 	
 	// Social login
 	function socialLogin(req, service, profileId, done) {
-		if (!req.user) { // Log in
+		
+		// Log in
+		if (!req.user) {
+			// console.log(`Logging in with ${service}.`);
+			
 			var query = {};
 			query['auth.'+service] = profileId;
 			User.findOne(query, function (err, user) {
 				if (err){ return done(err); }
-				else if (!user){ return done(); }
-				else { return done(null, user); }
+				else if (!user){
+					// console.log('User not found.');
+					
+					// Lazy update from old googleId field
+					if (service==='google') {
+						User.findOne({'googleID':parseInt(profileId)}, function(err,user){
+							// console.log(`searched for user with googleID ${profileId}`);
+							if (err){ mw.throwErr(err); }
+							if (user) {
+								// console.log(`Lazily updating schema for ${user.name}.`);
+								user.auth.google = profileId;
+								user.googleId = null;
+								user.save(function(err){
+									if (err){ mw.throwErr(err); }
+									return done(null, user);
+								});
+							} else {
+								req.flash('danger',`There's no user for that ${service} account. `);
+								return done();
+							}
+						});
+					} else {
+						
+						req.flash('danger',`There's no user for that ${service} account. `);
+						return done();
+					}
+				}
+				else {
+					// console.log(`Found user: ${user}`);
+					return done(null, user);
+				}
 			});
-		} else {
+		}
+		
+		// Connect account
+		else {
+			console.log(`Connecting ${service} account.`);
 			req.user.auth[service] = profileId;
 			req.user.save(function(err){
 				if (err){ return done(err); }
 				else { return done(null, req.user); }
 			});
 		}
+		
 	}
 
 	// Google
 	passport.use('google', new GoogleStrategy({
-			clientID: vars.googleClientId,
-			clientSecret: vars.googleClientSecret,
-			callbackURL: vars.url+'/login/google/cb',
+			clientID: env.googleClientId,
+			clientSecret: env.googleClientSecret,
+			callbackURL: env.url+'/login/google/cb',
 			passReqToCallback: true
 		}, function(req, accessToken, refreshToken, profile, done) {
 			socialLogin(req, 'google', profile.id, done);
@@ -117,9 +157,9 @@ module.exports = function(passport) {
 	
 	// Facebook
 	passport.use('facebook', new FacebookStrategy({
-			clientID: vars.facebookAppId,
-			clientSecret: vars.facebookAppSecret,
-			callbackURL: vars.url+'/login/facebook/cb',
+			clientID: env.facebookAppId,
+			clientSecret: env.facebookAppSecret,
+			callbackURL: env.url+'/login/facebook/cb',
 			passReqToCallback: true
 		}, function(req, accessToken, refreshToken, profile, done) {
 			socialLogin(req, 'facebook', profile.id, done);
@@ -128,9 +168,9 @@ module.exports = function(passport) {
 	
 	// Twitter
 	passport.use(new TwitterStrategy({
-			consumerKey: vars.twitterConsumerKey,
-			consumerSecret: vars.twitterConsumerSecret,
-			callbackURL: vars.url+'/login/twitter/cb',
+			consumerKey: env.twitterConsumerKey,
+			consumerSecret: env.twitterConsumerSecret,
+			callbackURL: env.url+'/login/twitter/cb',
 			passReqToCallback: true
 		}, function(req, token, tokenSecret, profile, done) {
 			socialLogin(req, 'twitter', profile.id, done);
