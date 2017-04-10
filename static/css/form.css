@@ -1,6 +1,6 @@
 form {
 	margin: auto;
-	max-width: 600px;
+	max-width: 800px;
 }
 
 .form-group {
@@ -26,6 +26,10 @@ form input, form textarea, form select {
 	padding: 1% 1.5%;
 	border: 1px solid #666;
 	border-radius: .3vw;
+}
+form input:not(.input-addon):not(.input-with-addon):not([type="radio"]):not([type="checkbox"]),
+form .input-with-addon-group {
+	min-width: 50%;
 }
 form input:active:not(.input-addon), form textarea:active, form select:active,
 form input:focus:not(.input-addon), form textarea:focus, form select:focus {

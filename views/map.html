@@ -341,19 +341,6 @@
 				}
 			}
 			
-			// Delete account
-			function deleteAccount() {
-				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
-					$.ajax({
-						url: "/map",
-						type: "DELETE",
-						success: function(){
-							location.reload();
-						}
-					})
-				}
-			}
-			
 		{% endif %}
 		
 		// Check altitude

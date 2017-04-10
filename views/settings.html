@@ -1,13 +1,9 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{super()}} | Settings{% endblock %}
+
 {% block head %}
 {{super()}}
 	<link rel="stylesheet" type="text/css" href="/static/css/form.css">
-	<style>
-		/*#slug-input {*/
-		/*	padding-left: calc(146px + 1.6%);*/
-		/*}*/
-	</style>
 {% endblock %}
 
 {% block main %}
@@ -30,12 +26,80 @@
 				<input class='form-control' name="email" type="email" value="{{user.email}}" maxlength="160">
 			</div>
 				
-				<!--TODO: add password field-->
+				<div id='social-connect' class='form-group'>
+					<style>
+						
+						#social-connect {
+							flex-wrap: wrap;
+						}
+						#social-connect > .btn {
+							display: flex;
+							align-items: center;
+							text-align: center;
+							margin-left: 1vw;
+							margin-right: 1vw;
+							flex-grow: 1;
+							flex-basis: 0;
+							font-size: .9em;
+						}
+						#social-connect > .btn:hover {
+							color: #fff;
+						}
+						#social-connect > .btn .fa {
+							font-size: 1.1em;
+							margin-left: 0;
+							margin-right: 5%;
+						}
+						
+						/* Connected social button styles */
+						#social-connect > .btn.gp.connected {
+							border: 2px solid rgb(206,77,57);
+						}
+						#social-connect > .btn.fb.connected {
+							border: 2px solid rgb(48,88,145);
+						}
+						#social-connect > .btn.tw.connected {
+							border: 2px solid rgb(44,168,210);
+						}
+						
+						/* Unconnected social button styles */
+						#social-connect > .btn.gp:not(.connected) {
+							background: rgb(206,77,57);
+						}
+						#social-connect > .btn.gp:not(.connected):hover {
+							background: rgb(251,122,102);
+						}
+						#social-connect > .btn.fb:not(.connected) {
+							background: rgb(48,88,145);
+						}
+						#social-connect > .btn.fb:not(.connected):hover {
+							background: rgb(93,133,190);
+						}
+						#social-connect > .btn.tw:not(.connected) {
+							background: rgb(44,168,210);
+						}
+						#social-connect > .btn.tw:not(.connected):hover {
+							background: rgb(89,213,255);
+						}
+						
+					</style>
+					<a href="/login/google" class='btn gp{% if user.auth.google %} connected{% endif %}'>
+						<i class="fa fa-google-plus"></i>
+						{% if user.auth.google %}Disconnect{% else %}Connect{% endif %} Google
+					</a>
+					<a href="/login/facebook" class='btn fb{% if user.auth.facebook %} connected{% endif %}'>
+						<i class="fa fa-facebook"></i>
+						{% if user.auth.facebook %}Disconnect{% else %}Connect{% endif %} Facebook
+					</a>
+					<a href="/login/twitter" class='btn tw{% if user.auth.twitter %} connected{% endif %}'>
+						<i class="fa fa-twitter"></i>
+						{% if user.auth.twitter %}Disconnect{% else %}Connect{% endif %} Twitter
+					</a>
+				</div>
 				
-				<!--TODO: add social login buttons-->
-				
-				<div id='delete' class='form-group' title="Permently delete your Tracman account. ">
-					<a class='red' style='width:100%; text-align:right' href="" onclick="deleteAccount()">Delete account</a>
+				<div id='password-delete' class='form-group'>
+					<a href="/settings/password?next=/settings" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
+					<a class='red' style="text-align:right" href="#" onclick="deleteAccount()" title="Permently delete your Tracman account. ">Delete account</a>
 				</div>
 				
 			<h2>Map settings</h2>
@@ -124,9 +188,32 @@
 			
 		</form>
 			
-		{% if not user.isPro %}<p style="clear:both">Want to try <a href="/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}
+		{% if not user.isPro %}<p style="clear:both">Want to try <a href="/settings/pro">Tracman Pro</a>? It's free during beta testing. </p>{% endif %}
 		<p style="clear:both">Would you like to <a href="https://github.com/Tracman-org/Server/issues/new">submit a suggestion or bug report</a>? </p>
 	
 	</section>
 	
+{% endblock %}
+
+{% block javascript %}
+{{super()}}
+	<script>
+		
+		// Delete account
+		function deleteAccount() {
+			if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
+				$.ajax({
+					url: "/settings",
+					type: "DELETE",
+					success: function(){
+						location.reload();
+					},
+					fail: function(){
+						alert("Failed to delete account!");
+					}
+				})
+			}
+		}
+		
+	</script>
 {% endblock %}

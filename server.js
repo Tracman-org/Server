@@ -92,16 +92,16 @@ const
 		});
 		
 		// Main routes
-		app.use('/', 
-			require('./config/routes/index.js'),
-			require('./config/routes/misc.js')
-		);
+		app.use( '/', require('./config/routes/index.js') );
+		
+		// Settings
+		app.use( '/settings', require('./config/routes/settings.js') );
 		
 		// Map
-		app.use(['/map','/trac'], require('./config/routes/map.js'));
+		app.use( ['/map','/trac'], require('./config/routes/map.js') );
 		
-		// Admin
-		app.use('/admin', require('./config/routes/admin.js'));
+		// Site administration
+		app.use( '/admin', require('./config/routes/admin.js') );
 		
 	}
 	
@@ -146,12 +146,6 @@ const
 }
 
 /* RUNTIME */ {
-	
-	// Check mail transporter
-	require('./config/mail.js').verify(function(err, success) {
-		if (err){ console.error(`SMTP Error: ${err}`); }
-		console.log(success?'SMTP ready...':'SMTP not ready!');
-	});
 	
 	// Listen
 	http.listen(env.port, function(){

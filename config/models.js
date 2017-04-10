@@ -2,7 +2,8 @@
 
 const mongoose = require('mongoose'),
 	unique = require('mongoose-unique-validator'),
-	bcrypt = require('bcrypt-nodejs');
+	bcrypt = require('bcrypt-nodejs'),
+	crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
 	name: {type:String, required:true},
@@ -52,8 +53,9 @@ const userSchema = new mongoose.Schema({
 
 	// Create password reset token
 	userSchema.methods.createToken = function(next){
+		//TODO: Use the same token if there already is one that's not yet expired.
 		var user = this;
-		require('crypto').randomBytes(16, function(err,buf){
+		crypto.randomBytes(16, function(err,buf){
 			if (err){ next(err,null); }
 			else {
 				user.auth.passToken = buf.toString('hex');

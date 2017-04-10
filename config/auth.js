@@ -55,11 +55,11 @@ module.exports = function(app, passport) {
 				newUser.createToken(function(err,token){
 					if (err){ next(err); }
 					mail({
-						from: '"Trackmap" <accounts@trackmap.tech>',
+						from: '"Tracman" <NoReply@tracman.org>',
 						to: req.body.email,
-						subject: 'Complete your Trackmap registration',
-						text: `Welcome to trackmap!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/account/password/${token}`, // plaintext body
-						html: `<p>Welcome to trackmap!  </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/account/password/${token}">${env.url}/account/password/${token}</a></p>` // html body
+						subject: 'Complete your Tracman registration',
+						text: `Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}`,
+						html: `<p>Welcome to Tracman!  </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p>`
 					}).then(function(){
 						req.flash('success',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to complete your registration.`);
 						res.redirect('/');
@@ -100,11 +100,11 @@ module.exports = function(app, passport) {
 						
 						// Email reset link
 						mail({
-							from: '"Trackmap" <accounts@trackmap.tech>',
-							to: user.email,
-							subject: 'Reset your Trackmap password',
-							text: `Hi, \n\nDid you request to reset your trackmap password?  If so, follow this link to do so:\n${env.url}/account/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `,
-							html: `<p>Hi, </p><p>Did you request to reset your trackmap password?  If so, follow this link to do so:<br><a href="${env.url}/account/password/${token}">${env.url}/account/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`
+							from: '"Tracman" <NoReply@tracman.org>',
+							to: `"${user.name}"" <${user.email}>`,
+							subject: 'Reset your Tracman password',
+							text: `Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/account/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `,
+							html: `<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/account/password/${token}">${env.url}/account/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`
 						}).then(function(){
 							req.flash('success', `An email has been sent to <u>${req.body.email}</u>. Check your email for instructions to reset your password. `);
 						res.redirect('/');
