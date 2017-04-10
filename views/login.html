@@ -24,14 +24,16 @@
 				<h3>Login</h3>
 				<form method="post">
 					
-					<div id='social-login' class='flex'>
+					<div id='social-login' class='flex form-group' style="justify-content:space-around">
 						<a href="/login/google" class='gp btn'><i class="fa fa-google-plus"></i></a>
 						<a href="/login/facebook" class='fb btn'><i class="fa fa-facebook"></i></a>
 						<a href="/login/twitter" class='tw btn'><i class="fa fa-twitter"></i></a>
 					</div>
 					
-					<input type="email" placeholder="Email" name="email" required>
-					<input type="password" placeholder="Password" name="password" required>
+					<div class='form-group' style="flex-wrap:wrap">
+						<input type="email" placeholder="Email" name="email" required>
+						<input type="password" placeholder="Password" name="password" required>
+					</div>
 					
 					<input type="submit" value="Sign in" class='btn main'>
 					
