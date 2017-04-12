@@ -26,8 +26,4 @@ router
 		res.render('password');
 	})
 	
-	.get('/short',function(req,res){
-		res.render('short');
-	});
-
 module.exports = router;
