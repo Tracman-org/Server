@@ -1,7 +1,4 @@
-# Nodemon config
-nodemon.json
-
-# Ignore node modules
+# npm packages
 node_modules
 
 # Secret stuff
@@ -37,6 +34,8 @@ nbproject
 *.sublime-project
 *.sublime-workspace
 .idea
+.c9
+c9d
 
 # Komodo
 *.komodoproject
