@@ -9,41 +9,7 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/env.js`.  It should contain the following information: 
-
-```javascript
-'use strict';
-
-module.exports = {
-
-	mode: 'development', // or 'production'
-	
-	// Random strings to prevent hijacking
-	session: 'this is a secret',
-	cookie: 'shhhhh',
-	
-	// Client IDs for authentication
-	googleClientId: '############-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com',
-	googleClientSecret: 'XXXXXXXXX_XXXXXXXXXXXXXX',
-	facebookAppId: 'XXXXXXXXXXXXXXXX',
-	facebookAppSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-	twitterConsumerKey: 'XXXXXXXXXXXXXXXXXXXXXXXXX',
-	twitterConsumerSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-	
-	// A google maps API key
-	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX',
-	
-	// Location of your mongoDB
-	mongoSetup: 'mongodb://localhost/tracman',
-	
-	// URL and port where Tracman will be run. 
-	url: 'http://localhost:8080',
-	port: 8080
-	
-};
-```
-
-Use `config/env-sample.js` for help.  
+You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  Be sure to block this file in your `.gitignore`, since it contains secrets.  
 
 You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
 
