@@ -105,7 +105,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 ## License
 
-Full license information available in [LICENSE.md](https://github.com/Tracman-org/Server/blob/master/LICENSE.md)
+###### see [LICENSE.md](https://github.com/Tracman-org/Server/blob/master/LICENSE.md)
 
 Tracman: GPS tracking service in node.js
 Copyright © 2017 [Keith Irwin](https://keithirwin.us/)
@@ -114,4 +114,4 @@ This program is free software: you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program.  If not, see <[http://www.gnu.org/licenses/](http://www.gnu.org/licenses/)>.
