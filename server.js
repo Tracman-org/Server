@@ -79,7 +79,7 @@ const
 			// console.log(`Setting local variables for request to ${req.path}.`);
 				
 			// User account
-			res.locals.user = req.user;
+			// res.locals.user = req.user;
 			// console.log(`User set as ${res.locals.user}. `);
 			
 			// Flash messages
@@ -102,6 +102,11 @@ const
 		
 		// Site administration
 		app.use( '/admin', require('./config/routes/admin.js') );
+		
+		// Testing
+		if (env.mode == 'development') {
+			app.use( '/test', require('./config/routes/test.js' ) );
+		}
 		
 	}
 	

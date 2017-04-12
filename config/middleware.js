@@ -5,7 +5,7 @@ const env = require('./env.js');
 module.exports = {
 
 	// Throw error
-	throwErr: function(req,err){
+	throwErr: function(err,req=null){
 		console.error('Middleware error:'+err.message+'\nfor request:\n'+req);
 		if (env.mode==='production') {
 			req.flash('danger', 'An error occured. <br>Would you like to <a href="https://github.com/Tracman-org/Server/issues/new">report it</a>?');

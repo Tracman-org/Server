@@ -14,7 +14,7 @@ router.route('/')
 		var checkCBC = function(req,res,err){
 			if (err) { 
 				req.flash('error', err.message);
-				console.log(err); 
+				console.error(err); 
 			}
 			if (cbc<1){ cbc++; }
 			else { // done
@@ -26,7 +26,7 @@ router.route('/')
 			}
 		};
 		
-		User.findById(req.session.passport.user, function(err, found) {
+		User.findById(req.user, function(err, found) {
 			res.locals.user = found;
 			checkCBC(req,res,err);
 		});
@@ -62,7 +62,7 @@ router.route('/testmail').get(function(req,res,next){
 		console.log("Test email should have sent...");
 		res.sendStatus(200);
 	}).catch(function(err){
-	  mw.throwErr(err);
+	  mw.throwErr(err,req);
 	  next();
 	});
 });

@@ -40,7 +40,7 @@ router.get('/validate', function(req,res){
 	if (req.query.slug) { // validate unique slug
 		User.findOne({slug:slug(req.query.slug)}, function(err, existingUser){
 			if (err) { console.log('/validate error:',err); }
-			if (existingUser && existingUser.id!==req.session.passport.user) { res.sendStatus(400); }
+			if (existingUser && existingUser.id!==req.user) { res.sendStatus(400); }
 			else { res.sendStatus(200); }
 		});
 	}

@@ -16,7 +16,7 @@ router.get('/:slug?', function(req,res,next){
 	
 	// Confirm sucessful queries
 	function checkQuery(err,found) {	
-		if (err){ mw.throwErr(req,err); }
+		if (err){ mw.throwErr(err,req); }
 		if (found){ return found; }
 	}
 	
@@ -29,7 +29,7 @@ router.get('/:slug?', function(req,res,next){
 	// QUERIES
 	// Get logged in user -> user
 	if (req.isAuthenticated()) {
-		User.findById(req.session.passport.user, function(err, found) {
+		User.findById(req.user, function(err, found) {
 			user = checkQuery(err,found);
 			checkCBC();
 		});

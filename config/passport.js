@@ -105,13 +105,13 @@ module.exports = function(passport) {
 					if (service==='google') {
 						User.findOne({'googleID':parseInt(profileId)}, function(err,user){
 							// console.log(`searched for user with googleID ${profileId}`);
-							if (err){ mw.throwErr(err); }
+							if (err){ mw.throwErr(err,req); }
 							if (user) {
 								// console.log(`Lazily updating schema for ${user.name}.`);
 								user.auth.google = profileId;
 								user.googleId = null;
 								user.save(function(err){
-									if (err){ mw.throwErr(err); }
+									if (err){ mw.throwErr(err,req); }
 									return done(null, user);
 								});
 							} else {

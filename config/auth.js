@@ -19,15 +19,15 @@ module.exports = function(app, passport) {
 		failureFlash: true
 	},
 		loginCallback = function(req,res){
-			res.redirect( req.session.returnTo || '/settings' );
-			delete req.session.returnTo;
+			res.redirect( req.session.next || '/settings' );
+			delete req.session.next;
 		};
 	
 	// Login/-out
 	app.route('/login')
 		.get( function(req,res){
 			if (req.isAuthenticated()){ 
-				res.redirect('/account'); }
+				res.redirect('/settings'); }
 			else { res.render('login'); }
 		})
 		.post( passport.authenticate('local',loginOutcome), loginCallback );
@@ -75,7 +75,7 @@ module.exports = function(app, passport) {
 	// Forgot password
 	app.route('/login/forgot')
 		.all( function(req,res,next){
-			if (req.isAuthenticated()){ res.redirect('/account'); }
+			if (req.isAuthenticated()){ res.redirect('/settings'); }
 			else { next(); }
 		})
 		.get( function(req,res,next){
@@ -103,8 +103,8 @@ module.exports = function(app, passport) {
 							from: '"Tracman" <NoReply@tracman.org>',
 							to: `"${user.name}"" <${user.email}>`,
 							subject: 'Reset your Tracman password',
-							text: `Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/account/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `,
-							html: `<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/account/password/${token}">${env.url}/account/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`
+							text: `Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `,
+							html: `<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`
 						}).then(function(){
 							req.flash('success', `An email has been sent to <u>${req.body.email}</u>. Check your email for instructions to reset your password. `);
 						res.redirect('/');
@@ -131,11 +131,11 @@ module.exports = function(app, passport) {
 		} else { // Disconnect social account
 			req.user.auth[service] = undefined;
 			req.user.save(function(err){
-				if (err){ return next(err); }
+				if (err){ mw.throwErr(err,req); }
 				else {
 					req.flash('success', `${mw.capitalize(service)} account disconnected. `);
-					res.redirect('/account');
 				}
+				res.redirect('/settings');
 			});
 
 		}
@@ -146,7 +146,7 @@ module.exports = function(app, passport) {
 			passport.authenticate(service, loginOutcome)(req,res,next);
 		} else {
 			req.flash('success', `${mw.capitalize(service)} account connected. `);
-			req.session.returnTo = '/account';
+			req.session.next = '/settings';
 			passport.authenticate(service, connectOutcome)(req,res,next);
 		}
 	}, loginCallback);
@@ -190,7 +190,7 @@ module.exports = function(app, passport) {
 // 			if (!user.name) { user.name=profile.displayName; }
 // 			user.lastLogin = Date.now();
 // 			user.save(function (err, raw) {
-// 				if (err) { throwErr(req,err); }
+// 				if (err) { throwErr(err,req); }
 // 			}); done(null, user);
 // 		}
 		

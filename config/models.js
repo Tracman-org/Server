@@ -53,17 +53,28 @@ const userSchema = new mongoose.Schema({
 
 	// Create password reset token
 	userSchema.methods.createToken = function(next){
-		//TODO: Use the same token if there already is one that's not yet expired.
 		var user = this;
-		crypto.randomBytes(16, function(err,buf){
-			if (err){ next(err,null); }
-			else {
-				user.auth.passToken = buf.toString('hex');
-				user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
-				user.save();
-				return next(null,user.auth.passToken);
-			}
-		});
+		if ( user.auth.tokenExpires <= Date.now() ){
+			
+			// Reuse old token, resetting clock
+			user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
+			user.save();
+			return next(null.user.auth.passToken);
+			
+		} else {
+			
+			// Create new token
+			crypto.randomBytes(16, function(err,buf){
+				if (err){ next(err,null); }
+				else {
+					user.auth.passToken = buf.toString('hex');
+					user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
+					user.save();
+					return next(null,user.auth.passToken);
+				}
+			});
+			
+		}
 	};
 	
 	// Check for valid password
