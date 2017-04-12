@@ -6,13 +6,10 @@
 
 {% block main %}
 
-	<script src="/static/js/index.js"></script>
-		
 	<section class='splash dark' id='splash'>
 		<div class='container'>
 			<h1>Tracman</h1>
 			<h3>Display your realtime GPS location on a map</h3>
-			<!--<a class='btn' href="#" data-scrollto="overview">More info<i class='fa fa-angle-down'></i></a>-->
 			{% if user %}
 				<a class='btn' href="/map">Map<i class='fa fa-angle-right'></i></a>
 				{% if user.isAdmin %}
@@ -20,8 +17,8 @@
 				{% endif %}
 			{% else %}
 				<a class='btn' href="/map/keith">View example<i class='fa fa-angle-right'></i></a>
-				<a class='btn' href="#" data-scrollto="join">Join<i class='fa fa-angle-down'></i></a>
-				<a class='btn' href="/login">Login<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/login#signup">Join<i class='fa fa-angle-down'></i></a>
+				<a class='btn' href="/login#login">Login<i class='fa fa-angle-right'></i></a>
 			{% endif %}
 		</div>
 	</section>
