@@ -10,7 +10,7 @@ const
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
 	flash = require('connect-flash'),
-	secret = require('./config/secrets.js'),
+	env = require('./config/env.js'),
 	User = require('./config/models/user.js'),
 	app = express(),
 	http = require('http').Server(app),
@@ -19,7 +19,7 @@ const
 
 
 /* SETUP */ {
-	/* Database */ mongoose.connect(secret.mongoSetup, {
+	/* Database */ mongoose.connect(env.mongoSetup, {
 		server:{socketOptions:{
 			keepAlive:1, connectTimeoutMS:30000 }},
 		replset:{socketOptions:{
@@ -32,11 +32,11 @@ const
 	});
 	
 	/* Session */ {
-		app.use(cookieParser(secret.cookie));
+		app.use(cookieParser(env.cookie));
 		// app.use(expressSession({
 		app.use(cookieSession({
 			cookie: {maxAge:60000},
-			secret: secret.session,
+			secret: env.session,
 			saveUninitialized: true,
 			resave: true
 		}));
@@ -110,7 +110,7 @@ const
 		});
 		
 		// Handlers
-		if (secret.env=='production') {
+		if (env.env=='production') {
 			app.use(function(err,req,res,next) {
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
@@ -142,10 +142,10 @@ const
 /* RUNTIME */ {
 	
 	// Listen
-	http.listen(secret.port, function(){
+	http.listen(env.port, function(){
 		console.log(
 			'==========================================\n'+
-			'Listening at '+secret.url+
+			'Listening at '+env.url+
 			'\n=========================================='
 		);
 		

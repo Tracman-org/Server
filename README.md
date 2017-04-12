@@ -9,7 +9,7 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/secrets.js`.  It should contain the following information: 
+You will need to set up a configuration file at `config/env.js`.  It should contain the following information: 
 
 ```javascript
 'use strict';
