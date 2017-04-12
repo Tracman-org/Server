@@ -152,13 +152,11 @@ const
 
 /* RUNTIME */ {
 	
+	console.log('Starting Tracman server...');
+	
 	// Listen
 	http.listen(env.port, function(){
-		console.log(
-			'==========================================\n'+
-			'Listening at '+env.url+
-			'\n=========================================='
-		);
+		console.log(`Listening in ${env.mode} mode on port ${env.port}. `);
 		
 		// Check for clients for each user
 		User.find({}, function(err, users){
