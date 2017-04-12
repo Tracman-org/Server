@@ -74,12 +74,12 @@ const
 		// Static files (keep this before setting default locals)
 		app.use('/static', express.static(__dirname+'/static'));
 		
-		// Set default locals (keep this after static files)
+		// Set default locals available to all views (keep this after static files)
 		app.get('/*', function(req,res,next){
 			// console.log(`Setting local variables for request to ${req.path}.`);
 				
 			// User account
-			// res.locals.user = req.user;
+			res.locals.user = req.user;
 			// console.log(`User set as ${res.locals.user}. `);
 			
 			// Flash messages

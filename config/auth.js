@@ -11,13 +11,13 @@ module.exports = function(app, passport) {
 	// Methods for success and failure
 	const
 		loginOutcome = {
-		failureRedirect: '/login',
-		failureFlash: true
-	},
+			failureRedirect: '/login',
+			failureFlash: true
+		},
 		connectOutcome = {
-		failureRedirect: '/settings',
-		failureFlash: true
-	},
+			failureRedirect: '/settings',
+			failureFlash: true
+		},
 		loginCallback = function(req,res){
 			res.redirect( req.session.next || '/settings' );
 			delete req.session.next;
@@ -33,6 +33,7 @@ module.exports = function(app, passport) {
 		.post( passport.authenticate('local',loginOutcome), loginCallback );
 	app.get('/logout', function(req,res){
 		req.logout();
+		req.flash('success',`You have been logged out.`);
 		res.redirect('/');
 	});
 	
