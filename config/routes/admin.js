@@ -2,7 +2,8 @@
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
-  User = require('../models.js').user;
+  User = require('../models.js').user,
+  mail = require('../mail.js');
 
 router.route('/')
 	.all(mw.ensureAdmin, function(req,res,next){
@@ -47,7 +48,23 @@ router.route('/users')
 				else { req.flash('success', '<i>'+user.name+'</i> deleted.'); }
 				res.redirect('/admin#users');
 			});
-		} else { console.log('ERROR! POST without action sent.  '); next(); }
+		} else { console.error('ERROR! POST without action sent.  '); next(); }
 	});
+	
+router.route('/testmail').get(function(req,res,next){
+	mail.send({
+	  to: `"Keith Irwin" <hypergeek14@gmail.com>`,
+	  from: mail.from,
+	  subject: 'Test email',
+	  text: mail.text("Looks like everything's working! "),
+	  html: mail.html("<p>Looks like everything's working! </p>")
+	}).then(function(){
+		console.log("Test email should have sent...");
+		res.sendStatus(200);
+	}).catch(function(err){
+	  mw.throwErr(err);
+	  next();
+	});
+});
   
 module.exports = router;

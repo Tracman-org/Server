@@ -17,9 +17,9 @@
 			<h2>Account settings</h2>
 				
 				<div id='name' class='form-group' title="This appears in your page's title. ">
-				<label for="name">Name</label>
-				<input class='form-control' name="name" type="text" value="{{user.name}}" maxlength="160">
-			</div>
+					<label for="name">Name</label>
+					<input class='form-control' name="name" type="text" value="{{user.name}}" maxlength="160">
+				</div>
 				
 				<div id='email' class='form-group' title="For account stuff, no dumb newsletters.  ">
 				<label for="email">Email</label>
@@ -35,7 +35,6 @@
 						#social-connect > .btn {
 							display: flex;
 							align-items: center;
-							text-align: center;
 							margin-left: 1vw;
 							margin-right: 1vw;
 							flex-grow: 1;
@@ -98,8 +97,8 @@
 				</div>
 				
 				<div id='password-delete' class='form-group'>
-					<a href="/settings/password?next=/settings" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
-					<a class='red' style="text-align:right" href="#" onclick="deleteAccount()" title="Permently delete your Tracman account. ">Delete account</a>
+					<a class='underline' href="/settings/password?next=/settings" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
+					<a class='red underline' style="text-align:right" href="#" onclick="deleteAccount()" title="Permently delete your Tracman account. ">Delete account</a>
 				</div>
 				
 			<h2>Map settings</h2>

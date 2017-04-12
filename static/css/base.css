@@ -36,7 +36,7 @@ h1, h2, h3 {
 	position: relative;
 	z-index: 6;
 }
-h1,h2,h3,h4 { font-weight: 600; }
+h1, h2, h3, h4 { font-weight: 600; }
 h1 {
 	font-size: 48px;
 	line-height: 46px; }
@@ -58,12 +58,10 @@ main a:hover:not(.btn) {
 	color: #fbc93d;
 	text-decoration: underline;
 }
-.light a:not(.btn) {
-	color:#111;
+a.underline {
 	text-decoration: underline;
 }
-.light a:hover {
-	color:#111;
+a.underline:hover:not(.btn) {
 	text-decoration: none;
 }
 
