@@ -1,0 +1,131 @@
+{% extends '../../base.html' %}
+
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/files/styles/form.css">
+{% endblock %}
+
+{% block main %}
+	
+	<h1>Account Settings</h1>
+	
+	<form role="form" method="post">
+		
+		<p>These are standard account settings.  This information will not be published anywhere.  You will never be sent spam, marketing emails, or newsletters.  Your email will only be used for important information, updates to terms of service, and password recovery. </p>
+		
+		<div id='standard' class='group flex'>
+			<style>
+				#standard > div {
+					display: flex;
+					width: 45%;
+				}
+			</style>
+			
+			<div id='name'>
+				<label for="name">Name:</label>
+				<input name="name" type="text" value="{{user.name}}" placeholder="Enter your name" maxlength="160">
+			</div>
+
+			<div id='email'>
+				<label for="email">Email:</label>
+				<input name="email" type="email" value="{{user.email}}" maxlength="200">
+			</div>
+		
+		</div>
+		
+		<p>Click save to save your name/email as entered above.  If you change your email, an email will be sent to both the old address and the new address to confirm the change.  To change your password, click "Change password".  You will be sent an email with a link to a page where you can reset your password.  These precautions are for security and to prevent mistakes.  </p>
+		
+		<div id='buttons' class='group flex' style="margin-bottom:10vh">
+		<style>
+			#buttons > .btn {
+				width: 45%;
+			}
+		</style>
+			<!--TODO: Disable buttons after clicking and show loading icon -->
+			<input class='main btn' type="submit" value="Save settings">
+			<a class='btn' href="/account/password">Change password</a>
+		</div>
+		
+		<p>You can connect to social network accounts for faster login.  This information is <i>only</i> used for logging in.  On some authorization screens, you will be told that Trackmap will be granted access to profile information and will be able to post to your profile.  Only your account ID, which is needed for login, will be saved in our database.  Trackmap will <i>never</i> post to your profile or sell information about you.  For more information, see our <a href="/privacy">privacy policy</a>. </p>
+		
+		<div id='social-connect' class='flex' style="margin-bottom:10vh">
+		<style>
+				
+				#social-connect {
+					flex-wrap: wrap;
+				}
+				#social-connect > .btn {
+					text-align: center;
+					margin-left: 1vw;
+					margin-right: 1vw;
+					flex-grow: 1;
+					flex-basis: 0;
+					font-size: .9em;
+				}
+				#social-connect > .btn:hover {
+					color: #fff;
+				}
+				#social-connect > .btn .fa {
+					font-size: 1.1em;
+					margin-left: 0;
+					margin-right: 5%;
+				}
+				
+				/* Connected social button styles */
+				#social-connect > .btn.gp.connected {
+					border: 2px solid rgb(206,77,57);
+				}
+				#social-connect > .btn.fb.connected {
+					border: 2px solid rgb(48,88,145);
+				}
+				#social-connect > .btn.tw.connected {
+					border: 2px solid rgb(44,168,210);
+				}
+				
+				/* Unconnected social button styles */
+				#social-connect > .btn.gp:not(.connected) {
+					background: rgb(206,77,57);
+				}
+				#social-connect > .btn.gp:not(.connected):hover {
+					background: rgb(251,122,102);
+				}
+				#social-connect > .btn.fb:not(.connected) {
+					background: rgb(48,88,145);
+				}
+				#social-connect > .btn.fb:not(.connected):hover {
+					background: rgb(93,133,190);
+				}
+				#social-connect > .btn.tw:not(.connected) {
+					background: rgb(44,168,210);
+				}
+				#social-connect > .btn.tw:not(.connected):hover {
+					background: rgb(89,213,255);
+				}
+
+			</style>
+			
+			<a href="/login/google" class='btn gp{% if user.auth.google %} connected{% endif %}'>
+				<i class="fa fa-google-plus"></i>
+				{% if user.auth.google %}Disconnect{% else %}Connect{% endif %} Google
+			</a>
+			<a href="/login/facebook" class='btn fb{% if user.auth.facebook %} connected{% endif %}'>
+				<i class="fa fa-facebook"></i>
+				{% if user.auth.facebook %}Disconnect{% else %}Connect{% endif %} Facebook
+			</a>
+			<a href="/login/twitter" class='btn tw{% if user.auth.twitter %} connected{% endif %}'>
+				<i class="fa fa-twitter"></i>
+				{% if user.auth.twitter %}Disconnect{% else %}Connect{% endif %} Twitter
+			</a>
+			
+		</div>
+		
+	</form>
+	
+	<p>If you're satisfied with your settings, you can create and edit maps on the <a href="/maps">maps page</a>.  </p>
+
+{% endblock %}
+
+{% block javascript %}
+{{super()}}
+	<script src="/files/scripts/validator.min.js"></script>
+{% endblock %}
