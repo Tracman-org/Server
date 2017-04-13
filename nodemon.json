@@ -1,4 +1,7 @@
 {
 	"verbose": true,
 	"ext": "html, js, json, css",
+	"events": {
+		"restart": "npm run minify"
+	}
 }

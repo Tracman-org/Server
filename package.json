@@ -45,7 +45,7 @@
   "scripts": {
     "test": "mocha test.js",
     "start": "node server.js",
-    "nodemon": "nodemon server.js",
+    "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "minify": "minify --template .{{filename}}.min.{{ext}} --clean static",
     "update": "sudo n stable && sudo npm update --save && sudo npm prune"
   },
