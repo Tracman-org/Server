@@ -6,24 +6,24 @@ const router = require('express').Router(),
 
 router
 
-	.get('/mail', function(req,res,next){
+	.get('/mail', (req,res,next)=>{
 		mail.send({
 		  to: `"Keith Irwin" <hypergeek14@gmail.com>`,
 		  from: mail.from,
 		  subject: 'Test email',
 		  text: mail.text("Looks like everything's working! "),
 		  html: mail.html("<p>Looks like everything's working! </p>")
-		}).then(function(){
+		}).then(()=>{
 			console.log("Test email should have sent...");
 			res.sendStatus(200);
-		}).catch(function(err){
+		}).catch((err)=>{
 		  mw.throwErr(err,req);
 		  next();
 		});
 	})
 	
-	.get('/password', function(req,res){
+	.get('/password', (req,res)=>{
 		res.render('password');
-	})
+	});
 	
 module.exports = router;

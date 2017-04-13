@@ -51,7 +51,10 @@ header nav {
 } header nav ul li a:hover,
 header nav ul li a:focus,
 header nav ul li a.active,
-
+header .logo:hover {
+	text-decoration: none;
+	background: rgba(255,255,255,0.1);
+}
 
 /* Hamburger */
 header .hamburger {
@@ -72,8 +75,8 @@ header .hamburger {
 } header .hamburger-inner {
 	top: 50%;
 	margin-top: -2px;
-} header .hamburger-inner, 
-header .hamburger-inner::before, 
+} header .hamburger-inner,
+header .hamburger-inner::before,
 header .hamburger-inner::after {
 		width: 40px;
 		height: 4px;

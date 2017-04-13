@@ -6,7 +6,7 @@ const mongoose = require('mongoose'),
 	crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
-	name: {type:String, required:true},
+	name: {type:String},
 	email: {type:String, required:true},
 	slug: {type:String, required:true, unique:true},
 	auth: {
@@ -19,52 +19,52 @@ const userSchema = new mongoose.Schema({
 	},
 	isAdmin: {type:Boolean, required:true, default:false},
 	isPro: {type:Boolean, required:true, default:false},
-	created: Date,
+	created: {type:Date, required:true},
 	lastLogin: Date,
 	settings: {
-		units: {type:String, default:'standard'},
-		defaultMap: {type:String, default:'road'},
-		defaultZoom: {type:Number, default:11},
-		showSpeed: {type:Boolean, default:false},
-		showTemp: {type:Boolean, default:false},
-		showAlt: {type:Boolean, default:false},
-		showStreetview: {type:Boolean, default:false}
+		units: {type:String, required:true, default:'standard'},
+		defaultMap: {type:String, required:true, default:'road'},
+		defaultZoom: {type:Number, required:true, default:11},
+		showSpeed: {type:Boolean, required:true, default:false},
+		showTemp: {type:Boolean, required:true, default:false},
+		showAlt: {type:Boolean, required:true, default:false},
+		showStreetview: {type:Boolean, required:true, default:false}
 	},
 	last: {
 		time: Date,
-		lat: {type:Number, default:0},
-		lon: {type:Number, default:0},
-		dir: {type:Number, default:0},
-		alt: {type:Number, default:0},
-		spd: {type:Number, default:0}
+		lat: {type:Number, required:true, default:0},
+		lon: {type:Number, required:true, default:0},
+		dir: {type:Number, required:true, default:0},
+		alt: {type:Number, required:true, default:0},
+		spd: {type:Number, required:true, default:0}
 	},
 	sk32: {type:String, required:true, unique:true}
 }).plugin(unique);
 
 /* User methods */ {
-	
+
 	// Generate hash for new password
-	userSchema.methods.generateHash = function(password, next) {
-		bcrypt.genSalt(8, function(err,salt){
+	userSchema.methods.generateHash = (password,next)=>{
+		bcrypt.genSalt(8, (err,salt)=>{
 			if (err){ return next(err); }
 			bcrypt.hash(password, salt, null, next);
 		});
 	};
 
 	// Create password reset token
-	userSchema.methods.createToken = function(next){
+	userSchema.methods.createToken = (next)=>{
 		var user = this;
 		if ( user.auth.tokenExpires <= Date.now() ){
-			
+
 			// Reuse old token, resetting clock
 			user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
 			user.save();
 			return next(null.user.auth.passToken);
-			
+
 		} else {
-			
+
 			// Create new token
-			crypto.randomBytes(16, function(err,buf){
+			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ next(err,null); }
 				else {
 					user.auth.passToken = buf.toString('hex');
@@ -73,15 +73,15 @@ const userSchema = new mongoose.Schema({
 					return next(null,user.auth.passToken);
 				}
 			});
-			
+
 		}
 	};
-	
+
 	// Check for valid password
-	userSchema.methods.validPassword = function(password, next) {
+	userSchema.methods.validPassword = (password,next)=>{
 		bcrypt.compare(password, this.auth.password, next);
 	};
-	
+
 }
 
 module.exports = {

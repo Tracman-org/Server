@@ -1,4 +1,5 @@
 'use strict';
+//TODO: Use promises
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
@@ -6,12 +7,12 @@ const router = require('express').Router(),
   User = require('../models.js').user;
 
 // Redirect to real slug
-router.get('/', mw.ensureAuth, function(req,res){
+router.get('/', mw.ensureAuth, (req,res)=>{
 	res.redirect(`/map/${req.user.slug}`);
 });
 
 // Show map
-router.get('/:slug?', function(req,res,next){
+router.get('/:slug?', (req,res,next)=>{
 	var mapuser='', user='', cbc=0;
 	
 	// Confirm sucessful queries
