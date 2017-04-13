@@ -1,7 +1,7 @@
 # Tracman
 ###### v 0.5.1
 
-node.js application to display a map with user's location.  
+node.js application to display a map with user's location.
 
 ## Installation
 
@@ -9,7 +9,7 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
+You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).
 
 ## Running
 
@@ -17,9 +17,15 @@ You will need to set up a configuration file at `config/env.js`.  Use `config/en
 $ npm run minify && npm start
 ```
 
+or, using [nodemon](https://nodemon.io/):
+
+```sh
+$ npm run nodemon
+```
+
 ## Contributing
 
-Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model). 
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model).
 
 ## Changelog
 
@@ -31,7 +37,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 * Updated libraries
 * Fixed recognition of attached clients [#34](https://github.com/Tracman-org/Server/issues/21)
-* Moved socket.io code to own file. 
+* Moved socket.io code to own file.
 * Many minor fixes
 
 #### v0.4.3
