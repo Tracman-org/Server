@@ -46,7 +46,7 @@
     "test": "mocha test.js",
     "start": "node server.js",
     "nodemon": "nodemon server.js",
-    "minify": "minify static",
+    "minify": "minify --clean static",
     "update": "sudo n stable && sudo npm update --save && sudo npm prune"
   },
   "repository": {
