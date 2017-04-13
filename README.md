@@ -9,20 +9,12 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  Be sure to block this file in your `.gitignore`, since it contains secrets.  
-
-You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
+You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
 
 ## Running
 
 ```sh
-$ node server.js
-```
-
-or
-
-```sh
-$ npm start
+$ npm run minify && npm start
 ```
 
 ## Contributing
