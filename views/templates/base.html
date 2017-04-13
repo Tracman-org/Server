@@ -48,6 +48,8 @@
 		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 		
 	{% endblock %}
+	{% if not noHeader %}<link href="/static/css/header.min.css" rel="stylesheet">{% endif %}
+	{% if not noFooter %}<link href="/static/css/footer.css" rel="stylesheet">{% endif %}
 	</head>
 	<body>
 
