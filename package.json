@@ -37,6 +37,7 @@
     "karma-chrome-launcher": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-mocha": "^1.1.1",
+    "minifier": "^0.8.1",
     "mocha": "^2.5.3",
     "nodemon": "^1.10.2",
     "supertest": "^1.2.0"
@@ -44,7 +45,8 @@
   "scripts": {
     "test": "mocha test.js",
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "nodemon": "nodemon server.js",
+    "minify": "minify static",
     "update": "sudo n stable && sudo npm update --save && sudo npm prune"
   },
   "repository": {

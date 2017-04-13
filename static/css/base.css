@@ -175,11 +175,3 @@ section {
 .btn .fa {
 	margin-left: 10px;
 }
-
-.group {
-	width: 100%;
-}
-.group div {
-	display: flex;
-	margin-bottom: 10vh;
-}
