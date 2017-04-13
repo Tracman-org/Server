@@ -105,9 +105,10 @@ router.route('/password/:token')
 		User
 			.findOne({'auth.passToken': req.params.token})
 			.where('auth.tokenExpires').gt(Date.now())
-			//TODO: Add own promise libary
-			.exec((err, user) => {
-				if (err) { mw.throwErr(err,req); }
+			.catch((err)=>{
+				mw.throwErr(err,req);
+			})
+			.then((user) => {
 				if (!user) {
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
 					res.redirect( (req.isAuthenticated)?'/settings':'/login' );
@@ -124,18 +125,18 @@ router.route('/password/:token')
 	} )
 
 	.post( (req,res,next)=>{
-		
+
 		//TODO: Validate password
-		
+
 		// Delete token
 		res.locals.passwordUser.auth.passToken = undefined;
 		res.locals.passwordUser.auth.tokenExpires = undefined;
-		
+
 		// Create hash
 		res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
 			if (err){ mw.throwErr(err,req); }
 			else {
-				
+
 				// Save new password to db
 				res.locals.passwordUser.auth.password = hash;
 				res.locals.passwordUser.save( (err)=>{
@@ -148,10 +149,10 @@ router.route('/password/:token')
 						res.redirect('/login#login');
 					}
 				});
-				
+
 			}
 		} );
-		
+
 	} );
 
 

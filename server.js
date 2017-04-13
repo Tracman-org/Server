@@ -21,16 +21,24 @@ const
 
 /* SETUP */ {
 
-	/* Database */ mongoose.connect(env.mongoSetup, {
-		server:{socketOptions:{
-			keepAlive:1, connectTimeoutMS:30000 }},
-		replset:{socketOptions:{
-			keepAlive:1, connectTimeoutMS:30000 }}
-	}).catch((err)=>{
-		mw.throwErr(err);
-	}).then(()=>{
-		console.log(`💿 Mongoose connected to database`);
-	});
+	/* Database */ {
+
+		// Setup with native ES6 promises
+		mongoose.Promise = global.Promise;
+
+    // Connect to database
+		mongoose.connect(env.mongoSetup, {
+			server:{socketOptions:{
+				keepAlive:1, connectTimeoutMS:30000 }},
+			replset:{socketOptions:{
+				keepAlive:1, connectTimeoutMS:30000 }}
+		}).catch((err)=>{
+			mw.throwErr(err);
+		}).then(()=>{
+			console.log(`💿 Mongoose connected to database`);
+		});
+
+	}
 
 	/* Templates */ {
 		nunjucks.configure(__dirname+'/views', {
