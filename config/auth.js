@@ -40,7 +40,8 @@ module.exports = (app, passport) => {
 	// Signup
 	app.get('/signup', (req,res)=>{
 		res.redirect('/login#signup');
-	}).post('/signup', (req,res,next)=>{
+	})
+	.post('/signup', (req,res,next)=>{
 		
 		// Send token and alert user
 		function sendToken(user){
@@ -148,50 +149,57 @@ module.exports = (app, passport) => {
 	});
 
 	// Forgot password
-	// app.route('/login/forgot')
-	// 	.all( (req,res,next)=>{
-	// 		if (req.isAuthenticated()){ res.redirect('/settings'); }
-	// 		else { next(); }
-	// 	})
-	// 	.get( (req,res,next)=>{
-	// 		res.render('forgot');
-	// 	})
-	// 	.post( (req,res,next)=>{
+	app.route('/login/forgot')
+		.all( (req,res,next)=>{
+			if (req.isAuthenticated()){ loginCallback(); }
+			else { next(); }
+		})
+		.get( (req,res,next)=>{
+			res.render('forgot');
+		})
+		.post( (req,res,next)=>{
+			
+			//TODO: Validate and sanitize email
+			// req.assert('email', 'Please enter a valid email address.').isEmail();
+			// req.sanitize('email').normalizeEmail({ remove_dots: false });
+			
+			User.findOne( {'email':req.body.email}, (err,user)=>{
+				if (err){ mw.throwErr(err); }
+				
+				// No user with that email
+				if (!user) {
+					// Don't let on that no such user exists, to prevent dictionary attacks
+					req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
+					res.redirect('/login');
+				}
+				
+				// User with that email exists
+				else {
+					
+					// Create reset token
+					user.createToken( (err,token)=>{
+						if (err){ next(err); }
+						
+						// Email reset link
+						mail.send({
+							from: mail.from,
+							to: mail.to(user),
+							subject: 'Reset your Tracman password',
+							text: mail.text(`Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `),
+							html: mail.html(`<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`)
+						}).then(()=>{
+							req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
+							res.redirect('/login');
+						}).catch((err)=>{
+							mw.throwErr(err);
+						});
 
-	// 		//TODO: Validate and sanitize email
-	// 		// req.assert('email', 'Please enter a valid email address.').isEmail();
-	// 		// req.sanitize('email').normalizeEmail({ remove_dots: false });
+					});
+					
+				}
+			});
 
-	// 		User.findOne( {'email':req.body.email}, (err,user)=>{
-	// 			if (err){ next(err); }
-	// 			else if (!user) {
-	// 				req.flash('danger', `No user has <u>${req.body.email}</u> set as their email address. `);
-	// 				res.redirect('/login/forgot');
-	// 			} else {
-
-	// 				// Set reset token to user
-	// 				user.createToken( (err,token)=>{
-	// 					if (err){ next(err); }
-
-	// 					// Email reset link
-	// 					mail({
-	// 						from: '"Tracman" <NoReply@tracman.org>',
-	// 						to: `"${user.name}"" <${user.email}>`,
-	// 						subject: 'Reset your Tracman password',
-	// 						text: `Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `,
-	// 						html: `<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`
-	// 					}).then(()=>{
-	// 						req.flash('success', `An email has been sent to <u>${req.body.email}</u>. Check your email for instructions to reset your password. `);
-	// 					res.redirect('/');
-	// 					}).catch((err)=>{
-	// 						next(err);
-	// 					});
-
-	// 				});
-	// 			}
-	// 		});
-
-	// 	});
+		});
 
 	// Social
 	app.get('/login/:service', (req,res,next)=>{
