@@ -1,9 +1,9 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{super()}} | {{mapuser.name}}{% endblock %}
+{% block title %}{{super()}}{% if mapuser.name %} | {{mapuser.name}}{% endif %}{% endblock %}
 
 {% block head %}
 	{{super()}}
-	<link href="/static/css/map.css" rel="stylesheet">
+	<link href="/static/css/.map.min.css" rel="stylesheet">
 	<style>
 		.wrap { top:{% if not noHeader %}58{% else %}0{% endif %}px;}
 		
@@ -147,6 +147,7 @@
 		
 		// Google maps API callback
 		window.gmapsCb = function() {
+			
 			// Create map
 			if (disp!='1'||!settings.showStreetview) {
 				map = new google.maps.Map( mapElem, {
@@ -160,7 +161,7 @@
 				});
 				marker = new google.maps.Marker({
 					position: { lat:last.lat, lng:last.lon },
-					title: {{ mapuser.name | dump | safe }},
+					{% if mapuser.name.length %}title: {{mapuser.name|dump|safe}},{% endif %}
 					map: map,
 					draggable: false
 				});
@@ -338,19 +339,6 @@
 					}
 					socket.emit('set',newloc);
 					toggleMaps(newloc);
-				}
-			}
-			
-			// Delete account
-			function deleteAccount() {
-				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
-					$.ajax({
-						url: "/map",
-						type: "DELETE",
-						success: function(){
-							location.reload();
-						}
-					})
 				}
 			}
 			

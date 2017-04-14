@@ -1,17 +1,23 @@
 'use strict';
+//TODO: Use promises
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
-  secrets = require('../secrets.js'),
-  User = require('../models/user.js');
+  env = require('../env.js'),
+  User = require('../models.js').user;
+
+// Redirect to real slug
+router.get('/', mw.ensureAuth, (req,res)=>{
+	res.redirect(`/map/${req.user.slug}`);
+});
 
 // Show map
-router.get('/:slug?', function(req,res,next){
+router.get('/:slug?', (req,res,next)=>{
 	var mapuser='', user='', cbc=0;
 	
 	// Confirm sucessful queries
 	function checkQuery(err,found) {	
-		if (err){ mw.throwErr(req,err); }
+		if (err){ mw.throwErr(err,req); }
 		if (found){ return found; }
 	}
 	
@@ -24,7 +30,7 @@ router.get('/:slug?', function(req,res,next){
 	// QUERIES
 	// Get logged in user -> user
 	if (req.isAuthenticated()) {
-		User.findById(req.session.passport.user, function(err, found) {
+		User.findById(req.user, function(err, found) {
 			user = checkQuery(err,found);
 			checkCBC();
 		});
@@ -44,9 +50,9 @@ router.get('/:slug?', function(req,res,next){
 			res.redirect('/');
 		} else {
 			if (user && !mapuser) { mapuser = user; }
-			res.render('map.html', {
+			res.render('map', {
 				mapuser: mapuser,
-				mapApi: secrets.mapAPI,
+				mapApi: env.googleMapsAPI,
 				user: user,
 				noFooter: '1',
 				noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:'',

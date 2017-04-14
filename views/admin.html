@@ -3,7 +3,6 @@
 
 {% block head %}
 	{{ super() }}
-	<!--<link rel="stylesheet" type="text/css" href="/static/js/jquery-ui-tabs/jquery-ui.min.css">-->
 	<style>
 		.container { max-width:90%; }
 	</style>
@@ -38,7 +37,7 @@
 										<a href="https://plus.google.com/{{usr.googleID}}/">Google</a>
 									{% endif %}
 								</td>
-								<td id='{{usr.id}}-edit'><form action="/admin/users" method="POST">
+								<td id='{{usr.id}}-edit'><form method="POST">
 									<button type="submit" class='btn btn-block btn-danger' name="delete" value="{{usr.id}}">DELETE</button>
 								</form></td>
 							</tr>
@@ -50,7 +49,7 @@
 		</div>
 	</section>
 
-	<script src="/static/js/moment.min.js"></script>
+	<script src="/static/js/.moment.min.js"></script>
 	<script type="text/javascript">
 	
 		/* DATE/TIME FORMATS */ {

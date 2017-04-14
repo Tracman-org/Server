@@ -1,3 +1,4 @@
+/* global $ */
 'use strict';
 
 $(document).ready(function(){
@@ -18,6 +19,11 @@ $(document).ready(function(){
 	$('.wrap, section').click(function(){
 		$('.hamburger').removeClass('is-active');
 		$('nav').removeClass('visible');
+	});
+	
+	// Close alerts
+	$('.alert-dismissible .close').click(function() {
+		$(this).parent().slideUp(500);
 	});
 	
 });

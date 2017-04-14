@@ -1,99 +1,61 @@
 'use strict';
 
-const slug = require('slug'),
-	xss = require('xss'),
-	mw = require('../middleware.js'),
-	User = require('../models/user.js'),
-	router = require('express').Router();
+const mw = require('../middleware.js'),
+	router = require('express').Router(),
+	slug = require('slug'),
+  User = require('../models.js').user;
 
 // Index
-router.get('/', function(req,res,next) {
-	res.render('index.html');
+router.get('/', (req,res,next)=>{
+	res.render('index');
 });
 
-// Settings
-router.route('/settings').all(mw.ensureAuth, function(req,res,next){
-		next();
-	})
-	
-	// Get settings form
-	.get(function(req,res,next){
-		User.findById(req.session.passport.user, function(err,user){
-			if (err){ console.log('Error finding settings for user:',err); mw.throwErr(req,err); }
-			res.render('settings.html');
-		});
-	})
-	
-	// Set new settings
-	.post(function(req,res,next){
-		User.findByIdAndUpdate(req.session.passport.user, {$set:{
-			name: xss(req.body.name),
-			slug: slug(xss(req.body.slug)),
-			email: req.body.email,
-			settings: {
-				units: req.body.units,
-				defaultMap: req.body.map,
-				defaultZoom: req.body.zoom,
-				showSpeed: (req.body.showSpeed)?true:false,
-				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
-			}
-		}}, function(err, user){
-			if (err) { console.log('Error updating user settings:',err); mw.throwErr(req,err); }
-			else { req.flash('success', 'Settings updated.  '); }
-			res.redirect('/settings');
-		});		
-	})
-
-	// Delete user account
-	.delete(function(req,res,next){
-		User.findByIdAndRemove( req.session.passport.user,
-			function(err) {
-				if (err) { 
-					console.log('Error deleting user:',err);
-					mw.throwErr(req,err);
-				} else { 
-					req.flash('success', 'Your account has been deleted.  ');
-					res.redirect('/');
-				}
-			}
-		);
-	});
-
-// Tracman pro
-router.route('/pro').all(mw.ensureAuth, function(req,res,next){
-		next();
-	})
-	
-	// Get info about pro
-	.get(function(req,res,next){
-		User.findById(req.session.passport.user, function(err, user){
-			if (err){ mw.throwErr(req,err); }
-			if (!user){ next(); }
-			else { res.render('pro.html'); }
-		});
-	})
-	
-	// Join Tracman pro
-	.post(function(req,res){
-		User.findByIdAndUpdate(req.session.passport.user,
-			{$set:{ isPro:true }},
-			function(err, user){
-				if (err){ mw.throwErr(req,err); }
-				else { req.flash('success','You have been signed up for pro. '); }
-				res.redirect('/map');
-			}
-		);
-	});
-
 // Help
-router.route('/help').get(mw.ensureAuth, function(req,res){
-		res.render('help.html');
-	});
+router.get('/help', mw.ensureAuth, (req,res)=>{
+	res.render('help');
+});
 
-// Terms of Service
-router.get('/terms', function(req,res){
-	res.render('terms.html');
+// Terms of Service and Privacy Policy
+router.get('/terms', (req,res)=>{
+	res.render('terms');
+})
+.get('/privacy', (req,res)=>{
+	res.render('privacy');
+});
+
+// robots.txt
+router.get('/robots.txt', (req,res)=>{ 
+	res.type('text/plain');
+	res.send("User-agent: *\n"+
+		"Disallow: /map/*\n"
+	);
+});
+
+// favicon.ico
+router.get('/favicon.ico', (req,res)=>{
+	res.redirect('/static/img/icon/by/16-32-48.ico');
+});	
+
+// Endpoint to validate forms
+router.get('/validate', (req,res)=>{
+	if (req.query.slug) { // validate unique slug
+		User.findOne( {slug:slug(req.query.slug)}, (err,existingUser)=>{
+			if (err) { console.log('/validate error:',err); }
+			if (existingUser && existingUser.id!==req.user) { res.sendStatus(400); }
+			else { res.sendStatus(200); }
+		} );
+	}
+});
+
+// Link to androidapp in play store
+router.get('/android', (req,res)=>{
+	res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
+});
+
+// Link to iphone app in the apple store
+router.get('/ios', (req,res)=>{
+	res.sendStatus(404);
+	//TODO: Add link to info about why there's no ios app
 });
 
 module.exports = router;

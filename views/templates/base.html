@@ -1,14 +1,30 @@
 <!doctype html>
+
+<!--
+
+	Tracman: GPS tracking service in node.js
+	Copyright © 2017 Keith Irwin
+
+	This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+	(A full copy of this programs license is available at https://github.com/Tracman-org/Server/blob/master/LICENSE.md)
+
+-->
+
 <html>
 	<head>
 	{% block head %}
 		<title>{% block title %}Tracman{% endblock %}</title>
 		
 		<link rel="manifest" href="/static/manifest.webmanifest">
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<meta http-equiv="Content-type" content="text/html;charset=utf-8">
 		<meta charset="UTF-8">
 		<meta name="author" content="Keith Irwin">
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
 		<meta name="keywords" content="map, phone, gps, link, location, track, friends, app">
 		<meta name="description" content="Tracman lets you see and share your phone's exact realtime location">
 		<meta name="theme-color" content="#222">
@@ -25,26 +41,29 @@
 		<link rel="icon apple-touch-icon" sizes="228x228" type="image/png" href="/static/img/icon/by/228.png">
 		<link rel="apple-touch-icon-precomposed" type="image/png" href="/static/img/icon/by/152.png">
 		
-		<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
-		<link href="/static/css/base.css" rel="stylesheet">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,600">
+		<link rel="stylesheet" type="text/css" href="/static/css/.base.min.css">
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,600">
 		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Merriweather:300,700">
 		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
+		
 	{% endblock %}
-	{% if not noHeader %}<link href="/static/css/header.css" rel="stylesheet">{% endif %}
-	{% if not noFooter %}<link href="/static/css/footer.css" rel="stylesheet">{% endif %}
+	{% if not noHeader %}<link href="/static/css/.header.min.css" rel="stylesheet">{% endif %}
+	{% if not noFooter %}<link href="/static/css/.footer.min.css" rel="stylesheet">{% endif %}
 	</head>
 	<body>
 
 		{% if not noHeader %}{% include 'templates/header.html' %}{% endif %}
-		{% block main %}Loading... {% endblock %}
-		{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}
+		<main>
+			{% block main %}{% endblock %}
+			{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}
+		</main>
 
-		<!-- Google Analytics -->
+		<!-- Javascript -->
+		{% block javascript %}
 		<script>
+			
+			// Google analytics
 			(function(t,r,a,c,m,o,n){t['GoogleAnalyticsObject']=m;t[m]=t[m]||function(){
 			(t[m].q=t[m].q||[]).push(arguments);},t[m].l=1*new Date();o=r.createElement(a),
 			n=r.getElementsByTagName(a)[0];o.async=1;o.src=c;n.parentNode.insertBefore(o,n);
@@ -53,19 +72,9 @@
 			ga('create','UA-44266909-3','auto');
 			ga('require','linkid');
 			ga('send','pageview');
+			
 		</script>
-		
-		<!-- Firebase -->
-		<script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
-		<script>
-			firebase.initializeApp({
-				apiKey: "AIzaSyDPYY_Fw3FXLm0hKfIfc8qlrc98zZiN4IY",
-				authDomain: "tracman-b894f.firebaseapp.com",
-				databaseURL: "https://tracman-b894f.firebaseio.com",
-				storageBucket: "tracman-b894f.appspot.com",
-				messagingSenderId: "483494341936"
-			});
-		</script>
+		{% endblock %}
 
 	</body>
 </html>

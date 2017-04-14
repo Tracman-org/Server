@@ -1,23 +1,32 @@
-var chai = require('chai'),
+const chai = require('chai'),
 	chaiHttp = require('chai-http'),
 	request = require('supertest'),
-	server = require('./server'),
-	should = chai.should(),
-	expect = chai.expect();
+	server = require('./server');
 chai.use(chaiHttp);
 
-describe('Index', function() {
-	// I think this restarts the server after each try? 
-	// var server;
-	// beforeEach(function() {
-	// 	server = require('./server');
-	// });
-	// afterEach(function() {
-	// 	server.close();
-	// });
+
+describe('Pages', function() {
 	
 	it('Displays homepage', function(done){
 		request(server).get('/')
+		.expect(200)
+		.end(function(err,res){ done(); });
+	});
+	
+	it('Displays help page', function(done){
+		request(server).get('/help')
+		.expect(200)
+		.end(function(err,res){ done(); });
+	});
+	
+	it('Displays terms of service', function(done){
+		request(server).get('/terms')
+		.expect(200)
+		.end(function(err,res){ done(); });
+	});
+	
+	it('Displays privacy policy', function(done){
+		request(server).get('/privacy')
 		.expect(200)
 		.end(function(err,res){ done(); });
 	});
@@ -40,50 +49,9 @@ describe('Index', function() {
 describe('Auth', function() {
 	
 	it('Creates an account', function(done){
-		request(server).get('/login')
-			.expect(200)
-			.end(function(err,res){
-				//TODO: google authentication
-				it('Logs out', function(done){
-					request(server).get('/logout')
-						.expect(200)
-						.end(function(err,res){
-							it('Logs in', function(done){
-								request(server).get('/logout')
-									.expect(200)
-									.end(function(err,res){
-										cbc=2;
-										var deletesAccount = function(done){
-											it('Deletes own account', function(){
-												//TODO: Delete account via GUI
-											});
-										}
-										it('Shows own map', function(done){
-											request(server).get('/map')
-												.expect(200)
-												//TODO: Expect no js errors
-												.end(function(err,res){
-													if (cbc<2){ deletesAccount(); }
-													else { cbc--; }
-													done();
-												});
-										});
-										
-										it('Has the correct account info', function(done){
-											//TODO: Check account info
-											if (cbc<2){ deletesAccount(); }
-											else { cbc--; }
-											done();
-										});
-										
-										done();
-									});
-							});
-							done();
-						});
-				});
-				done();
-			});
+		request(server).post('/signup',{"email":"test@tracman.org"})
+		.expect(200)
+		.end(function(err,res){ done(); });
 	});
 	
 	//TODO: it('Has the correct account info', function(done){
@@ -106,9 +74,9 @@ describe('Auth', function() {
 		
 	// });
 	
-});
+// });
 
-describe('Map controls', function() {
+// describe('Map controls', function() {
 	
 	//TODO: it('Sets location', function(done){
 		
@@ -126,24 +94,5 @@ describe('Map controls', function() {
 		
 	// });
 	
-});
+// });
 
-describe('Map popups', function() {
-	
-	//TODO: it('Opens Share popup', function(done){
-		
-	// });
-	
-	//TODO: it('Closes Share popup', function(done){
-		
-	// });
-	
-	//TODO: it('Opens Settings popup', function(done){
-		
-	// });
-	
-	//TODO: it('Closes Settings popup', function(done){
-		
-	// });
-	
-});

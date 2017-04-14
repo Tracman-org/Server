@@ -1,14 +1,12 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{ super() }} | {{ code }} Error{% endblock %}
+{% block title %}{{super()}} | Error{% endblock %}
 
 {% block main %}
-<section class='dark'>
-	<div class='container'>
-		{% if code %}<h2>{{code}}</h2>{% endif %}
-		{% if message %}<h3>{{message}}</h3>{% endif %}
-		{% if error %}<p>{{error}}</p>{% endif %}
-		<p>I would really appreciate it if you would <a href="https://github.com/Tracman-org/Server/issues/new">report this error</a>. </p>
-		{% if code %}<img style="width:100%" src="https://http.cat/{{code}}.jpg">{% endif %}
-	</div>
+<section class='container'>
+	{% if code %}<h2>{{code}}</h2>{% endif %}
+	{% if message %}<h3>{{message}}</h3>{% endif %}
+	{% if stack %}<p>{{stack}}</p>{% endif %}
+	{% if not stack %}<p>I would really appreciate it if you would <a href="https://github.com/Tracman-org/Server/issues/new">report this error</a>. </p>{% endif %}
+	{% if code %}<img style="width:100%" src="https://http.cat/{{code}}.jpg">{% endif %}
 </section>
 {% endblock %}
