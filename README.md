@@ -1,5 +1,5 @@
 # Tracman
-###### v 0.5.1
+###### v 0.6.0
 
 node.js application to display a map with user's location.
 
