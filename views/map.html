@@ -1,5 +1,5 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{super()}} | {{mapuser.name}}{% endblock %}
+{% block title %}{{super()}}{% if mapuser.name %} | {{mapuser.name}}{% endif %}{% endblock %}
 
 {% block head %}
 	{{super()}}
@@ -147,6 +147,7 @@
 		
 		// Google maps API callback
 		window.gmapsCb = function() {
+			
 			// Create map
 			if (disp!='1'||!settings.showStreetview) {
 				map = new google.maps.Map( mapElem, {
@@ -160,7 +161,7 @@
 				});
 				marker = new google.maps.Marker({
 					position: { lat:last.lat, lng:last.lon },
-					title: {{ mapuser.name | dump | safe }},
+					{% if mapuser.name.length %}title: {{mapuser.name|dump|safe}},{% endif %}
 					map: map,
 					draggable: false
 				});

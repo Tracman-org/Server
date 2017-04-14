@@ -42,27 +42,27 @@ const userSchema = new mongoose.Schema({
 }).plugin(unique);
 
 /* User methods */ {
-
+	
 	// Generate hash for new password
-	userSchema.methods.generateHash = (password,next)=>{
+	userSchema.methods.generateHash = function(password,next){
 		bcrypt.genSalt(8, (err,salt)=>{
 			if (err){ return next(err); }
 			bcrypt.hash(password, salt, null, next);
 		});
 	};
-
+	
 	// Create password reset token
-	userSchema.methods.createToken = (next)=>{
+	userSchema.methods.createToken = function(next){
 		var user = this;
 		if ( user.auth.tokenExpires <= Date.now() ){
-
+			
 			// Reuse old token, resetting clock
 			user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
 			user.save();
-			return next(null.user.auth.passToken);
-
+			return next(null,user.auth.passToken);
+			
 		} else {
-
+			
 			// Create new token
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ next(err,null); }
@@ -73,15 +73,15 @@ const userSchema = new mongoose.Schema({
 					return next(null,user.auth.passToken);
 				}
 			});
-
+			
 		}
 	};
-
+	
 	// Check for valid password
-	userSchema.methods.validPassword = (password,next)=>{
+	userSchema.methods.validPassword = function(password,next){
 		bcrypt.compare(password, this.auth.password, next);
 	};
-
+	
 }
 
 module.exports = {

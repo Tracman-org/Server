@@ -35,7 +35,7 @@ const
 		}).catch((err)=>{
 			mw.throwErr(err);
 		}).then(()=>{
-			console.log(`💿 Mongoose connected to database`);
+			console.log(`💿 Mongoose connected to mongoDB`);
 		});
 
 	}
@@ -89,40 +89,40 @@ const
 
 		// Set default locals available to all views (keep this after static files)
 		app.get( '/*', (req,res,next)=>{
-			// console.log(`Setting local variables for request to ${req.path}.`);
-
+			
+			// Path for redirects
+			req.session.next = ( req.path.substring(0, req.path.indexOf('#')) || req.path )+'#';
+			
 			// User account
 			res.locals.user = req.user;
-			// console.log(`User set as ${res.locals.user}. `);
-
+			
 			// Flash messages
 			res.locals.successes = req.flash('success');
 			res.locals.dangers = req.flash('danger');
 			res.locals.warnings = req.flash('warning');
-			// console.log(`Flash messages set as:\nSuccesses: ${res.locals.successes}\nWarnings: ${res.locals.warnings}\nDangers: ${res.locals.dangers}`);
-
+			
 			next();
 		} );
-
+		
 		// Main routes
 		app.use( '/', require('./config/routes/index.js') );
-
+		
 		// Settings
 		app.use( '/settings', require('./config/routes/settings.js') );
-
+		
 		// Map
 		app.use( ['/map','/trac'], require('./config/routes/map.js') );
-
+		
 		// Site administration
 		app.use( '/admin', require('./config/routes/admin.js') );
-
+		
 		// Testing
 		if (env.mode == 'development') {
 			app.use( '/test', require('./config/routes/test.js' ) );
 		}
-
+		
 	}
-
+	
 	/* Errors */	{
 		// Catch-all for 404s
 		app.use( (req,res,next)=>{
@@ -156,21 +156,21 @@ const
 			} );
 		}
 	}
-
+	
 	/* Sockets */ {
 		sockets.init(io);
 	}
-
+	
 }
 
 /* RUNTIME */ {
-
-	console.log('🖥 Starting Tracman server...');
-
+	
+	console.log('🖥  Starting Tracman server...');
+	
 	// Listen
 	http.listen( env.port, ()=>{
 		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
-
+		
 		// Check for clients for each user
 		User.find( {}, (err,users)=>{
 			if (err) { console.log(`DB error finding all users: ${err.message}`); }
@@ -178,9 +178,9 @@ const
 				sockets.checkForUsers( io, user.id );
 			});
 		});
-
+		
 	});
-
+	
 }
 
 module.exports = app;
