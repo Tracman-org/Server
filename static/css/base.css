@@ -87,6 +87,8 @@ pre {
 .hide { display: none !important; }
 .red, .red:hover { color: #fb6e3d !important; }
 .yellow, .yellow:hover { color: #fbc93d !important; }
+	.green, .green:hover { color: #8ae137 !important; }
+
 .shadow {
 	-moz-box-shadow: .18vw .18vw .36vw #000;
 	-webkit-box-shadow: .18vw .18vw .36vw #000;
@@ -134,13 +136,13 @@ section {
 	font-weight:600;
 	display: inline-block;
 	padding: 15px 30px;
-	transition: 100ms;
-	cursor: pointer;
 	background: rgba(255,255,255,0.1);
 	color: #eee;
-	border: 1px solid #666;
 	border-radius: .5vw;
-} .btn:not(.disabled) {
+} .btn:not(:disabled) {
+	border: 1px solid #666;
+	transition: 100ms;
+	cursor: pointer;
 	-moz-box-shadow:
 		inset .11vw .18vw .52vw rgba(255,255,255,.2),
 		inset -.11vw -.18vw .52vw rgba(0,0,0,.4),
@@ -153,10 +155,12 @@ section {
 		inset .11vw .18vw .52vw rgba(255,255,255,.2),
 		inset -.11vw -.18vw .52vw rgba(0,0,0,.4),
 		.18vw .18vw .36vw #000;
-} .btn:hover:not(.disabled) {
+} .btn:disabled {
+	border: 1px solid #999;
+} .btn:hover:not(:disabled) {
 	text-decoration: none;
 	background: rgba(255,255,255,0.2);
-} .btn:active:not(.disabled) {
+} .btn:active:not(:disabled) {
 	-moz-box-shadow:
 		inset .11vw .18vw .52vw rgba(0,0,0,.4),
 		inset -.11vw -.18vw .52vw rgba(255,255,255,.2);
@@ -166,10 +170,10 @@ section {
 	box-shadow:
 		inset .11vw .18vw .52vw rgba(0,0,0,.4),
 		inset -.11vw -.18vw .52vw rgba(255,255,255,.2);
-} .btn:focus:not(.disabled){
+} .btn:focus:not(:disabled){
 	border: 1px solid #fbc93d;
 }
-.btn.main {
+.btn.main:not(:disabled) {
 	color: #fbc93d;
 }
 .btn .fa {

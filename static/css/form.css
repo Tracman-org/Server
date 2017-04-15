@@ -17,15 +17,20 @@ form label {
 
 /* Input formatting */
 form input, form textarea, form select {
-	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
-	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
-	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 	color: #eee;
 	background-color: #202020;
 	background-color: rgba(255,255,255,0.1);
 	padding: 1% 1.5%;
-	border: 1px solid #666;
 	border-radius: .3vw;
+}
+form input:not(:disabled), form textarea:not(:disabled), form select:not(:disabled) {
+	border: 1px solid #666;
+	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+}
+form input:disabled, form textarea:disabled form select:disabled {
+	border: 1px solid #999;	
 }
 form input:not(.input-addon):not(.input-with-addon):not([type="radio"]):not([type="checkbox"]),
 form .input-with-addon-group {

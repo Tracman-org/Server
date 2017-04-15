@@ -2,6 +2,7 @@
 
 const slug = require('slug'),
 	xss = require('xss'),
+	mellt = require('mellt'),
 	mw = require('../middleware.js'),
 	User = require('../models.js').user,
 	mail = require('../mail.js'),
@@ -130,37 +131,45 @@ router.route('/password/:token')
 	.get( (req,res)=>{
 		res.render('password');
 	} )
-
+	
+	// Set new password
 	.post( (req,res,next)=>{
 		
-		//TODO: Validate password
-		
-		// Delete token
-		res.locals.passwordUser.auth.passToken = undefined;
-		res.locals.passwordUser.auth.tokenExpires = undefined;
-
-		// Create hash
-		res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
-			if (err){
-				mw.throwErr(err,req);
-				res.redirect(`/password/${req.params.token}`);
-			}
-			else {
-
-				// Save new password to db
-				res.locals.passwordUser.auth.password = hash;
-				res.locals.passwordUser.save()
-					.then( ()=>{
-						req.flash('success', 'Password set.  You can use it to log in now. ');
-						res.redirect('/login#login');
-					})
-					.catch( (err)=>{
-						mw.throwErr(err,req);
-						res.redirect('/login#signup');
-					});
-				
-			}
-		} );
+		// Validate password
+		let daysToCrack = mellt.CheckPassword(req.body.password);
+		if (daysToCrack<10) {
+			mw.throwErr(new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `));
+			res.redirect(`/settings/password/${req.params.token}`);
+		} else {
+			
+			// Delete token
+			res.locals.passwordUser.auth.passToken = undefined;
+			res.locals.passwordUser.auth.tokenExpires = undefined;
+			
+			// Create hash
+			res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
+				if (err){
+					mw.throwErr(err,req);
+					res.redirect(`/password/${req.params.token}`);
+				}
+				else {
+					
+					// Save new password to db
+					res.locals.passwordUser.auth.password = hash;
+					res.locals.passwordUser.save()
+						.then( ()=>{
+							req.flash('success', 'Password set.  You can use it to log in now. ');
+							res.redirect('/login#login');
+						})
+						.catch( (err)=>{
+							mw.throwErr(err,req);
+							res.redirect('/login#signup');
+						});
+					
+				}
+			} );
+			
+		}
 		
 	} );
 

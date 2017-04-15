@@ -13,17 +13,23 @@ router
 		  subject: 'Test email',
 		  text: mail.text("Looks like everything's working! "),
 		  html: mail.html("<p>Looks like everything's working! </p>")
-		}).then(()=>{
+		})
+		.then(()=>{
 			console.log("Test email should have sent...");
 			res.sendStatus(200);
-		}).catch((err)=>{
+		})
+		.catch((err)=>{
 		  mw.throwErr(err,req);
-		  next();
+		  res.sendStatus(500);
 		});
 	})
 	
 	.get('/password', (req,res)=>{
 		res.render('password');
+	})
+	.post('/password', (req,res)=>{
+		//TODO: Server-side checks
+		res.sendStatus(200);
 	});
 	
 module.exports = router;
