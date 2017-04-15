@@ -1,6 +1,7 @@
 'use strict';
 
 const router = require('express').Router(),
+	mellt = require('mellt'),
   mw = require('../middleware.js'),
   mail = require('../mail.js');
 
@@ -27,9 +28,16 @@ router
 	.get('/password', (req,res)=>{
 		res.render('password');
 	})
-	.post('/password', (req,res)=>{
-		//TODO: Server-side checks
-		res.sendStatus(200);
+	.post('/password', (req,res,next)=>{
+		let daysToCrack = mellt.CheckPassword(req.body.password);
+		if (daysToCrack<10) {
+			let err = new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `)
+			mw.throwErr(err);
+			next(err);
+		}
+		else {
+			res.sendStatus(200);
+		}
 	});
 	
 module.exports = router;
