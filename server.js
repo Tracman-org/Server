@@ -4,6 +4,7 @@
 const
 	express = require('express'),
 	bodyParser = require('body-parser'),
+	expressValidator = require('express-validator'),
 	cookieParser = require('cookie-parser'),
 	cookieSession = require('cookie-session'),
 	mongoose = require('mongoose'),
@@ -22,10 +23,10 @@ const
 /* SETUP */ {
 
 	/* Database */ {
-
+		
 		// Setup with native ES6 promises
 		mongoose.Promise = global.Promise;
-
+		
     // Connect to database
 		mongoose.connect(env.mongoSetup, {
 			server:{socketOptions:{
@@ -37,7 +38,7 @@ const
 		}).then(()=>{
 			console.log(`💿 Mongoose connected to mongoDB`);
 		});
-
+		
 	}
 
 	/* Templates */ {
@@ -60,6 +61,7 @@ const
 		app.use(bodyParser.urlencoded({
 			extended: true
 		}));
+		app.use(expressValidator());
 		app.use(flash());
 	}
 
