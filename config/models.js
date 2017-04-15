@@ -43,6 +43,8 @@ const userSchema = new mongoose.Schema({
 
 /* User methods */ {
 	
+	//TODO: Return promises instead of taking callbacks
+	
 	// Generate hash for new password
 	userSchema.methods.generateHash = function(password,next){
 		bcrypt.genSalt(8, (err,salt)=>{

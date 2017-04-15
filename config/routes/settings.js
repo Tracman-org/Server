@@ -16,55 +16,59 @@ router.route('/')
 	} )
 
 	// Get settings form
-	.get( (req,res,next)=>{
-		User.findById( req.user, (err,user)=>{
-			if (err){ mw.throwErr(err,req); }
-			res.render('settings');
-		} );
+	.get( (req,res)=>{
+		res.render('settings');
 	} )
 
 	// Set new settings
 	.post( (req,res,next)=>{
-		User.findByIdAndUpdate(req.user, {$set:{
-			name: xss(req.body.name),
-			slug: slug(xss(req.body.slug)),
-			email: req.body.email,
-			settings: {
-				units: req.body.units,
-				defaultMap: req.body.map,
-				defaultZoom: req.body.zoom,
-				showSpeed: (req.body.showSpeed)?true:false,
-				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
-			}
-		}}, (err,user)=>{
-			if (err) {
+		
+		//TODO: Validate everything! 
+		
+		User.findByIdAndUpdate(req.user.id, {$set:{
+				name: xss(req.body.name),
+				slug: slug(xss(req.body.slug)),
+				email: req.body.email,
+				settings: {
+					units: req.body.units,
+					defaultMap: req.body.map,
+					defaultZoom: req.body.zoom,
+					showSpeed: (req.body.showSpeed)?true:false,
+					showAlt: (req.body.showAlt)?true:false,
+					showStreetview: (req.body.showStreet)?true:false
+				}
+			}})
+			.then( (user)=>{
+				req.flash('success', 'Settings updated. ');
+				res.redirect('/settings');
+			})
+			.catch( (err)=>{
 				mw.throwErr(err,req);
 				res.redirect('/settings');
-			}
-			else {
-				req.flash('success', 'Settings updated.  ');
-				res.redirect('/settings');
-			}
-		});
+			});
+			
 	} )
 
 	// Delete user account
 	.delete( (req,res,next)=>{
-		User.findByIdAndRemove( req.user, (err)=>{
-			if (err) {
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			} else {
+		
+		//TODO: Reenter password?
+		
+		User.findByIdAndRemove(req.user)
+			.then(()=>{
 				req.flash('success', 'Your account has been deleted.  ');
 				res.redirect('/');
-			}
-		} );
+			})
+			.catch((err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/settings');
+			});
+			
 	} );
 
 
 // Set password
-router.route('/password/')
+router.route('/password')
 	.all( mw.ensureAuth, (req,res,next)=>{
 		next();
 	} )
@@ -73,28 +77,30 @@ router.route('/password/')
 	.get( (req,res,next)=>{
 
 		// Create token for password change
-		req.user.createToken( (err,token)=>{
-			if (err){ next(err); }
-
-			// Confirm password change request by email.
-			mail.send({
-				to: mail.to(req.user),
-				from: mail.from,
-				subject: 'Request to change your Tracman password',
-				text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire in 1 hour. `),
-				html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire in 1 hour. </p>`)
-			}).catch( err=>{
+		req.user.createToken()
+			.then( (token)=>{
+				
+				// Confirm password change request by email.
+				mail.send({
+					to: mail.to(req.user),
+					from: mail.from,
+					subject: 'Request to change your Tracman password',
+					text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire in 1 hour. `),
+					html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire in 1 hour. </p>`)
+				}).then( ()=>{
+					// Alert user to check email.
+					req.flash('success',`An email has been sent to <u>${req.user.email}</u>.  Check your inbox to complete your password change. `);
+					res.redirect('/login#login');
+				}).catch( (err)=>{
+					mw.throwErr(err,req);
+					res.redirect('/login#login');
+				});
+				
+			})
+			.catch( (err)=>{
 				mw.throwErr(err,req);
-				res.redirect('/login#login');
-			}).then( ()=>{
-
-				// Alert user to check email.
-				req.flash('success',`An email has been sent to <u>${req.user.email}</u>.  Check your inbox to complete your password change. `);
-				res.redirect('/login#login');
-
+				res.redirect('/password');
 			});
-
-		} );
 
 	} );
 
@@ -105,9 +111,6 @@ router.route('/password/:token')
 		User
 			.findOne({'auth.passToken': req.params.token})
 			.where('auth.tokenExpires').gt(Date.now())
-			.catch((err)=>{
-				mw.throwErr(err,req);
-			})
 			.then((user) => {
 				if (!user) {
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
@@ -116,6 +119,10 @@ router.route('/password/:token')
 					res.locals.passwordUser = user;
 					next();
 				}
+			})
+			.catch((err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/password');
 			});
 	} )
 
@@ -125,34 +132,36 @@ router.route('/password/:token')
 	} )
 
 	.post( (req,res,next)=>{
-
+		
 		//TODO: Validate password
-
+		
 		// Delete token
 		res.locals.passwordUser.auth.passToken = undefined;
 		res.locals.passwordUser.auth.tokenExpires = undefined;
 
 		// Create hash
 		res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
-			if (err){ mw.throwErr(err,req); }
+			if (err){
+				mw.throwErr(err,req);
+				res.redirect(`/password/${req.params.token}`);
+			}
 			else {
 
 				// Save new password to db
 				res.locals.passwordUser.auth.password = hash;
-				res.locals.passwordUser.save( (err)=>{
-					if (err){
-						mw.throwErr(err,req);
-						res.redirect('/login#signup');
-					}
-					else {
+				res.locals.passwordUser.save()
+					.then( ()=>{
 						req.flash('success', 'Password set.  You can use it to log in now. ');
 						res.redirect('/login#login');
-					}
-				});
-
+					})
+					.catch( (err)=>{
+						mw.throwErr(err,req);
+						res.redirect('/login#signup');
+					});
+				
 			}
 		} );
-
+		
 	} );
 
 
@@ -170,13 +179,15 @@ router.route('/pro')
 	// Join Tracman pro
 	.post( (req,res)=>{
 		User.findByIdAndUpdate(req.user.id,
-			{$set:{ isPro:true }},
-			(err,user)=>{
-				if (err){ mw.throwErr(err,req); }
-				else { req.flash('success','You have been signed up for pro. '); }
+				{$set:{ isPro:true }})
+			.then( (user)=>{
+				req.flash('success','You have been signed up for pro. ');
 				res.redirect('/map');
-			}
-		);
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/pro');	
+			});
 	} );
 
 module.exports = router;
