@@ -38,125 +38,126 @@ module.exports = (app, passport) => {
 	});
 	
 	// Signup
-	app.get('/signup', (req,res)=>{
-		res.redirect('/login#signup');
-	})
-	.post('/signup', (req,res,next)=>{
-		
-		// Send token and alert user
-		function sendToken(user){
+	app.route('/signup')
+		.get( (req,res)=>{
+			res.redirect('/login#signup');
+		})
+		.post( (req,res,next)=>{
 			
-			// Create a password token
-			user.createToken((err,token)=>{
+			// Send token and alert user
+			function sendToken(user){
+				
+				// Create a password token
+				user.createToken((err,token)=>{
+					if (err){ mw.throwErr(err,req); }
+					
+					// Email the instructions to continue
+					mail.send({
+						from: mail.from,
+						to: `<${user.email}>`,
+						subject: 'Complete your Tracman registration',
+						text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}`),
+						html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p>`)
+					}).then(()=>{
+						req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox to complete your registration. `);
+						res.redirect('/login');
+					}).catch((err)=>{
+						mw.throwErr(err,req);
+						res.redirect('/login#signup');
+					});
+				});
+				
+			}
+			
+			// Check if somebody already has that email
+			User.findOne({'email':req.body.email}, (err,user)=>{
 				if (err){ mw.throwErr(err,req); }
 				
-				// Email the instructions to continue
-				mail.send({
-					from: mail.from,
-					to: `<${user.email}>`,
-					subject: 'Complete your Tracman registration',
-					text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}`),
-					html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p>`)
-				}).catch((err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/login#signup');
-				}).then(()=>{
-					req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox to complete your registration. `);
-					res.redirect('/login');
-				});
-			});
-			
-		}
-		
-		// Check if somebody already has that email
-		User.findOne({'email':req.body.email}, (err,user)=>{
-			if (err){ mw.throwErr(err,req); }
-			
-			// User already exists
-			if (user && user.auth.password) {
-				req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
-				res.redirect('/login#login');
-				next();
-			}
-			
-			// User exists but hasn't created a password yet
-			else if (user) {
-				// Send another token (or the same one if it hasn't expired)
-				sendToken(user);
-			}
-			
-			// Create user
-			else {
+				// User already exists
+				if (user && user.auth.password) {
+					req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
+					res.redirect('/login#login');
+					next();
+				}
 				
-				user = new User();
-				user.created = Date.now();
-				user.email = req.body.email;
-				user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
+				// User exists but hasn't created a password yet
+				else if (user) {
+					// Send another token (or the same one if it hasn't expired)
+					sendToken(user);
+				}
 				
-				// Generate unique slug
-				var generateSlug = new Promise((resolve,reject) => {
-					(function checkSlug(s,cb){
-						
-						User.findOne({slug:s})
-						.catch((err)=>{
-							mw.throwErr(err,req);
-						})
-						.then((existingUser)=>{
+				// Create user
+				else {
+					
+					user = new User();
+					user.created = Date.now();
+					user.email = req.body.email;
+					user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
+					
+					// Generate unique slug
+					let slug = new Promise((resolve,reject) => {
+						(function checkSlug(s,cb){
 							
-							// Slug in use: generate a random one and retry
-							if (existingUser){
-								s = '';
-								while (s.length<6) {
-									s+='abcdefghijkmnpqrtuvwxy346789'.charAt(Math.floor(Math.random()*28));
+							User.findOne({slug:s})
+							.catch((err)=>{
+								mw.throwErr(err,req);
+							})
+							.then((existingUser)=>{
+								
+								// Slug in use: generate a random one and retry
+								if (existingUser){
+									crypto.randomBytes(6, (err,buf)=>{
+										if (err) { mw.throwErr(err,req); }
+										s = buf.toString('hex');
+										checkSlug(s,cb);
+									});
 								}
-								checkSlug(s,cb);
-							}
+								
+								// Unique slug: proceed
+								else { cb(s); }
+								
+							});
 							
-							// Unique slug: proceed
-							else { cb(s); }
-							
+						})(user.slug, (newSlug)=>{
+							user.slug = newSlug;
+							resolve();
 						});
-						
-					})(user.slug, (newSlug)=>{
-						user.slug = newSlug;
-						resolve();
 					});
-				});
-				
-				// Generate sk32
-				var generateSk32 = new Promise((resolve,reject) => {
-					crypto.randomBytes(32, (err,buf)=>{
-						if (err) { mw.throwErr(err,req); }
-						user.sk32 = buf.toString('hex');
-						resolve();
+					
+					// Generate sk32
+					let sk32 = new Promise((resolve,reject) => {
+						crypto.randomBytes(32, (err,buf)=>{
+							if (err) { mw.throwErr(err,req); }
+							user.sk32 = buf.toString('hex');
+							resolve();
+						});
 					});
-				});
-				
-				// Save user and send the token by email
-				Promise.all([generateSlug, generateSk32])
-					.catch(err => {
-						mw.throwErr(err,req);
-					}).then(() => {
-						user.save( (err)=>{
-							if (err){ mw.throwErr(err,req); }
+					
+					// Save user and send the token by email
+					Promise.all([slug, sk32])
+						.then( ()=> {
+							user.save();
+						}).then( ()=>{
 							sendToken(user);
+						}).catch( (err)=>{
+							mw.throwErr(err,req);
+							res.redirect('/login#signup');
 						});
-					});
+					
+				}
 				
-			}
-			
+			});
 		});
-	});
-
+	
 	// Forgot password
 	app.route('/login/forgot')
 		.all( (req,res,next)=>{
 			if (req.isAuthenticated()){ loginCallback(); }
 			else { next(); }
-		})
+		} )
 		.get( (req,res,next)=>{
 			res.render('forgot');
-		})
+		} )
 		.post( (req,res,next)=>{
 			
 			//TODO: Validate and sanitize email
@@ -199,7 +200,7 @@ module.exports = (app, passport) => {
 				}
 			});
 
-		});
+		} );
 
 	// Social
 	app.get('/login/:service', (req,res,next)=>{
