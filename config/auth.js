@@ -4,7 +4,6 @@ const
 	mw = require('./middleware.js'),
 	mail = require('./mail.js'),
 	User = require('./models.js').user,
-	slug = require('slug'),
 	crypto = require('crypto'),
 	env = require('./env.js');
 
@@ -160,46 +159,50 @@ module.exports = (app, passport) => {
 		} )
 		.post( (req,res,next)=>{
 			
-			//TODO: Validate and sanitize email
+			//TODO: Validate email
 			// req.assert('email', 'Please enter a valid email address.').isEmail();
 			// req.sanitize('email').normalizeEmail({ remove_dots: false });
 			
-			User.findOne( {'email':req.body.email}, (err,user)=>{
-				if (err){ mw.throwErr(err); }
-				
-				// No user with that email
-				if (!user) {
-					// Don't let on that no such user exists, to prevent dictionary attacks
-					req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
-					res.redirect('/login');
-				}
-				
-				// User with that email exists
-				else {
+			User.findOne({'email':req.body.email})
+				.then((user)=>{
 					
-					// Create reset token
-					user.createToken( (err,token)=>{
-						if (err){ next(err); }
+					// No user with that email
+					if (!user) {
+						// Don't let on that no such user exists, to prevent dictionary attacks
+						req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
+						res.redirect('/login');
+					}
+					
+					// User with that email does exist
+					else {
 						
-						// Email reset link
-						mail.send({
-							from: mail.from,
-							to: mail.to(user),
-							subject: 'Reset your Tracman password',
-							text: mail.text(`Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `),
-							html: mail.html(`<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`)
-						}).then(()=>{
-							req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
-							res.redirect('/login');
-						}).catch((err)=>{
-							mw.throwErr(err);
+						// Create reset token
+						user.createToken( (err,token)=>{
+							if (err){ next(err); }
+							
+							// Email reset link
+							mail.send({
+								from: mail.from,
+								to: mail.to(user),
+								subject: 'Reset your Tracman password',
+								text: mail.text(`Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `),
+								html: mail.html(`<p>Hi, </p><p>Did you request to reset your Tracman password?  If so, follow this link to do so:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>If you didn't initiate this request, just ignore this email. </p>`)
+							}).then(()=>{
+								req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
+								res.redirect('/login');
+							}).catch((err)=>{
+								mw.throwErr(err);
+							});
+	
 						});
-
-					});
+						
+					}
 					
-				}
-			});
-
+				}).catch( (err)=>{
+					mw.throwErr(err,req);
+					res.redirect('/login/forgot');
+				});
+			
 		} );
 
 	// Social
