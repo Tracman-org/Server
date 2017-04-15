@@ -64,10 +64,10 @@ $(function(){
 				checkMatch();
 			}
 			else if (daysToCrack<=365) {
-				$('#password-help').text("That password is pretty good.  It would take "+daysToCrack+" days to crack. ").css({'color':'#8ae137'});
+				$('#password-help').text("That password is good.  It would take "+daysToCrack+" days to crack. ").css({'color':'#8ae137'});
 				checkMatch();
 			}
-			else {
+			else if (daysToCrack<1000000000) {
 				var years = Math.round(daysToCrack / 365 * 10) / 10;
 				if (years>1000000) {
 					years = (Math.round(years/1000000*10)/10)+' million';
@@ -76,6 +76,10 @@ $(function(){
 					years = (Math.round(years/1000))+' thousand';
 				}
 				$('#password-help').text("That password is great!  It could take up to "+years+" years to crack!").css({'color':'#8ae137'});
+				checkMatch();
+			}
+			else {
+				$('#password-help').text("That password is amazing!  It is virtually impossible to crack!").css({'color':'#8ae137'});
 				checkMatch();
 			}
 		}
