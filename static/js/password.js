@@ -13,7 +13,7 @@ function checkMatch(){
 	
 	// User has retyped, but they don't match yet
 	else if ($('#p2').val()!=='') {
-		$('#password-help').text("Those passwords don't match! ").css({'color':'#fb6e3d'});
+		$('#password-help').text("Those passwords don't match... ").css({'color':'#fb6e3d'});
 		$('#submit').prop('disabled',true).prop('title',"You need to type the same password twice before you can save it. ");
 	}
 	
@@ -33,7 +33,7 @@ $(function(){
 		
 		// Only second password entered
 		else if ($('#p1').val()==='') {
-			$('#password-help').show().text("Those passwords don't match! ");
+			$('#password-help').show().text("Those passwords don't match... ");
 			$('#submit').prop('disabled',true).prop('title',"You need to type the same password twice correctly before you can save it. ");
 		}
 		
