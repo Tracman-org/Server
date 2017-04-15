@@ -159,12 +159,12 @@ module.exports = (app, passport) => {
 		} )
 		.post( (req,res,next)=>{
 			
-			//TODO: Validate email
-			// req.assert('email', 'Please enter a valid email address.').isEmail();
-			// req.sanitize('email').normalizeEmail({ remove_dots: false });
+			// Validate email
+			req.checkBody('email', 'Please enter a valid email address.').isEmail();
+			req.sanitizeBody('email').normalizeEmail({remove_dots:false});
 			
 			User.findOne({'email':req.body.email})
-				.then((user)=>{
+				.then( (user)=>{
 					
 					// No user with that email
 					if (!user) {
