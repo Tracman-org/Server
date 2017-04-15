@@ -5,7 +5,7 @@ const chai = require('chai'),
 chai.use(chaiHttp);
 
 
-describe('Pages', function() {
+describe('Public', function() {
 	
 	it('Displays homepage', function(done){
 		request(server).get('/')
@@ -46,7 +46,7 @@ describe('Pages', function() {
 	
 });
 
-describe('Auth', function() {
+describe('User', function() {
 	
 	it('Creates an account', function(done){
 		request(server).post('/signup',{"email":"test@tracman.org"})
@@ -54,11 +54,7 @@ describe('Auth', function() {
 		.end(function(err,res){ done(); });
 	});
 	
-	//TODO: it('Has the correct account info', function(done){
-		
-	// });
-	
-	//TODO: it('Logs out', function(done){
+	//TODO: it('Creates a password', function(done){
 		
 	// });
 	
@@ -66,7 +62,85 @@ describe('Auth', function() {
 		
 	// });
 	
+	//TODO: it('Logs out', function(done){
+		
+	// });
+	
+	//TODO: it('Forgets password', function(done){
+		
+	// });
+	
+	//TODO: it('Changes forgotten password', function(done){
+		
+	// });
+	
+	//TODO: it('Logs back in', function(done){
+		
+	// });
+	
+	//TODO: it('Changes email address', function(done){
+		
+	// });
+	
+	//TODO: it('Changes password', function(done){
+		
+	// });
+	
+	//TODO: it('Changes settings', function(done){
+		
+	// });
+	
+	//TODO: it('Connects a Google account', function(done){
+		
+	// });
+	
+	//TODO: it('Connects a Facebook account', function(done){
+		
+	// });
+	
+	//TODO: it('Connects a Twitter account', function(done){
+		
+	// });
+	
+	//TODO: it('Logs in with Google', function(done){
+		
+	// });
+	
+	//TODO: it('Logs in with Facebook', function(done){
+		
+	// });
+	
+	//TODO: it('Logs in with Twitter', function(done){
+		
+	// });
+	
+	//TODO: it('Disconnects a Google account', function(done){
+		
+	// });
+	
+	//TODO: it('Disconnects a Facebook account', function(done){
+		
+	// });
+	
+	//TODO: it('Disconnects a Twitter account', function(done){
+		
+	// });
+	
 	//TODO: it('Shows own map', function(done){
+	// 	request(server).get('/map')
+	// 	.expect(200)
+	// 	.end(function(err,res){ done(); });
+	// });
+	
+	//TODO: it('Sets own location', function(done){
+		
+	// });
+	
+	//TODO: it('Tracks own location', function(done){
+		
+	// });
+	
+	//TODO: it('Clears own location', function(done){
 		
 	// });
 	
@@ -74,25 +148,4 @@ describe('Auth', function() {
 		
 	// });
 	
-// });
-
-// describe('Map controls', function() {
-	
-	//TODO: it('Sets location', function(done){
-		
-	// });
-	
-	//TODO: it('Clears location', function(done){
-		
-	// });
-	
-	//TODO: it('Starts tracking', function(done){
-		
-	// });
-	
-	//TODO: it('Stops tracking', function(done){
-		
-	// });
-	
-// });
-
+});
