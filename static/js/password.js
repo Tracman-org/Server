@@ -49,8 +49,12 @@ $(function(){
 				$('#password-help').text("That's is one of the world's most commonly used passwords. You may not use it for Tracman and should not use it anywhere. ").css({'color':'#fb6e3d'});
 				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
 			}
+			else if (daysToCrack<1) {
+				$('#password-help').text("That password is pretty bad.  It could be cracked in less than a day.  Try adding more words, numbers, or symbols. ").css({'color':'#fb6e3d'});
+				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
+			}
 			else if (daysToCrack<10) {
-				$('#password-help').text("That password isn't good enough.  It could be cracked in "+daysToCrack+" day"+(daysToCrack!=1?'s':'')+".  Try something a little longer or more complex. ").css({'color':'#fb6e3d'});
+				$('#password-help').text("That password isn't good enough.  It could be cracked in "+daysToCrack+" day"+(daysToCrack!=1?'s':'')+".  Try adding another word, number, or symbol. ").css({'color':'#fb6e3d'});
 				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
 			}
 			
