@@ -69,7 +69,7 @@ const
 		require('./config/passport.js')(passport);
 		app.use(passport.initialize());
 		app.use(passport.session());
-		require('./config/auth.js')(app, passport);
+		require('./config/routes/auth.js')(app, passport);
 	}
 
 	/* Routes	*/ {
