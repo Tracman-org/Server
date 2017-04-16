@@ -13,37 +13,57 @@ form #social-login {
 }
 
 #social-login .btn {
-	padding: 0;
-	font-size: 1.3em;
-	height: 60px;
+	padding: 2%;
 	text-align: center;
-	width: 60px;
 	margin: 0 3%;
 	color: #FFF;
-} #social-login .btn .fa {
-	margin: 0;
+}
+#social-login .btn .fa {
 	position: relative;
-	padding-top: 20px;
-} #social-login .btn.gp {
+}
+#social-login .btn .text {
+	font-size: .8em;
+}
+#social-login .btn.gp {
 	background: rgb(206,77,57);
-} #social-login .btn.gp:hover {
+}
+#social-login .btn.gp:hover {
 	background: rgb(251,122,102);
-} #social-login .btn.fb {
+}
+#social-login .btn.fb {
 	background: rgb(48,88,145);
-} #social-login .btn.fb:hover {
+}
+#social-login .btn.fb:hover {
 	background: rgb(93,133,190);
-} #social-login .btn.tw {
+}
+#social-login .btn.tw {
 	background: rgb(44,168,210);
-} #social-login .btn.tw:hover {
+}
+#social-login .btn.tw:hover {
 	background: rgb(89,213,255);
+}
+@media (max-width: 600px) {
+	#social-login .btn {
+		padding: 0;
+		width: 60px;
+		height: 60px;
+	}
+	#social-login .btn .text {
+		display: none;
+	}
+	#social-login .btn .fa {
+		margin: 18px auto;
+	}
 }
 
 @media (max-width: 800px) {
+	
 	section > .flex {
 		flex-direction: column;
 	}
 	section > .flex > div {
 		width: 100%;
 	}
-	hr.hide { display:block; }
+	hr { display: block; }
+	
 }

@@ -27,26 +27,26 @@ router.route('/')
 		//TODO: Validate everything! 
 		
 		User.findByIdAndUpdate(req.user.id, {$set:{
-				name: xss(req.body.name),
-				slug: slug(xss(req.body.slug)),
-				email: req.body.email,
-				settings: {
-					units: req.body.units,
-					defaultMap: req.body.map,
-					defaultZoom: req.body.zoom,
-					showSpeed: (req.body.showSpeed)?true:false,
-					showAlt: (req.body.showAlt)?true:false,
-					showStreetview: (req.body.showStreet)?true:false
-				}
-			}})
-			.then( (user)=>{
-				req.flash('success', 'Settings updated. ');
-				res.redirect('/settings');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			});
+			name: xss(req.body.name),
+			slug: slug(xss(req.body.slug)),
+			email: req.body.email,
+			settings: {
+				units: req.body.units,
+				defaultMap: req.body.map,
+				defaultZoom: req.body.zoom,
+				showSpeed: (req.body.showSpeed)?true:false,
+				showAlt: (req.body.showAlt)?true:false,
+				showStreetview: (req.body.showStreet)?true:false
+			}
+		}})
+		.then( (user)=>{
+			req.flash('success', 'Settings updated. ');
+			res.redirect('/settings');
+		})
+		.catch( (err)=>{
+			mw.throwErr(err,req);
+			res.redirect('/settings');
+		});
 			
 	} )
 
@@ -140,7 +140,8 @@ router.route('/password/:token')
 		if (daysToCrack<10) {
 			mw.throwErr(new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `));
 			res.redirect(`/settings/password/${req.params.token}`);
-		} else {
+		}
+		else {
 			
 			// Delete token
 			res.locals.passwordUser.auth.passToken = undefined;
