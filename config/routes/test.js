@@ -38,6 +38,13 @@ router
 		else {
 			res.sendStatus(200);
 		}
+	})
+	
+	.get('/settings', (req,res)=>{
+		res.render('settings');
+	})
+	.post('/settings', (req,res)=>{
+		//TODO: Test validation here.  
 	});
 	
 module.exports = router;

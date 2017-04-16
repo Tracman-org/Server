@@ -1,17 +1,45 @@
-section > .flex > div {
+/* More padding on the bottom */
+.container {
+	padding-bottom: 10vh;
+}
+
+/* Sections */
+#login, #signup {
 	width: 50%;
-	padding: 0 2%;
+	margin: 0 2%;
 }
 
-form input {
+/* Form overrides */
+form .form-group {
+	margin: 8% 0 0;
+}
+form input:not(.input-addon):not(.input-with-addon), 
+form .input-with-addon-group {
 	width: 96%;
+	margin: 0 auto 5vh;
 }
-
-form input.btn, 
-form #social-login {
+form .input-with-addon, form .input-addon {
+	margin: 0;
+}
+form .input-with-addon-group {
 	width: 100%;
 }
+p, input, #social-login {
+	margin-bottom: 5vh;
+}
+form input.btn[type="submit"] {
+	margin: 0 2% 5vh;
+}
+form #social-login {
+	justify-content: space-around;
+	width: 100%;
+}
+#show {
+	padding: 1%;
+	cursor: pointer;
+}
 
+/* Social buttons */
 #social-login .btn {
 	padding: 2%;
 	text-align: center;
@@ -22,7 +50,7 @@ form #social-login {
 	position: relative;
 }
 #social-login .btn .text {
-	font-size: .8em;
+	font-size: .6em;
 }
 #social-login .btn.gp {
 	background: rgb(206,77,57);
@@ -42,7 +70,8 @@ form #social-login {
 #social-login .btn.tw:hover {
 	background: rgb(89,213,255);
 }
-@media (max-width: 600px) {
+/* Small buttons */
+@media (max-width:600px), (min-width:800px) and (max-width:1200px) {
 	#social-login .btn {
 		padding: 0;
 		width: 60px;
@@ -56,14 +85,20 @@ form #social-login {
 	}
 }
 
-@media (max-width: 800px) {
+/* Single column */
+@media (max-width:800px) {
 	
+	#login, #signup {
+		width: 100%;
+	}
 	section > .flex {
 		flex-direction: column;
 	}
 	section > .flex > div {
 		width: 100%;
 	}
-	hr { display: block; }
+	hr { 
+		display: block !important;
+	}
 	
 }

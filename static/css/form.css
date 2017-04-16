@@ -23,21 +23,25 @@ form input, form textarea, form select {
 	padding: 1% 1.5%;
 	border-radius: .3vw;
 }
-form input:not(:disabled), form textarea:not(:disabled), form select:not(:disabled) {
+form input:not(:disabled), form textarea:not(:disabled), 
+form select:not(:disabled), form .input-addon {
 	border: 1px solid #666;
 	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 }
-form input:disabled, form textarea:disabled form select:disabled {
-	border: 1px solid #999;	
+form input:disabled:not(.input-addon), form textarea:disabled, 
+form select:disabled {
+	border: 1px solid #444;	
 }
 form input:not(.input-addon):not(.input-with-addon):not([type="radio"]):not([type="checkbox"]),
 form .input-with-addon-group {
 	min-width: 50%;
 }
-form input:active:not(.input-addon), form textarea:active, form select:active,
-form input:focus:not(.input-addon), form textarea:focus, form select:focus {
+form input:active:not(.input-addon), form textarea:active, 
+form select:active,
+form input:focus:not(.input-addon), form textarea:focus, 
+form select:focus {
 	outline: none;
 	border: 1px solid #fbc93d;
 }
@@ -45,25 +49,45 @@ form input:focus:not(.input-addon), form textarea:focus, form select:focus {
 form .input-with-addon-group {
 	display: flex;
 }
+form .input-addon, form .input-with-addon {
+	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
+}
 form .input-addon {
+	text-align: center;
+	width: auto;
+}
+form .input-with-addon {
+	flex-grow: 1;
+}
+form .input-addon.left {
 	padding: 1% 0 1% 1.5%;
 	border-right-color: #202020;
 	border-right-color: rgba(102,102,102,0);
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
-	-moz-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
-	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
-	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 }
-form .input-with-addon {
+form .input-with-addon.left {
 	padding: 1% 1.5% 1% 0;
 	border-left-color: #202020;
 	border-left-color: rgba(102,102,102,0);
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	-moz-box-shadow: inset 0 .18vw .25vw rgba(0,0,0,.5);
-	-webkit-box-shadow: inset 0 .18vw .25vw rgba(0,0,0,.5);
-	box-shadow: inset 0 .18vw .25vw rgba(0,0,0,.5);
+}
+form .input-addon.right {
+	padding: 1% 1.5% 1% 0;
+	border-left-color: #202020;
+	border-left-color: rgba(102,102,102,0);
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+form .input-with-addon.right {
+	padding: 1% 0 1% 1.5%;
+	border-right-color: #202020;
+	border-right-color: rgba(102,102,102,0);
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 
 ::-webkit-input-placeholder {
