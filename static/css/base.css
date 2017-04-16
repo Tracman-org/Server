@@ -87,7 +87,7 @@ pre {
 .hide { display: none !important; }
 .red, .red:hover { color: #fb6e3d !important; }
 .yellow, .yellow:hover { color: #fbc93d !important; }
-	.green, .green:hover { color: #8ae137 !important; }
+.green, .green:hover { color: #8ae137 !important; }
 
 .shadow {
 	-moz-box-shadow: .18vw .18vw .36vw #000;
