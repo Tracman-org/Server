@@ -26,7 +26,7 @@ module.exports = (app, passport) => {
 	// Login/-out
 	app.route('/login')
 		.get( (req,res)=>{
-			if (req.isAuthenticated()){ loginCallback(); }
+			if (req.isAuthenticated()){ loginCallback(req,res); }
 			else { res.render('login'); }
 		})
 		.post( passport.authenticate('local',loginOutcome), loginCallback );
@@ -160,7 +160,7 @@ module.exports = (app, passport) => {
 	// Forgot password
 	app.route('/login/forgot')
 		.all( (req,res,next)=>{
-			if (req.isAuthenticated()){ loginCallback(); }
+			if (req.isAuthenticated()){ loginCallback(req,res); }
 			else { next(); }
 		} )
 		.get( (req,res,next)=>{
