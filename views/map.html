@@ -77,10 +77,10 @@
 {% block javascript %}
 {{super()}}
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
-	<script src="/static/js/.map.min.js"></script>
-	{% if user.id == mapuser.id %}<script src="/static/js/.map-controls.min.js"></script>{% endif %}
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
+	<script type="text/javascript" src="/static/js/.map.min.js"></script>
+	{% if user.id == mapuser.id %}<script type="text/javascript" src="/static/js/.map-controls.min.js"></script>{% endif %}
 	<script> /* Variables from server */
 		
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
