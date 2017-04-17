@@ -4,6 +4,7 @@
 {% block head %}
 {{super()}}
 	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.settings.min.css">
 {% endblock %}
 
 {% block main %}
@@ -27,61 +28,6 @@
 			</div>
 				
 				<div id='social-connect' class='form-group'>
-					<style>
-
-						#social-connect {
-							flex-wrap: wrap;
-						}
-						#social-connect > .btn {
-							display: flex;
-							align-items: center;
-							margin-left: 1vw;
-							margin-right: 1vw;
-							flex-grow: 1;
-							flex-basis: 0;
-							font-size: .9em;
-						}
-						#social-connect > .btn:hover {
-							color: #fff;
-						}
-						#social-connect > .btn .fa {
-							font-size: 1.1em;
-							margin-left: 0;
-							margin-right: 5%;
-						}
-
-						/* Connected social button styles */
-						#social-connect > .btn.gp.connected {
-							border: 2px solid rgb(206,77,57);
-						}
-						#social-connect > .btn.fb.connected {
-							border: 2px solid rgb(48,88,145);
-						}
-						#social-connect > .btn.tw.connected {
-							border: 2px solid rgb(44,168,210);
-						}
-
-						/* Unconnected social button styles */
-						#social-connect > .btn.gp:not(.connected) {
-							background: rgb(206,77,57);
-						}
-						#social-connect > .btn.gp:not(.connected):hover {
-							background: rgb(251,122,102);
-						}
-						#social-connect > .btn.fb:not(.connected) {
-							background: rgb(48,88,145);
-						}
-						#social-connect > .btn.fb:not(.connected):hover {
-							background: rgb(93,133,190);
-						}
-						#social-connect > .btn.tw:not(.connected) {
-							background: rgb(44,168,210);
-						}
-						#social-connect > .btn.tw:not(.connected):hover {
-							background: rgb(89,213,255);
-						}
-
-					</style>
 					<a href="/login/google" class='btn gp{% if user.auth.google %} connected{% endif %}'>
 						<i class="fa fa-google-plus"></i>
 						{% if user.auth.google %}Disconnect{% else %}Connect{% endif %} Google
@@ -180,8 +126,8 @@
 					<input name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif user.settings.showStreetview %}checked{% else %}{% endif %}>
 				</div>
 				
-			<div id='submit-group' class='form-group flexbox' style="padding:0 0 60px; justify-content:space-around">
-				<input class='btn yellow' style="width:50%; background:#333" type="submit" value="Save">
+			<div id='submit-group' class='form-group flexbox'>
+				<input class='btn yellow' type="submit" value="Save">
 				<a href="#" class='btn'>cancel</a>
 			</div>
 			
