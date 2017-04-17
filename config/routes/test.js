@@ -44,7 +44,10 @@ router
 		res.render('settings');
 	})
 	.post('/settings', (req,res)=>{
+		
 		//TODO: Test validation here.  
+		
+		
 	});
 	
 module.exports = router;

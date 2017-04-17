@@ -38,13 +38,31 @@ router.get('/favicon.ico', (req,res)=>{
 
 // Endpoint to validate forms
 router.get('/validate', (req,res)=>{
-	if (req.query.slug) { // validate unique slug
-		User.findOne( {slug:slug(req.query.slug)}, (err,existingUser)=>{
-			if (err) { console.log('/validate error:',err); }
-			if (existingUser && existingUser.id!==req.user) { res.sendStatus(400); }
+	
+	// Validate unused slug
+	if (req.query.slug) {
+		User.findOne({ slug: slug(req.query.slug) })
+		.then( (existingUser)=>{
+			if (existingUser && existingUser.id!==req.user) {
+				res.sendStatus(400);
+			}
 			else { res.sendStatus(200); }
-		} );
+		})
+		.catch( (err)=>{ mw.throwErr(err); });
 	}
+	
+	// Validate unused email
+	else if (req.query.email) {
+		User.findOne({ email: slug(req.query.email) })
+		.then( (existingUser)=>{
+			if (existingUser && existingUser.id!==req.user) {
+				res.sendStatus(400);
+			}
+			else { res.sendStatus(200); }
+		})
+		.catch( (err)=>{ mw.throwErr(err); });
+	}
+	
 });
 
 // Link to androidapp in play store
@@ -54,8 +72,7 @@ router.get('/android', (req,res)=>{
 
 // Link to iphone app in the apple store
 router.get('/ios', (req,res)=>{
-	res.sendStatus(404);
-	//TODO: Add link to info about why there's no ios app
+	res.redirect('/help#why-is-there-no-ios-app');
 });
 
 module.exports = router;
