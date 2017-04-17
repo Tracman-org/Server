@@ -10,7 +10,7 @@ const
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
-	flash = require('connect-flash'),
+	flash = require('connect-flash-plus'),
 	env = require('./config/env.js'),
 	mw = require('./config/middleware.js'),
 	User = require('./config/models.js').user,
@@ -64,21 +64,20 @@ const
 		app.use(expressValidator());
 		app.use(flash());
 	}
-
+	
 	/* Auth */ {
 		require('./config/passport.js')(passport);
 		app.use(passport.initialize());
 		app.use(passport.session());
-		require('./config/routes/auth.js')(app, passport);
 	}
-
+	
 	/* Routes	*/ {
-
+		
 		// Static files (keep this before setting default locals)
 		app.use('/static', express.static( __dirname+'/static', {dotfiles:'allow'} ));
-
+		
 		// Set default locals available to all views (keep this after static files)
-		app.get( '/*', (req,res,next)=>{
+		app.get( '*', (req,res,next)=>{
 			
 			// Path for redirects
 			req.session.next = ( req.path.substring(0, req.path.indexOf('#')) || req.path )+'#';
@@ -93,6 +92,9 @@ const
 			
 			next();
 		} );
+		
+		// Auth routes
+		require('./config/routes/auth.js')(app, passport);
 		
 		// Main routes
 		app.use( '/', require('./config/routes/index.js') );

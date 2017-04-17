@@ -33,6 +33,7 @@ module.exports = (passport)=>{
 			
 			// No user with that email
 			if (!user) {
+				req.session.next = undefined;
 				return done( null, false, req.flash('danger','Incorrect email or password.') );
 			}
 			
@@ -45,6 +46,7 @@ module.exports = (passport)=>{
 					
 					// Password incorrect
 					if (!res) {
+						req.session.next = undefined;
 						return done( null, false, req.flash('danger','Incorrect email or password.') );
 					}
 					
