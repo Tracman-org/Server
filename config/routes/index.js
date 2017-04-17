@@ -38,12 +38,14 @@ router.get('/favicon.ico', (req,res)=>{
 
 // Endpoint to validate forms
 router.get('/validate', (req,res)=>{
+	console.log(req.query);
 	
-	// Validate unused slug
+	// Validate unique slug
 	if (req.query.slug) {
+		console.log(`Checking slug: ${req.query.slug} for user ${req.user.id}`);
 		User.findOne({ slug: slug(req.query.slug) })
 		.then( (existingUser)=>{
-			if (existingUser && existingUser.id!==req.user) {
+			if (existingUser && existingUser.id!==req.user.id) {
 				res.sendStatus(400);
 			}
 			else { res.sendStatus(200); }
@@ -51,16 +53,22 @@ router.get('/validate', (req,res)=>{
 		.catch( (err)=>{ mw.throwErr(err); });
 	}
 	
-	// Validate unused email
+	// Validate unique email
 	else if (req.query.email) {
-		User.findOne({ email: slug(req.query.email) })
+		console.log(`Checking email: ${req.query.email} for user ${req.user.id}`);
+		User.findOne({ email: req.query.email })
 		.then( (existingUser)=>{
-			if (existingUser && existingUser.id!==req.user) {
+			if (existingUser && existingUser.id!==req.user.id) {
 				res.sendStatus(400);
 			}
 			else { res.sendStatus(200); }
 		})
 		.catch( (err)=>{ mw.throwErr(err); });
+	}
+	
+	// Create slug
+	else if (req.query.slugify) {
+		res.send(slug(req.query.slugify));
 	}
 	
 });
@@ -71,6 +79,7 @@ router.get('/android', (req,res)=>{
 });
 
 // Link to iphone app in the apple store
+// ... maybe someday
 router.get('/ios', (req,res)=>{
 	res.redirect('/help#why-is-there-no-ios-app');
 });

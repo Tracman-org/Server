@@ -19,13 +19,15 @@
 				
 				<div id='name' class='form-group' title="This appears in your page's title. ">
 					<label for="name">Name</label>
-					<input class='form-control' name="name" type="text" value="{{user.name}}" maxlength="160">
+					<input id='name-input' class='form-control' name="name" type="text" value="{{user.name}}" maxlength="160">
+					<p id='name-help' class='red help'></p>
 				</div>
 				
 				<div id='email' class='form-group' title="For account stuff, no dumb newsletters.  ">
-				<label for="email">Email</label>
-				<input class='form-control' name="email" type="email" value="{{user.email}}" maxlength="160">
-			</div>
+					<label for="email">Email</label>
+					<input id='email-input' class='form-control' name="email" type="email" value="{{user.email}}" maxlength="160">
+					<p id='email-help' class='red help'></p>
+				</div>
 				
 				<div id='social-connect' class='form-group'>
 					<a href="/login/google" class='btn gp{% if user.auth.google %} connected{% endif %}'>
@@ -43,8 +45,8 @@
 				</div>
 				
 				<div id='password-delete' class='form-group'>
-					<a class='underline' href="/settings/password" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
-					<a class='red underline' style="text-align:right" href="#" onclick="deleteAccount()" title="Permently delete your Tracman account. ">Delete account</a>
+					<a id='password' class='underline' href="/settings/password" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
+					<a id='delete' class='red underline' style="text-align:right" href="#" title="Permently delete your Tracman account. ">Delete account</a>
 				</div>
 				
 			<h2>Map settings</h2>
@@ -53,8 +55,9 @@
 					<label for="slug">URL</label>
 					<div class='input-with-addon-group'>
 						<input type="text" class='left input-addon' size="13" value="tracman.org/map/" disabled readonly>
-						<input type="text" class='input-with-addon left' name="slug" value="{{user.slug}}" maxlength="160" required>
+						<input type="text" class='input-with-addon left' id='slug-input' name="slug" value="{{user.slug}}" maxlength="160" required>
 					</div>
+					<p id='slug-help' class='red help'></p>
 				</div>
 				
 				<div id='units' class='form-group' title="Select standard units for feet and miles/hour. Select metric units if you are a commie. ">
@@ -127,8 +130,8 @@
 				</div>
 				
 			<div id='submit-group' class='form-group flexbox'>
-				<input class='btn yellow' type="submit" value="Save">
-				<a href="#" class='btn'>cancel</a>
+				<input class='main btn' type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="#" class='btn' title="Click here to discard your changes. ">cancel</a>
 			</div>
 			
 		</form>

@@ -57,7 +57,15 @@
 	padding: 0 0 60px;
 	justify-content: space-around;
 }
-#submit-group .btn {
+#submit-group .main {
 	width: 50%;
-	background: #333;
+}
+
+/* Help */
+.help {
+	display: none;
+	width: 100%;
+	margin-top: 2%;
+	margin-bottom: 0;
+	text-align: right;
 }
