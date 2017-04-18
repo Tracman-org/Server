@@ -55,7 +55,7 @@ $(function(){
 						function(pos) {
 							newloc = {
 								tok: token,
-								usr: '{{user.id}}',
+								usr: userid,
 								lat: pos.coords.latitude,
 								lon: pos.coords.longitude,
 								spd: (pos.coords.speed||0)
