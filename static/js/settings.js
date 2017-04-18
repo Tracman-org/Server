@@ -7,12 +7,11 @@ function validateEmail(email) {
 	return re.test(email);
 }
 
-// Turn inputed value into slug
-function slugify(cb) {
-	$.get('/validate?slugify='+$('#slug-input').val())
+// Replace inputed value with response
+function validateFromEndpoint(type, selector, cb) {
+	$.get('/validate?'+type+'='+$(selector).val())
 	.done(function(data){
-		console.log('Got '+data);
-		$('#slug-input').val(data);
+		$(selector).val(data);
 		cb();
 	});
 }
@@ -90,8 +89,8 @@ $(function(){
 	
 	// Validate slug
 	$('#slug-input').change(function(){
-		slugify( function(){
-			validateForm('slug');
+		validateFromEndpoint('slugify','#slug-input',function(){
+			validateForm(slug);
 		});
 	});
 	
@@ -100,8 +99,10 @@ $(function(){
 		validateForm('email');
 	});
 	
-	// Validate form after name change
-	$('#name-input').change(validateForm);
+	// Validate name
+	$('#name-input').change(function(){
+		validateFromEndpoint('xss','#name-input',validateForm);
+	});
 	
 	// Delete account
 	$('#delete').click(function(){

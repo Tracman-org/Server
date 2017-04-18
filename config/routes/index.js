@@ -3,6 +3,7 @@
 const mw = require('../middleware.js'),
 	router = require('express').Router(),
 	slug = require('slug'),
+	xss = require('xss'),
   User = require('../models.js').user;
 
 // Index
@@ -38,11 +39,9 @@ router.get('/favicon.ico', (req,res)=>{
 
 // Endpoint to validate forms
 router.get('/validate', (req,res)=>{
-	console.log(req.query);
 	
 	// Validate unique slug
 	if (req.query.slug) {
-		console.log(`Checking slug: ${req.query.slug} for user ${req.user.id}`);
 		User.findOne({ slug: slug(req.query.slug) })
 		.then( (existingUser)=>{
 			if (existingUser && existingUser.id!==req.user.id) {
@@ -55,7 +54,6 @@ router.get('/validate', (req,res)=>{
 	
 	// Validate unique email
 	else if (req.query.email) {
-		console.log(`Checking email: ${req.query.email} for user ${req.user.id}`);
 		User.findOne({ email: req.query.email })
 		.then( (existingUser)=>{
 			if (existingUser && existingUser.id!==req.user.id) {
@@ -69,6 +67,10 @@ router.get('/validate', (req,res)=>{
 	// Create slug
 	else if (req.query.slugify) {
 		res.send(slug(req.query.slugify));
+	}
+	
+	else if (req.query.xss) {
+		res.send(xss(req.query.xss));
 	}
 	
 });
