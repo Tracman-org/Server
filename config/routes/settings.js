@@ -29,18 +29,7 @@ router.route('/')
 	// Set new settings
 	.post( (req,res,next)=>{
 		
-		// Validations
-		if (req.body.slug==='') {
-			req.flash('warning', `You must supply a slug.  `);
-			res.redirect('/settings');
-		}
-		else if (!validateEmail(req.body.email)) {
-			req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
-			res.redirect('/settings');
-		}
-		else {
-			
-			function setSettings(){
+		function setSettings(){
 				
 				// Set values
 				req.user.name = xss(req.body.name);
@@ -55,7 +44,7 @@ router.route('/')
 					showStreetview: (req.body.showStreet)?true:false
 				};
 				
-				// Save user and respond
+				// Save user and send response
 				req.user.save()
 				.then( ()=>{
 					req.flash('success', 'Settings updated. ');
@@ -66,12 +55,24 @@ router.route('/')
 					res.redirect('/settings');
 				});
 			
-			};
+			}
+		
+		// Validations
+		if (req.body.slug==='') {
+			req.flash('warning', `You must supply a slug.  `);
+			res.redirect('/settings');
+		}
+		else if (!validateEmail(req.body.email)) {
+			req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
+			res.redirect('/settings');
+		}
+		else {
 			
 			// Email changed
 			if (req.user.email!==req.body.email) {
 				req.user.newEmail = req.body.email;
 				
+				// Create token
 				req.user.createEmailToken((err,token)=>{
 					if (err){
 						mw.throwErr(err,req);
@@ -87,9 +88,7 @@ router.route('/')
 						html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
 					})
 					.then( ()=>{
-						// Alert user to check email.
-						req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email. `);
-						// Set other settings
+						req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `);
 						setSettings();
 					})
 					.catch( (err)=>{
@@ -100,9 +99,7 @@ router.route('/')
 			}
 			
 			// Email not changed
-			else {
-				setSettings();
-			}
+			else { setSettings(); }
 			
 		}
 		
@@ -133,7 +130,8 @@ router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
 			
 			// Set new email
 			req.user.email = req.user.newEmail;
-			req.user.save().then( ()=>{
+			req.user.save()
+			.then( ()=>{
 				
 				// Delete token and newEmail
 				req.user.emailToken = undefined;
