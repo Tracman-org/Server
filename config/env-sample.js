@@ -25,7 +25,6 @@ module.exports = {
 	googleClientSecret: 'XXXXXXXXX_XXXXXXXXXXXXXX',
 	
 	// Google maps API key
-	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX',
-	
+	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX'
 	
 };
