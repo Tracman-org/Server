@@ -201,9 +201,7 @@ function getAltitude(loc,elev,cb){
 function getStreetViewData(loc,rad,cb) {
 	if (!sv) { var sv=new google.maps.StreetViewService(); }
 	sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:rad},function(data,status){
-		if (status===google.maps.StreetViewStatus.ZERO_RESULTS){
-			getStreetViewData(loc,rad*2,cb);
-		} else if (status!==google.maps.StreetViewStatus.OK){ console.error(new Error('⛔️ Street view not available:',status).message); }
+		if (status!==google.maps.StreetViewStatus.OK){ console.error(new Error('⛔️ Street view not available:',status).message); }
 		else { cb(data); }
 	});
 }
