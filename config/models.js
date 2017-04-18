@@ -7,7 +7,7 @@ const mongoose = require('mongoose'),
 
 const userSchema = new mongoose.Schema({
 	name: {type:String},
-	email: {type:String, required:true, unique:true},
+	email: {type:String, unique:true},
 	slug: {type:String, required:true, unique:true},
 	auth: {
 		password: String,
@@ -22,22 +22,22 @@ const userSchema = new mongoose.Schema({
 	created: {type:Date, required:true},
 	lastLogin: Date,
 	settings: {
-		units: {type:String, required:true, default:'standard'},
-		defaultMap: {type:String, required:true, default:'road'},
-		defaultZoom: {type:Number, required:true, default:11},
-		showScale: {type:Boolean, required:true, default:false},
-		showSpeed: {type:Boolean, required:true, default:false},
-		showTemp: {type:Boolean, required:true, default:false},
-		showAlt: {type:Boolean, required:true, default:false},
-		showStreetview: {type:Boolean, required:true, default:false}
+		units: {type:String, default:'standard'},
+		defaultMap: {type:String, default:'road'},
+		defaultZoom: {type:Number, default:11},
+		showScale: {type:Boolean, default:false},
+		showSpeed: {type:Boolean, default:false},
+		showTemp: {type:Boolean, default:false},
+		showAlt: {type:Boolean, default:false},
+		showStreetview: {type:Boolean, default:false}
 	},
 	last: {
 		time: Date,
-		lat: {type:Number, required:true, default:0},
-		lon: {type:Number, required:true, default:0},
-		dir: {type:Number, required:true, default:0},
-		alt: {type:Number, required:true, default:0},
-		spd: {type:Number, required:true, default:0}
+		lat: {type:Number, default:0},
+		lon: {type:Number, default:0},
+		dir: {type:Number, default:0},
+		alt: {type:Number, default:0},
+		spd: {type:Number, default:0}
 	},
 	sk32: {type:String, required:true, unique:true}
 }).plugin(unique);
