@@ -66,7 +66,7 @@ router.get('/validate', (req,res)=>{
 	
 	// Create slug
 	else if (req.query.slugify) {
-		res.send(slug(req.query.slugify));
+		res.send(slug(xss(req.query.slugify)));
 	}
 	
 	else if (req.query.xss) {
