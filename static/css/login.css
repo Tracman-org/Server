@@ -32,6 +32,7 @@ form input.btn[type="submit"] {
 }
 form #social-login {
 	justify-content: space-around;
+	flex-wrap: nowrap;
 	width: 100%;
 }
 #show {

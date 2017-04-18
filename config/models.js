@@ -8,11 +8,13 @@ const mongoose = require('mongoose'),
 const userSchema = new mongoose.Schema({
 	name: {type:String},
 	email: {type:String, unique:true},
+	newEmail: String,
+	emailToken: String,
 	slug: {type:String, required:true, unique:true},
 	auth: {
 		password: String,
 		passToken: String,
-		tokenExpires: Date,
+		passTokenExpires: Date,
 		google: {type:String, unique:true},
 		facebook: {type:String, unique:true},
 		twitter: {type:String, unique:true},
@@ -46,6 +48,21 @@ const userSchema = new mongoose.Schema({
 	
 	//TODO: Return promises instead of taking callbacks
 	
+	// Create email confirmation token
+	userSchema.methods.createEmailToken = function(next){
+		var user = this;
+		
+		crypto.randomBytes(16, (err,buf)=>{
+			if (err){ next(err,null); }
+			else {
+				user.emailToken = buf.toString('hex');
+				user.save();
+				return next(null,user.emailToken);
+			}
+		});
+		
+	};
+	
 	// Generate hash for new password
 	userSchema.methods.generateHash = function(password,next){
 		bcrypt.genSalt(8, (err,salt)=>{
@@ -55,29 +72,29 @@ const userSchema = new mongoose.Schema({
 	};
 	
 	// Create password reset token
-	userSchema.methods.createToken = function(next){
+	userSchema.methods.createPassToken = function(next){
 		var user = this;
-		if ( user.auth.tokenExpires <= Date.now() ){
-			
-			// Reuse old token, resetting clock
-			user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
+		
+		// Reuse old token, resetting clock
+		if ( user.auth.passTokenExpires <= Date.now() ){
+			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save();
 			return next(null,user.auth.passToken);
-			
-		} else {
-			
-			// Create new token
+		}
+		
+		// Create new token
+		else {
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ next(err,null); }
 				else {
 					user.auth.passToken = buf.toString('hex');
-					user.auth.tokenExpires = Date.now() + 3600000; // 1 hour
+					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 					user.save();
 					return next(null,user.auth.passToken);
 				}
 			});
-			
 		}
+		
 	};
 	
 	// Check for valid password

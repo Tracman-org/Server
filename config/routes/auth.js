@@ -65,23 +65,26 @@ module.exports = (app, passport) => {
 			function sendToken(user){
 				
 				// Create a password token
-				user.createToken((err,token)=>{
+				user.createPassToken((err,token)=>{
 					if (err){ mw.throwErr(err,req); }
 					
 					// Email the instructions to continue
 					mail.send({
-						from: mail.from,
-						to: `<${user.email}>`,
-						subject: 'Complete your Tracman registration',
-						text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}`),
-						html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p>`)
-					}).then(()=>{
+							from: mail.from,
+							to: `<${user.email}>`,
+							subject: 'Complete your Tracman registration',
+							text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}`),
+							html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p>`)
+						})
+					.then(()=>{
 						req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox to complete your registration. `);
 						res.redirect('/login');
-					}).catch((err)=>{
+					})
+					.catch((err)=>{
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
 					});
+						
 				});
 				
 			}
@@ -204,7 +207,7 @@ module.exports = (app, passport) => {
 					else {
 						
 						// Create reset token
-						user.createToken( (err,token)=>{
+						user.createPassToken( (err,token)=>{
 							if (err){ next(err); }
 							
 							// Email reset link

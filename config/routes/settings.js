@@ -40,22 +40,49 @@ router.route('/')
 		}
 		else {
 			
-			// Update user document
-			User.findByIdAndUpdate(req.user.id, {$set:{
-				name: xss(req.body.name),
-				slug: slug(xss(req.body.slug)),
-				email: req.body.email,
-				settings: {
-					units: req.body.units,
-					defaultMap: req.body.map,
-					defaultZoom: req.body.zoom,
-					showScale: (req.body.showScale)?true:false,
-					showSpeed: (req.body.showSpeed)?true:false,
-					showAlt: (req.body.showAlt)?true:false,
-					showStreetview: (req.body.showStreet)?true:false
-				}
-			}})
-			.then( (user)=>{
+			// Confirm email change
+			if (req.user.email!==req.body.email) {
+				req.user.newEmail = req.body.email;
+				
+				req.user.createEmailToken((err,token)=>{
+					if (err){
+						mw.throwErr(err,req);
+						res.redirect(req.session.next||'/settings');
+					}
+					
+					// Send token to user by email
+					mail.send({
+						to: `"${req.user.name}" <${req.body.email}>`,
+						from: mail.from,
+						subject: 'Confirm your new email address for Tracman',
+						text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
+						html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
+					})
+					.then( ()=>{
+						// Alert user to check email.
+						req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email. `);
+					})
+					.catch( (err)=>{
+						mw.throwErr(err,req);
+					});
+					
+				});
+			}
+			
+			// Set new user settings
+			req.user.name = xss(req.body.name);
+			req.user.slug = slug(xss(req.body.slug));
+			req.user.settings = {
+				units: req.body.units,
+				defaultMap: req.body.map,
+				defaultZoom: req.body.zoom,
+				showScale: (req.body.showScale)?true:false,
+				showSpeed: (req.body.showSpeed)?true:false,
+				showAlt: (req.body.showAlt)?true:false,
+				showStreetview: (req.body.showStreet)?true:false
+			};
+			req.user.save()
+			.then( ()=>{
 				req.flash('success', 'Settings updated. ');
 				res.redirect('/settings');
 			})
@@ -74,17 +101,51 @@ router.route('/')
 		//TODO: Reenter password?
 		
 		User.findByIdAndRemove(req.user)
-			.then(()=>{
+			.then( ()=>{
 				req.flash('success', 'Your account has been deleted.  ');
 				res.redirect('/');
 			})
-			.catch((err)=>{
+			.catch( (err)=>{
 				mw.throwErr(err,req);
 				res.redirect('/settings');
 			});
 			
 	} );
 
+// Confirm email address
+router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
+		
+		// Check token
+		if ( req.user.emailToken===req.params.token) {
+			
+			// Set new email
+			req.user.email = req.user.newEmail;
+			req.user.save().then( ()=>{
+				
+				// Delete token and newEmail
+				req.user.emailToken = undefined;
+				req.user.newEmail = undefined;
+				req.user.save();
+				
+				// Report success
+				req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
+				res.redirect('/settings');
+				
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect(req.session.next||'/settings');
+			});
+			
+		}
+		
+		// Invalid token
+		else {
+			req.flash('danger', 'Email confirmation token is invalid. ');
+			res.redirect('/settings');
+		}
+		
+	} );
 
 // Set password
 router.route('/password')
@@ -96,30 +157,31 @@ router.route('/password')
 	.get( (req,res,next)=>{
 
 		// Create token for password change
-		req.user.createToken()
-			.then( (token)=>{
-				
-				// Confirm password change request by email.
-				mail.send({
-					to: mail.to(req.user),
-					from: mail.from,
-					subject: 'Request to change your Tracman password',
-					text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire in 1 hour. `),
-					html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire in 1 hour. </p>`)
-				}).then( ()=>{
-					// Alert user to check email.
-					req.flash('success',`An email has been sent to <u>${req.user.email}</u>.  Check your inbox to complete your password change. `);
-					res.redirect('/login#login');
-				}).catch( (err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/login#login');
-				});
-				
+		req.user.createPassToken( (err,token)=>{
+			if (err){
+				mw.throwErr(err,req);
+				res.redirect(req.session.next||'/settings');
+			}
+			
+			// Confirm password change request by email.
+			mail.send({
+				to: mail.to(req.user),
+				from: mail.from,
+				subject: 'Request to change your Tracman password',
+				text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire in 1 hour. `),
+				html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire in 1 hour. </p>`)
+			})
+			.then( ()=>{
+				// Alert user to check email.
+				req.flash('success',`An email has been sent to <u>${req.user.email}</u>.  Check your inbox to complete your password change. `);
+				res.redirect('/login#login');
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);
-				res.redirect('/password');
+				res.redirect('/login#login');
 			});
+			
+		});
 
 	} );
 
@@ -129,7 +191,7 @@ router.route('/password/:token')
 	.all( (req,res,next)=>{
 		User
 			.findOne({'auth.passToken': req.params.token})
-			.where('auth.tokenExpires').gt(Date.now())
+			.where('auth.passTokenExpires').gt(Date.now())
 			.then((user) => {
 				if (!user) {
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
@@ -163,7 +225,7 @@ router.route('/password/:token')
 			
 			// Delete token
 			res.locals.passwordUser.auth.passToken = undefined;
-			res.locals.passwordUser.auth.tokenExpires = undefined;
+			res.locals.passwordUser.auth.passTokenExpires = undefined;
 			
 			// Create hash
 			res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
