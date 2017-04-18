@@ -9,6 +9,11 @@ const slug = require('slug'),
 	env = require('../env.js'),
 	router = require('express').Router();
 
+// Validate email addresses
+function validateEmail(email) {
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(email);
+}
 
 // Settings form
 router.route('/')
@@ -24,30 +29,42 @@ router.route('/')
 	// Set new settings
 	.post( (req,res,next)=>{
 		
-		//TODO: Validate everything! 
-		
-		User.findByIdAndUpdate(req.user.id, {$set:{
-			name: xss(req.body.name),
-			slug: slug(xss(req.body.slug)),
-			email: req.body.email,
-			settings: {
-				units: req.body.units,
-				defaultMap: req.body.map,
-				defaultZoom: req.body.zoom,
-				showSpeed: (req.body.showSpeed)?true:false,
-				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
-			}
-		}})
-		.then( (user)=>{
-			req.flash('success', 'Settings updated. ');
+		// Validations
+		if (req.body.slug==='') {
+			req.flash('warning', `You must supply a slug.  `);
 			res.redirect('/settings');
-		})
-		.catch( (err)=>{
-			mw.throwErr(err,req);
+		}
+		else if (!validateEmail(req.body.email)) {
+			req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
 			res.redirect('/settings');
-		});
+		}
+		else {
 			
+			// Update user document
+			User.findByIdAndUpdate(req.user.id, {$set:{
+				name: xss(req.body.name),
+				slug: slug(xss(req.body.slug)),
+				email: req.body.email,
+				settings: {
+					units: req.body.units,
+					defaultMap: req.body.map,
+					defaultZoom: req.body.zoom,
+					showSpeed: (req.body.showSpeed)?true:false,
+					showAlt: (req.body.showAlt)?true:false,
+					showStreetview: (req.body.showStreet)?true:false
+				}
+			}})
+			.then( (user)=>{
+				req.flash('success', 'Settings updated. ');
+				res.redirect('/settings');
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/settings');
+			});
+			
+		}
+		
 	} )
 
 	// Delete user account
