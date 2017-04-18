@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
 		units: {type:String, required:true, default:'standard'},
 		defaultMap: {type:String, required:true, default:'road'},
 		defaultZoom: {type:Number, required:true, default:11},
+		showScale: {type:Boolean, required:true, default:false},
 		showSpeed: {type:Boolean, required:true, default:false},
 		showTemp: {type:Boolean, required:true, default:false},
 		showAlt: {type:Boolean, required:true, default:false},

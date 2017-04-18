@@ -114,6 +114,11 @@
 						</select>
 				</div>
 				
+				<div id='showScale' class='form-group' title="Shows a scale on the map.">
+					<label for="showScale">Show scale</label>
+					<input name="showScale" type="checkbox" {% if user.settings.showScale %}checked{% endif %}>
+				</div>
+				
 				<div id='showSpeed' class='form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
 					<label for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
 					<input name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif user.settings.showSpeed %}checked{% else %}{% endif %}>

@@ -49,6 +49,7 @@ router.route('/')
 					units: req.body.units,
 					defaultMap: req.body.map,
 					defaultZoom: req.body.zoom,
+					showScale: (req.body.showScale)?true:false,
 					showSpeed: (req.body.showSpeed)?true:false,
 					showAlt: (req.body.showAlt)?true:false,
 					showStreetview: (req.body.showStreet)?true:false

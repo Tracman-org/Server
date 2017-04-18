@@ -81,6 +81,7 @@ window.gmapsCb = function() {
 		map = new google.maps.Map( mapElem, {
 			center: new google.maps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 			panControl: false,
+			scaleControl: mapuser.settings.showScale,
 			draggable: false,
 			zoom: mapuser.settings.defaultZoom,
 			streetViewControl: false,
