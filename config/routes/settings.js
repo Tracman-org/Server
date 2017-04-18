@@ -40,7 +40,35 @@ router.route('/')
 		}
 		else {
 			
-			// Confirm email change
+			function setSettings(){
+				
+				// Set values
+				req.user.name = xss(req.body.name);
+				req.user.slug = slug(xss(req.body.slug));
+				req.user.settings = {
+					units: req.body.units,
+					defaultMap: req.body.map,
+					defaultZoom: req.body.zoom,
+					showScale: (req.body.showScale)?true:false,
+					showSpeed: (req.body.showSpeed)?true:false,
+					showAlt: (req.body.showAlt)?true:false,
+					showStreetview: (req.body.showStreet)?true:false
+				};
+				
+				// Save user and respond
+				req.user.save()
+				.then( ()=>{
+					req.flash('success', 'Settings updated. ');
+					res.redirect('/settings');
+				})
+				.catch( (err)=>{
+					mw.throwErr(err,req);
+					res.redirect('/settings');
+				});
+			
+			};
+			
+			// Email changed
 			if (req.user.email!==req.body.email) {
 				req.user.newEmail = req.body.email;
 				
@@ -61,6 +89,8 @@ router.route('/')
 					.then( ()=>{
 						// Alert user to check email.
 						req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email. `);
+						// Set other settings
+						setSettings();
 					})
 					.catch( (err)=>{
 						mw.throwErr(err,req);
@@ -69,27 +99,10 @@ router.route('/')
 				});
 			}
 			
-			// Set new user settings
-			req.user.name = xss(req.body.name);
-			req.user.slug = slug(xss(req.body.slug));
-			req.user.settings = {
-				units: req.body.units,
-				defaultMap: req.body.map,
-				defaultZoom: req.body.zoom,
-				showScale: (req.body.showScale)?true:false,
-				showSpeed: (req.body.showSpeed)?true:false,
-				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
-			};
-			req.user.save()
-			.then( ()=>{
-				req.flash('success', 'Settings updated. ');
-				res.redirect('/settings');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			});
+			// Email not changed
+			else {
+				setSettings();
+			}
 			
 		}
 		
