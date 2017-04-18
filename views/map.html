@@ -65,9 +65,9 @@
 			</style>
 		{% endif %}
 			
-			<button class='btn set' onclick="setLocation()">Set</button>
-			<button class='btn track' onclick="trackLocation()" data-toggle="tooltop" title="Tracking location..." data-trigger="manual"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
-			<button class='btn clear' onclick="clearLocation()">Clear</button>
+			<button id='set-loc' class='btn set' title="Click here to set your location">Set</button>
+			<button id='track-loc' class='btn track' title="Click here to track your location"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
+			<button id='clear-loc' class='btn clear' title="Click here to clear your location">Clear</button>
 			
 		</div>
 	{% endif %}
