@@ -80,7 +80,10 @@ const
 		app.get( '*', (req,res,next)=>{
 			
 			// Path for redirects
-			req.session.next = ( req.path.substring(0, req.path.indexOf('#')) || req.path )+'#';
+			let nextPath = ( req.path.substring(0, req.path.indexOf('#')) || req.path );
+			if ( nextPath!=='/login' && nextPath!=='/logout' ){
+				req.session.next = nextPath+'#';
+			}
 			
 			// User account
 			res.locals.user = req.user;

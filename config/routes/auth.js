@@ -20,14 +20,7 @@ module.exports = (app, passport) => {
 			failureFlash: true
 		},
 		loginCallback = (req,res)=>{
-			// Prevent redirect loop
-			if (req.session.next.substring(0,7)==='/login#'){
-				req.session.next = '#';
-				res.redirect('/map');
-			}
-			else {
-				res.redirect( req.session.next || '/map' );
-			}
+			res.redirect( req.session.next || '/map' );
 		};
 	
 	// Login/-out
@@ -45,13 +38,7 @@ module.exports = (app, passport) => {
 	app.get('/logout', (req,res)=>{
 		req.logout();
 		req.flash('success',`You have been logged out.`);
-		// Prevent redirect loop
-		if (req.session.next.substring(0,8)==='/logout#') {
-			req.session.next = '#';
-			res.redirect('/');
-		} else {
-			res.redirect(req.session.next || '/');
-		}
+		res.redirect( req.session.next || '/' );
 	});
 	
 	// Signup
