@@ -21,6 +21,10 @@ module.exports = (app, passport) => {
 		},
 		loginCallback = (req,res)=>{
 			res.redirect( req.session.next || '/map' );
+		},
+		androidLoginCallback = (req,res)=>{
+			if (req.user){ res.send(req.user); }
+			else { res.sendStatus(401); }
 		};
 	
 	// Login/-out
@@ -261,11 +265,10 @@ module.exports = (app, passport) => {
 		}
 	}, loginCallback);
 
-	// Android auth
-	//TODO: See if there's a better method
-	app.get('/auth/google/idtoken', passport.authenticate('google-id-token'),	(req,res)=>{
-		if (!req.user){ res.sendStatus(401); }
-		else { res.send(req.user); }
-	} );
+	// Android
+	app.get('/login/android/',  passport.authenticate('local'), androidLoginCallback);
+	app.get('/login/android/google', passport.authenticate('google-id-token'),	androidLoginCallback);
+	//TODO: Add android facebook login
+	//TODO: Add android twitter login
 
 };
