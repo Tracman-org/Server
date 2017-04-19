@@ -52,23 +52,23 @@ const userSchema = new mongoose.Schema({
 	userSchema.methods.createEmailToken = function(next){
 		var user = this;
 		
-		crypto.randomBytes(16, (err,buf)=>{
-			if (err){ next(err,null); }
-			else {
-				user.emailToken = buf.toString('hex');
-				user.save();
-				return next(null,user.emailToken);
-			}
-		});
+		crypto.randomBytes(16)
+		.then( (buf)=>{
+			user.emailToken = buf.toString('hex');
+			user.save();
+			return next(null,user.emailToken);
+		})
+		.catch( (err)=>{ next(err,null); });
 		
 	};
 	
 	// Generate hash for new password
 	userSchema.methods.generateHash = function(password,next){
-		bcrypt.genSalt(8, (err,salt)=>{
-			if (err){ return next(err); }
+		bcrypt.genSalt(8)
+		.then( (salt)=>{
 			bcrypt.hash(password, salt, null, next);
-		});
+		})
+		.catch( (err)=>{ return next(err); });
 	};
 	
 	// Create password reset token
@@ -84,15 +84,14 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			crypto.randomBytes(16, (err,buf)=>{
-				if (err){ next(err,null); }
-				else {
-					user.auth.passToken = buf.toString('hex');
-					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-					user.save();
-					return next(null,user.auth.passToken);
-				}
-			});
+			crypto.randomBytes(16)
+			.then( (buf)=>{
+				user.auth.passToken = buf.toString('hex');
+				user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
+				user.save();
+				return next(null,user.auth.passToken);
+			})
+			.catch( (err)=>{ return next(err,null); });
 		}
 		
 	};
