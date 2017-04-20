@@ -12,12 +12,13 @@
 			<h3>Display your realtime GPS location on a map</h3>
 			{% if user %}
 				<a class='btn' href="/map">Map<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/settings">Settings<i class='fa fa-angle-right'></i></a>
 				{% if user.isAdmin %}
 					<a class='btn' href="/admin">Admin<i class='fa fa-angle-right'></i></a>
 				{% endif %}
 			{% else %}
 				<a class='btn' href="/map/keith">View example<i class='fa fa-angle-right'></i></a>
-				<a class='btn' href="/login#signup">Join<i class='fa fa-angle-down'></i></a>
+				<a class='btn' href="/login#signup">Join<i class='fa fa-angle-right'></i></a>
 				<a class='btn' href="/login#login">Login<i class='fa fa-angle-right'></i></a>
 			{% endif %}
 		</div>

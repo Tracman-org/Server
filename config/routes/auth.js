@@ -14,15 +14,13 @@ module.exports = (app, passport) => {
 		loginOutcome = {
 			failureRedirect: '/login',
 			failureFlash: true
-		},	
-		connectOutcome = {
-			failureRedirect: '/settings',
-			failureFlash: true
-		},
+		}, 
 		loginCallback = (req,res)=>{
+			// console.log(`Login callback called... redirecting to ${req.session.next}`);
+			req.flash('success',"You have been logged in.");
 			res.redirect( req.session.next || '/map' );
 		},
-		androidLoginCallback = (req,res)=>{
+		appLoginCallback = (req,res)=>{
 			if (req.user){ res.send(req.user); }
 			else { res.sendStatus(401); }
 		};
@@ -212,7 +210,8 @@ module.exports = (app, passport) => {
 								req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
 								res.redirect('/login');
 							}).catch((err)=>{
-								mw.throwErr(err);
+								mw.throwErr(err,req);
+								res.redirect('/login');
 							});
 	
 						});
@@ -225,50 +224,59 @@ module.exports = (app, passport) => {
 				});
 			
 		} );
-
+	
+	// Android
+	app.get('/login/app/',  passport.authenticate('local'), appLoginCallback);
+	
+	// Token-based
+	app.get(['/login/app/google','/auth/google/idtoken'], passport.authenticate('google-token'),	appLoginCallback);
+	app.get('/login/app/facebook', passport.authenticate('facebook-token'),	appLoginCallback);
+	app.get('/login/app/twitter', passport.authenticate('twitter-token'),	appLoginCallback);
+	
 	// Social
 	app.get('/login/:service', (req,res,next)=>{
 		let service = req.params.service,
-			sendParams = (service==='google')? {scope:['profile']} : null;
+			sendParams = (service==='google')?{scope:['https://www.googleapis.com/auth/userinfo.profile']}:null;
 		
 		// Social login
 		if (!req.user) {
+			// console.log(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
 			passport.authenticate(service, sendParams)(req,res,next);
 		}
 		
 		// Connect social account
 		else if (!req.user.auth[service]) {
+			// console.log(`Attempting to connect ${service} account...`);
 			passport.authorize(service, sendParams)(req,res,next);
 		}
 		
 		// Disconnect social account
 		else {
+			// console.log(`Attempting to disconnect ${service} account...`);
 			req.user.auth[service] = undefined;
 			req.user.save()
-				.catch((err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/settings');
-				}).then(()=>{
-					req.flash('success', `${mw.capitalize(service)} account disconnected. `);
-					res.redirect('/settings');
-				});
-			
+			.then(()=>{
+				req.flash('success', `${mw.capitalize(service)} account disconnected. `);
+				res.redirect('/settings');
+			})
+			.catch((err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/settings');
+			});
 		}
+		
 	});
-	app.get('/login/:service/cb', (req,res,next)=>{
-		var service = req.params.service;
-		if (!req.user) {
-			passport.authenticate(service, loginOutcome)(req,res,next);
-		} else {
-			req.flash('success', `${mw.capitalize(service)} account connected. `);
-			passport.authenticate(service, connectOutcome)(req,res,next);
-		}
-	}, loginCallback);
-
-	// Android
-	app.get('/login/android/',  passport.authenticate('local'), androidLoginCallback);
-	app.get('/login/android/google', passport.authenticate('google-id-token'),	androidLoginCallback);
-	//TODO: Add android facebook login
-	//TODO: Add android twitter login
-
+	app.get('/login/google/cb', 
+		passport.authenticate('google',loginOutcome),
+		loginCallback
+	);
+	app.get('/login/facebook/cb', 
+		passport.authenticate('facebook',loginOutcome),
+		loginCallback
+	);
+	app.get('/login/twitter/cb', 
+		passport.authenticate('twitter',loginOutcome),
+		loginCallback
+	);
 };
+

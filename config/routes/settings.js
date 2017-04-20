@@ -31,10 +31,10 @@ router.route('/')
 		
 		function setSettings(){
 				
-				// Set values
-				req.user.name = xss(req.body.name);
-				req.user.slug = slug(xss(req.body.slug));
-				req.user.settings = {
+			// Set values
+			req.user.name = xss(req.body.name);
+			req.user.slug = slug(xss(req.body.slug));
+			req.user.settings = {
 					units: req.body.units,
 					defaultMap: req.body.map,
 					defaultZoom: req.body.zoom,

@@ -5,6 +5,9 @@ const
 	GoogleStrategy = require('passport-google-oauth20').Strategy,
 	FacebookStrategy = require('passport-facebook').Strategy,
 	TwitterStrategy = require('passport-twitter').Strategy,
+	GoogleTokenStrategy = require('passport-google-id-token'),
+	FacebookTokenStrategy = require('passport-facebook-token'),
+	TwitterTokenStrategy = require('passport-twitter-token'),
 	env = require('./env.js'),
 	mw = require('./middleware.js'),
 	User = require('./models.js').user;
@@ -34,7 +37,7 @@ module.exports = (passport)=>{
 			// No user with that email
 			if (!user) {
 				req.session.next = undefined;
-				return done( null, false, req.flash('danger','Incorrect email or password.') );
+				return done( null, false, req.flash('warning','Incorrect email or password.') );
 			}
 			
 			// User exists
@@ -47,7 +50,7 @@ module.exports = (passport)=>{
 					// Password incorrect
 					if (!res) {
 						req.session.next = undefined;
-						return done( null, false, req.flash('danger','Incorrect email or password.') );
+						return done( null, false, req.flash('warning','Incorrect email or password.') );
 					}
 					
 					// Successful login
@@ -65,41 +68,55 @@ module.exports = (passport)=>{
 	
 	// Social login
 	function socialLogin(req, service, profileId, done) {
+		// console.log(`socialLogin() called`);
+		let query = {};
+		query['auth.'+service] = profileId;
 		
-		// Log in
+		// Intent to log in
 		if (!req.user) {
-			// console.log(`Logging in with ${service}.`);
-			
-			var query = {};
-			query['auth.'+service] = profileId;
-			User.findOne(query, (err,user)=>{
-				if (err){ return done(err); }
+			// console.log(`Logging in with ${service}...`);
+			User.findOne(query)
+			.then( (user)=>{
 				
 				// Can't find user
-				else if (!user){
+				if (!user){
 					
 					// Lazy update from old googleId field
 					if (service==='google') {
-						User.findOne( {'googleID':parseInt(profileId)}, (err,user)=>{
-							if (err){ return done(err); }
+						User.findOne({ 'googleID': parseInt(profileId) })
+						.then( (user)=>{
+							
+							// User exists with old schema
 							if (user) {
 								user.auth.google = profileId;
-								user.googleId = null;
-								user.save( (err)=>{
-									if (err){ mw.throwErr(err,req); }
-									else { console.info(`🗂️ Lazily updated schema for ${user.name}.`); }
+								user.googleId = undefined;
+								user.save()
+								.then( ()=>{
+									console.info(`🗂️ Lazily updated schema for ${user.name}.`);
 									return done(null, user);
-								} );
-							} else {
-								req.flash('danger',`There's no user for that ${service} account. `);
+								})
+								.catch( (err)=>{
+									mw.throwErr(err,req);
+									return done(err);
+								});
+							} 
+							
+							// No such user
+							else {
+								req.flash('warning',`There's no user for that ${service} account. `);
 								return done();
 							}
-						} );
+							
+						})
+						.catch ( (err)=>{
+							mw.throwErr(err,req);
+							return done(err);
+						});
 					}
 					
 					// No googleId either
 					else {
-						req.flash('danger',`There's no user for that ${service} account. `);
+						req.flash('warning',`There's no user for that ${service} account. `);
 						return done();
 					}
 				}
@@ -109,17 +126,49 @@ module.exports = (passport)=>{
 					// console.log(`Found user: ${user}`);
 					return done(null, user);
 				}
+				
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				return done(err);
 			});
 		}
 		
-		// Connect account
+		// Intent to connect account
 		else {
-			// console.log(`Connecting ${service} account.`);
-			req.user.auth[service] = profileId;
-			req.user.save( (err)=>{
-				if (err){ return done(err); }
-				else { return done(null, req.user); }
-			} );
+			// console.log(`Connecting ${service} account...`);
+			
+			// Check for unique profileId
+			User.findOne(query)
+			.then( (existingUser)=>{
+				
+				// Social account already in use
+				if (existingUser) {
+					req.flash('warning',`Another user is already connected to that ${service} account. `);
+					return done();
+				}
+				
+				// Connect to account
+				else {
+					// console.log(`Connecting ${service} account.`);
+					req.user.auth[service] = profileId;
+					req.user.save()
+					.then( ()=>{
+						req.flash('success', `${mw.capitalize(service)} account connected. `);
+						return done(null,req.user);
+					} )
+					.catch( (err)=>{
+						mw.throwErr(err);
+						return done(err);
+					} );
+				}
+				
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				return done(err);
+			})
+			
 		}
 		
 	}
@@ -133,6 +182,12 @@ module.exports = (passport)=>{
 		}, (req, accessToken, refreshToken, profile, done)=>{
 			socialLogin(req, 'google', profile.id, done);
 		}
+	)).use('google-token', new GoogleTokenStrategy({
+			clientID: env.googleClientId,
+			passReqToCallback: true
+		}, (req, parsedToken, googleId, done)=>{
+			socialLogin(req,'google', googleId, done);
+		}
 	));
 	
 	// Facebook
@@ -144,6 +199,13 @@ module.exports = (passport)=>{
 		}, (req, accessToken, refreshToken, profile, done)=>{
 			socialLogin(req, 'facebook', profile.id, done);
 		}
+	)).use('facebook-token', new FacebookTokenStrategy({
+			clientID: env.facebookAppId,
+			clientSecret: env.facebookAppSecret,
+			passReqToCallback: true
+		}, (req, accessToken, refreshToken, profile, done)=>{
+			socialLogin(req,'facebook', profile.id, done);
+		}
 	));
 	
 	// Twitter
@@ -154,6 +216,13 @@ module.exports = (passport)=>{
 			passReqToCallback: true
 		}, (req, token, tokenSecret, profile, done)=>{
 			socialLogin(req, 'twitter', profile.id, done);
+		}
+	)).use('twitter-token', new TwitterTokenStrategy({
+			consumerKey: env.twitterConsumerKey,
+			consumerSecret: env.twitterConsumerSecret,
+			passReqToCallback: true
+		}, (req, token, tokenSecret, profile, done)=>{
+			socialLogin(req,'twitter', profile.id, done);
 		}
 	));
 
