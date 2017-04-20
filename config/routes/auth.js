@@ -17,7 +17,9 @@ module.exports = (app, passport) => {
 		}, 
 		loginCallback = (req,res)=>{
 			// console.log(`Login callback called... redirecting to ${req.session.next}`);
-			req.flash('success',"You have been logged in.");
+			req.flash(req.session.flashType,req.session.flashMessage);
+			req.session.flashType = undefined;
+			req.session.flashMessage = undefined;
 			res.redirect( req.session.next || '/map' );
 		},
 		appLoginCallback = (req,res)=>{
@@ -84,86 +86,84 @@ module.exports = (app, passport) => {
 			
 			// Check if somebody already has that email
 			User.findOne({'email':req.body.email})
-				.then( (user)=>{
+			.then( (user)=>{
+				
+				// User already exists
+				if (user && user.auth.password) {
+					req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
+					res.redirect('/login#login');
+					next();
+				}
+				
+				// User exists but hasn't created a password yet
+				else if (user) {
+					// Send another token (or the same one if it hasn't expired)
+					sendToken(user);
+				}
+				
+				// Create user
+				else {
 					
-					// User already exists
-					if (user && user.auth.password) {
-						req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
-						res.redirect('/login#login');
-						next();
-					}
+					user = new User();
+					user.created = Date.now();
+					user.email = req.body.email;
+					user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
 					
-					// User exists but hasn't created a password yet
-					else if (user) {
-						// Send another token (or the same one if it hasn't expired)
-						sendToken(user);
-					}
-					
-					// Create user
-					else {
-						
-						user = new User();
-						user.created = Date.now();
-						user.email = req.body.email;
-						user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
-						
-						// Generate unique slug
-						let slug = new Promise((resolve,reject) => {
-							(function checkSlug(s,cb){
+					// Generate unique slug
+					let slug = new Promise((resolve,reject) => {
+						(function checkSlug(s,cb){
+							
+							User.findOne({slug:s})
+							.then((existingUser)=>{
 								
-								User.findOne({slug:s})
-								.catch((err)=>{
-									mw.throwErr(err,req);
-								})
-								.then((existingUser)=>{
-									
-									// Slug in use: generate a random one and retry
-									if (existingUser){
-										crypto.randomBytes(6, (err,buf)=>{
-											if (err) { mw.throwErr(err,req); }
-											s = buf.toString('hex');
-											checkSlug(s,cb);
-										});
-									}
-									
-									// Unique slug: proceed
-									else { cb(s); }
-									
-								});
+								// Slug in use: generate a random one and retry
+								if (existingUser){
+									crypto.randomBytes(6, (err,buf)=>{
+										if (err) { mw.throwErr(err,req); }
+										s = buf.toString('hex');
+										checkSlug(s,cb);
+									});
+								}
 								
-							})(user.slug, (newSlug)=>{
-								user.slug = newSlug;
-								resolve();
-							});
-						});
-						
-						// Generate sk32
-						let sk32 = new Promise((resolve,reject) => {
-							crypto.randomBytes(32, (err,buf)=>{
-								if (err) { mw.throwErr(err,req); }
-								user.sk32 = buf.toString('hex');
-								resolve();
-							});
-						});
-						
-						// Save user and send the token by email
-						Promise.all([slug, sk32])
-							.then( ()=> {
-								user.save();
-							}).then( ()=>{
-								sendToken(user);
-							}).catch( (err)=>{
+								// Unique slug: proceed
+								else { cb(s); }
+								
+							})
+							.catch((err)=>{
 								mw.throwErr(err,req);
-								res.redirect('/login#signup');
 							});
-						
-					}
+							
+						})(user.slug, (newSlug)=>{
+							user.slug = newSlug;
+							resolve();
+						});
+					});
 					
-				})
-				.catch( (err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/signup');
-				});
+					// Generate sk32
+					let sk32 = new Promise((resolve,reject) => {
+						crypto.randomBytes(32, (err,buf)=>{
+							if (err) { mw.throwErr(err,req); }
+							user.sk32 = buf.toString('hex');
+							resolve();
+						});
+					});
+					
+					// Save user and send the token by email
+					Promise.all([slug, sk32])
+					.then( ()=>{ user.save(); })
+					.then( ()=>{ sendToken(user); })
+					.catch( (err)=>{
+							mw.throwErr(err,req);
+							res.redirect('/login#signup');
+						});
+					
+				}
+				
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/signup');
+			});
 				
 		});
 	
@@ -228,10 +228,10 @@ module.exports = (app, passport) => {
 	// Android
 	app.get('/login/app/',  passport.authenticate('local'), appLoginCallback);
 	
-	// Token-based
-	app.get(['/login/app/google','/auth/google/idtoken'], passport.authenticate('google-token'),	appLoginCallback);
-	app.get('/login/app/facebook', passport.authenticate('facebook-token'),	appLoginCallback);
-	app.get('/login/app/twitter', passport.authenticate('twitter-token'),	appLoginCallback);
+	// Token-based (android social)
+	app.get(['/login/app/google','/auth/google/idtoken'], passport.authenticate('google-token'), appLoginCallback);
+	app.get('/login/app/facebook', passport.authenticate('facebook-token'), appLoginCallback);
+	app.get('/login/app/twitter', passport.authenticate('twitter-token'), appLoginCallback);
 	
 	// Social
 	app.get('/login/:service', (req,res,next)=>{
@@ -266,17 +266,8 @@ module.exports = (app, passport) => {
 		}
 		
 	});
-	app.get('/login/google/cb', 
-		passport.authenticate('google',loginOutcome),
-		loginCallback
-	);
-	app.get('/login/facebook/cb', 
-		passport.authenticate('facebook',loginOutcome),
-		loginCallback
-	);
-	app.get('/login/twitter/cb', 
-		passport.authenticate('twitter',loginOutcome),
-		loginCallback
-	);
+	app.get('/login/google/cb', passport.authenticate('google',loginOutcome), loginCallback	);
+	app.get('/login/facebook/cb', passport.authenticate('facebook',loginOutcome), loginCallback );
+	app.get('/login/twitter/cb', passport.authenticate('twitter',loginOutcome), loginCallback );
+	
 };
-

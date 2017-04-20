@@ -93,6 +93,8 @@ module.exports = (passport)=>{
 								user.save()
 								.then( ()=>{
 									console.info(`🗂️ Lazily updated schema for ${user.name}.`);
+									req.session.flashType = 'success';
+									req.session.flashMessage = "You have been logged in. ";
 									return done(null, user);
 								})
 								.catch( (err)=>{
@@ -103,7 +105,8 @@ module.exports = (passport)=>{
 							
 							// No such user
 							else {
-								req.flash('warning',`There's no user for that ${service} account. `);
+								req.session.flashType = 'warning';
+								req.session.flashMessage = `There's no user for that ${service} account. `;
 								return done();
 							}
 							
@@ -116,7 +119,8 @@ module.exports = (passport)=>{
 					
 					// No googleId either
 					else {
-						req.flash('warning',`There's no user for that ${service} account. `);
+						req.session.flashType = 'warning';
+						req.session.flashMessage = `There's no user for that ${service} account. `;
 						return done();
 					}
 				}
@@ -124,6 +128,8 @@ module.exports = (passport)=>{
 				// Successfull social login
 				else {
 					// console.log(`Found user: ${user}`);
+					req.session.flashType = 'success';
+					req.session.flashMessage = "You have been logged in.";
 					return done(null, user);
 				}
 				
@@ -136,7 +142,7 @@ module.exports = (passport)=>{
 		
 		// Intent to connect account
 		else {
-			// console.log(`Connecting ${service} account...`);
+			// console.log(`Attempting to connect ${service} account...`);
 			
 			// Check for unique profileId
 			User.findOne(query)
@@ -144,7 +150,9 @@ module.exports = (passport)=>{
 				
 				// Social account already in use
 				if (existingUser) {
-					req.flash('warning',`Another user is already connected to that ${service} account. `);
+					// console.log(`${service} account already in use.`);
+					req.session.flashType = 'warning';
+					req.session.flashMessage = `Another user is already connected to that ${service} account. `;
 					return done();
 				}
 				
@@ -154,7 +162,8 @@ module.exports = (passport)=>{
 					req.user.auth[service] = profileId;
 					req.user.save()
 					.then( ()=>{
-						req.flash('success', `${mw.capitalize(service)} account connected. `);
+						req.session.flashType = 'success';
+						req.session.flashMessage = `${mw.capitalize(service)} account connected. `;
 						return done(null,req.user);
 					} )
 					.catch( (err)=>{
@@ -167,7 +176,7 @@ module.exports = (passport)=>{
 			.catch( (err)=>{
 				mw.throwErr(err,req);
 				return done(err);
-			})
+			});
 			
 		}
 		
