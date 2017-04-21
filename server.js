@@ -117,6 +117,10 @@ const
 			app.use( '/test', require('./config/routes/test.js' ) );
 		}
 		
+		app.get('/500', (req,res)=>{
+			Balls
+		});
+		
 	}
 	
 	/* Errors */	{
@@ -136,7 +140,6 @@ const
 				if (err.status!==404){ console.error(err.stack); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
-				console.log(err.status===500)?"Server error":err.message;
 				res.render('error', {
 					code: err.status,
 					message: (err.status===500)?"Server error":err.message
@@ -149,7 +152,7 @@ const
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
-					code: err.status,
+					code: err.status||500,
 					message: err.message,
 					stack: err.stack
 				});

@@ -45,8 +45,7 @@ router
 	})
 	.post('/settings', (req,res)=>{
 		
-		//TODO: Test validation here.  
-		
+		//TODO: Test validation here? 
 		
 	});
 	
