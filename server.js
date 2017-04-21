@@ -120,10 +120,11 @@ const
 	}
 	
 	/* Errors */	{
+		
 		// Catch-all for 404s
 		app.use( (req,res,next)=>{
 			if (!res.headersSent) {
-				var err = new Error('404 Not found: '+req.url);
+				var err = new Error(`Not found: ${req.url}`);
 				err.status = 404;
 				next(err);
 			}
@@ -132,6 +133,7 @@ const
 		// Handlers
 		if (env.mode=='production') {
 			app.use( (err,req,res,next)=>{
+				if (err.status!=='404'){ console.error(err.stack); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
@@ -141,13 +143,13 @@ const
 		}
 		else /* Development */{
 			app.use( (err,req,res,next)=>{
-				console.log(err);
+				console.error(err.stack);
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
 					code: err.status,
 					message: err.message,
-					error: err.stack
+					stack: err.stack
 				});
 			} );
 		}
