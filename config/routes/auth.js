@@ -123,10 +123,14 @@ module.exports = (app, passport) => {
 								
 								// Slug in use: generate a random one and retry
 								if (existingUser){
-									crypto.randomBytes(6, (err,buf)=>{
-										if (err) { mw.throwErr(err,req); }
+									crypto.randomBytes(6)
+									.then( (buf)=>{
 										s = buf.toString('hex');
 										checkSlug(s,cb);
+									})
+									.catch( (err)=>{
+										mw.throwErr(err,req);
+										reject();
 									});
 								}
 								
@@ -136,6 +140,7 @@ module.exports = (app, passport) => {
 							})
 							.catch((err)=>{
 								mw.throwErr(err,req);
+								reject();
 							});
 							
 						})(user.slug, (newSlug)=>{
@@ -146,10 +151,14 @@ module.exports = (app, passport) => {
 					
 					// Generate sk32
 					let sk32 = new Promise((resolve,reject) => {
-						crypto.randomBytes(32, (err,buf)=>{
-							if (err) { mw.throwErr(err,req); }
+						crypto.randomBytes(32)
+						.then( (buf)=>{
 							user.sk32 = buf.toString('hex');
 							resolve();
+						})
+						.catch( (err)=>{
+							mw.throwErr(err,req);
+							reject();
 						});
 					});
 					
@@ -158,9 +167,9 @@ module.exports = (app, passport) => {
 					.then( ()=>{ user.save(); })
 					.then( ()=>{ sendToken(user); })
 					.catch( (err)=>{
-							mw.throwErr(err,req);
-							res.redirect('/login#signup');
-						});
+						mw.throwErr(err,req);
+						res.redirect('/login#signup');
+					});
 					
 				}
 				

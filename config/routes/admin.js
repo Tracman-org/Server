@@ -12,25 +12,33 @@ router.route('/')
 	.get( (req,res)=>{
 		
 		User.find({}).sort({lastLogin:-1})
-		.catch( (err)=>{
-			mw.throwErr(err);
-		}).then( (found)=>{
+		.then( (found)=>{
 			res.render('admin', {
 				noFooter: '1',
 				users: found
 			});
-		});
+		})
+		.catch( (err)=>{ mw.throwErr(err,req); });
 		
 	} )
 	
 	.post( (req,res,next)=>{
 		if (req.body.delete) {
-			User.findOneAndRemove( {'_id':req.body.delete}, (err,user)=>{
-				if (err){ req.flash('error', err.message); }
-				else { req.flash('success', '<i>'+user.name+'</i> deleted.'); }
+			User.findOneAndRemove({'_id':req.body.delete})
+			.then( (user)=>{
+				req.flash('success', '<i>'+user.name+'</i> deleted.');
 				res.redirect('/admin#users');
-			} );
-		} else { console.error(new Error('POST without action sent.  ')); next(); }
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/admin#users');
+			});
+		}
+		else { 
+			let err = new Error('POST without action sent.  ');
+			err.status = 500; 
+			next();
+		}
 	} );
 
 module.exports = router;

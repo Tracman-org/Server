@@ -31,8 +31,8 @@ module.exports = (passport)=>{
 		passwordField: 'password',
 		passReqToCallback: true
 	}, (req,email,password,done)=>{
-		User.findOne( {'email':email}, (err,user)=>{
-			if (err){ return done(err); }
+		User.findOne({'email':email})
+		.then( (user)=>{
 			
 			// No user with that email
 			if (!user) {
@@ -62,7 +62,11 @@ module.exports = (passport)=>{
 					
 				} );
 			}
-		} );
+			
+		})
+		.catch( (err)=>{
+			return done(err);
+		});
 	}
 	));
 	
@@ -168,7 +172,6 @@ module.exports = (passport)=>{
 						return done(null,req.user);
 					} )
 					.catch( (err)=>{
-						mw.throwErr(err);
 						return done(err);
 					} );
 				}

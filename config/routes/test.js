@@ -32,7 +32,7 @@ router
 		let daysToCrack = mellt.CheckPassword(req.body.password);
 		if (daysToCrack<10) {
 			let err = new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `);
-			mw.throwErr(err);
+			mw.throwErr(err,req);
 			next(err);
 		}
 		else {

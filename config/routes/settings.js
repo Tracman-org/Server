@@ -132,16 +132,15 @@ router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
 			req.user.email = req.user.newEmail;
 			req.user.save()
 			.then( ()=>{
-				
 				// Delete token and newEmail
 				req.user.emailToken = undefined;
 				req.user.newEmail = undefined;
 				req.user.save();
-				
+			})
+			.then( ()=>{
 				// Report success
 				req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
 				res.redirect('/settings');
-				
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);
@@ -249,14 +248,14 @@ router.route('/password/:token')
 					// Save new password to db
 					res.locals.passwordUser.auth.password = hash;
 					res.locals.passwordUser.save()
-						.then( ()=>{
-							req.flash('success', 'Password set.  You can use it to log in now. ');
-							res.redirect('/login#login');
-						})
-						.catch( (err)=>{
-							mw.throwErr(err,req);
-							res.redirect('/login#signup');
-						});
+					.then( ()=>{
+						req.flash('success', 'Password set.  You can use it to log in now. ');
+						res.redirect('/login#login');
+					})
+					.catch( (err)=>{
+						mw.throwErr(err,req);
+						res.redirect('/login#signup');
+					});
 					
 				}
 			} );

@@ -49,7 +49,7 @@ router.get('/validate', (req,res)=>{
 			}
 			else { res.sendStatus(200); }
 		})
-		.catch( (err)=>{ mw.throwErr(err); });
+		.catch( (err)=>{ mw.throwErr(err,req); });
 	}
 	
 	// Validate unique email
@@ -61,7 +61,7 @@ router.get('/validate', (req,res)=>{
 			}
 			else { res.sendStatus(200); }
 		})
-		.catch( (err)=>{ mw.throwErr(err); });
+		.catch( (err)=>{ mw.throwErr(err,req); });
 	}
 	
 	// Create slug

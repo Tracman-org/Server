@@ -65,12 +65,12 @@ module.exports = {
 				else {
 					
 					// Get loc.usr
-					User.findById(loc.usr, (err,user)=>{
-						if (err) { mw.throwErr(err); }
+					User.findById(loc.usr)
+					.then( (user)=>{
 						if (user) {
 							
 							// Confirm sk32 token
-							if (loc.tok!=user.sk32) { mw.throwErr(new Error(`⛔️ loc.tok!=user.sk32\n\t${loc.tok} != ${user.sk32}`)); }
+							if (loc.tok!=user.sk32) { mw.throwErr(new Error(`loc.tok!=user.sk32\n\t${loc.tok} != ${user.sk32}`)); }
 							else {
 								
 								// Broadcast location
@@ -85,13 +85,13 @@ module.exports = {
 									spd: parseFloat(loc.spd||0),
 									time: loc.time
 								};
-								user.save( (err)=>{
-									if (err) { mw.throwErr(err); }
-								} );
+								user.save()
+								.catch( (err)=>{ console.error(`⛔ ${err.stack}`); } );
 								
 							}
 						}
-					});
+					})
+					.catch( (err)=>{ console.error(`⛔ ${err.stack}`); });
 				
 				}
 			});
@@ -109,9 +109,7 @@ module.exports = {
 			});
 			
 			// Log errors
-			socket.on('error', (err)=>{
-				mw.throwErr(err);
-			});
+			socket.on('error', (err)=>{ console.error(`⛔ ${err.stack}`); });
 			
 		});
 	}

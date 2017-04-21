@@ -33,11 +33,9 @@ const
 				keepAlive:1, connectTimeoutMS:30000 }},
 			replset:{socketOptions:{
 				keepAlive:1, connectTimeoutMS:30000 }}
-		}).catch((err)=>{
-			mw.throwErr(err);
-		}).then(()=>{
-			console.log(`💿 Mongoose connected to mongoDB`);
-		});
+		})
+		.then( ()=>{ console.log(`💿 Mongoose connected to mongoDB`); })
+		.catch( (err)=>{ console.error(`⛔ ${err.stack}`); });
 		
 	}
 
@@ -133,7 +131,7 @@ const
 		// Production handlers
 		if (env.mode!=='development') {
 			app.use( (err,req,res,next)=>{
-				if (err.status!==404){ console.error(err.stack); }
+				if (err.status!==404){ console.error(`⛔ ${err.stack}`); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
@@ -146,7 +144,7 @@ const
 		// Development handlers
 		else {
 			app.use( (err,req,res,next)=>{
-				console.error(err.stack);
+				console.error(`⛔ ${err.stack}`);
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
@@ -174,11 +172,14 @@ const
 		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
 		
 		// Check for clients for each user
-		User.find( {}, (err,users)=>{
-			if (err) { console.log(`DB error finding all users: ${err.message}`); }
+		User.find({})
+		.then( (users)=>{
 			users.forEach( (user)=>{
 				sockets.checkForUsers( io, user.id );
 			});
+		})
+		.catch( (err)=>{
+			console.error(`⛔ ${err.stack}`);
 		});
 		
 	});

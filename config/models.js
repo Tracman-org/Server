@@ -56,7 +56,6 @@ const userSchema = new mongoose.Schema({
 		.then( (buf)=>{
 			user.emailToken = buf.toString('hex');
 			user.save();
-			return next(null,user.emailToken);
 		})
 		.catch( (err)=>{ next(err,null); });
 		
@@ -78,8 +77,13 @@ const userSchema = new mongoose.Schema({
 		// Reuse old token, resetting clock
 		if ( user.auth.passTokenExpires <= Date.now() ){
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-			user.save();
-			return next(null,user.auth.passToken);
+			user.save()
+			.then( ()=>{
+				return next(null,user.auth.passToken);
+			})
+			.catch( (err)=>{
+				return next(err,user.auth.passToken);
+			});
 		}
 		
 		// Create new token
@@ -89,7 +93,6 @@ const userSchema = new mongoose.Schema({
 				user.auth.passToken = buf.toString('hex');
 				user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 				user.save();
-				return next(null,user.auth.passToken);
 			})
 			.catch( (err)=>{ return next(err,null); });
 		}
