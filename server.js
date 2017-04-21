@@ -117,10 +117,6 @@ const
 			app.use( '/test', require('./config/routes/test.js' ) );
 		}
 		
-		// app.get('/500', (req,res)=>{
-		// 	Balls
-		// });
-		
 	}
 	
 	/* Errors */	{
@@ -134,19 +130,21 @@ const
 			}
 		} );
 
-		// Handlers
-		if (env.mode=='production') {
+		// Production handlers
+		if (env.mode!=='development') {
 			app.use( (err,req,res,next)=>{
 				if (err.status!==404){ console.error(err.stack); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
-					code: err.status,
-					message: (err.status===500)?"Server error":err.message
+					code: err.status||500,
+					message: (err.status<=499)?err.message:"Server error"
 				});
 			} );
 		}
-		else /* Development */{
+		
+		// Development handlers
+		else {
 			app.use( (err,req,res,next)=>{
 				console.error(err.stack);
 				if (res.headersSent) { return next(err); }
@@ -158,6 +156,7 @@ const
 				});
 			} );
 		}
+		
 	}
 	
 	/* Sockets */ {
