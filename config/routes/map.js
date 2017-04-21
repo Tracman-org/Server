@@ -16,9 +16,8 @@ router.get('/:slug?', (req,res,next)=>{
 
 	User.findOne({slug:req.params.slug})
 	.then( (mapuser)=>{
-		if (mapuser===undefined){
-			res.sendStatus(404);
-		} else {
+		if (!mapuser){ next(); } //404
+		else {
 			res.render('map', {
 				mapuser: mapuser,
 				mapApi: env.googleMapsAPI,

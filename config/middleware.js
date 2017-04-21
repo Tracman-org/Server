@@ -30,7 +30,11 @@ module.exports = {
 	// Ensure administrator
 	ensureAdmin: (req,res,next)=>{
 		if (req.user.isAdmin){ return next(); }
-		else { res.sendStatus(401); }
+		else { 
+			let err = new Error("Unauthorized");
+			err.status = 401;
+			next(err);
+		}
 		//TODO: test this by logging in as !isAdmin and go to /admin
 	}
 

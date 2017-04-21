@@ -119,6 +119,7 @@ module.exports = (passport)=>{
 					
 					// No googleId either
 					else {
+						// console.log(`Couldn't find ${service} user.`);
 						req.session.flashType = 'warning';
 						req.session.flashMessage = `There's no user for that ${service} account. `;
 						return done();

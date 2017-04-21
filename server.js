@@ -117,9 +117,9 @@ const
 			app.use( '/test', require('./config/routes/test.js' ) );
 		}
 		
-		app.get('/500', (req,res)=>{
-			Balls
-		});
+		// app.get('/500', (req,res)=>{
+		// 	Balls
+		// });
 		
 	}
 	

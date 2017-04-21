@@ -22,9 +22,14 @@ module.exports = (app, passport) => {
 			req.session.flashMessage = undefined;
 			res.redirect( req.session.next || '/map' );
 		},
-		appLoginCallback = (req,res)=>{
+		appLoginCallback = (req,res,next)=>{
+			console.log('appLoginCallback called.');
 			if (req.user){ res.send(req.user); }
-			else { res.sendStatus(401); }
+			else { 
+				let err = new Error("Unauthorized");
+				err.status = 401;
+				next(err);
+			}
 		};
 	
 	// Login/-out
