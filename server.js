@@ -133,11 +133,13 @@ const
 		// Handlers
 		if (env.mode=='production') {
 			app.use( (err,req,res,next)=>{
-				if (err.status!=='404'){ console.error(err.stack); }
+				if (err.status!==404){ console.error(err.stack); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
+				console.log(err.status===500)?"Server error":err.message;
 				res.render('error', {
-					code: err.status
+					code: err.status,
+					message: (err.status===500)?"Server error":err.message
 				});
 			} );
 		}
