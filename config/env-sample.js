@@ -11,6 +11,8 @@ module.exports = {
 	
 	// Location of your mongoDB
 	mongoSetup: 'mongodb://localhost:27017/tracman',
+	// Or use the test database from mLab
+	//mongoSetup: 'mongodb://tracman:MUPSLXQ34f9cQTc5@ds113841.mlab.com:13841/tracman-dev',
 	
 	// URL and port where this will run
 	url: 'https://localhost:8080',
