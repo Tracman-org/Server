@@ -54,22 +54,22 @@ form #social-login {
 	font-size: .6em;
 }
 #social-login .btn.gp {
-	background: rgb(206,77,57);
+	background: #ce4d39;
 }
 #social-login .btn.gp:hover {
-	background: rgb(251,122,102);
+	background: #fb7a66;
 }
 #social-login .btn.fb {
-	background: rgb(48,88,145);
+	background: #305891;
 }
 #social-login .btn.fb:hover {
-	background: rgb(93,133,190);
+	background: #5d85be;
 }
 #social-login .btn.tw {
-	background: rgb(44,168,210);
+	background: #2ca8d2;
 }
 #social-login .btn.tw:hover {
-	background: rgb(89,213,255);
+	background: #59d5ff;
 }
 /* Small buttons */
 @media (max-width:600px), (min-width:800px) and (max-width:1200px) {

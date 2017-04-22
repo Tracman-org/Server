@@ -23,7 +23,7 @@ module.exports = (app, passport) => {
 			res.redirect( req.session.next || '/map' );
 		},
 		appLoginCallback = (req,res,next)=>{
-			console.log('appLoginCallback called.');
+			// console.log('appLoginCallback called.');
 			if (req.user){ res.send(req.user); }
 			else { 
 				let err = new Error("Unauthorized");
