@@ -29,7 +29,11 @@ module.exports = {
 	
 	init: (io)=>{
 		io.on('connection', (socket)=>{
-			//console.log(`${socket.id} connected.`);
+			// console.log(`${socket.id} connected.`);
+			
+			// Set a few variables
+			socket.ip = socket.client.request.headers['x-real-ip'];
+			socket.ua = socket.client.request.headers['user-agent'];
 			
 			/* Log */
 			//socket.on('log', (text)=>{
@@ -62,10 +66,10 @@ module.exports = {
 				
 				// Check for user and sk32 token
 				if (!loc.usr){
-					console.error("⛔", new Error(`Recieved an update from ${socket.id} without a usr!`).message);
+					console.error("⛔", new Error(`Recieved an update from ${socket.ip} without a usr!`).message);
 				}
 				else if (!loc.tok){
-					console.error("⛔", new Error(`Recieved an update from ${socket.id} for usr ${loc.usr} without an sk32!`).message);
+					console.error("⛔", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} without an sk32!`).message);
 				}
 				else {
 					
@@ -73,13 +77,13 @@ module.exports = {
 					User.findById(loc.usr)
 					.then( (user)=>{
 						if (!user){
-							console.error("⛔", new Error(`Recieved an update from ${socket.id} for ${loc.usr}, but no such user was found in the db!`).message);
+							console.error("⛔", new Error(`Recieved an update from ${socket.ip} for ${loc.usr}, but no such user was found in the db!`).message);
 						}
 						else {
 							
 							// Confirm sk32 token
 							if (loc.tok!=user.sk32) {
-								console.error("⛔", new Error(`Recieved an update from ${socket.id} for usr ${loc.usr} with tok of ${loc.tok}, but that user's sk32 is ${user.sk32}!`).message);
+								console.error("⛔", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} with tok of ${loc.tok}, but that user's sk32 is ${user.sk32}!`).message);
 							}
 							else {
 								
