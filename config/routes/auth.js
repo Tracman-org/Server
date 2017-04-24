@@ -16,14 +16,14 @@ module.exports = (app, passport) => {
 			failureFlash: true
 		}, 
 		loginCallback = (req,res)=>{
-			// console.log(`Login callback called... redirecting to ${req.session.next}`);
+			//console.log(`Login callback called... redirecting to ${req.session.next}`);
 			req.flash(req.session.flashType,req.session.flashMessage);
 			req.session.flashType = undefined;
 			req.session.flashMessage = undefined;
 			res.redirect( req.session.next || '/map' );
 		},
 		appLoginCallback = (req,res,next)=>{
-			// console.log('appLoginCallback called.');
+			//console.log('appLoginCallback called.');
 			if (req.user){ res.send(req.user); }
 			else { 
 				let err = new Error("Unauthorized");
@@ -240,12 +240,12 @@ module.exports = (app, passport) => {
 		} );
 	
 	// Android
-	app.get('/login/app/',  passport.authenticate('local'), appLoginCallback);
+	app.post('/login/app', passport.authenticate('local'), appLoginCallback);
 	
 	// Token-based (android social)
 	app.get(['/login/app/google','/auth/google/idtoken'], passport.authenticate('google-token'), appLoginCallback);
-	app.get('/login/app/facebook', passport.authenticate('facebook-token'), appLoginCallback);
-	app.get('/login/app/twitter', passport.authenticate('twitter-token'), appLoginCallback);
+	// app.get('/login/app/facebook', passport.authenticate('facebook-token'), appLoginCallback);
+	// app.get('/login/app/twitter', passport.authenticate('twitter-token'), appLoginCallback);
 	
 	// Social
 	app.get('/login/:service', (req,res,next)=>{
@@ -254,19 +254,19 @@ module.exports = (app, passport) => {
 		
 		// Social login
 		if (!req.user) {
-			// console.log(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
+			//console.log(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
 			passport.authenticate(service, sendParams)(req,res,next);
 		}
 		
 		// Connect social account
 		else if (!req.user.auth[service]) {
-			// console.log(`Attempting to connect ${service} account...`);
+			//console.log(`Attempting to connect ${service} account...`);
 			passport.authorize(service, sendParams)(req,res,next);
 		}
 		
 		// Disconnect social account
 		else {
-			// console.log(`Attempting to disconnect ${service} account...`);
+			//console.log(`Attempting to disconnect ${service} account...`);
 			req.user.auth[service] = undefined;
 			req.user.save()
 			.then(()=>{
