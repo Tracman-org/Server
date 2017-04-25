@@ -20,20 +20,34 @@ main {
 /* Map and streetview */
 #map, #pano {position:relative;}
 #pano {float:right;}
-img#panoImg { width:100%; height:100%; }
+#panoImg { width:100%; height:100%; }
 #notset {display:none}
 
 /* Tracman logo */
-.map-logo {
+#map-logo {
 	margin-left: -75px;
+	background: #444;
 	background: rgba(0,0,0,.7);
 	padding: 0 10px 0 75px;
 	font-size: 2em;
 }
-.map-logo a { color: #fbc93d; }
+#map-logo a:hover {
+	text-decoration: none;
+}
+#map-logo img {
+	position: relative;
+	top: 3px;
+	margin-left: 3px;
+}
+#map-logo .text {
+	color: #fbc93d;
+	position: relative;
+	top: -3px;
+	margin-left: 3px;
+}
 
 /* Timestamp */
-.tim {
+#timestamp {
 	color: #000;
 	font-size: 12px;
 	padding-left: 5px;
@@ -42,65 +56,65 @@ img#panoImg { width:100%; height:100%; }
 }
 
 /* Signs */
-.spd-sign, .alt-sign {
+#spd-sign, #alt-sign {
 	text-align: center;
 	padding: 2%;
 	border-radius: 3px;
 	margin: 3%;
-} .spd-sign {
+} #spd-sign {
 	color: #000;
 	background-color: #FFF;
 	border: 2px solid #000;
-} .alt-sign {
+} #alt-sign {
 	color: #FFF;
 	background-color: #009800;
 	border: 2px solid #FFF;
 }
 @media (min-width:400px) {
-	.spd, .alt {
+	#spd, #alt {
 		height: 40px;
 		font-size: 32px;
 	}
-	.alt-unit, .spd-unit {
+	#alt-unit, #spd-unit {
 		font-size: 12px;
 	}
-	.alt-label, .spd-label {
+	#alt-label, #spd-label {
 		font-size: 18px;
 		height: 18px;
 	}
 } @media (min-width:350px) and (max-width:400px) {
-	.spd, .alt {
+	#spd, #alt {
 		height: 30px;
 		font-size: 28px;
 	}
-	.alt-unit, .spd-unit {
+	#alt-unit, #spd-unit {
 		font-size: 10px;
 	}
-	.alt-label, .spd-label {
+	#alt-label, #spd-label {
 		font-size: 14px;
 		height: 14px;
 	}
 } @media (min-width:300px) and (max-width:350px) {
-	.spd, .alt {
+	#spd, #alt {
 		height: 22px;
 		font-size: 20px;
 	}
-	.alt-unit, .spd-unit {
+	#alt-unit, #spd-unit {
 		font-size: 9px;
 	}
-	.alt-label, .spd-label {
+	#alt-label, #spd-label {
 		font-size: 11px;
 		height: 11px;
 	}
 } @media (min-width:0px) and (max-width:300px) {
-	.spd, .alt {
+	#spd, #alt {
 		height: 20px;
 		font-size: 18px;
 	}
-	.alt-unit, .spd-unit {
+	#alt-unit, #spd-unit {
 		font-size: 8px;
 	}
-	.alt-label, .spd-label {
+	#alt-label, #spd-label {
 		font-size: 9px;
 		height: 9px;
 	}

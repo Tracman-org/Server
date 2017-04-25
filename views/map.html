@@ -5,7 +5,7 @@
 	{{super()}}
 	<link href="/static/css/.map.min.css" rel="stylesheet">
 	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
-		{% if noHeader=='1' %} main { top:0; } {% endif %}
+		{% if noHeader!='0' %} main { top:0; } {% endif %}
 		
 		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
 		/* show both */
@@ -84,13 +84,10 @@
 	<script> /* Variables from server */
 		
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
-			noHeader = {{noHeader |dump|safe}},
-			disp = {{disp |dump|safe}}; // 0=map, 1=streetview, 2=both
-			
-		{% if user %}
-			const userid = {{user._id |dump|safe}},
-				token = {{user.sk32 |dump|safe}};
-		{% endif %}
+			noHeader = "{{noHeader |safe}}",
+			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
+			userid = "{{user._id |safe}}",
+			token = "{{user.sk32 |safe}}";
 		
 	</script>
 	

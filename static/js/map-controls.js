@@ -7,7 +7,7 @@ $(function(){
 	
 	// Set location
 	$('#set-loc').click(function(){
-		if (!userid==mapuser._id){ alert('You are not logged in! '); }
+		if (!userid===mapuser._id){ alert('You are not logged in! '); }
 		else { if (!navigator.geolocation){ alert('Geolocation not enabled. '); }
 		
 		else { navigator.geolocation.getCurrentPosition(
@@ -41,7 +41,7 @@ $(function(){
 	
 	// Track location
 	$('#track-loc').click(function(){
-		if (!userid==mapuser._id) { alert('You are not logged in! '); }
+		if (!userid===mapuser._id) { alert('You are not logged in! '); }
 		else {
 			
 			// Start tracking
@@ -92,7 +92,7 @@ $(function(){
 	
 	// Clear location
 	$('#clear-loc').click(function(){
-		if (!userid==mapuser._id) { alert('You are not logged in! '); }
+		if (!userid===mapuser._id) { alert('You are not logged in! '); }
 		else {
 			// Stop tracking
 			if (wpid) {
