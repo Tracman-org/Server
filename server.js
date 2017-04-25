@@ -12,7 +12,6 @@ const
 	passport = require('passport'),
 	flash = require('connect-flash-plus'),
 	env = require('./config/env.js'),
-	mw = require('./config/middleware.js'),
 	User = require('./config/models.js').user,
 	app = express(),
 	http = require('http').Server(app),
@@ -166,7 +165,6 @@ const
 }
 
 /* RUNTIME */ {
-	
 	console.log('🖥  Starting Tracman server...');
 	
 	// Listen
