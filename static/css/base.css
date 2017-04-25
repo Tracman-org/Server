@@ -149,15 +149,15 @@ section {
 	-moz-box-shadow:
 		inset .11vw .18vw .52vw rgba(255,255,255,.2),
 		inset -.11vw -.18vw .52vw rgba(0,0,0,.4),
-		.11vw .18vw .52vw #000;
+		.1vw .1vw .52vw #000;
 	-webkit-box-shadow:
 		inset .11vw .18vw .52vw rgba(255,255,255,.2),
 		inset -.11vw -.18vw .52vw rgba(0,0,0,.4),
-		.18vw .18vw .36vw #000;
+		.1vw .1vw .36vw #000;
 	box-shadow:
 		inset .11vw .18vw .52vw rgba(255,255,255,.2),
 		inset -.11vw -.18vw .52vw rgba(0,0,0,.4),
-		.18vw .18vw .36vw #000;
+		.1vw .1vw .36vw #000;
 } .btn:disabled {
 	color: #aaa;
 	border: 1px solid #444;
