@@ -6,7 +6,7 @@ module.exports = {
 
 	// Throw error
 	throwErr: (err,req=null)=>{
-		console.error(`⛔️ ${err.stack}`);
+		console.error(`❌️ ${err.stack}`);
 		if (req){
 			if (env.mode==='production') {
 				req.flash('danger', 'An error occured. <br>Would you like to <a href="https://github.com/Tracman-org/Server/issues/new">report it</a>?');

@@ -29,7 +29,7 @@ $(function(){
 			// Error callback
 			function(err) {
 				alert("Unable to set location.");
-				console.error('⛔️',err.message);
+				console.error('❌️',err.message);
 			},
 			
 			// Options

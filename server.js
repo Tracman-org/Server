@@ -35,7 +35,7 @@ const
 				keepAlive:1, connectTimeoutMS:30000 }}
 		})
 		.then( ()=>{ console.log(`💿 Mongoose connected to mongoDB`); })
-		.catch( (err)=>{ console.error(`⛔ ${err.stack}`); });
+		.catch( (err)=>{ console.error(`❌ ${err.stack}`); });
 		
 	}
 
@@ -131,7 +131,7 @@ const
 		// Production handlers
 		if (env.mode!=='development') {
 			app.use( (err,req,res,next)=>{
-				if (err.status!==404){ console.error(`⛔ ${err.stack}`); }
+				if (err.status!==404){ console.error(`❌ ${err.stack}`); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {
@@ -145,7 +145,7 @@ const
 		else {
 			app.use( (err,req,res,next)=>{
 				if (err.status!==404) {
-					console.error(`⛔ ${err.stack}`);
+					console.error(`❌ ${err.stack}`);
 				}
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
@@ -181,7 +181,7 @@ const
 			});
 		})
 		.catch( (err)=>{
-			console.error(`⛔ ${err.stack}`);
+			console.error(`❌ ${err.stack}`);
 		});
 		
 	});

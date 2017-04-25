@@ -66,10 +66,10 @@ module.exports = {
 				
 				// Check for user and sk32 token
 				if (!loc.usr){
-					console.error("⛔", new Error(`Recieved an update from ${socket.ip} without a usr!`).message);
+					console.error("❌", new Error(`Recieved an update from ${socket.ip} without a usr!`).message);
 				}
 				else if (!loc.tok){
-					console.error("⛔", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} without an sk32!`).message);
+					console.error("❌", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} without an sk32!`).message);
 				}
 				else {
 					
@@ -77,13 +77,13 @@ module.exports = {
 					User.findById(loc.usr)
 					.then( (user)=>{
 						if (!user){
-							console.error("⛔", new Error(`Recieved an update from ${socket.ip} for ${loc.usr}, but no such user was found in the db!`).message);
+							console.error("❌", new Error(`Recieved an update from ${socket.ip} for ${loc.usr}, but no such user was found in the db!`).message);
 						}
 						else {
 							
 							// Confirm sk32 token
 							if (loc.tok!=user.sk32) {
-								console.error("⛔", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} with tok of ${loc.tok}, but that user's sk32 is ${user.sk32}!`).message);
+								console.error("❌", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} with tok of ${loc.tok}, but that user's sk32 is ${user.sk32}!`).message);
 							}
 							else {
 								
@@ -100,12 +100,12 @@ module.exports = {
 									time: loc.time
 								};
 								user.save()
-								.catch( (err)=>{ console.error("⛔", err.stack); });
+								.catch( (err)=>{ console.error("❌", err.stack); });
 								
 							}
 						}
 					})
-					.catch( (err)=>{ console.error("⛔", err.stack); });
+					.catch( (err)=>{ console.error("❌", err.stack); });
 				
 				}
 			});
@@ -123,7 +123,7 @@ module.exports = {
 			});
 			
 			// Log errors
-			socket.on('error', (err)=>{ console.error('⛔', err.stack); });
+			socket.on('error', (err)=>{ console.error('❌', err.stack); });
 			
 		});
 	}
