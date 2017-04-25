@@ -66,6 +66,7 @@ router.route('/')
 			req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
 			res.redirect('/settings');
 		}
+		
 		else {
 			
 			// Email changed
@@ -231,6 +232,7 @@ router.route('/password/:token')
 			mw.throwErr(new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `));
 			res.redirect(`/settings/password/${req.params.token}`);
 		}
+		
 		else {
 			
 			// Delete token
@@ -282,7 +284,7 @@ router.route('/pro')
 				{$set:{ isPro:true }})
 			.then( (user)=>{
 				req.flash('success','You have been signed up for pro. ');
-				res.redirect('/map');
+				res.redirect(req.session.next||'/settings');
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);

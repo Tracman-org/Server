@@ -113,6 +113,8 @@ section {
 .red, .red:hover { color: #fb6e3d !important; }
 .yellow, .yellow:hover { color: #fbc93d !important; }
 .green, .green:hover { color: #8ae137 !important; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
 
 .shadow {
 	-moz-box-shadow: .18vw .18vw .36vw #000;
