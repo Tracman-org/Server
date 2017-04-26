@@ -57,9 +57,6 @@ $(function(){
 			$.get('/validate?'+input+'='+$('#'+input+'-input').val())
 			.fail(function(data,status){
 				
-				console.log(typeof status);
-				console.log(status);
-				
 				// Input is not unique
 				if (status===400) {
 					$('#'+input+'-help').show().text("That "+input+" is already in use by another user. ");

@@ -1,7 +1,7 @@
 # Tracman
 ###### v 0.6.0
 
-node.js application to display a map with user's location.
+node.js application to display a sharable map with user's location.
 
 ## Installation
 
@@ -25,15 +25,19 @@ $ npm run nodemon
 
 ## Contributing
 
-Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model).
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  
 
 ## Changelog
 
 #### v0.6.0
 
-* Added more login options
-* Replaced some callbacks with promises
+* [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60) Added more login options
+* [#50](https://github.com/Tracman-org/Server/issues/50) Replaced some callbacks with promises
 * Minified static files
+* [#51](https://github.com/Tracman-org/Server/issues/51), [#52](https://github.com/Tracman-org/Server/issues/52) Added settings validations
+* [#54](https://github.com/Tracman-org/Server/issues/54), [#55](https://github.com/Tracman-org/Server/issues/55) Made map work better
+* [#61](https://github.com/Tracman-org/Server/issues/61) New MongoDB security
+* [#62](https://github.com/Tracman-org/Server/issues/62) Fixed error handling
 
 #### v0.5.1
 

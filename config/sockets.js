@@ -29,7 +29,7 @@ module.exports = {
 	
 	init: (io)=>{
 		io.on('connection', (socket)=>{
-			// console.log(`${socket.id} connected.`);
+			//console.log(`${socket.id} connected.`);
 			
 			// Set a few variables
 			socket.ip = socket.client.request.headers['x-real-ip'];
@@ -61,7 +61,7 @@ module.exports = {
 			
 			// Set location
 			socket.on('set', (loc)=>{
-				// console.log(`${socket.id} set location for ${loc.usr}`);
+				//console.log(`${socket.id} set location for ${loc.usr}`);
 				loc.time = Date.now();
 				
 				// Check for user and sk32 token
