@@ -13,7 +13,7 @@ router.get('/', mw.ensureAuth, (req,res)=>{
 
 // Show map
 router.get('/:slug?', (req,res,next)=>{
-
+	
 	User.findOne({slug:req.params.slug})
 	.then( (mapuser)=>{
 		if (!mapuser){ next(); } //404

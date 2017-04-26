@@ -44,18 +44,18 @@ router.route('/')
 					showStreetview: (req.body.showStreet)?true:false
 				};
 				
-				// Save user and send response
-				req.user.save()
-				.then( ()=>{
-					req.flash('success', 'Settings updated. ');
-					res.redirect('/settings');
-				})
-				.catch( (err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/settings');
-				});
+			// Save user and send response
+			req.user.save()
+			.then( ()=>{
+				req.flash('success', 'Settings updated. ');
+				res.redirect('/settings');
+			})
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/settings');
+			});
 			
-			}
+		}
 		
 		// Validations
 		if (req.body.slug==='') {

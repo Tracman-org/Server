@@ -75,34 +75,28 @@ module.exports = {
 					
 					// Get loc.usr
 					User.findById(loc.usr)
+					.where('sk32').equals(loc.tok)
 					.then( (user)=>{
 						if (!user){
-							console.error("❌", new Error(`Recieved an update from ${socket.ip} for ${loc.usr}, but no such user was found in the db!`).message);
+							console.error("❌", new Error(`Recieved an update from ${socket.ip} for ${loc.usr} with tok of ${loc.tok}, but no such user was found in the db!`).message);
 						}
 						else {
 							
-							// Confirm sk32 token
-							if (loc.tok!=user.sk32) {
-								console.error("❌", new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} with tok of ${loc.tok}, but that user's sk32 is ${user.sk32}!`).message);
-							}
-							else {
+							// Broadcast location
+							io.to(loc.usr).emit('get', loc);
+							//console.log(`Broadcasting ${loc.lat}, ${loc.lon} to ${loc.usr}`);
+							
+							// Save in db as last seen
+							user.last = {
+								lat: parseFloat(loc.lat),
+								lon: parseFloat(loc.lon),
+								dir: parseFloat(loc.dir||0),
+								spd: parseFloat(loc.spd||0),
+								time: loc.time
+							};
+							user.save()
+							.catch( (err)=>{ console.error("❌", err.stack); });
 								
-								// Broadcast location
-								io.to(loc.usr).emit('get', loc);
-								//console.log(`Broadcasting ${loc.lat}, ${loc.lon} to ${loc.usr}`);
-								
-								// Save in db as last seen
-								user.last = {
-									lat: parseFloat(loc.lat),
-									lon: parseFloat(loc.lon),
-									dir: parseFloat(loc.dir||0),
-									spd: parseFloat(loc.spd||0),
-									time: loc.time
-								};
-								user.save()
-								.catch( (err)=>{ console.error("❌", err.stack); });
-								
-							}
 						}
 					})
 					.catch( (err)=>{ console.error("❌", err.stack); });
