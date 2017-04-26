@@ -47,17 +47,20 @@ const userSchema = new mongoose.Schema({
 /* User methods */ {
 	
 	//TODO: Return promises instead of taking callbacks
+	// See https://gist.github.com/7h1b0/5154fda207e68ad1cefc#file-random-js
+	// For an example
 	
 	// Create email confirmation token
 	userSchema.methods.createEmailToken = function(next){
 		var user = this;
 		
-		crypto.randomBytes(16)
-		.then( (buf)=>{
-			user.emailToken = buf.toString('hex');
-			user.save();
-		})
-		.catch( (err)=>{ next(err,null); });
+		crypto.randomBytes(16, (err,buf)=>{
+			if (err){ next(err,null); }
+			if (buf){ 
+				user.emailToken = buf.toString('hex');
+				user.save();
+			}
+		});
 		
 	};
 	

@@ -3,7 +3,7 @@
 
 {% block main %}
 <section class='container'>
-	<h2>❌️ {% if code %}{{code}} {% endif %}{% if message %}{{message}}{% endif %}</h2>
+	{% if message %}<h2>❌️ {{message}}</h2>{% endif %}
 	{% if stack %}<p>{{stack}}</p>{% else %}
 	{% if code == '404' %}<p>This page does not exist.  Maybe you followed a dead link here.  </p>
 	{% else %}<p>Would you please <a href="https://github.com/Tracman-org/Server/issues/new">report this error</a>? </p>{% endif %}
