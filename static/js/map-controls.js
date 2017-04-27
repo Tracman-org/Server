@@ -48,7 +48,7 @@ $(function(){
 			if (!wpid) {
 				if (!navigator.geolocation) { alert('Unable to track location. '); }
 				else {
-					$('#track-loc').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop').prop('title',"Click here to stop tracking your location. ");
+					$('#track-loc').html('<i class="fa fa-crosshairs fa-spin"></i>Stop').prop('title',"Click here to stop tracking your location. ");
 					wpid = navigator.geolocation.watchPosition(
 					
 						// Success callback
@@ -80,7 +80,7 @@ $(function(){
 			
 			// Stop tracking
 			else {
-				$('#track-loc').html('<i class="fa fa-crosshairs"></i>&emsp;Track').prop('title',"Click here to track your location. ");
+				$('#track-loc').html('<i class="fa fa-crosshairs"></i>Track').prop('title',"Click here to track your location. ");
 				navigator.geolocation.clearWatch(wpid);
 				wpid = undefined;
 			}
