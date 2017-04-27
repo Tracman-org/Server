@@ -1,3 +1,4 @@
+![Logo](https://tracman.org/static/img/icon/by/72.png "The Tracman Logo")
 # Tracman
 ###### v 0.6.0
 
@@ -20,21 +21,25 @@ $ echo "module.exports = require('./my-config.js');" > config/env/env.js
 
 Then edit `config/env/my-config.js` to match your local environment.  
 
-## Running
+## Usage
+
+Run Tracman with npm: 
 
 ```sh
 $ npm run minify && npm start
 ```
 
-or, using [nodemon](https://nodemon.io/):
+...or with [nodemon](https://nodemon.io/):
 
 ```sh
 $ npm run nodemon
 ```
 
+Nodemon will automatically minify files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
+
 ## Contributing
 
-Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.  
 
 ## Changelog
 
