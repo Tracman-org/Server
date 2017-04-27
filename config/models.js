@@ -51,8 +51,7 @@ const userSchema = new mongoose.Schema({
 	// For an example
 	
 	// Create email confirmation token
-	userSchema.methods.createEmailToken = function(next){
-		// next(err,hash);
+	userSchema.methods.createEmailToken = function(next){// next(err,hash)
 		console.log('user.createEmailToken() called');
 		var user = this;
 		
@@ -62,7 +61,7 @@ const userSchema = new mongoose.Schema({
 				//console.log(`Buffer ${buf.toString('hex')} created`);
 				user.emailToken = buf.toString('hex');
 				user.save();
-				next(null,user.emailToken);
+				return next(null,user.emailToken);
 			}
 		});
 		
@@ -96,13 +95,15 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			crypto.randomBytes(16)
-			.then( (buf)=>{
-				user.auth.passToken = buf.toString('hex');
-				user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-				user.save();
-			})
-			.catch( (err)=>{ return next(err,null); });
+			crypto.randomBytes(16, (err,buf)=>{
+				if (err){ return next(err,null); }
+				if (buf) {
+					user.auth.passToken = buf.toString('hex');
+					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
+					user.save();
+					return next(null,user.passToken);
+				}
+			});
 		}
 		
 	};
