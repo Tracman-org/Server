@@ -1,4 +1,4 @@
-![Logo](https://tracman.org/static/img/icon/by/72.png "The Tracman Logo")
+![Logo](https://tracman.org/static/img/icon/by/72.png "The Tracman Logo"){:style="float:left;}
 # Tracman
 ###### v 0.6.0
 
