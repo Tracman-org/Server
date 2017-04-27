@@ -115,7 +115,7 @@ module.exports = (app, passport) => {
 					user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
 					
 					// Generate unique slug
-					let slug = new Promise((resolve,reject) => {
+					const slug = new Promise((resolve,reject) => {
 						(function checkSlug(s,cb){
 							
 							User.findOne({slug:s})
@@ -150,7 +150,7 @@ module.exports = (app, passport) => {
 					});
 					
 					// Generate sk32
-					let sk32 = new Promise((resolve,reject) => {
+					const sk32 = new Promise((resolve,reject) => {
 						crypto.randomBytes(32)
 						.then( (buf)=>{
 							user.sk32 = buf.toString('hex');

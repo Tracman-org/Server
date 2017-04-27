@@ -30,8 +30,109 @@ router.route('/')
 	// Set new settings
 	.post( (req,res,next)=>{
 		
-		function setSettings(){
-			//console.log('setSettings() called');
+		// Validate email
+		const checkEmail = new Promise( (resolve,reject)=>{
+			
+			// Check validity
+			if (!validateEmail(req.body.email)) {
+				req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
+				resolve();
+			}
+			
+			// Check if unchanged
+			else if (req.user.email===req.body.email) {
+				resolve();
+			}
+			
+			// Check uniqueness
+			else {
+				User.findOne({ email: req.body.email })
+				.then( (existingUser)=>{
+					
+					// Not unique!
+					if (existingUser && existingUser.id!==req.user.id) {
+						//console.log("Email not unique!");
+						req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `);
+						resolve();
+					}
+					
+					// It's unique
+					else {
+						//console.log("Email is unique");
+						req.user.newEmail = req.body.email;
+				
+						// Create token
+						//console.log(`Creating email token...`);
+						req.user.createEmailToken((err,token)=>{
+							if (err){ reject(err); }
+							
+							// Send token to user by email
+							//console.log(`Mailing new email token to ${req.body.email}...`);
+							mail.send({
+								to: `"${req.user.name}" <${req.body.email}>`,
+								from: mail.from,
+								subject: 'Confirm your new email address for Tracman',
+								text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
+								html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
+							})
+							.then( ()=>{
+								req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `);
+								resolve();
+							})
+							.catch(reject);
+							
+						});
+						
+					}
+			
+				})
+				.catch(reject);
+			}
+			
+		});
+		
+		// Validate slug
+		const checkSlug = new Promise( (resolve,reject)=>{
+			
+			// Check existence
+			if (req.body.slug==='') {
+				req.flash('warning', `You must supply a slug.  `);
+				resolve();
+			}
+			
+			// Check if unchanged
+			else if (req.user.slug===slug(xss(req.body.slug))) {
+				resolve();
+			}
+				
+			// Check uniqueness
+			else {
+				
+				User.findOne({ slug: req.body.slug })
+				.then( (existingUser)=>{
+					
+					// Not unique!
+					if (existingUser && existingUser.id!==req.user.id) {
+						req.flash('warning', `That slug, <u>${req.body.slug}</u>, is already in use by another user! `);
+					}
+					
+					// It's unique
+					else {
+						req.user.slug = slug(xss(req.body.slug));
+					}
+			
+				})
+				.then(resolve)
+				.catch(reject);
+				
+			}
+			
+		});
+		
+		// Set settings when done
+		Promise.all([checkEmail, checkSlug])
+		.then( ()=>{
+			//console.log('Setting settings... ');
 				
 			// Set values
 			req.user.name = xss(req.body.name);
@@ -58,117 +159,11 @@ router.route('/')
 				res.redirect('/settings');
 			});
 			
-		}
-		
-		// Validations
-		if (req.body.slug==='') {
-			req.flash('warning', `You must supply a slug.  `);
+		})
+		.catch( (err)=>{
+			mw.throwErr(err,req);
 			res.redirect('/settings');
-		}
-		else if (!validateEmail(req.body.email)) {
-			req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
-			res.redirect('/settings');
-		}
-		
-		else {
-			
-			// Check if email changed
-			let checkEmailChanged = new Promise( (resolve,reject)=>{
-				
-				// Email changed
-				if (req.user.email!==req.body.email) {
-					//console.log(`Email changed to ${req.body.email}`);
-					
-					// Check uniqueness
-					User.findOne({ email: req.body.email })
-					.then( (existingUser)=>{
-						
-						// Not unique!
-						if (existingUser && existingUser.id!==req.user.id) {
-							//console.log("Email not unique!");
-							req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `);
-						}
-						
-						// It's unique
-						else {
-							//console.log("Email is unique");
-							req.user.newEmail = req.body.email;
-					
-							// Create token
-							//console.log(`Creating email token...`);
-							req.user.createEmailToken((err,token)=>{
-								if (err){ reject(err); }
-								
-								// Send token to user by email
-								//console.log(`Mailing new email token to ${req.body.email}...`);
-								mail.send({
-									to: `"${req.user.name}" <${req.body.email}>`,
-									from: mail.from,
-									subject: 'Confirm your new email address for Tracman',
-									text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
-									html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
-								})
-								.then( ()=>{
-									req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `);
-								})
-								.catch( (err)=>{
-									reject(err);
-								});
-								
-							});
-							
-						}
-				
-					})
-					.then(resolve)
-					.catch( (err)=>{ 
-						mw.throwErr(err,req);
-						res.redirect('/settings');
-					});
-					
-				} else { resolve(); }
-			});
-			
-			// Check if slug changed
-			let checkSlugChanged = new Promise( (resolve,reject)=>{
-				
-				// Slug changed
-				if (req.user.slug!==req.body.slug) {
-					
-					// Check uniqueness
-					User.findOne({ slug: req.body.slug })
-					.then( (existingUser)=>{
-						
-						// Not unique!
-						if (existingUser && existingUser.id!==req.user.id) {
-							req.flash('warning', `That slug, <u>${req.body.slug}</u>, is already in use by another user! `);
-						}
-						
-						// It's unique
-						else {
-							req.user.slug = slug(xss(req.body.slug));
-						}
-				
-					})
-					.then(resolve)
-					.catch( (err)=>{ 
-						mw.throwErr(err,req);
-						res.redirect('/settings');
-					});
-					
-				} else { resolve(); }
-				
-			});
-			
-			// Set settings when done
-			Promise.all([checkEmailChanged, checkSlugChanged])
-			.then(setSettings)
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			});
-			
-		}
+		});
 		
 	} )
 
