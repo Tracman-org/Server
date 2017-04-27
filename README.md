@@ -9,7 +9,16 @@ node.js application to display a sharable map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).
+You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
+
+A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
+
+```sh
+$ cp config/env/sample.js config/env/my-config.js
+$ echo "module.exports = require('./my-config.js');" > config/env/env.js
+```
+
+Then edit `config/env/my-config.js` to match your local environment.  
 
 ## Running
 

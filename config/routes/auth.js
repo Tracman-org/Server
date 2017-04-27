@@ -5,7 +5,7 @@ const
 	mail = require('../mail.js'),
 	User = require('../models.js').user,
 	crypto = require('crypto'),
-	env = require('../env.js');
+	env = require('../env/env.js');
 
 module.exports = (app, passport) => {
 

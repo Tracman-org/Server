@@ -1,7 +1,7 @@
 'use strict';
 
 const nodemailer = require('nodemailer'),
-	env = require('./env.js');
+	env = require('./env/env.js');
 
 let transporter = nodemailer.createTransport({
 	host: 'keithirwin.us',

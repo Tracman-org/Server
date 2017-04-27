@@ -6,7 +6,7 @@ const slug = require('slug'),
 	mw = require('../middleware.js'),
 	User = require('../models.js').user,
 	mail = require('../mail.js'),
-	env = require('../env.js'),
+	env = require('../env/env.js'),
 	router = require('express').Router();
 
 // Validate email addresses

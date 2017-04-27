@@ -1,6 +1,6 @@
 'use strict';
 
-const env = require('./env.js');
+const env = require('./env/env.js');
 
 module.exports = {
 

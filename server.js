@@ -11,7 +11,7 @@ const
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
 	flash = require('connect-flash-plus'),
-	env = require('./config/env.js'),
+	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
 	app = express(),
 	http = require('http').Server(app),
