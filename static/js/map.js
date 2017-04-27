@@ -23,7 +23,7 @@ function onConnect(socket,userid,mapuserid) {
 	console.log("🚹 Receiving updates for",mapuserid);
 
 	// Can set location too
-	if (mapuserid==userid) { 
+	if (mapuserid===userid) { 
 		socket.emit('can-set', userid );
 		console.log("🚹 Sending updates for",userid);
 	}
@@ -75,9 +75,10 @@ $(function() {
 
 // Google maps API callback
 window.gmapsCb = function() {
+	//console.log("gmapsCb() called");
+	
 	// Make sure everything's ready...
 	waitForElements([mapuser,disp,noHeader], function() {
-		//console.log("gmapsCb() called");
 		
 		// Create map
 		if (disp!=='1') {
@@ -145,8 +146,8 @@ window.gmapsCb = function() {
 			// Create altitude block
 			if (mapuser.settings.showAlt) {
 				//console.log("Creating altitude sign...");
-				var elevator = new google.maps.ElevationService;
-				const altitudeSign = document.createElement('div'),
+				const elevator = new google.maps.ElevationService,
+					altitudeSign = document.createElement('div'),
 					altitudeLabel = document.createElement('div'),
 					altitudeText = document.createElement('div'),
 					altitudeUnit = document.createElement('div');
@@ -175,29 +176,53 @@ window.gmapsCb = function() {
 		}
 		
 	});
+	
 };
 
-// Get location
+// Got location
 socket.on('get', function(loc) {
+	console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 	
+	// Parse location
 	loc = parseLoc(loc);
 	
-	// Update street view
-	if (disp!=='0' && mapuser.settings.showStreetview) {
-		$('.tim').text('location updated '+loc.time);
-		if (mapuser.settings.showSpeed) { $('.spd').text(loc.spd.toFixed()); }
+	// Update map
+	if (disp!=='1') {
+	
+		// Update time
+		$('#timestamp').text('location updated '+loc.time);
+		
+		// Show or hide map
+		toggleMaps(loc);
+		
+		// Update marker and map center
+		map.setCenter({ lat:loc.lat, lng:loc.lon });
+		marker.setPosition({ lat:loc.lat, lng:loc.lon });
+		
+		// Update speed
+		if (mapuser.settings.showSpeed) {
+			$('#spd').text( loc.spd.toFixed() );
+		}
+			
+		// Update altitude
 		if (mapuser.settings.showAlt) {
-			getAltitude({lat:loc.lat,lng:loc.lon}, elevator, function(alt) {
-				if (alt) { $('.alt').text((mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed()); }
+			getAltitude({
+				lat:loc.lat,
+				lng:loc.lon
+			}, elevator, function(alt) {
+				if (alt) {
+					$('#alt').text( (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed() );
+				}
 			});
 		}
-		toggleMaps(loc);
-		map.setCenter({lat:loc.lat,lng:loc.lon});
-		marker.setPosition({lat:loc.lat,lng:loc.lon});
+		
+	}
+
+	// Update street view
+	if (disp!=='0' && mapuser.settings.showStreetview) {
 		updateStreetView(loc,10);
 	}
 	
-	console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 });
 
 // Check altitude
