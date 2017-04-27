@@ -79,8 +79,8 @@ const
 			// Path for redirects
 			let nextPath = ( req.path.substring(0, req.path.indexOf('#')) || req.path );
 			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' ){
-				//console.log(`Setting redirect path to ${nextPath}#`);
 				req.session.next = nextPath+'#';
+				//console.log(`Set redirect path to ${nextPath}#`);
 			}
 			
 			// User account

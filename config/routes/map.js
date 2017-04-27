@@ -1,5 +1,4 @@
 'use strict';
-//TODO: Use promises
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),

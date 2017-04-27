@@ -1,8 +1,7 @@
 'use strict';
 
 // Imports
-const mw = require('./middleware.js'),
-	User = require('./models.js').user;
+const User = require('./models.js').user;
 
 // Check for tracking clients
 function checkForUsers(io, user) {
@@ -10,10 +9,14 @@ function checkForUsers(io, user) {
 	
 	// Checks if any sockets are getting updates for this user
 	//TODO: Use Object.values() after upgrading to node v7
-	if (Object.keys(io.sockets.connected).map( (id)=>{
-		return io.sockets.connected[id];
+	/* if (Object.values(io.sockets.connected).some( (socket)=>{
+	* 	return socket.gets==user;
+	* })) {
+	*/
+	if (Object.keys(io.sockets.connected).map( (key)=>{
+		return io.sockets.connected[key];
 	}).some( (socket)=>{
-		return socket.gets==user;
+		return socket.gets===user;
 	})) {
 		//console.log(`Activating updates for ${user}.`);
 		io.to(user).emit('activate','true');
@@ -32,8 +35,8 @@ module.exports = {
 			//console.log(`${socket.id} connected.`);
 			
 			// Set a few variables
-			socket.ip = socket.client.request.headers['x-real-ip'];
-			socket.ua = socket.client.request.headers['user-agent'];
+			//socket.ip = socket.client.request.headers['x-real-ip'];
+			//socket.ua = socket.client.request.headers['user-agent'];
 			
 			/* Log */
 			//socket.on('log', (text)=>{

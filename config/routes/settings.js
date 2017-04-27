@@ -3,6 +3,7 @@
 const slug = require('slug'),
 	xss = require('xss'),
 	mellt = require('mellt'),
+	moment = require('moment'),
 	mw = require('../middleware.js'),
 	User = require('../models.js').user,
 	mail = require('../mail.js'),
@@ -34,7 +35,6 @@ router.route('/')
 				
 			// Set values
 			req.user.name = xss(req.body.name);
-			req.user.slug = slug(xss(req.body.slug));
 			req.user.settings = {
 					units: req.body.units,
 					defaultMap: req.body.map,
@@ -72,41 +72,101 @@ router.route('/')
 		
 		else {
 			
-			// Email changed
-			if (req.user.email!==req.body.email) {
-				//console.log(`Email changed to ${req.body.email}`);
-				req.user.newEmail = req.body.email;
+			// Check if email changed
+			let checkEmailChanged = new Promise( (resolve,reject)=>{
 				
-				// Create token
-				//console.log(`Creating email token...`);
-				req.user.createEmailToken((err,token)=>{
-					if (err){
-						mw.throwErr(err,req);
-						res.redirect(req.session.next||'/settings');
-					}
+				// Email changed
+				if (req.user.email!==req.body.email) {
+					//console.log(`Email changed to ${req.body.email}`);
 					
-					// Send token to user by email
-					//console.log(`Mailing new email token to ${req.body.email}...`);
-					mail.send({
-						to: `"${req.user.name}" <${req.body.email}>`,
-						from: mail.from,
-						subject: 'Confirm your new email address for Tracman',
-						text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
-						html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
+					// Check uniqueness
+					User.findOne({ email: req.body.email })
+					.then( (existingUser)=>{
+						
+						// Not unique!
+						if (existingUser && existingUser.id!==req.user.id) {
+							//console.log("Email not unique!");
+							req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `);
+						}
+						
+						// It's unique
+						else {
+							//console.log("Email is unique");
+							req.user.newEmail = req.body.email;
+					
+							// Create token
+							//console.log(`Creating email token...`);
+							req.user.createEmailToken((err,token)=>{
+								if (err){ reject(err); }
+								
+								// Send token to user by email
+								//console.log(`Mailing new email token to ${req.body.email}...`);
+								mail.send({
+									to: `"${req.user.name}" <${req.body.email}>`,
+									from: mail.from,
+									subject: 'Confirm your new email address for Tracman',
+									text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
+									html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
+								})
+								.then( ()=>{
+									req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `);
+								})
+								.catch( (err)=>{
+									reject(err);
+								});
+								
+							});
+							
+						}
+				
 					})
-					.then( ()=>{
-						req.flash('warning',`An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `);
-						setSettings();
-					})
-					.catch( (err)=>{
+					.then(resolve)
+					.catch( (err)=>{ 
 						mw.throwErr(err,req);
+						res.redirect('/settings');
 					});
 					
-				});
-			}
+				} else { resolve(); }
+			});
 			
-			// Email not changed
-			else { setSettings(); }
+			// Check if slug changed
+			let checkSlugChanged = new Promise( (resolve,reject)=>{
+				
+				// Slug changed
+				if (req.user.slug!==req.body.slug) {
+					
+					// Check uniqueness
+					User.findOne({ slug: req.body.slug })
+					.then( (existingUser)=>{
+						
+						// Not unique!
+						if (existingUser && existingUser.id!==req.user.id) {
+							req.flash('warning', `That slug, <u>${req.body.slug}</u>, is already in use by another user! `);
+						}
+						
+						// It's unique
+						else {
+							req.user.slug = slug(xss(req.body.slug));
+						}
+				
+					})
+					.then(resolve)
+					.catch( (err)=>{ 
+						mw.throwErr(err,req);
+						res.redirect('/settings');
+					});
+					
+				} else { resolve(); }
+				
+			});
+			
+			// Set settings when done
+			Promise.all([checkEmailChanged, checkSlugChanged])
+			.then(setSettings)
+			.catch( (err)=>{
+				mw.throwErr(err,req);
+				res.redirect('/settings');
+			});
 			
 		}
 		
@@ -114,8 +174,6 @@ router.route('/')
 
 	// Delete user account
 	.delete( (req,res,next)=>{
-		
-		//TODO: Reenter password?
 		
 		User.findByIdAndRemove(req.user)
 			.then( ()=>{
@@ -174,28 +232,33 @@ router.route('/password')
 	.get( (req,res,next)=>{
 
 		// Create token for password change
-		req.user.createPassToken( (err,token)=>{
+		req.user.createPassToken( (err,token,expires)=>{
 			if (err){
 				mw.throwErr(err,req);
-				res.redirect(req.session.next||'/settings');
+				res.redirect((req.user)?'/settings':'/login');
 			}
+			
+			// Figure out expiration time
+			let expirationTimeString = (req.query.tz)?
+				moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0]):
+				moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0])+" UTC";
 			
 			// Confirm password change request by email.
 			mail.send({
 				to: mail.to(req.user),
 				from: mail.from,
 				subject: 'Request to change your Tracman password',
-				text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire in 1 hour. `),
-				html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire in 1 hour. </p>`)
+				text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire at ${expirationTimeString}. `),
+				html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire at ${expirationTimeString}. </p>`)
 			})
 			.then( ()=>{
 				// Alert user to check email.
-				req.flash('success',`An email has been sent to <u>${req.user.email}</u>.  Check your inbox to complete your password change. `);
-				res.redirect('/login#login');
+				req.flash('success',`An link has been sent to <u>${req.user.email}</u>.  Click on the link to complete your password change.  This link will expire in one hour (${expirationTimeString}). `);
+				res.redirect((req.user)?'/settings':'/login');
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);
-				res.redirect('/login#login');
+				res.redirect((req.user)?'/settings':'/login');
 			});
 			
 		});
