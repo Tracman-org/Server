@@ -52,13 +52,17 @@ const userSchema = new mongoose.Schema({
 	
 	// Create email confirmation token
 	userSchema.methods.createEmailToken = function(next){
+		// next(err,hash);
+		console.log('user.createEmailToken() called');
 		var user = this;
 		
 		crypto.randomBytes(16, (err,buf)=>{
 			if (err){ next(err,null); }
-			if (buf){ 
+			if (buf){
+				//console.log(`Buffer ${buf.toString('hex')} created`);
 				user.emailToken = buf.toString('hex');
 				user.save();
+				next(null,user.emailToken);
 			}
 		});
 		
@@ -66,11 +70,12 @@ const userSchema = new mongoose.Schema({
 	
 	// Generate hash for new password
 	userSchema.methods.generateHash = function(password,next){
+		// next(err,hash);
 		bcrypt.genSalt(8)
 		.then( (salt)=>{
 			bcrypt.hash(password, salt, null, next);
 		})
-		.catch( (err)=>{ return next(err); });
+		.catch( (err)=>{ return next(err,null); });
 	};
 	
 	// Create password reset token

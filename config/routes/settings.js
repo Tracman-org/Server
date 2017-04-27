@@ -30,6 +30,7 @@ router.route('/')
 	.post( (req,res,next)=>{
 		
 		function setSettings(){
+			//console.log('setSettings() called');
 				
 			// Set values
 			req.user.name = xss(req.body.name);
@@ -43,10 +44,12 @@ router.route('/')
 					showAlt: (req.body.showAlt)?true:false,
 					showStreetview: (req.body.showStreet)?true:false
 				};
-				
+			
 			// Save user and send response
+			//console.log(`Saving new settings for user ${req.user.name}...`);
 			req.user.save()
 			.then( ()=>{
+				//console.log(`DONE!  Redirecting user...`);
 				req.flash('success', 'Settings updated. ');
 				res.redirect('/settings');
 			})
@@ -71,9 +74,11 @@ router.route('/')
 			
 			// Email changed
 			if (req.user.email!==req.body.email) {
+				//console.log(`Email changed to ${req.body.email}`);
 				req.user.newEmail = req.body.email;
 				
 				// Create token
+				//console.log(`Creating email token...`);
 				req.user.createEmailToken((err,token)=>{
 					if (err){
 						mw.throwErr(err,req);
@@ -81,6 +86,7 @@ router.route('/')
 					}
 					
 					// Send token to user by email
+					//console.log(`Mailing new email token to ${req.body.email}...`);
 					mail.send({
 						to: `"${req.user.name}" <${req.body.email}>`,
 						from: mail.from,
