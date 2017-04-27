@@ -1,4 +1,4 @@
-![Logo](https://tracman.org/static/img/icon/by/72.png "The Tracman Logo"){:align="left"}
+<img align="left" src="https://tracman.org/static/img/icon/by/72.png" alt="[]" title="The Tracman Logo">
 # Tracman
 ###### v 0.6.0
 
