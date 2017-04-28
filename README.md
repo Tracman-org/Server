@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.0
+###### v 0.6.1
 
 node.js application to display a sharable map with user's location.
 
@@ -41,6 +41,8 @@ Nodemon will automatically minify files and restart the app when you make change
 Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.  
 
 ## Changelog
+
+#### v0.6.1
 
 #### v0.6.0
 
