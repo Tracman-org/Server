@@ -1,7 +1,8 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.0
+###### v 0.6.1
 
 node.js application to display a sharable map with user's location.
+
 
 ## Installation
 
@@ -15,10 +16,11 @@ A good method is to simply copy the sample configuration and point `config/env/e
 
 ```sh
 $ cp config/env/sample.js config/env/my-config.js
-$ echo "module.exports = require('./my-config.js');" > config/env/env.js
+$ printf "'use strict';\n\nmodule.exports = require('./my-config.js');" > config/env/env.js
 ```
 
 Then edit `config/env/my-config.js` to match your local environment.  
+
 
 ## Usage
 
@@ -36,11 +38,20 @@ $ npm run nodemon
 
 Nodemon will automatically minify files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
 
+
 ## Contributing
 
 Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.  
 
+
 ## Changelog
+
+[view full changelog](CHANGELOG.md)
+
+#### v0.6.1
+
+* [#77](https://github.com/Tracman-org/Server/issues/77) Fixed 500 after password change, swapped `bcrypt` for `bcrypt-nodejs`
+* Removed extraneous packages
 
 #### v0.6.0
 
@@ -52,47 +63,10 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * [#61](https://github.com/Tracman-org/Server/issues/61) New MongoDB security
 * [#62](https://github.com/Tracman-org/Server/issues/62) Fixed error handling
 
-#### v0.5.1
-
-* Fixed broken controls
-
-#### v0.5.0
-
-* Updated libraries
-* Fixed recognition of attached clients [#34](https://github.com/Tracman-org/Server/issues/21)
-* Moved socket.io code to own file.
-* Many minor fixes
-
-#### v0.4.3
-
-* Fixed memory store [#21](https://github.com/Tracman-org/Server/issues/21)
-
-#### v0.4.2
-
-* Fixed Streetview covering buttons
-* Fixed error when viewing map of nonexistant user
-
-#### v0.4.1
-
-* Users can view/change email address
-* Added linked accounts to admin
-
-#### v0.4.0
-
-* Opened registration
-* Replaced 'Imperial' with 'Standard'
-* Bug fixes
-
-#### v0.3.0
-
-* Unified map and dashboard UI
-* Security updates
-* New admin UI
-
 
 ## License
 
-###### see [LICENSE.md](https://github.com/Tracman-org/Server/blob/master/LICENSE.md)
+[view full license](LICENSE.md)
 
 Tracman: GPS tracking service in node.js
 Copyright © 2017 [Keith Irwin](https://keithirwin.us/)
