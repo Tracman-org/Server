@@ -301,31 +301,24 @@ router.route('/password/:token')
 		
 		else {
 			
-			// Delete token
-			res.locals.passwordUser.auth.passToken = undefined;
-			res.locals.passwordUser.auth.passTokenExpires = undefined;
-			
-			// Create hash
-			res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
+			// Create hashed password and save to db
+			res.locals.passwordUser.generateHashedPassword( req.body.password, (err)=>{
 				if (err){
 					mw.throwErr(err,req);
 					res.redirect(`/password/${req.params.token}`);
 				}
-				else {
-					
-					// Save new password to db
-					res.locals.passwordUser.auth.password = hash;
-					res.locals.passwordUser.save()
-					.then( ()=>{
-						req.flash('success', 'Password set.  You can use it to log in now. ');
-						res.redirect('/login#login');
-					})
-					.catch( (err)=>{
-						mw.throwErr(err,req);
-						res.redirect('/login#signup');
-					});
-					
+				
+				// User changed password
+				else if (req.user) {
+					req.flash('success', 'Your password has been changed. ');
+					res.redirect('/settings');
 				}
+				// New user created password
+				else {
+					req.flash('success', 'Password set.  You can use it to log in now. ');
+					res.redirect('/login#login');
+				}
+				
 			} );
 			
 		}

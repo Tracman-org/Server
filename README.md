@@ -44,6 +44,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 #### v0.6.1
 
+* [#77](https://github.com/Tracman-org/Server/issues/77) Fixed 500 after password change, swapped `bcrypt` for `bcrypt-nodejs`
+* Removed extraneous packages
+
 #### v0.6.0
 
 * [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60) Added more login options
