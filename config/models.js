@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Reuse old token, resetting clock
 		if ( user.auth.passTokenExpires >= Date.now() ){
-			console.log(`Reusing old password token...`);
+			//console.log(`Reusing old password token...`);
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save()
 			.then( ()=>{
@@ -92,7 +92,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			console.log(`Creating new password token...`);
+			//console.log(`Creating new password token...`);
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ return next(err,null,null); }
 				if (buf) {
