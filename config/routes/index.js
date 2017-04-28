@@ -14,7 +14,7 @@ module.exports = router
 	})
 
 	// Help
-	.get('/help', mw.ensureAuth, (req,res)=>{
+	.get('/help', (req,res)=>{
 		res.render('help');
 	})
 	
