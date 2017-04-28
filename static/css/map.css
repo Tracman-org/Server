@@ -61,14 +61,55 @@ main {
 	padding: 2%;
 	border-radius: 3px;
 	margin: 3%;
-} #spd-sign {
+}
+#spd-sign {
 	color: #000;
 	background-color: #FFF;
 	border: 2px solid #000;
-} #alt-sign {
+}
+#alt-sign {
 	color: #FFF;
 	background-color: #009800;
 	border: 2px solid #FFF;
+}
+@media (max-width:300px) {
+	#spd, #alt {
+		height: 20px;
+		font-size: 18px;
+	}
+	#alt-unit, #spd-unit {
+		font-size: 8px;
+	}
+	#alt-label, #spd-label {
+		font-size: 9px;
+		height: 9px;
+	}
+}
+@media (min-width:300px) and (max-width:350px) {
+	#spd, #alt {
+		height: 22px;
+		font-size: 20px;
+	}
+	#alt-unit, #spd-unit {
+		font-size: 9px;
+	}
+	#alt-label, #spd-label {
+		font-size: 11px;
+		height: 11px;
+	}
+}
+@media (min-width:350px) and (max-width:400px) {
+	#spd, #alt {
+		height: 30px;
+		font-size: 28px;
+	}
+	#alt-unit, #spd-unit {
+		font-size: 10px;
+	}
+	#alt-label, #spd-label {
+		font-size: 14px;
+		height: 14px;
+	}
 }
 @media (min-width:400px) {
 	#spd, #alt {
@@ -82,43 +123,8 @@ main {
 		font-size: 18px;
 		height: 18px;
 	}
-} @media (min-width:350px) and (max-width:400px) {
-	#spd, #alt {
-		height: 30px;
-		font-size: 28px;
-	}
-	#alt-unit, #spd-unit {
-		font-size: 10px;
-	}
-	#alt-label, #spd-label {
-		font-size: 14px;
-		height: 14px;
-	}
-} @media (min-width:300px) and (max-width:350px) {
-	#spd, #alt {
-		height: 22px;
-		font-size: 20px;
-	}
-	#alt-unit, #spd-unit {
-		font-size: 9px;
-	}
-	#alt-label, #spd-label {
-		font-size: 11px;
-		height: 11px;
-	}
-} @media (min-width:0px) and (max-width:300px) {
-	#spd, #alt {
-		height: 20px;
-		font-size: 18px;
-	}
-	#alt-unit, #spd-unit {
-		font-size: 8px;
-	}
-	#alt-label, #spd-label {
-		font-size: 9px;
-		height: 9px;
-	}
 }
+
 
 /* Control buttons */
 #controls {
@@ -127,16 +133,34 @@ main {
 	bottom: 50px;
 	display: flex;
 	justify-content: space-around;
-} #controls .btn {
+}
+#controls .btn {
 	z-index: 50;
 	background: #222;
 	height: 10vh;
 	padding: 2vh 0;
-} #controls .btn:hover {
+}
+#controls .btn .fa {
+	margin: 0 2vw;
+}
+#controls .btn:hover {
 	background: #333;
 }
 #controls .btn.set, #controls .btn.clear {
 	width: 30vw;
-} #controls .btn.track {
+}
+#controls .btn.track {
 	width: 35vw;
+}
+@media (max-width:250px) {
+	#controls .btn { font-size:.8em; }
+}
+@media (min-width:250px) and (max-width:350px) {
+	#controls .btn { font-size:1em; }
+}
+@media (min-width:350px) and (max-width:450px) {
+	#controls .btn { font-size:1.15em; }
+}
+@media (min-width:450px) {
+	#controls .btn { font-size:1.3em; }
 }

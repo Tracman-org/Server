@@ -2,8 +2,8 @@
 node_modules
 
 # Secret stuff
-config/env*
-!config/env-sample.js
+config/env/*
+!config/env/sample.js
 
 # Minified static files (can be built with `npm run minify`)
 static/**/*.min.*

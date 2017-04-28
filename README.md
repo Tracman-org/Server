@@ -1,7 +1,7 @@
-# Tracman
+# <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
 ###### v 0.6.0
 
-node.js application to display a map with user's location.
+node.js application to display a sharable map with user's location.
 
 ## Installation
 
@@ -9,31 +9,48 @@ node.js application to display a map with user's location.
 $ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
 ```
 
-You will need to set up a configuration file at `config/env.js`.  Use `config/env-sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).
+You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
 
-## Running
+A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
+
+```sh
+$ cp config/env/sample.js config/env/my-config.js
+$ echo "module.exports = require('./my-config.js');" > config/env/env.js
+```
+
+Then edit `config/env/my-config.js` to match your local environment.  
+
+## Usage
+
+Run Tracman with npm: 
 
 ```sh
 $ npm run minify && npm start
 ```
 
-or, using [nodemon](https://nodemon.io/):
+...or with [nodemon](https://nodemon.io/):
 
 ```sh
 $ npm run nodemon
 ```
 
+Nodemon will automatically minify files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
+
 ## Contributing
 
-Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model).
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.  
 
 ## Changelog
 
 #### v0.6.0
 
-* Added more login options
-* Replaced some callbacks with promises
+* [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60) Added more login options
+* [#50](https://github.com/Tracman-org/Server/issues/50) Replaced some callbacks with promises
 * Minified static files
+* [#51](https://github.com/Tracman-org/Server/issues/51), [#52](https://github.com/Tracman-org/Server/issues/52) Added settings validations
+* [#54](https://github.com/Tracman-org/Server/issues/54), [#55](https://github.com/Tracman-org/Server/issues/55) Made map work better
+* [#61](https://github.com/Tracman-org/Server/issues/61) New MongoDB security
+* [#62](https://github.com/Tracman-org/Server/issues/62) Fixed error handling
 
 #### v0.5.1
 

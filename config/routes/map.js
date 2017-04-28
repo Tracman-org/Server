@@ -1,9 +1,8 @@
 'use strict';
-//TODO: Use promises
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
-  env = require('../env.js'),
+  env = require('../env/env.js'),
   User = require('../models.js').user;
 
 // Redirect to real slug

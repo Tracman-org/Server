@@ -47,56 +47,78 @@ const userSchema = new mongoose.Schema({
 /* User methods */ {
 	
 	//TODO: Return promises instead of taking callbacks
+	// See https://gist.github.com/7h1b0/5154fda207e68ad1cefc#file-random-js
+	// For an example
 	
 	// Create email confirmation token
-	userSchema.methods.createEmailToken = function(next){
+	userSchema.methods.createEmailToken = function(next){ // next(err,token)
+		//console.log('user.createEmailToken() called');
 		var user = this;
 		
-		crypto.randomBytes(16)
-		.then( (buf)=>{
-			user.emailToken = buf.toString('hex');
-			user.save();
-		})
-		.catch( (err)=>{ next(err,null); });
+		crypto.randomBytes(16, (err,buf)=>{
+			if (err){ next(err,null); }
+			if (buf){
+				//console.log(`Buffer ${buf.toString('hex')} created`);
+				user.emailToken = buf.toString('hex');
+				user.save()
+				.then( ()=>{
+					return next(null,user.emailToken);
+				})
+				.catch( (err)=>{
+					return next(err,null);
+				});
+				
+			}
+		});
 		
 	};
-	
-	// Generate hash for new password
-	userSchema.methods.generateHash = function(password,next){
-		bcrypt.genSalt(8)
-		.then( (salt)=>{
-			bcrypt.hash(password, salt, null, next);
-		})
-		.catch( (err)=>{ return next(err); });
-	};
-	
+
 	// Create password reset token
-	userSchema.methods.createPassToken = function(next){
+	userSchema.methods.createPassToken = function(next){ // next(err,token,expires)
 		var user = this;
 		
 		// Reuse old token, resetting clock
-		if ( user.auth.passTokenExpires <= Date.now() ){
+		if ( user.auth.passTokenExpires >= Date.now() ){
+			console.log(`Reusing old password token...`);
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save()
 			.then( ()=>{
-				return next(null,user.auth.passToken);
+				return next(null,user.auth.passToken,user.auth.passTokenExpires);
 			})
 			.catch( (err)=>{
-				return next(err,user.auth.passToken);
+				return next(err,null,null);
 			});
 		}
 		
 		// Create new token
 		else {
-			crypto.randomBytes(16)
-			.then( (buf)=>{
-				user.auth.passToken = buf.toString('hex');
-				user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-				user.save();
-			})
-			.catch( (err)=>{ return next(err,null); });
+			console.log(`Creating new password token...`);
+			crypto.randomBytes(16, (err,buf)=>{
+				if (err){ return next(err,null,null); }
+				if (buf) {
+					user.auth.passToken = buf.toString('hex');
+					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
+					user.save()
+					.then( ()=>{
+						return next(null,user.auth.passToken,user.auth.passTokenExpires);
+					})
+					.catch( (err)=>{
+						return next(err,null,null);
+					});
+				}
+			});
 		}
 		
+	};
+	
+	// Generate hash for new password
+	userSchema.methods.generateHash = function(password,next){
+		// next(err,hash);
+		bcrypt.genSalt(8)
+		.then( (salt)=>{
+			bcrypt.hash(password, salt, null, next);
+		})
+		.catch( (err)=>{ return next(err,null); });
 	};
 	
 	// Check for valid password

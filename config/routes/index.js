@@ -14,7 +14,7 @@ module.exports = router
 	})
 
 	// Help
-	.get('/help', mw.ensureAuth, (req,res)=>{
+	.get('/help', (req,res)=>{
 		res.render('help');
 	})
 	
@@ -40,7 +40,7 @@ module.exports = router
 	})
 	
 	// Endpoint to validate forms
-	.get('/validate', (req,res)=>{
+	.get('/validate', (req,res,next)=>{
 		
 		// Validate unique slug
 		if (req.query.slug) {
@@ -51,7 +51,10 @@ module.exports = router
 				}
 				else { res.sendStatus(200); }
 			})
-			.catch( (err)=>{ mw.throwErr(err,req); });
+			.catch( (err)=>{
+				console.error(err);
+				res.sendStatus(500);
+			});
 		}
 		
 		// Validate unique email
@@ -63,7 +66,10 @@ module.exports = router
 				}
 				else { res.sendStatus(200); }
 			})
-			.catch( (err)=>{ mw.throwErr(err,req); });
+			.catch( (err)=>{
+				console.error(err);
+				res.sendStatus(500);
+			});
 		}
 		
 		// Create slug
@@ -71,9 +77,13 @@ module.exports = router
 			res.send(slug(xss(req.query.slugify)));
 		}
 		
+		// Sanitize for XSS
 		else if (req.query.xss) {
 			res.send(xss(req.query.xss));
 		}
+		
+		// 404
+		else { next(); }
 		
 	})
 	

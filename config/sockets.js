@@ -1,8 +1,7 @@
 'use strict';
 
 // Imports
-const mw = require('./middleware.js'),
-	User = require('./models.js').user;
+const User = require('./models.js').user;
 
 // Check for tracking clients
 function checkForUsers(io, user) {
@@ -10,10 +9,14 @@ function checkForUsers(io, user) {
 	
 	// Checks if any sockets are getting updates for this user
 	//TODO: Use Object.values() after upgrading to node v7
-	if (Object.keys(io.sockets.connected).map( (id)=>{
-		return io.sockets.connected[id];
+	/* if (Object.values(io.sockets.connected).some( (socket)=>{
+	* 	return socket.gets==user;
+	* })) {
+	*/
+	if (Object.keys(io.sockets.connected).map( (key)=>{
+		return io.sockets.connected[key];
 	}).some( (socket)=>{
-		return socket.gets==user;
+		return socket.gets===user;
 	})) {
 		//console.log(`Activating updates for ${user}.`);
 		io.to(user).emit('activate','true');
@@ -29,11 +32,11 @@ module.exports = {
 	
 	init: (io)=>{
 		io.on('connection', (socket)=>{
-			// console.log(`${socket.id} connected.`);
+			//console.log(`${socket.id} connected.`);
 			
 			// Set a few variables
-			socket.ip = socket.client.request.headers['x-real-ip'];
-			socket.ua = socket.client.request.headers['user-agent'];
+			//socket.ip = socket.client.request.headers['x-real-ip'];
+			//socket.ua = socket.client.request.headers['user-agent'];
 			
 			/* Log */
 			//socket.on('log', (text)=>{
@@ -61,7 +64,7 @@ module.exports = {
 			
 			// Set location
 			socket.on('set', (loc)=>{
-				// console.log(`${socket.id} set location for ${loc.usr}`);
+				//console.log(`${socket.id} set location for ${loc.usr}`);
 				loc.time = Date.now();
 				
 				// Check for user and sk32 token

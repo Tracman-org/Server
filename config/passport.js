@@ -8,7 +8,7 @@ const
 	GoogleTokenStrategy = require('passport-google-id-token'),
 	FacebookTokenStrategy = require('passport-facebook-token'),
 	TwitterTokenStrategy = require('passport-twitter-token'),
-	env = require('./env.js'),
+	env = require('./env/env.js'),
 	mw = require('./middleware.js'),
 	User = require('./models.js').user;
 	
