@@ -1,0 +1,26 @@
+{% extends 'templates/base.html' %}
+
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+{% endblock %}
+
+{% block main %}
+<section class='container'>
+
+	<h1>Reset password</h1>
+	<p>Enter your email below to recieve a link to reset your password.  </p>
+	
+	<form method="post" role="form">
+		
+		<div class='group'>
+			<label for="email">Email:</label>
+			<input name="email" type="email">
+		</div>
+		
+		<input class='main btn' type="submit" value="Go">
+		
+	</form>
+
+</section>
+{% endblock %}

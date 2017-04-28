@@ -1,437 +1,93 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{super()}} | {{mapuser.name}}{% endblock %}
+{% block title %}{{super()}}{% if mapuser.name %} | {{mapuser.name}}{% endif %}{% endblock %}
 
 {% block head %}
 	{{super()}}
-	<link href="/static/css/map.css" rel="stylesheet">
-	<style>
-		.wrap { top:{% if not noHeader %}58{% else %}0{% endif %}px;}
+	<link href="/static/css/.map.min.css" rel="stylesheet">
+	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
+		{% if noHeader!='0' %} main { top:0; } {% endif %}
 		
 		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
 		/* show both */
 			@media (orientation: landscape) {
 					#map, #pano {
-						display:inline-block;
-						width:50%;
-						height:99%;
-					}2
+						display: inline-block;
+						width: 50%;
+						height: 100%;
+					}
 					#pano { float:right; }
 				}
 			@media (orientation: portrait) {
 				#map, #pano {
-					width:100%;
-					height:50%;
+					width: 100%;
+					height: 50%;
 				}
 				#pano { bottom:0; }
 		}
 		{% elif mapuser.settings.showStreetview and disp=='1' %}
 		/* show streetview */
+			#map { display:none; }
 			#pano {
-				width:100%;
-				height:100%;}
-			#map {display: none}
+				width: 100%;
+				height: 100%;
+			}
 		{% else %}
 		/* show map */
 			#map {
-				width:100%;
-				height:100%;}
-			#pano {display: none}
+				width: 100%;
+				height: 100%;
+			}
+			#pano { display:none; }
 		{% endif %}
 	</style>
 {% endblock %}
 
 {% block main %}
 
-	<div class='wrap'>
+	<div id='map'></div>
+	<div id='pano'></div>
 	
-			<div id='map'></div>
-			<div id='pano'></div>
-			
-			<div id='notset' class='centered alert alert-warning'>
-				{% if user.id == mapuser.id %}
-					Your location is unset. You can click 'set' below to set it to your current position.
-				{% else %}
-					This user has no location set.  
-				{% endif %}
-			</div>
-		
+	<div id='notset' class='centered alert alert-warning'>
 		{% if user.id == mapuser.id %}
-			<div id='controls'>
+			Your location is unset. You can click 'set' below to set it to your current position.
+		{% else %}
+			This user has no location set.  
+		{% endif %}
+	</div>
+	
+	{% if user.id == mapuser.id %}
+		<div id='controls'>
+		{% if mapuser.settings.showStreetview and disp!='0' %}
 			<style>
-				#controls {
-					width: 100vw;
-					position: absolute;
-					bottom: 50px;
-					display: flex;
-					justify-content: space-around;
-				} #controls .btn {
-					padding: 15px 0;
-				} #controls .btn.set, #controls .btn.clear {
-					width: 30vw;
-				} #controls .btn.track {
-					width: 35vw;
-				}
-				{% if mapuser.settings.showStreetview and disp!='0' %}
 				@media (orientation: portrait) {
 					#controls { bottom:30px }
 				}
-				{% endif %}
-		</style>
-				<button class='btn set' onclick="setLocation()">Set</button>
-				<button class='btn track' onclick="trackLocation()" data-toggle="tooltop" title="Tracking location..." data-trigger="manual"><i class='fa fa-crosshairs'></i>&emsp;Track</button>
-				<button class='btn clear' onclick="clearLocation()">Clear</button>
-			</div>
+			</style>
 		{% endif %}
-		
-	</div>
+			
+			<button id='set-loc' class='btn set' title="Click here to set your location">Set</button>
+			<button id='track-loc' class='btn track' title="Click here to track your location"><i class='fa fa-crosshairs'></i>Track</button>
+			<button id='clear-loc' class='btn clear' title="Click here to clear your location">Clear</button>
+			
+		</div>
+	{% endif %}
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
-	<script>
+{% endblock %}
+
+{% block javascript %}
+{{super()}}
 	
-		/* Variables */ {
-		var wpid, map, pano, sv, marker, elevator,
-			socket = io('//'+window.location.hostname),
-			mapuserid = {{mapuser._id |dump|safe}},
-			userid{% if user._id %} = {{user._id |dump|safe}}{% endif %},
-			settings = JSON.parse('{{mapuser.settings |dump|safe}}'),
-			last = JSON.parse('{{mapuser.last |dump|safe}}'),
-			noHeader = {{noHeader |dump|safe}},
-			disp = {{disp |dump|safe}}, // 0=map, 1=streetview, 2=both
-			mapElem = document.getElementById('map'),
-			panoElem = document.getElementById('pano');
-		}
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
+	<script type="text/javascript" src="/static/js/.map.min.js"></script>
+	{% if user.id == mapuser.id %}<script type="text/javascript" src="/static/js/.map-controls.min.js"></script>{% endif %}
+	<script> /* Variables from server */
 		
-		function onConnect(socket,userid,mapuserid){
-			
-			// Can get location
-			socket.emit('can-get', mapuserid );
-			//console.log(`Receiving updates for ${mapuserid}.`);
-			
-			// Can set location too
-			if (mapuserid==userid){ 
-				socket.emit('can-set', userid );
-				//console.log(`Sending updates for ${userid}.`);
-			}
-			
-		}
-		
-		// Connect to socket.io
-		socket.on('connect', function(){
-			//console.log(`Connected... `);
-			onConnect(socket,userid,mapuserid);
-		}).on('reconnect', function(){
-			//console.log(`Reconnected... `);
-			onConnect(socket,userid,mapuserid);
-		}).on('error', function (err){
-			console.error(`Unable to connect because of: ${err.message}`);
-		});
-		
-		// Parse location
-		function parseLoc(loc) {
-			loc.spd = (settings.units=='standard')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd)
-			loc.dir = parseFloat(loc.dir);
-			loc.lat = parseFloat(loc.lat);
-			loc.lon = parseFloat(loc.lon);
-			loc.time = new Date(loc.time).toLocaleString()
-			loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
-			return loc;
-		}
-		
-		// Show/hide map if location is set/unset
-		function toggleMaps(loc) {
-			if (loc.lat===0&&loc.lon===0) {
-				$('#map').hide();
-				$('#pano').hide();
-				$('#notset').show();
-			} else {
-				$('#map').show();
-				$('#pano').show();
-				$('#notset').hide();
-			}
-		}
-		
-		// execute on page load
-		$(function() {
-			toggleMaps(last);
-		});
-		
-		// Google maps API callback
-		window.gmapsCb = function() {
-			// Create map
-			if (disp!='1'||!settings.showStreetview) {
-				map = new google.maps.Map( mapElem, {
-					center: new google.maps.LatLng( last.lat, last.lon ),
-					panControl: false,
-					draggable: false,
-					zoom: settings.defaultZoom,
-					streetViewControl: false,
-					zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
-					mapTypeId: (settings.defaultMap=='road')?google.maps.MapTypeId.ROADMAP:google.maps.MapTypeId.HYBRID
-				});
-				marker = new google.maps.Marker({
-					position: { lat:last.lat, lng:last.lon },
-					title: {{ mapuser.name | dump | safe }},
-					map: map,
-					draggable: false
-				});
-				map.addListener('zoom_changed',function(){
-					map.setCenter(marker.getPosition());
-				});
-				
-				// Create iFrame logo
-				if (noHeader.length) {
-					var logoDiv = document.createElement('div');
-					logoDiv.className = 'map-logo';
-					logoDiv.innerHTML = '<a href="https://tracman.org/">'+
-						'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
-						'Tracman</a>';
-					map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
-				}
-				
-				// Create update time block
-				var timeDiv = document.createElement('div');
-				timeDiv.className = 'tim';
-				if (last.time) {
-					timeDiv.innerHTML = 'location updated '+new Date(last.time).toLocaleString();
-				}
-				map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
-				
-				// Create speed block
-				if (settings.showSpeed) {
-					var speedSign = document.createElement('div'),
-						speedLabel = document.createElement('div'),
-						speedText = document.createElement('div'),
-						speedUnit = document.createElement('div');
-					speedLabel.className = 'spd-label';
-					speedLabel.innerHTML = 'SPEED';
-					speedText.className = 'spd';
-					speedText.innerHTML = (settings.units=='standard')?(parseFloat(last.spd)*2.23694).toFixed():last.spd.toFixed();
-					speedUnit.className = 'spd-unit';
-					speedUnit.innerHTML = (settings.units=='standard')?'m.p.h.':'k.p.h.';
-					speedSign.className = 'spd-sign';
-					speedSign.appendChild(speedLabel);
-					speedSign.appendChild(speedText);
-					speedSign.appendChild(speedUnit);
-					map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign);
-				}
-				
-				// Create altitude block
-				if (settings.showAlt) {
-					var elevator = new google.maps.ElevationService;
-					var altitudeSign = document.createElement('div'),
-						altitudeLabel = document.createElement('div'),
-						altitudeText = document.createElement('div'),
-						altitudeUnit = document.createElement('div');
-					altitudeLabel.className = 'alt-label';
-					altitudeText.className = 'alt';
-					altitudeUnit.className = 'alt-unit';
-					altitudeSign.className = 'alt-sign';
-					altitudeText.innerHTML = '';
-					altitudeLabel.innerHTML = 'ALTITUDE';
-					getAltitude(new google.maps.LatLng(last.lat,last.lon), elevator, function(alt) {
-						if (alt) { altitudeText.innerHTML = (settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
-					});
-					altitudeUnit.innerHTML = (settings.units=='standard')?'feet above sea level':'meters above sea level';
-					altitudeSign.appendChild(altitudeLabel);
-					altitudeSign.appendChild(altitudeText);
-					altitudeSign.appendChild(altitudeUnit);
-					map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign);
-				}
-			}
-				
-			// Create streetview
-			updateStreetView(parseLoc(last),10);
-		}
-		
-		// Get location
-		socket.on('get', function(loc) {
-			//console.log(`Received location: ${loc.lat}, ${loc.lon}`);
-			
-			loc = parseLoc(loc);
-			if (disp!='1' || !settings.showStreetview) {
-				$('.tim').text('location updated '+loc.time);
-				if (settings.showSpeed) { $('.spd').text(loc.spd.toFixed()); }
-				if (settings.showAlt) {
-					getAltitude({lat:loc.lat,lng:loc.lon}, elevator, function(alt) {
-						if (alt) { $('.alt').text((settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed()); }
-					});
-				}
-				toggleMaps(loc);
-				map.setCenter({lat:loc.lat,lng:loc.lon});
-				marker.setPosition({lat:loc.lat,lng:loc.lon});
-			}
-			updateStreetView(loc,10);
-		});
-		
-		{% if user %}
-			var token = '{{user.sk32}}';
-			
-			// Set location
-			function setLocation() {
-				if (!userid==mapuserid) {alert('You are not logged in! '); next();}
-				else {
-					if (!navigator.geolocation) {alert('Geolocation not enabled. ');}
-					else {
-						navigator.geolocation.getCurrentPosition(function(pos){
-							newloc = {
-								tok: token,
-								usr: userid,
-								lat: pos.coords.latitude,
-								lon: pos.coords.longitude,
-								spd: (pos.coords.speed||0)
-							}
-							socket.emit('set', newloc);
-							toggleMaps(newloc);
-						}, function(err) {
-							if (err) { 
-								alert("Unable to set location.");
-								console.error(err.message); }
-							else { 
-								//console.log('Set position',pos);
-							}
-						}, { enableHighAccuracy:true });
-					}
-				}
-			}
-			
-			// Track location
-			function trackLocation() {
-				if (!userid==mapuserid) { alert('You are not logged in! '); }
-				else {
-					// Stop tracking
-					if (wpid) {
-						$('#controls > .track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
-						navigator.geolocation.clearWatch(wpid);
-						wpid = undefined;
-					// Start tracking
-					} else {
-						$('#controls > .track').html('<i class="fa fa-crosshairs fa-spin"></i>&emsp;Stop').tooltip('show');
-						if (!navigator.geolocation) { alert('Unable to track location. '); }
-						else {
-							wpid = navigator.geolocation.watchPosition(function(pos) {
-								newloc = {
-									tok: token,
-									usr: '{{user.id}}',
-									lat: pos.coords.latitude,
-									lon: pos.coords.longitude,
-									spd: (pos.coords.speed||0)
-								};
-								socket.emit('set',newloc);
-								toggleMaps(newloc);
-							}, function(err){
-								if (err) {
-									alert("Unable to track location.");
-									console.error(err.message);
-								} else {
-									// console.log('Tracking position...');
-								}
-							}, { enableHighAccuracy:true });
-						}
-					}
-					}
-			}
-			
-			// Clear location
-			function clearLocation() {
-				if (!userid==mapuserid) { alert('You are not logged in! '); }
-				else {
-					// Stop tracking
-					if (wpid) {
-						$('#controls > .track').html('<i class="fa fa-crosshairs"></i>&emsp;Track').tooltip('hide');
-						navigator.geolocation.clearWatch(wpid);
-						wpid = undefined;
-					} 
-					newloc = {
-						tok: token,
-						usr: userid,
-						lat:0, lon:0, spd:0
-					}
-					socket.emit('set',newloc);
-					toggleMaps(newloc);
-				}
-			}
-			
-			// Delete account
-			function deleteAccount() {
-				if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
-					$.ajax({
-						url: "/map",
-						type: "DELETE",
-						success: function(){
-							location.reload();
-						}
-					})
-				}
-			}
-			
-		{% endif %}
-		
-		// Check altitude
-		function getAltitude(loc,elev,cb){
-			elev = elev || new google.maps.ElevationService;
-			elev.getElevationForLocations({
-				'locations': [loc]
-			}, function(results, status) {
-				if (status === google.maps.ElevationStatus.OK && results[0]) {
-					cb(results[0].elevation);
-				}
-			});
-		}
-		
-		// Get street view imagery
-		function getStreetViewData(loc,rad,cb) {
-			if (!sv) { var sv=new google.maps.StreetViewService(); }
-			sv.getPanorama({location:{lat:loc.lat,lng:loc.lon},radius:rad},function(data,status){
-				if (status===google.maps.StreetViewStatus.ZERO_RESULTS){
-					getStreetViewData(loc,rad*2,cb);
-				} else if (status!==google.maps.StreetViewStatus.OK){ console.log('Street view not available: '+status); }
-				else { cb(data); }
-			});
-		}
-		
-		// Update streetview
-		function updateStreetView(loc) {
-			if (loc.spd>1) { // moving
-				if (settings.showStreetview && disp!='0') {
-					var imgElem = document.getElementById('panoImg');
-					getStreetViewData(loc, 50, function(data){
-						if (!imgElem) {
-							// Create image
-							pano = undefined;
-							$('#pano').empty();
-							$('#pano').append($('<img>',{
-								alt: 'Street view image',
-								src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-								id: 'panoImg'
-							}));
-						}
-						// Set image
-						$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
-					});
-				}
-			} else if (pano==null) { // not moving and pano not set
-				getStreetViewData(loc, 50, function(data){
-					// Create panorama
-					$('#pano').empty();
-					var panoOptions = {
-						panControl: false,
-						zoomControl: false,
-						addressControl: false,
-						linksControl: false,
-						motionTracking: false,
-						motionTrackingControl: false
-					};
-					pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
-					// Set panorama
-					pano.setPano(data.location.pano);							
-					pano.setPov({
-						pitch: 0,
-						heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
-					});
-				});
-			}
-		}
+		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
+			noHeader = "{{noHeader |safe}}",
+			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
+			userid = "{{user._id |safe}}",
+			token = "{{user.sk32 |safe}}";
 		
 	</script>
 	

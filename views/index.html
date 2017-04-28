@@ -1,47 +1,45 @@
 {% extends 'templates/base.html' %}
-
 {% block head %}
-	{{ super() }}
-	<link href="/static/css/index.css" rel="stylesheet">
+{{super()}}
+	<link href="/static/css/.index.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block main %}
-	<script src="/static/js/index.js"></script>
-		
+
 	<section class='splash dark' id='splash'>
 		<div class='container'>
 			<h1>Tracman</h1>
 			<h3>Display your realtime GPS location on a map</h3>
-			<!--<a class='btn' href="#" data-scrollto="overview">More info<i class='fa fa-angle-down'></i></a>-->
 			{% if user %}
 				<a class='btn' href="/map">Map<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/settings">Settings<i class='fa fa-angle-right'></i></a>
 				{% if user.isAdmin %}
 					<a class='btn' href="/admin">Admin<i class='fa fa-angle-right'></i></a>
 				{% endif %}
 			{% else %}
 				<a class='btn' href="/map/keith">View example<i class='fa fa-angle-right'></i></a>
-				<a class='btn' href="#" data-scrollto="join">Join<i class='fa fa-angle-down'></i></a>
-				<a class='btn' href="/login">Login<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/login#signup">Join<i class='fa fa-angle-right'></i></a>
+				<a class='btn' href="/login#login">Login<i class='fa fa-angle-right'></i></a>
 			{% endif %}
 		</div>
 	</section>
-
+	
 	<section class='overview dark' id='overview'>
 		<div class='container'>
 			<div>
 				<i class='fa fa-mobile'></i>
 				<h3>Easy-to-use</h3>
-				<p>Download the android app and log in.&ensp;Then send your friends a link with a map showing your live location.&ensp;</p>
+				<p>Download the android app and log in. Then send your friends a link with a map showing your live location. </p>
 			</div>
 			<div>
 				<i class='fa fa-bolt'></i>
 				<h3>Realtime</h3>
-				<p>Your location updates every second for all the world to see.&ensp;</p>
+				<p>Your location updates every second for all the world to see. </p>
 			</div>
 			<div>
 				<i class='fa fa-usd'></i>
 				<h3>Free</h3>
-				<p>It's free, but you can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=hypergeek14%40gmail%2ecom&lc=US&item_name=Tracman&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">donate</a> if you want to help with server expenses.&ensp;</p>
+				<p>It's free, but you can <a href="https://cash.me/$KeithIrwin">donate</a> if you want to help with server expenses. </p>
 			</div>
 		</div>
 	</section>
@@ -51,22 +49,22 @@
 			<img src="/static/img/style/phone.png" alt="Mobile phone">
 			<div>
 				<h2>Setting your location</h2>
-				<p>You can track your GPS location from your phone's web browsers.&ensp;There's also has an android app which can run in the background.&ensp;With the app, you can: </p>
+				<p>You can track your GPS location from your phone's web browsers. There's also has an android app which can run in the background. With the app, you can: </p>
 				<ul>
 					<li>
 						<i class='fa fa-toggle-on'></i>
 						<h4>Turn off tracking</h4>
-						<p>If you need to go undercover, just turn tracman off with the flip of a switch.&ensp;</p>
+						<p>If you need to go undercover, just turn tracman off with the flip of a switch. </p>
 					</li>
 					<li>
 						<i class='fa fa-cog'></i>
 						<h4>Change settings</h4>
-						<p>Change your settings to show a less accurate location, if you want an air of mystery.&ensp;</p>
+						<p>Change your settings to show a less accurate location, if you want an air of mystery. </p>
 					</li>
 					<li>
 						<i class='fa fa-battery-3'></i>
 						<h4>Save energy</h4>
-						<p>If nobody's tracking you, tracman won't needlessly drain your battery.&ensp;</p>
+						<p>If nobody's tracking you, tracman won't needlessly drain your battery. </p>
 					</li>
 				</ul>
 			</div>
@@ -78,34 +76,33 @@
 			<img src="/static/img/style/laptop.png" alt="Laptop">
 			<div>
 				<h2>The Map</h2>
-				<p>You'll get a simple webpage with a map to send to friends.&ensp;It'll look <a href="/map/keith">like this</a>.&ensp;</p>
+				<p>You'll get a simple webpage with a map to send to friends. It'll look <a href="/map/keith">like this</a>. </p>
 				<ul>
 					<li>
 						<i class='fa fa-hand-o-right'></i>
 						<h4>Easy</h4>
-						<p>Just send a link to whomever you want.&ensp;Bam, now they know where you are.&ensp;</p>
+						<p>Just send a link to whomever you want. Bam, now they know where you are. </p>
 					</li>
 					<li>
 						<i class='fa fa-map-marker'></i>
 						<h4>Precise</h4>
-						<p>Map updates in realtime with websockets.&ensp;</p>
+						<p>Map updates in realtime with websockets. </p>
 					</li>
 					<li>
 						<i class='fa fa-cogs'></i>
 						<h4>Customizable</h4>
-						<p>Change the map default type and zoom level.&ensp;You can also show speed, altitude, and streetview.&ensp;</p>
+						<p>Change the map default type and zoom level. You can also show speed, altitude, and streetview. </p>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</section>
 
-	<section class='disclaimer light' id='disclaimer'>
+	<section class='disclaimer' id='disclaimer'>
 		<div class='container'>
 			<h2>Warning! </h2>
-			<p>This is beta software, so there are still kinks to be worked out.&ensp;</p>
-			<p>Also keep in mind that publishing your location online could be a bad idea.&ensp;</p>
-			<p>I assume no responsibilities.&ensp;</p>
+			<p>This is beta software, so there are still kinks to be worked out. </p>
+			<p>Keep in mind that publishing your location online could be a bad idea. </p>
 		</div>
 	</section>
 
@@ -113,9 +110,8 @@
 	<section class='join light' id='join'>
 		<div class='container'>
 			<h2>Hook me up!</h2>
-			<h3>Right now, Tracman is in beta testing.&ensp;Things may break.&ensp;</h3>
-			<p>You will need a google account to join tracman and log in.&ensp;</p>
-			<a class='btn btn-lg ' href="/login">Join Tracman</a>
+			<p>Just click that there button to create an account. </p>
+			<a class='btn btn-lg' href="/login#signup">Join Tracman</a>
 		</div>
 	</section>
 	{% endif %}

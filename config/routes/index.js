@@ -1,96 +1,101 @@
 'use strict';
 
-const slug = require('slug'),
-	mw = require('../middleware.js'),
-	User = require('../models/user.js'),
-	router = require('express').Router();
+const mw = require('../middleware.js'),
+	router = require('express').Router(),
+	slug = require('slug'),
+	xss = require('xss'),
+  User = require('../models.js').user;
 
-// Shortcut to favicon.ico
-router.get('/favicon.ico', function(req,res){
-	res.redirect('/static/img/icon/by/16-32-48.ico');
-});	
-
-// Index route
-router.route('/')
-	.get(function(req,res,next){
+module.exports = router
 	
-	// Logged in
-	if ( req.session.passport && req.session.passport.user ){
-		// Get user
-		User.findById(req.session.passport.user, function(err, user){
-			if (err){ mw.throwErr(req,err); }
-			if (!user){ console.log('Already logged in user not found:', req.session.passport); next(); }
-			// If user found: 
-			else {
-				// Open index
-				res.render('index.html', {
-					user: user,
-					error: req.flash('error')[0],
-					success: req.flash('succcess')[0]
-				});
-			}
-		});
-	}
-	
-	// Not logged in
-	else {
-		res.render('index.html', {
-			error: req.flash('error')[0],
-			success: req.flash('success')[0]
-		});
-	}
-	
-});
-
-// Settings
-router.route('/settings')
-	
-	// Get settings form
-	.get(mw.ensureAuth, function(req,res,next){
-		User.findById(req.session.passport.user, function(err,user){
-			if (err){ console.log('Error finding settings for user:',err); mw.throwErr(req,err); }
-			res.render('settings.html', {user:user});
-		});
-		
-	// Set new settings
-	}).post(mw.ensureAuth, function(req,res,next){
-		User.findByIdAndUpdate(req.session.passport.user, {$set:{
-			name: req.body.name,
-			slug: slug(req.body.slug),
-			email: req.body.email,
-			settings: {
-				units: req.body.units,
-				defaultMap: req.body.map,
-				defaultZoom: req.body.zoom,
-				showSpeed: (req.body.showSpeed)?true:false,
-				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
-			}
-		}}, function(err, user){
-			if (err) { console.log('Error updating user settings:',err); mw.throwErr(req,err); }
-			else { req.flash('success', 'Settings updated.  '); }
-			res.redirect('/map#');
-		});		
+	// Index
+	.get('/', (req,res,next)=>{
+		res.render('index');
 	})
 
-	// Delete user account
-	.delete(mw.ensureAuth, function(req,res,next){
-		User.findByIdAndRemove( req.session.passport.user,
-			function(err) {
-				if (err) { 
-					console.log('Error deleting user:',err);
-					mw.throwErr(req,err);
-				} else { 
-					req.flash('success', 'Your account has been deleted.  ');
-					res.redirect('/');
-				}
-			}
-		);
-	});
+	// Help
+	.get('/help', (req,res)=>{
+		res.render('help');
+	})
 	
-router.route('/help')
-	.get(mw.ensureAuth, function(req,res){
-		res.render('help.html', {user:req.session.passport.user});
-	});
+	// Terms of Service and Privacy Policy
+	.get('/terms', (req,res)=>{
+		res.render('terms');
+	})
+	.get('/privacy', (req,res)=>{
+		res.render('privacy');
+	})
+	
+	// robots.txt
+	.get('/robots.txt', (req,res)=>{ 
+		res.type('text/plain');
+		res.send("User-agent: *\n"+
+			"Disallow: /map/*\n"
+		);
+	})
+	
+	// favicon.ico
+	.get('/favicon.ico', (req,res)=>{
+		res.redirect('/static/img/icon/by/16-32-48.ico');
+	})
+	
+	// Endpoint to validate forms
+	.get('/validate', (req,res,next)=>{
+		
+		// Validate unique slug
+		if (req.query.slug) {
+			User.findOne({ slug: slug(req.query.slug) })
+			.then( (existingUser)=>{
+				if (existingUser && existingUser.id!==req.user.id) {
+					res.sendStatus(400);
+				}
+				else { res.sendStatus(200); }
+			})
+			.catch( (err)=>{
+				console.error(err);
+				res.sendStatus(500);
+			});
+		}
+		
+		// Validate unique email
+		else if (req.query.email) {
+			User.findOne({ email: req.query.email })
+			.then( (existingUser)=>{
+				if (existingUser && existingUser.id!==req.user.id) {
+					res.sendStatus(400);
+				}
+				else { res.sendStatus(200); }
+			})
+			.catch( (err)=>{
+				console.error(err);
+				res.sendStatus(500);
+			});
+		}
+		
+		// Create slug
+		else if (req.query.slugify) {
+			res.send(slug(xss(req.query.slugify)));
+		}
+		
+		// Sanitize for XSS
+		else if (req.query.xss) {
+			res.send(xss(req.query.xss));
+		}
+		
+		// 404
+		else { next(); }
+		
+	})
+	
+	// Link to androidapp in play store
+	.get('/android', (req,res)=>{
+		res.redirect('https://play.google.com/store/apps/details?id=us.keithirwin.tracman');
+	})
+	
+	// Link to iphone app in the apple store
+	// ... maybe someday
+	.get('/ios', (req,res)=>{
+		res.redirect('/help#why-is-there-no-ios-app');
+	})
 
-module.exports = router;
+;

@@ -1,0 +1,105 @@
+/* More padding on the bottom */
+.container {
+	padding-bottom: 10vh;
+}
+
+/* Sections */
+#login, #signup {
+	width: 50%;
+	margin: 0 2%;
+}
+
+/* Form overrides */
+form .form-group {
+	margin: 8% 0 0;
+}
+form input:not(.input-addon):not(.input-with-addon), 
+form .input-with-addon-group {
+	width: 96%;
+	margin: 0 auto 5vh;
+}
+form .input-with-addon, form .input-addon {
+	margin: 0;
+}
+form .input-with-addon-group {
+	width: 100%;
+}
+p, input, #social-login {
+	margin-bottom: 5vh;
+}
+form input.btn[type="submit"] {
+	margin: 0 2% 5vh;
+}
+form #social-login {
+	justify-content: space-around;
+	flex-wrap: nowrap;
+	width: 100%;
+}
+#show {
+	padding: 1%;
+	cursor: pointer;
+}
+
+/* Social buttons */
+#social-login .btn {
+	padding: 2%;
+	text-align: center;
+	margin: 0 3%;
+	color: #FFF;
+}
+#social-login .btn .fa {
+	position: relative;
+}
+#social-login .btn .text {
+	font-size: .6em;
+}
+#social-login .btn.gp {
+	background: #ce4d39;
+}
+#social-login .btn.gp:hover {
+	background: #fb7a66;
+}
+#social-login .btn.fb {
+	background: #305891;
+}
+#social-login .btn.fb:hover {
+	background: #5d85be;
+}
+#social-login .btn.tw {
+	background: #2ca8d2;
+}
+#social-login .btn.tw:hover {
+	background: #59d5ff;
+}
+/* Small buttons */
+@media (max-width:600px), (min-width:800px) and (max-width:1200px) {
+	#social-login .btn {
+		padding: 0;
+		width: 60px;
+		height: 60px;
+	}
+	#social-login .btn .text {
+		display: none;
+	}
+	#social-login .btn .fa {
+		margin: 18px auto;
+	}
+}
+
+/* Single column */
+@media (max-width:800px) {
+	
+	#login, #signup {
+		width: 100%;
+	}
+	section > .flex {
+		flex-direction: column;
+	}
+	section > .flex > div {
+		width: 100%;
+	}
+	hr { 
+		display: block !important;
+	}
+	
+}

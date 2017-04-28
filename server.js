@@ -1,17 +1,18 @@
 'use strict';
 
-/* IMPORTS */ 
-const 
+/* IMPORTS */
+const
 	express = require('express'),
 	bodyParser = require('body-parser'),
+	expressValidator = require('express-validator'),
 	cookieParser = require('cookie-parser'),
 	cookieSession = require('cookie-session'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
-	flash = require('connect-flash'),
-	secret = require('./config/secrets.js'),
-	User = require('./config/models/user.js'),
+	flash = require('connect-flash-plus'),
+	env = require('./config/env/env.js'),
+	User = require('./config/models.js').user,
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
@@ -19,24 +20,37 @@ const
 
 
 /* SETUP */ {
-	/* Database */ mongoose.connect(secret.mongoSetup, {
-		server:{socketOptions:{
-			keepAlive:1, connectTimeoutMS:30000 }},
-		replset:{socketOptions:{
-			keepAlive:1, connectTimeoutMS:30000 }}
-	});
-	
-	/* Templates */ nunjucks.configure(__dirname+'/views', {
-		autoescape: true,
-		express: app
-	});
-	
+
+	/* Database */ {
+		
+		// Setup with native ES6 promises
+		mongoose.Promise = global.Promise;
+		
+    // Connect to database
+		mongoose.connect(env.mongoSetup, {
+			server:{socketOptions:{
+				keepAlive:1, connectTimeoutMS:30000 }},
+			replset:{socketOptions:{
+				keepAlive:1, connectTimeoutMS:30000 }}
+		})
+		.then( ()=>{ console.log(`💿 Mongoose connected to mongoDB`); })
+		.catch( (err)=>{ console.error(`❌ ${err.stack}`); });
+		
+	}
+
+	/* Templates */ {
+		nunjucks.configure(__dirname+'/views', {
+			autoescape: true,
+			express: app
+		});
+		app.set('view engine','html');
+	}
+
 	/* Session */ {
-		app.use(cookieParser(secret.cookie));
-		// app.use(expressSession({
+		app.use(cookieParser(env.cookie));
 		app.use(cookieSession({
 			cookie: {maxAge:60000},
-			secret: secret.session,
+			secret: env.session,
 			saveUninitialized: true,
 			resave: true
 		}));
@@ -44,70 +58,104 @@ const
 		app.use(bodyParser.urlencoded({
 			extended: true
 		}));
+		app.use(expressValidator());
 		app.use(flash());
 	}
 	
 	/* Auth */ {
+		require('./config/passport.js')(passport);
 		app.use(passport.initialize());
 		app.use(passport.session());
-		require('./config/auth.js');
-		passport.serializeUser(function(user,done) {
-			done(null, user.id);
-		});
-		passport.deserializeUser(function(id,done) {
-			User.findById(id, function(err, user) {
-				if(!err) done(null, user);
-				else done(err, null);
-			});
-		});
 	}
 	
 	/* Routes	*/ {
-		app.get('/favicon.ico', function(req,res){
-			res.redirect('/static/img/icon/by/16-32-48.ico');
-		});
-		app.use('/', 
-			require('./config/routes/index.js'),
-			require('./config/routes/auth.js'),
-			require('./config/routes/misc.js')
-		);
-		app.use(['/map','/trac'], require('./config/routes/map.js'));
-		app.use('/admin', require('./config/routes/admin.js'));
-		app.use('/static', express.static(__dirname+'/static'));
+		
+		// Static files (keep this before setting default locals)
+		app.use('/static', express.static( __dirname+'/static', {dotfiles:'allow'} ));
+		
+		// Set default locals available to all views (keep this after static files)
+		app.get( '*', (req,res,next)=>{
+			
+			// Path for redirects
+			let nextPath = ( req.path.substring(0, req.path.indexOf('#')) || req.path );
+			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' ){
+				req.session.next = nextPath+'#';
+				//console.log(`Set redirect path to ${nextPath}#`);
+			}
+			
+			// User account
+			res.locals.user = req.user;
+			
+			// Flash messages
+			res.locals.successes = req.flash('success');
+			res.locals.dangers = req.flash('danger');
+			res.locals.warnings = req.flash('warning');
+			
+			next();
+		} );
+		
+		// Auth routes
+		require('./config/routes/auth.js')(app, passport);
+		
+		// Main routes
+		app.use( '/', require('./config/routes/index.js') );
+		
+		// Settings
+		app.use( '/settings', require('./config/routes/settings.js') );
+		
+		// Map
+		app.use( ['/map','/trac'], require('./config/routes/map.js') );
+		
+		// Site administration
+		app.use( '/admin', require('./config/routes/admin.js') );
+		
+		// Testing
+		if (env.mode == 'development') {
+			app.use( '/test', require('./config/routes/test.js' ) );
+		}
+		
 	}
 	
 	/* Errors */	{
+		
 		// Catch-all for 404s
-		app.use(function(req,res,next) {
+		app.use( (req,res,next)=>{
 			if (!res.headersSent) {
-				var err = new Error('404: Not found: '+req.url);
+				var err = new Error(`Not found: ${req.url}`);
 				err.status = 404;
 				next(err);
 			}
-		});
+		} );
+
+		// Production handlers
+		if (env.mode!=='development') {
+			app.use( (err,req,res,next)=>{
+				if (err.status!==404){ console.error(`❌ ${err.stack}`); }
+				if (res.headersSent) { return next(err); }
+				res.status(err.status||500);
+				res.render('error', {
+					code: err.status||500,
+					message: (err.status<=499)?err.message:"Server error"
+				});
+			} );
+		}
 		
-		// Handlers
-		if (secret.env=='production') {
-			app.use(function(err,req,res,next) {
+		// Development handlers
+		else {
+			app.use( (err,req,res,next)=>{
+				if (err.status!==404) {
+					console.error(`❌ ${err.stack}`);
+				}
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
-				res.render('error.html', {
-					code: err.status
-				});
-			});
-		}
-		else /* Development */{
-			app.use(function(err,req,res,next) {
-				console.log(err);
-				if (res.headersSent) { return next(err); }
-				res.status(err.status||500);
-				res.render('error.html', {
-					code: err.status,
+				res.render('error', {
+					code: err.status||500,
 					message: err.message,
-					error: err
+					stack: err.stack
 				});
-			});
+			} );
 		}
+		
 	}
 	
 	/* Sockets */ {
@@ -117,24 +165,25 @@ const
 }
 
 /* RUNTIME */ {
+	console.log('🖥  Starting Tracman server...');
 	
 	// Listen
-	http.listen(secret.port, function(){
-		console.log(
-			'==========================================\n'+
-			'Listening at '+secret.url+
-			'\n=========================================='
-		);
+	http.listen( env.port, ()=>{
+		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
 		
 		// Check for clients for each user
-		User.find({}, function(err, users){
-			if (err) { console.log(`DB error finding all users: ${err.message}`); }
-			users.forEach( function(user){
+		User.find({})
+		.then( (users)=>{
+			users.forEach( (user)=>{
 				sockets.checkForUsers( io, user.id );
 			});
+		})
+		.catch( (err)=>{
+			console.error(`❌ ${err.stack}`);
 		});
 		
 	});
+	
 }
 
 module.exports = app;
