@@ -8,10 +8,6 @@ function checkForUsers(io, user) {
 	//console.log(`Checking for clients receiving updates for ${user}`);
 	
 	// Checks if any sockets are getting updates for this user
-	/* if (Object.values(io.sockets.connected).map( (key)=>{
-	 * 	return io.sockets.connected[key];
-	 * }).some( (socket)=>{
-	 */
 	if (Object.values(io.sockets.connected).some( (socket)=>{
 		return socket.gets===user;
 	})) {
