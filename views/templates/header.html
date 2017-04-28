@@ -12,14 +12,14 @@
 
 	<!-- Navigation -->
 	<nav id='navigation'><ul>
+			<li><a href="/">About</a></li>
 		{% if user %}
 			<li><a href="/map">Map</a></li>
 			<li><a href="/settings">Settings</a></li>
-			{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
 		{% endif %}
-			<li><a href="/">About</a></li>
 			<li><a href="/help">Help</a></li>
 		{% if user %}
+			{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
 			<li><a href="/logout">Logout</a></li>
 		{% else %}
 			<li><a href="/map/keith">Demo</a></li>
