@@ -232,30 +232,32 @@ router.route('/password')
 				mw.throwErr(err,req);
 				res.redirect((req.user)?'/settings':'/login');
 			}
+			else {
 			
-			// Figure out expiration time
-			let expirationTimeString = (req.query.tz)?
-				moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0]):
-				moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0])+" UTC";
+				// Figure out expiration time
+				let expirationTimeString = (req.query.tz)?
+					moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0]):
+					moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0])+" UTC";
+				
+				// Confirm password change request by email.
+				mail.send({
+					to: mail.to(req.user),
+					from: mail.from,
+					subject: 'Request to change your Tracman password',
+					text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire at ${expirationTimeString}. `),
+					html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire at ${expirationTimeString}. </p>`)
+				})
+				.then( ()=>{
+					// Alert user to check email.
+					req.flash('success',`An link has been sent to <u>${req.user.email}</u>.  Click on the link to complete your password change.  This link will expire in one hour (${expirationTimeString}). `);
+					res.redirect((req.user)?'/settings':'/login');
+				})
+				.catch( (err)=>{
+					mw.throwErr(err,req);
+					res.redirect((req.user)?'/settings':'/login');
+				});
 			
-			// Confirm password change request by email.
-			mail.send({
-				to: mail.to(req.user),
-				from: mail.from,
-				subject: 'Request to change your Tracman password',
-				text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire at ${expirationTimeString}. `),
-				html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire at ${expirationTimeString}. </p>`)
-			})
-			.then( ()=>{
-				// Alert user to check email.
-				req.flash('success',`An link has been sent to <u>${req.user.email}</u>.  Click on the link to complete your password change.  This link will expire in one hour (${expirationTimeString}). `);
-				res.redirect((req.user)?'/settings':'/login');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect((req.user)?'/settings':'/login');
-			});
-			
+			}
 		});
 
 	} );
@@ -299,31 +301,24 @@ router.route('/password/:token')
 		
 		else {
 			
-			// Delete token
-			res.locals.passwordUser.auth.passToken = undefined;
-			res.locals.passwordUser.auth.passTokenExpires = undefined;
-			
-			// Create hash
-			res.locals.passwordUser.generateHash( req.body.password, (err,hash)=>{
+			// Create hashed password and save to db
+			res.locals.passwordUser.generateHashedPassword( req.body.password, (err)=>{
 				if (err){
 					mw.throwErr(err,req);
 					res.redirect(`/password/${req.params.token}`);
 				}
-				else {
-					
-					// Save new password to db
-					res.locals.passwordUser.auth.password = hash;
-					res.locals.passwordUser.save()
-					.then( ()=>{
-						req.flash('success', 'Password set.  You can use it to log in now. ');
-						res.redirect('/login#login');
-					})
-					.catch( (err)=>{
-						mw.throwErr(err,req);
-						res.redirect('/login#signup');
-					});
-					
+				
+				// User changed password
+				else if (req.user) {
+					req.flash('success', 'Your password has been changed. ');
+					res.redirect('/settings');
 				}
+				// New user created password
+				else {
+					req.flash('success', 'Password set.  You can use it to log in now. ');
+					res.redirect('/login#login');
+				}
+				
 			} );
 			
 		}

@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose'),
 	unique = require('mongoose-unique-validator'),
-	bcrypt = require('bcrypt-nodejs'),
+	bcrypt = require('bcrypt'),
 	crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Reuse old token, resetting clock
 		if ( user.auth.passTokenExpires >= Date.now() ){
-			console.log(`Reusing old password token...`);
+			//console.log(`Reusing old password token...`);
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save()
 			.then( ()=>{
@@ -92,7 +92,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			console.log(`Creating new password token...`);
+			//console.log(`Creating new password token...`);
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ return next(err,null,null); }
 				if (buf) {
@@ -111,18 +111,31 @@ const userSchema = new mongoose.Schema({
 		
 	};
 	
-	// Generate hash for new password
-	userSchema.methods.generateHash = function(password,next){
-		// next(err,hash);
-		bcrypt.genSalt(8)
-		.then( (salt)=>{
-			bcrypt.hash(password, salt, null, next);
-		})
-		.catch( (err)=>{ return next(err,null); });
+	// Generate hash for new password and save it to the database
+	userSchema.methods.generateHashedPassword = function(password,next){
+		// next(err);
+		
+		// Delete token
+		this.auth.passToken = undefined;
+		this.auth.passTokenExpires = undefined;
+		
+		// Generate hash
+		bcrypt.genSalt(8, (err,salt)=>{
+			if (err){ return next(err); }
+			bcrypt.hash(password, salt, (err,hash)=>{
+				if (err){ return next(err); }
+				this.auth.password = hash;
+				this.save();
+				next();
+			});
+		});
+		
 	};
 	
 	// Check for valid password
 	userSchema.methods.validPassword = function(password,next){
+		// next(err,res);
+		// res = true/false
 		bcrypt.compare(password, this.auth.password, next);
 	};
 	
