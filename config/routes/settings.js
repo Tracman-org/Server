@@ -137,14 +137,14 @@ router.route('/')
 			// Set values
 			req.user.name = xss(req.body.name);
 			req.user.settings = {
-					units: req.body.units,
-					defaultMap: req.body.map,
-					defaultZoom: req.body.zoom,
-					showScale: (req.body.showScale)?true:false,
-					showSpeed: (req.body.showSpeed)?true:false,
-					showAlt: (req.body.showAlt)?true:false,
-					showStreetview: (req.body.showStreet)?true:false
-				};
+				units: req.body.units,
+				defaultMap: req.body.map,
+				defaultZoom: req.body.zoom,
+				showScale: (req.body.showScale)?true:false,
+				showSpeed: (req.body.showSpeed)?true:false,
+				showAlt: (req.body.showAlt)?true:false,
+				showStreetview: (req.body.showStreet)?true:false
+			};
 			
 			// Save user and send response
 			//console.log(`Saving new settings for user ${req.user.name}...`);

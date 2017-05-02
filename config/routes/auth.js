@@ -62,7 +62,7 @@ module.exports = (app, passport) => {
 			function sendToken(user){
 				
 				// Create a password token
-				user.createPassToken((err,token,expires)=>{
+				user.createPassToken( (err,token,expires)=>{
 					if (err){
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
@@ -76,12 +76,12 @@ module.exports = (app, passport) => {
 						
 						// Email the instructions to continue
 						mail.send({
-								from: mail.from,
-								to: `<${user.email}>`,
-								subject: 'Complete your Tracman registration',
-								text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}\n\nThis link will expire at ${expirationTimeString}.  `),
-								html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>This link will expire at ${expirationTimeString}. </p>`)
-							})
+							from: mail.from,
+							to: `<${user.email}>`,
+							subject: 'Complete your Tracman registration',
+							text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}\n\nThis link will expire at ${expirationTimeString}.  `),
+							html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>This link will expire at ${expirationTimeString}. </p>`)
+						})
 						.then(()=>{
 							req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox and follow the link to complete your registration. (Your registration link will expire in one hour). `);
 							res.redirect('/login');
@@ -278,16 +278,28 @@ module.exports = (app, passport) => {
 		// Disconnect social account
 		else {
 			//console.log(`Attempting to disconnect ${service} account...`);
-			req.user.auth[service] = undefined;
-			req.user.save()
-			.then(()=>{
-				req.flash('success', `${mw.capitalize(service)} account disconnected. `);
+			
+			// Make sure the user has a password before they disconnect their google login account
+			// This is because login used to only be through google, and some people might not have
+			// set passwords yet... 
+			if (!req.user.auth.password && service==='google') {
+				req.flash('warning',`Hey, you need to <a href="/settings/password">set a password</a> before you can disconnect your google account.  Otherwise, you won't be able to log in! `);
 				res.redirect('/settings');
-			})
-			.catch((err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			});
+			}
+			
+			else {
+				req.user.auth[service] = undefined;
+				req.user.save()
+				.then(()=>{
+					req.flash('success', `${mw.capitalize(service)} account disconnected. `);
+					res.redirect('/settings');
+				})
+				.catch((err)=>{
+					mw.throwErr(err,req);
+					res.redirect('/settings');
+				});
+			}
+			
 		}
 		
 	});
