@@ -316,7 +316,7 @@ router.route('/password/:token')
 				// New user created password
 				else {
 					req.flash('success', 'Password set.  You can use it to log in now. ');
-					res.redirect('/login#login');
+					res.redirect('/login?next=/settings');
 				}
 				
 			} );
