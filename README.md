@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.1
+###### v 0.6.2
 
 node.js application to display a sharable map with user's location.
 
@@ -51,6 +51,11 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 ## Changelog
 
 [view full changelog](CHANGELOG.md)
+
+#### v0.6.2
+
+* [#76](https://github.com/Tracman-org/Server/issues/76) Prevented users with no password from deleting google social login
+* Fixed error when creating user
 
 #### v0.6.1
 
