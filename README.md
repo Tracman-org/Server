@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.1
+###### v 0.6.2
 
 node.js application to display a sharable map with user's location.
 
