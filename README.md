@@ -1,13 +1,17 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.1
+###### v 0.6.2
 
 node.js application to display a sharable map with user's location.
 
 
 ## Installation
 
+On unix-based systems:
+
 ```sh
-$ git clone https://github.com/Tracman-org/Server.git && (cd Server && exec npm install)
+git clone https://github.com/Tracman-org/Server.git &&\
+mv Server tracman-server && cd tracman-server &&\
+exec npm install
 ```
 
 You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
@@ -15,8 +19,8 @@ You will need to set up a configuration file at `config/env/env.js`.  Use `confi
 A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
 
 ```sh
-$ cp config/env/sample.js config/env/my-config.js
-$ printf "'use strict';\n\nmodule.exports = require('./my-config.js');" > config/env/env.js
+cp config/env/sample.js config/env/my-config.js
+printf "'use strict';\n\nmodule.exports = require('./my-config.js');" > config/env/env.js
 ```
 
 Then edit `config/env/my-config.js` to match your local environment.  
@@ -27,13 +31,13 @@ Then edit `config/env/my-config.js` to match your local environment.
 Run Tracman with npm: 
 
 ```sh
-$ npm run minify && npm start
+npm run minify && npm start
 ```
 
 ...or with [nodemon](https://nodemon.io/):
 
 ```sh
-$ npm run nodemon
+npm run nodemon
 ```
 
 Nodemon will automatically minify files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
@@ -47,6 +51,11 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 ## Changelog
 
 [view full changelog](CHANGELOG.md)
+
+#### v0.6.2
+
+* [#76](https://github.com/Tracman-org/Server/issues/76) Prevented users with no password from deleting google social login
+* Fixed error when creating user
 
 #### v0.6.1
 

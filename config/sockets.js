@@ -8,14 +8,7 @@ function checkForUsers(io, user) {
 	//console.log(`Checking for clients receiving updates for ${user}`);
 	
 	// Checks if any sockets are getting updates for this user
-	//TODO: Use Object.values() after upgrading to node v7
-	/* if (Object.values(io.sockets.connected).some( (socket)=>{
-	* 	return socket.gets==user;
-	* })) {
-	*/
-	if (Object.keys(io.sockets.connected).map( (key)=>{
-		return io.sockets.connected[key];
-	}).some( (socket)=>{
+	if (Object.values(io.sockets.connected).some( (socket)=>{
 		return socket.gets===user;
 	})) {
 		//console.log(`Activating updates for ${user}.`);
