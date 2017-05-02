@@ -4,6 +4,7 @@
 #### v0.6.2
 
 * [#76](https://github.com/Tracman-org/Server/issues/76) Prevented users with no password from deleting google social login
+* Fixed error when creating user
 
 #### v0.6.1
 

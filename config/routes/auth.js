@@ -6,6 +6,7 @@ const
 	User = require('../models.js').user,
 	crypto = require('crypto'),
 	moment = require('moment'),
+	slugify = require('slug'),
 	env = require('../env/env.js');
 
 module.exports = (app, passport) => {
@@ -123,7 +124,7 @@ module.exports = (app, passport) => {
 					user = new User();
 					user.created = Date.now();
 					user.email = req.body.email;
-					user.slug = slug(user.email.substring(0, user.email.indexOf('@')));
+					user.slug = slugify(user.email.substring(0, user.email.indexOf('@')));
 					
 					// Generate unique slug
 					const slug = new Promise((resolve,reject) => {
