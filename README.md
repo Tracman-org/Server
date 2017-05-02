@@ -52,6 +52,10 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.6.2
+
+* [#76](https://github.com/Tracman-org/Server/issues/76) Prevented users with no password from deleting google social login
+
 #### v0.6.1
 
 * [#77](https://github.com/Tracman-org/Server/issues/77) Fixed 500 after password change, swapped `bcrypt` for `bcrypt-nodejs`
