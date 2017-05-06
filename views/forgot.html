@@ -1,4 +1,5 @@
 {% extends 'templates/base.html' %}
+{% block title %}{{super()}} | Reset Password{% endblock %}
 
 {% block head %}
 {{super()}}
@@ -13,12 +14,12 @@
 	
 	<form method="post" role="form">
 		
-		<div class='group'>
+		<div class='form-group'>
 			<label for="email">Email:</label>
 			<input name="email" type="email">
 		</div>
 		
-		<input class='main btn' type="submit" value="Go">
+		<input class='main btn' type="submit" value="Go" style="display:block; margin:auto">
 		
 	</form>
 
