@@ -15,6 +15,7 @@ $(function(){
 			// Success callback
 			function(pos){
 				var newloc = {
+					ts: Date.now(),
 					tok: token,
 					usr: userid,
 					lat: pos.coords.latitude,
@@ -54,6 +55,7 @@ $(function(){
 						// Success callback
 						function(pos) {
 							newloc = {
+								ts: Date.now(),
 								tok: token,
 								usr: userid,
 								lat: pos.coords.latitude,
@@ -96,13 +98,14 @@ $(function(){
 		else {
 			// Stop tracking
 			if (wpid) {
-				$('#track-loc').html('<i class="fa fa-crosshairs"></i>&emsp;Track');
+				$('#track-loc').html('<i class="fa fa-crosshairs"></i>Track');
 				navigator.geolocation.clearWatch(wpid);
 				wpid = undefined;
 			}
 			
 			// Clear location
 			newloc = {
+				ts: Date.now(),
 				tok: token,
 				usr: userid,
 				lat:0, lon:0, spd:0
