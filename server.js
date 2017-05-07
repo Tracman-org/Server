@@ -7,6 +7,7 @@ const
 	expressValidator = require('express-validator'),
 	cookieParser = require('cookie-parser'),
 	cookieSession = require('cookie-session'),
+	winston = require('winston'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
@@ -14,13 +15,15 @@ const
 	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
 	app = express(),
-	debug = require('debug')('tracman'),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
 	sockets = require('./config/sockets.js');
 
 
 /* SETUP */ {
+	
+	// Log level
+	winston.level = env.logLevel || 'info';
 
 	/* Database */ {
 		
@@ -81,7 +84,7 @@ const
 			let nextPath = ((req.query.next)?req.query.next: req.path.substring(0,req.path.indexOf('#')) || req.path );
 			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' ){
 				req.session.next = nextPath+'#';
-				//console.log(`Set redirect path to ${nextPath}#`);
+				winston.debug(`Set redirect path to ${nextPath}#`);
 			}
 			
 			// User account
@@ -168,8 +171,8 @@ const
 	
 	// Listen
 	http.listen( env.port, ()=>{
-		debug('Starting Tracman');
 		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
+		winston.verbose(`Log level set to ${env.logLevel}`);
 		
 		// Check for clients for each user
 		User.find({})

@@ -8,6 +8,7 @@ const
 	GoogleTokenStrategy = require('passport-google-id-token'),
 	FacebookTokenStrategy = require('passport-facebook-token'),
 	TwitterTokenStrategy = require('passport-twitter-token'),
+	winston = require('winston'),
 	env = require('./env/env.js'),
 	mw = require('./middleware.js'),
 	User = require('./models.js').user;
@@ -31,7 +32,7 @@ module.exports = (passport)=>{
 		passwordField: 'password',
 		passReqToCallback: true
 	}, (req,email,password,done)=>{
-		//console.log(`Perfoming local login for ${email}`);
+		winston.debug(`Perfoming local login for ${email}`);
 		User.findOne({'email':email})
 		.then( (user)=>{
 			
@@ -73,13 +74,13 @@ module.exports = (passport)=>{
 	
 	// Social login
 	function socialLogin(req, service, profileId, done) {
-		//console.log(`socialLogin() called`);
+		winston.debug(`socialLogin() called`);
 		let query = {};
 		query['auth.'+service] = profileId;
 		
 		// Intent to log in
 		if (!req.user) {
-			//console.log(`Logging in with ${service}...`);
+			winston.debug(`Logging in with ${service}...`);
 			User.findOne(query)
 			.then( (user)=>{
 				
@@ -124,7 +125,7 @@ module.exports = (passport)=>{
 					
 					// No googleId either
 					else {
-						//console.log(`Couldn't find ${service} user.`);
+						winston.debug(`Couldn't find ${service} user.`);
 						req.session.flashType = 'warning';
 						req.session.flashMessage = `There's no user for that ${service} account. `;
 						return done();
@@ -133,7 +134,7 @@ module.exports = (passport)=>{
 				
 				// Successfull social login
 				else {
-					//console.log(`Found user: ${user}`);
+					winston.debug(`Found user: ${user}`);
 					req.session.flashType = 'success';
 					req.session.flashMessage = "You have been logged in.";
 					return done(null, user);
@@ -148,7 +149,7 @@ module.exports = (passport)=>{
 		
 		// Intent to connect account
 		else {
-			//console.log(`Attempting to connect ${service} account...`);
+			winston.debug(`Attempting to connect ${service} account...`);
 			
 			// Check for unique profileId
 			User.findOne(query)
@@ -156,7 +157,7 @@ module.exports = (passport)=>{
 				
 				// Social account already in use
 				if (existingUser) {
-					//console.log(`${service} account already in use.`);
+					winston.debug(`${service} account already in use.`);
 					req.session.flashType = 'warning';
 					req.session.flashMessage = `Another user is already connected to that ${service} account. `;
 					return done();
@@ -164,7 +165,7 @@ module.exports = (passport)=>{
 				
 				// Connect to account
 				else {
-					//console.log(`Connecting ${service} account.`);
+					winston.debug(`Connecting ${service} account.`);
 					req.user.auth[service] = profileId;
 					req.user.save()
 					.then( ()=>{

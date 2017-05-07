@@ -7,6 +7,7 @@ const
 	crypto = require('crypto'),
 	moment = require('moment'),
 	slugify = require('slug'),
+	winston = require('winston'),
 	env = require('../env/env.js');
 
 module.exports = (app, passport) => {
@@ -18,14 +19,14 @@ module.exports = (app, passport) => {
 			failureFlash: true
 		}, 
 		loginCallback = (req,res)=>{
-			//console.log(`Login callback called... redirecting to ${req.session.next}`);
+			winston.debug(`Login callback called... redirecting to ${req.session.next}`);
 			req.flash(req.session.flashType,req.session.flashMessage);
 			req.session.flashType = undefined;
 			req.session.flashMessage = undefined;
 			res.redirect( req.session.next || '/map' );
 		},
 		appLoginCallback = (req,res,next)=>{
-			//console.log('appLoginCallback called.');
+			winston.debug('appLoginCallback called.');
 			if (req.user){ res.send(req.user); }
 			else { 
 				let err = new Error("Unauthorized");
@@ -267,19 +268,19 @@ module.exports = (app, passport) => {
 		
 		// Social login
 		if (!req.user) {
-			//console.log(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
+			winston.debug(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
 			passport.authenticate(service, sendParams)(req,res,next);
 		}
 		
 		// Connect social account
 		else if (!req.user.auth[service]) {
-			//console.log(`Attempting to connect ${service} account...`);
+			winston.debug(`Attempting to connect ${service} account...`);
 			passport.authorize(service, sendParams)(req,res,next);
 		}
 		
 		// Disconnect social account
 		else {
-			//console.log(`Attempting to disconnect ${service} account...`);
+			winston.debug(`Attempting to disconnect ${service} account...`);
 			
 			// Make sure the user has a password before they disconnect their google login account
 			// This is because login used to only be through google, and some people might not have

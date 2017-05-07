@@ -3,7 +3,8 @@
 const mongoose = require('mongoose'),
 	unique = require('mongoose-unique-validator'),
 	bcrypt = require('bcrypt'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	winston = require('winston');
 
 const userSchema = new mongoose.Schema({
 	name: {type:String},
@@ -52,13 +53,13 @@ const userSchema = new mongoose.Schema({
 	
 	// Create email confirmation token
 	userSchema.methods.createEmailToken = function(next){ // next(err,token)
-		//console.log('user.createEmailToken() called');
+		winston.debug('user.createEmailToken() called');
 		var user = this;
 		
 		crypto.randomBytes(16, (err,buf)=>{
 			if (err){ next(err,null); }
 			if (buf){
-				//console.log(`Buffer ${buf.toString('hex')} created`);
+				winston.debug(`Buffer ${buf.toString('hex')} created`);
 				user.emailToken = buf.toString('hex');
 				user.save()
 				.then( ()=>{
@@ -79,7 +80,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Reuse old token, resetting clock
 		if ( user.auth.passTokenExpires >= Date.now() ){
-			//console.log(`Reusing old password token...`);
+			winston.debug(`Reusing old password token...`);
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save()
 			.then( ()=>{
@@ -92,7 +93,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			//console.log(`Creating new password token...`);
+			winston.debug(`Creating new password token...`);
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ return next(err,null,null); }
 				if (buf) {

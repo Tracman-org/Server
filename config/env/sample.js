@@ -2,6 +2,10 @@
 
 module.exports = {
 	
+	// Log level
+	// See https://www.npmjs.com/package/winston#logging-levels
+	logLevel: 'verbose',
+	
 	// Local variables
 	mode: 'development', // or production
 	

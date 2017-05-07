@@ -8,6 +8,7 @@ const slug = require('slug'),
 	User = require('../models.js').user,
 	mail = require('../mail.js'),
 	env = require('../env/env.js'),
+	winston = require('winston'),
 	router = require('express').Router();
 
 // Validate email addresses
@@ -51,23 +52,23 @@ router.route('/')
 					
 					// Not unique!
 					if (existingUser && existingUser.id!==req.user.id) {
-						//console.log("Email not unique!");
+						winston.debug("Email not unique!");
 						req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `);
 						resolve();
 					}
 					
 					// It's unique
 					else {
-						//console.log("Email is unique");
+						winston.debug("Email is unique");
 						req.user.newEmail = req.body.email;
 				
 						// Create token
-						//console.log(`Creating email token...`);
+						winston.debug(`Creating email token...`);
 						req.user.createEmailToken((err,token)=>{
 							if (err){ reject(err); }
 							
 							// Send token to user by email
-							//console.log(`Mailing new email token to ${req.body.email}...`);
+							winston.debug(`Mailing new email token to ${req.body.email}...`);
 							mail.send({
 								to: `"${req.user.name}" <${req.body.email}>`,
 								from: mail.from,
@@ -132,7 +133,7 @@ router.route('/')
 		// Set settings when done
 		Promise.all([checkEmail, checkSlug])
 		.then( ()=>{
-			//console.log('Setting settings... ');
+			winston.debug('Setting settings... ');
 				
 			// Set values
 			req.user.name = xss(req.body.name);
@@ -147,10 +148,10 @@ router.route('/')
 			};
 			
 			// Save user and send response
-			//console.log(`Saving new settings for user ${req.user.name}...`);
+			winston.debug(`Saving new settings for user ${req.user.name}...`);
 			req.user.save()
 			.then( ()=>{
-				//console.log(`DONE!  Redirecting user...`);
+				winston.debug(`DONE!  Redirecting user...`);
 				req.flash('success', 'Settings updated. ');
 				res.redirect('/settings');
 			})
