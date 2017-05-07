@@ -55,7 +55,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 #### v0.6.3
 
-* 
+* [#84](https://github.com/Tracman-org/Server/issues/84) Fixed password reset page
 
 #### v0.6.2
 
