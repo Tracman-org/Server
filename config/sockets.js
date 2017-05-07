@@ -33,9 +33,9 @@ module.exports = {
 			//socket.ua = socket.client.request.headers['user-agent'];
 			
 			/* Log */
-			//socket.on('log', (text)=>{
+			socket.on('log', (text)=>{
 				winston.debug(`LOG: ${text}`);
-			//});
+			});
 			
 			// This socket can set location (app)
 			socket.on('can-set', (userId)=>{
