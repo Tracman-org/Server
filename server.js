@@ -14,6 +14,7 @@ const
 	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
 	app = express(),
+	debug = require('debug')('tracman'),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
 	sockets = require('./config/sockets.js');
@@ -167,6 +168,7 @@ const
 	
 	// Listen
 	http.listen( env.port, ()=>{
+		debug('Starting Tracman');
 		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
 		
 		// Check for clients for each user
