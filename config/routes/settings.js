@@ -166,57 +166,55 @@ router.route('/')
 			res.redirect('/settings');
 		});
 		
-	} )
-
-	// Delete user account
-	.delete( (req,res,next)=>{
-		
-		User.findByIdAndRemove(req.user)
-			.then( ()=>{
-				req.flash('success', 'Your account has been deleted.  ');
-				res.redirect('/');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/settings');
-			});
-			
 	} );
+
+// Delete account
+router.get('/delete', (req,res)=>{
+	User.findByIdAndRemove(req.user)
+	.then( ()=>{
+		req.flash('success', 'Your account has been deleted. ');
+		res.redirect('/');
+	})
+	.catch( (err)=>{
+		mw.throwErr(err,req);
+		res.redirect('/settings');
+	});
+});
 
 // Confirm email address
 router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
+	
+	// Check token
+	if ( req.user.emailToken===req.params.token) {
 		
-		// Check token
-		if ( req.user.emailToken===req.params.token) {
-			
-			// Set new email
-			req.user.email = req.user.newEmail;
-			req.user.save()
-			.then( ()=>{
-				// Delete token and newEmail
-				req.user.emailToken = undefined;
-				req.user.newEmail = undefined;
-				req.user.save();
-			})
-			.then( ()=>{
-				// Report success
-				req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
-				res.redirect('/settings');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect(req.session.next||'/settings');
-			});
-			
-		}
-		
-		// Invalid token
-		else {
-			req.flash('danger', 'Email confirmation token is invalid. ');
+		// Set new email
+		req.user.email = req.user.newEmail;
+		req.user.save()
+		.then( ()=>{
+			// Delete token and newEmail
+			req.user.emailToken = undefined;
+			req.user.newEmail = undefined;
+			req.user.save();
+		})
+		.then( ()=>{
+			// Report success
+			req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
 			res.redirect('/settings');
-		}
+		})
+		.catch( (err)=>{
+			mw.throwErr(err,req);
+			res.redirect(req.session.next||'/settings');
+		});
 		
-	} );
+	}
+	
+	// Invalid token
+	else {
+		req.flash('danger', 'Email confirmation token is invalid. ');
+		res.redirect('/settings');
+	}
+	
+} );
 
 // Set password
 router.route('/password')

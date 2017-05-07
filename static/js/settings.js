@@ -26,16 +26,7 @@ $(function(){
 	// Delete account
 	$('#delete').click(function(){
 		if (confirm("Are you sure you want to delete your account?  This CANNOT be undone! ")) {
-			$.ajax({
-				url: '/settings',
-				type: 'DELETE',
-				success: function(){
-					location.reload();
-				},
-				fail: function(){
-					alert("Failed to delete account!");
-				}
-			});
+			window.location.href = "/settings/delete";
 		}
 	});
 	
