@@ -111,8 +111,7 @@ module.exports = (passport)=>{
 							
 							// No such user
 							else {
-								req.session.flashType = 'warning';
-								req.session.flashMessage = `There's no user for that ${service} account. `;
+								req.flash('warning', `There's no user for that ${service} account. `);
 								return done();
 							}
 							
@@ -126,8 +125,7 @@ module.exports = (passport)=>{
 					// No googleId either
 					else {
 						winston.debug(`Couldn't find ${service} user.`);
-						req.session.flashType = 'warning';
-						req.session.flashMessage = `There's no user for that ${service} account. `;
+						req.flash('warning', `There's no user for that ${service} account. `);
 						return done();
 					}
 				}
