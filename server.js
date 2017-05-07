@@ -23,7 +23,7 @@ const
 /* SETUP */ {
 	
 	// Log level
-	winston.level = env.logLevel || 'info';
+	winston.level = process.env.LOGLEVEL || env.logLevel || 'info';
 
 	/* Database */ {
 		
