@@ -51,7 +51,7 @@ function parseLoc(loc) {
 	loc.dir = parseFloat(loc.dir);
 	loc.lat = parseFloat(loc.lat);
 	loc.lon = parseFloat(loc.lon);
-	loc.time = new Date(loc.time).toLocaleString();
+	loc.tim = new Date(loc.tim).toLocaleString();
 	loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
 	return loc;
 }
@@ -190,7 +190,7 @@ socket.on('get', function(loc) {
 	if (disp!=='1') {
 	
 		// Update time
-		$('#timestamp').text('location updated '+loc.time);
+		$('#timestamp').text('location updated '+loc.tim);
 		
 		// Show or hide map
 		toggleMaps(loc);

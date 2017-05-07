@@ -6,16 +6,16 @@ const winston = require('winston'),
 
 // Check for tracking clients
 function checkForUsers(io, user) {
-	winston.debug(`Checking for clients receiving updates for ${user}`);
+	winston.silly(`Checking for clients receiving updates for ${user}`);
 	
 	// Checks if any sockets are getting updates for this user
 	if (Object.values(io.sockets.connected).some( (socket)=>{
 		return socket.gets===user;
 	})) {
-		winston.debug(`Activating updates for ${user}.`);
+		winston.silly(`Activating updates for ${user}.`);
 		io.to(user).emit('activate','true');
 	} else {
-		winston.debug(`Deactivating updates for ${user}.`);
+		winston.silly(`Deactivating updates for ${user}.`);
 		io.to(user).emit('activate', 'false');
 	}
 }
@@ -26,7 +26,7 @@ module.exports = {
 	
 	init: (io)=>{
 		io.on('connection', (socket)=>{
-			winston.debug(`${socket.id} connected.`);
+			winston.silly(`${socket.id} connected.`);
 			
 			// Set a few variables
 			//socket.ip = socket.client.request.headers['x-real-ip'];
@@ -39,9 +39,9 @@ module.exports = {
 			
 			// This socket can set location (app)
 			socket.on('can-set', (userId)=>{
-				winston.debug(`${socket.id} can set updates for ${userId}.`);
+				winston.silly(`${socket.id} can set updates for ${userId}.`);
 				socket.join(userId, ()=>{
-					winston.debug(`${socket.id} joined ${userId}`);
+					winston.silly(`${socket.id} joined ${userId}`);
 				});
 				checkForUsers( io, userId );
 			});
@@ -49,7 +49,7 @@ module.exports = {
 			// This socket can receive location (map)
 			socket.on('can-get', (userId)=>{
 				socket.gets = userId;
-				winston.debug(`${socket.id} can get updates for ${userId}.`);
+				winston.silly(`${socket.id} can get updates for ${userId}.`);
 				socket.join(userId, ()=>{
 					winston.debug(`${socket.id} joined ${userId}`);
 					socket.to(userId).emit('activate', 'true');
@@ -59,8 +59,12 @@ module.exports = {
 			// Set location
 			socket.on('set', (loc)=>{
 				winston.debug(`${socket.id} set location for ${loc.usr}`);
-				loc.time = Date.now();
+				winston.silly(`Location was set to: ${JSON.stringify(loc)}`);
 				
+				// Get android timestamp or use server timestamp
+				if (loc.ts){ loc.tim = Date(loc.ts); }
+				else { loc.tim = Date.now(); }
+
 				// Check for user and sk32 token
 				if (!loc.usr){
 					console.error("❌", new Error(`Recieved an update from ${socket.ip} without a usr!`).message);
@@ -89,7 +93,7 @@ module.exports = {
 								lon: parseFloat(loc.lon),
 								dir: parseFloat(loc.dir||0),
 								spd: parseFloat(loc.spd||0),
-								time: loc.time
+								time: loc.tim
 							};
 							user.save()
 							.catch( (err)=>{ console.error("❌", err.stack); });
@@ -103,11 +107,11 @@ module.exports = {
 			
 			// Shutdown (check for remaining clients)
 			socket.on('disconnect', (reason)=>{
-				winston.debug(`${socket.id} disconnected because of a ${reason}.`);
+				winston.silly(`${socket.id} disconnected because of a ${reason}.`);
 				
 				// Check if client was receiving updates
 				if (socket.gets){
-					winston.debug(`${socket.id} left ${socket.gets}`);
+					winston.silly(`${socket.id} left ${socket.gets}`);
 					checkForUsers( io, socket.gets );
 				}
 				
