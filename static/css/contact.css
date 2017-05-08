@@ -1,0 +1,31 @@
+input, textarea {
+	margin-bottom: 3%;
+}
+
+#subject, #message {
+	width: 100%;
+}
+
+@media (max-width:250px) {
+	#name, #email {
+		width: 100%;
+	}
+}
+@media (min-width:250px) {
+	#name, #email {
+		min-width: 45%;
+	}
+	#name {
+		float: left;
+	}
+	#email {
+		float: right;
+	}
+}
+
+button.btn {
+	display: block;
+	margin: auto;
+	min-width: 60%;
+	min-height: 12vh;
+}

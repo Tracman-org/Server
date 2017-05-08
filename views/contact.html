@@ -3,7 +3,9 @@
 
 {% block head %}
 {{super()}}
- <script src='https://www.google.com/recaptcha/api.js'></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.contact.min.css">
+	<script src='https://www.google.com/recaptcha/api.js'></script>
 {% endblock %}
 
 {% block main %}
@@ -11,11 +13,15 @@
 		
 		<h1>Contact</h1>
 		
-		<form id='contact-form'>
+		<form id='contact-form' role="form" method="POST">
 			
+			<input name="subject" id='subject' type="text" maxlength="160" value="{{subject}}" placeholder="Subject">
+			<textarea name="message" id='message' rows="10" maxlength="5000" placeholder="Message" required>{{message}}</textarea>
 			
-			<button class='g-recaptcha' data-sitekey="{{sitekey}}" data-callback="onSubmit">Submit</button>
-
+			<input name="name" id='name' type="text" maxlength="160" value="{{name}}" placeholder="Name">
+			<input name="email" id='email' type="email" maxlength="160" value="{{email}}" placeholder="Email" required>
+			
+			<button class='g-recaptcha main btn' data-sitekey="{{sitekey}}" data-callback="onSubmit">Submit</button>
 		</form>
 
 	</section>
