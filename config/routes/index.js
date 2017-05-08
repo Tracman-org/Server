@@ -18,6 +18,14 @@ module.exports = router
 		res.render('help');
 	})
 	
+	// Contact
+	.get('/contact', (req,res)=>{
+		res.render('contact');
+	})
+	.post('/contact', (req,res)=>{
+		//TODO: Get contact stuff
+	})
+	
 	// Terms of Service and Privacy Policy
 	.get('/terms', (req,res)=>{
 		res.render('terms');
