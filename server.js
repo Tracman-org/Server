@@ -7,7 +7,7 @@ const
 	expressValidator = require('express-validator'),
 	cookieParser = require('cookie-parser'),
 	cookieSession = require('cookie-session'),
-	winston = require('winston'),
+	debug = require('debug')('tracman-server'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
@@ -22,9 +22,6 @@ const
 
 /* SETUP */ {
 	
-	// Log level
-	winston.level = process.env.LOGLEVEL || env.logLevel || 'info';
-
 	/* Database */ {
 		
 		// Setup with native ES6 promises
@@ -84,7 +81,7 @@ const
 			let nextPath = ((req.query.next)?req.query.next: req.path.substring(0,req.path.indexOf('#')) || req.path );
 			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' && nextPath.substring(0,7)!=='/static' ){
 				req.session.next = nextPath+'#';
-				winston.debug(`Set redirect path to ${nextPath}#`);
+				debug(`Set redirect path to ${nextPath}#`);
 			}
 			
 			// User account
@@ -172,7 +169,6 @@ const
 	// Listen
 	http.listen( env.port, ()=>{
 		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
-		winston.verbose(`Log level set to ${env.logLevel}`);
 		
 		// Check for clients for each user
 		User.find({})

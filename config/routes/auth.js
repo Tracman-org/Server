@@ -7,7 +7,7 @@ const
 	crypto = require('crypto'),
 	moment = require('moment'),
 	slugify = require('slug'),
-	winston = require('winston'),
+	debug = require('debug')('tracman-routes-auth'),
 	env = require('../env/env.js');
 
 module.exports = (app, passport) => {
@@ -19,14 +19,14 @@ module.exports = (app, passport) => {
 			failureFlash: true
 		}, 
 		loginCallback = (req,res)=>{
-			winston.debug(`Login callback called... redirecting to ${req.session.next}`);
+			debug(`Login callback called... redirecting to ${req.session.next}`);
 			req.flash(req.session.flashType,req.session.flashMessage);
 			req.session.flashType = undefined;
 			req.session.flashMessage = undefined;
 			res.redirect( req.session.next || '/map' );
 		},
 		appLoginCallback = (req,res,next)=>{
-			winston.debug('appLoginCallback called.');
+			debug('appLoginCallback called.');
 			if (req.user){ res.send(req.user); }
 			else { 
 				let err = new Error("Unauthorized");
@@ -62,10 +62,12 @@ module.exports = (app, passport) => {
 			
 			// Send token and alert user
 			function sendToken(user){
+				debug('sendToken(user)');
 				
 				// Create a password token
 				user.createPassToken( (err,token,expires)=>{
 					if (err){
+						debug('Error creating password token');
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
 					}
@@ -138,6 +140,7 @@ module.exports = (app, passport) => {
 								if (existingUser){
 									crypto.randomBytes(6, (err,buf)=>{
 										if (err) {
+											debug('Failed to create random bytest for slug');
 											mw.throwErr(err,req);
 											reject();
 										}
@@ -152,11 +155,13 @@ module.exports = (app, passport) => {
 								
 							})
 							.catch((err)=>{
+								debug('Failed to create slug');
 								mw.throwErr(err,req);
 								reject();
 							});
 							
 						})(user.slug, (newSlug)=>{
+							debug('Successfully created slug');
 							user.slug = newSlug;
 							resolve();
 						});
@@ -164,13 +169,16 @@ module.exports = (app, passport) => {
 					
 					// Generate sk32
 					const sk32 = new Promise((resolve,reject) => {
+						debug('Creating sk32');
 						crypto.randomBytes(32, (err,buf)=>{
 							if (err) {
+								debug('Failed to create sk32');
 								mw.throwErr(err,req);
 								reject();
 							}
 							if (buf) {
 								user.sk32 = buf.toString('hex');
+								debug('Successfully created sk32');
 								resolve();
 							}
 						});
@@ -178,9 +186,10 @@ module.exports = (app, passport) => {
 					
 					// Save user and send the token by email
 					Promise.all([slug, sk32])
-					.then( ()=>{ user.save(); })
+					// .then( ()=>{ user.save(); })
 					.then( ()=>{ sendToken(user); })
 					.catch( (err)=>{
+						debug('Failed to save user');
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
 					});
@@ -268,19 +277,19 @@ module.exports = (app, passport) => {
 		
 		// Social login
 		if (!req.user) {
-			winston.debug(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
+			debug(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`);
 			passport.authenticate(service, sendParams)(req,res,next);
 		}
 		
 		// Connect social account
 		else if (!req.user.auth[service]) {
-			winston.debug(`Attempting to connect ${service} account...`);
+			debug(`Attempting to connect ${service} account...`);
 			passport.authorize(service, sendParams)(req,res,next);
 		}
 		
 		// Disconnect social account
 		else {
-			winston.debug(`Attempting to disconnect ${service} account...`);
+			debug(`Attempting to disconnect ${service} account...`);
 			
 			// Make sure the user has a password before they disconnect their google login account
 			// This is because login used to only be through google, and some people might not have

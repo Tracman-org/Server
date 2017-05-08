@@ -8,7 +8,7 @@ const slug = require('slug'),
 	User = require('../models.js').user,
 	mail = require('../mail.js'),
 	env = require('../env/env.js'),
-	winston = require('winston'),
+	debug = require('debug')('tracman-settings'),
 	router = require('express').Router();
 
 // Validate email addresses
@@ -52,23 +52,23 @@ router.route('/')
 					
 					// Not unique!
 					if (existingUser && existingUser.id!==req.user.id) {
-						winston.debug("Email not unique!");
+						debug("Email not unique!");
 						req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `);
 						resolve();
 					}
 					
 					// It's unique
 					else {
-						winston.debug("Email is unique");
+						debug("Email is unique");
 						req.user.newEmail = req.body.email;
 				
 						// Create token
-						winston.debug(`Creating email token...`);
+						debug(`Creating email token...`);
 						req.user.createEmailToken((err,token)=>{
 							if (err){ reject(err); }
 							
 							// Send token to user by email
-							winston.debug(`Mailing new email token to ${req.body.email}...`);
+							debug(`Mailing new email token to ${req.body.email}...`);
 							mail.send({
 								to: `"${req.user.name}" <${req.body.email}>`,
 								from: mail.from,
@@ -133,7 +133,7 @@ router.route('/')
 		// Set settings when done
 		Promise.all([checkEmail, checkSlug])
 		.then( ()=>{
-			winston.debug('Setting settings... ');
+			debug('Setting settings... ');
 				
 			// Set values
 			req.user.name = xss(req.body.name);
@@ -148,10 +148,10 @@ router.route('/')
 			};
 			
 			// Save user and send response
-			winston.debug(`Saving new settings for user ${req.user.name}...`);
+			debug(`Saving new settings for user ${req.user.name}...`);
 			req.user.save()
 			.then( ()=>{
-				winston.debug(`DONE!  Redirecting user...`);
+				debug(`DONE!  Redirecting user...`);
 				req.flash('success', 'Settings updated. ');
 				res.redirect('/settings');
 			})
@@ -265,14 +265,17 @@ router.route('/password/:token')
 
 	// Check token
 	.all( (req,res,next)=>{
+		debug('/settings/password/:token .all() called');
 		User
 			.findOne({'auth.passToken': req.params.token})
 			.where('auth.passTokenExpires').gt(Date.now())
 			.then((user) => {
 				if (!user) {
+					debug('Bad token');
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
 					res.redirect( (req.isAuthenticated)?'/settings':'/login' );
 				} else {
+					debug('setting passwordUser');
 					res.locals.passwordUser = user;
 					next();
 				}
@@ -285,6 +288,7 @@ router.route('/password/:token')
 
 	// Show password change form
 	.get( (req,res)=>{
+		debug('/settings/password/:token .get() called');
 		res.render('password');
 	} )
 	
