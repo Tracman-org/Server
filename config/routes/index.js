@@ -1,6 +1,6 @@
 'use strict';
 
-const mw = require('../middleware.js'),
+const env = require('../env/env.js'),
 	router = require('express').Router(),
 	slug = require('slug'),
 	xss = require('xss'),
@@ -20,7 +20,9 @@ module.exports = router
 	
 	// Contact
 	.get('/contact', (req,res)=>{
-		res.render('contact');
+		res.render('contact',{
+			sitekey: env.recaptcha
+		});
 	})
 	.post('/contact', (req,res)=>{
 		//TODO: Get contact stuff
