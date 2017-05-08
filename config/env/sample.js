@@ -31,4 +31,8 @@ module.exports = {
 	// Google maps API key
 	googleMapsAPI: 'XXXXXXXXXXXXXXX_XXXXXXXXXXXXXXXXXXXXXXX'
 	
+	// reCaptcha API key
+	recaptchaSitekey: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+	recaptchaSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+	
 };

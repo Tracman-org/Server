@@ -10,7 +10,7 @@ router
 	.get('/mail', (req,res,next)=>{
 		mail.send({
 		  to: `"Keith Irwin" <hypergeek14@gmail.com>`,
-		  from: mail.from,
+		  from: mail.noReply,
 		  subject: 'Test email',
 		  text: mail.text("Looks like everything's working! "),
 		  html: mail.html("<p>Looks like everything's working! </p>")
