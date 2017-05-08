@@ -71,7 +71,7 @@ router.route('/')
 							debug(`Mailing new email token to ${req.body.email}...`);
 							mail.send({
 								to: `"${req.user.name}" <${req.body.email}>`,
-								from: mail.from,
+								from: mail.noReply,
 								subject: 'Confirm your new email address for Tracman',
 								text: mail.text(`A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  \n\nTo confirm your email, follow this link:\n${env.url}/settings/email/${token}. `),
 								html: mail.html(`<p>A request has been made to change your Tracman email address.  If you did not initiate this request, please disregard it.  </p><p>To confirm your email, follow this link:<br><a href="${env.url}/settings/email/${token}">${env.url}/settings/email/${token}</a>. </p>`)
@@ -241,7 +241,7 @@ router.route('/password')
 				// Confirm password change request by email.
 				mail.send({
 					to: mail.to(req.user),
-					from: mail.from,
+					from: mail.noReply,
 					subject: 'Request to change your Tracman password',
 					text: mail.text(`A request has been made to change your tracman password.  If you did not initiate this request, please contact support at keith@tracman.org.  \n\nTo change your password, follow this link:\n${env.url}/settings/password/${token}. \n\nThis request will expire at ${expirationTimeString}. `),
 					html: mail.html(`<p>A request has been made to change your tracman password.  If you did not initiate this request, please contact support at <a href="mailto:keith@tracman.org">keith@tracman.org</a>.  </p><p>To change your password, follow this link:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a>. </p><p>This request will expire at ${expirationTimeString}. </p>`)

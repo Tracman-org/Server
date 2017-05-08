@@ -80,7 +80,7 @@ module.exports = (app, passport) => {
 						
 						// Email the instructions to continue
 						mail.send({
-							from: mail.from,
+							from: mail.noReply,
 							to: `<${user.email}>`,
 							subject: 'Complete your Tracman registration',
 							text: mail.text(`Welcome to Tracman!  \n\nTo complete your registration, follow this link and set your password:\n${env.url}/settings/password/${token}\n\nThis link will expire at ${expirationTimeString}.  `),
@@ -238,7 +238,7 @@ module.exports = (app, passport) => {
 							
 							// Email reset link
 							mail.send({
-								from: mail.from,
+								from: mail.noReply,
 								to: mail.to(user),
 								subject: 'Reset your Tracman password',
 								text: mail.text(`Hi, \n\nDid you request to reset your Tracman password?  If so, follow this link to do so:\n${env.url}/settings/password/${token}\n\nIf you didn't initiate this request, just ignore this email. `),

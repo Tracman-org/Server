@@ -34,7 +34,7 @@ module.exports = {
 		return `<h1><a href="/" style="text-decoration:none;"><span style="color:#000;font-family:sans-serif;font-size:36px;font-weight:bold"><img src="${env.url}/static/img/icon/by/32.png" alt="+" style="margin-right:10px">Tracman</span></a></h1>${text}<p style="font-size:8px;">Do not reply to this email.  For information about why you recieved this email, see our <a href="${env.url}/privacy#email">privacy policy</a>. </p>`;
 	},
 	
-	from: `"Tracman" <NoReply@tracman.org>`,
+	noReply: `"Tracman" <NoReply@tracman.org>`,
 	
 	to: (user)=>{
 		return `"${user.name}" <${user.email}>`;
