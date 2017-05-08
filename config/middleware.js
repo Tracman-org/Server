@@ -29,7 +29,7 @@ module.exports = {
 
 	// Ensure administrator
 	ensureAdmin: (req,res,next)=>{
-		if (req.user.isAdmin){ return next(); }
+		if (req.isAuthenticated() && req.user.isAdmin){ return next(); }
 		else { 
 			let err = new Error("Unauthorized");
 			err.status = 401;
