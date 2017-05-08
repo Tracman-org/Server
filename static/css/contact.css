@@ -6,12 +6,12 @@ input, textarea {
 	width: 100%;
 }
 
-@media (max-width:250px) {
+@media (max-width:600px) {
 	#name, #email {
 		width: 100%;
 	}
 }
-@media (min-width:250px) {
+@media (min-width:600px) {
 	#name, #email {
 		min-width: 45%;
 	}
