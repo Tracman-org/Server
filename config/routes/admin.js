@@ -4,41 +4,32 @@ const router = require('express').Router(),
   mw = require('../middleware.js'),
   User = require('../models.js').user;
 
-router.route('/')
-	.all(mw.ensureAdmin, (req,res,next)=>{
-		next();
-	} )
+router.get('/', mw.ensureAdmin,  (req,res)=>{
 	
-	.get( (req,res)=>{
+	User.find({}).sort({lastLogin:-1})
+	.then( (found)=>{
+		res.render('admin', {
+			noFooter: '1',
+			users: found,
+			total: found.length
+		});
+	})
+	.catch( (err)=>{ mw.throwErr(err,req); });
 		
-		User.find({}).sort({lastLogin:-1})
-		.then( (found)=>{
-			res.render('admin', {
-				noFooter: '1',
-				users: found
-			});
-		})
-		.catch( (err)=>{ mw.throwErr(err,req); });
-		
-	} )
+});
 	
-	.post( (req,res,next)=>{
-		if (req.body.delete) {
-			User.findOneAndRemove({'_id':req.body.delete})
-			.then( (user)=>{
-				req.flash('success', '<i>'+user.name+'</i> deleted.');
-				res.redirect('/admin#users');
-			})
-			.catch( (err)=>{
-				mw.throwErr(err,req);
-				res.redirect('/admin#users');
-			});
-		}
-		else { 
-			let err = new Error('POST without action sent.  ');
-			err.status = 500; 
-			next();
-		}
-	} );
+router.get('/delete/:usrid', mw.ensureAdmin,  (req,res,next)=>{
+	
+	User.findOneAndRemove({'_id':req.params.usrid})
+	.then( (user)=>{
+		req.flash('success', '<i>'+user.name+'</i> deleted.');
+		res.redirect('/admin');
+	})
+	.catch( (err)=>{
+		mw.throwErr(err,req);
+		res.redirect('/admin');
+	});
+	
+});
 
 module.exports = router;
