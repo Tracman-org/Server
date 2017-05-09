@@ -3,7 +3,8 @@
 const mongoose = require('mongoose'),
 	unique = require('mongoose-unique-validator'),
 	bcrypt = require('bcrypt'),
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	debug = require('debug')('tracman-models');
 
 const userSchema = new mongoose.Schema({
 	name: {type:String},
@@ -15,9 +16,9 @@ const userSchema = new mongoose.Schema({
 		password: String,
 		passToken: String,
 		passTokenExpires: Date,
-		google: {type:String, unique:true},
-		facebook: {type:String, unique:true},
-		twitter: {type:String, unique:true},
+		google: String,
+		facebook: String,
+		twitter: String,
 	},
 	isAdmin: {type:Boolean, required:true, default:false},
 	isPro: {type:Boolean, required:true, default:false},
@@ -52,13 +53,13 @@ const userSchema = new mongoose.Schema({
 	
 	// Create email confirmation token
 	userSchema.methods.createEmailToken = function(next){ // next(err,token)
-		//console.log('user.createEmailToken() called');
+		debug('user.createEmailToken() called');
 		var user = this;
 		
 		crypto.randomBytes(16, (err,buf)=>{
 			if (err){ next(err,null); }
 			if (buf){
-				//console.log(`Buffer ${buf.toString('hex')} created`);
+				debug(`Buffer ${buf.toString('hex')} created`);
 				user.emailToken = buf.toString('hex');
 				user.save()
 				.then( ()=>{
@@ -79,7 +80,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Reuse old token, resetting clock
 		if ( user.auth.passTokenExpires >= Date.now() ){
-			//console.log(`Reusing old password token...`);
+			debug(`Reusing old password token...`);
 			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 			user.save()
 			.then( ()=>{
@@ -92,7 +93,7 @@ const userSchema = new mongoose.Schema({
 		
 		// Create new token
 		else {
-			//console.log(`Creating new password token...`);
+			debug(`Creating new password token...`);
 			crypto.randomBytes(16, (err,buf)=>{
 				if (err){ return next(err,null,null); }
 				if (buf) {
@@ -100,9 +101,11 @@ const userSchema = new mongoose.Schema({
 					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
 					user.save()
 					.then( ()=>{
+						debug('successfully saved user in createPassToken');
 						return next(null,user.auth.passToken,user.auth.passTokenExpires);
 					})
 					.catch( (err)=>{
+						debug('error saving user in createPassToken');
 						return next(err,null,null);
 					});
 				}

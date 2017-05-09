@@ -1,11 +1,12 @@
 {% extends 'templates/base.html' %}
-{% block title %}{{super()}} | {% if code %}{{code}} {% endif %}Error{% endblock %}
+{% block title %}{{super()}} | {% if code %}{{code}}{% endif %}{% if message %}: {{message}}{% else %} Error{% endif%}{% endblock %}
 
 {% block main %}
 <section class='container'>
 	{% if message %}<h2>❌️ {{message}}</h2>{% endif %}
 	{% if stack %}<p>{{stack}}</p>{% else %}
 	{% if code == '404' %}<p>This page does not exist.  Maybe you followed a dead link here.  </p>
+	{% elif code == '401' %}<p>You aren't allowed in here.  Shoo.  </p>
 	{% else %}<p>Would you please <a href="https://github.com/Tracman-org/Server/issues/new">report this error</a>? </p>{% endif %}
 	{% if code %}<img style="width:100%" src="https://http.cat/{{code}}.jpg">{% endif %}{% endif %}
 </section>

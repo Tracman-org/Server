@@ -7,6 +7,7 @@ const
 	expressValidator = require('express-validator'),
 	cookieParser = require('cookie-parser'),
 	cookieSession = require('cookie-session'),
+	debug = require('debug')('tracman-server'),
 	mongoose = require('mongoose'),
 	nunjucks = require('nunjucks'),
 	passport = require('passport'),
@@ -20,7 +21,7 @@ const
 
 
 /* SETUP */ {
-
+	
 	/* Database */ {
 		
 		// Setup with native ES6 promises
@@ -78,9 +79,9 @@ const
 			
 			// Path for redirects
 			let nextPath = ((req.query.next)?req.query.next: req.path.substring(0,req.path.indexOf('#')) || req.path );
-			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' ){
+			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='/logout' && nextPath.substring(0,7)!=='/static' ){
 				req.session.next = nextPath+'#';
-				//console.log(`Set redirect path to ${nextPath}#`);
+				debug(`Set redirect path to ${nextPath}#`);
 			}
 			
 			// User account
@@ -130,7 +131,7 @@ const
 		// Production handlers
 		if (env.mode!=='development') {
 			app.use( (err,req,res,next)=>{
-				if (err.status!==404){ console.error(`❌ ${err.stack}`); }
+				if (err.status!==404&&err.status!==401){ console.error(`❌ ${err.stack}`); }
 				if (res.headersSent) { return next(err); }
 				res.status(err.status||500);
 				res.render('error', {

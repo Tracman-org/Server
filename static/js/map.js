@@ -51,7 +51,7 @@ function parseLoc(loc) {
 	loc.dir = parseFloat(loc.dir);
 	loc.lat = parseFloat(loc.lat);
 	loc.lon = parseFloat(loc.lon);
-	loc.time = new Date(loc.time).toLocaleString();
+	loc.tim = new Date(loc.tim).toLocaleString();
 	loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
 	return loc;
 }
@@ -62,7 +62,8 @@ function toggleMaps(loc) {
 		$('#map').hide();
 		$('#pano').hide();
 		$('#notset').show();
-	} else {
+	}
+	else {
 		$('#map').show();
 		$('#pano').show();
 		$('#notset').hide();
@@ -83,6 +84,7 @@ window.gmapsCb = function() {
 		// Create map
 		if (disp!=='1') {
 			//console.log("Creating map...");
+			
 			map = new google.maps.Map( mapElem, {
 				center: new google.maps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 				panControl: false,
@@ -185,17 +187,15 @@ socket.on('get', function(loc) {
 	
 	// Parse location
 	loc = parseLoc(loc);
-	
+		
 	// Update map
 	if (disp!=='1') {
-	
-		// Update time
-		$('#timestamp').text('location updated '+loc.time);
 		
-		// Show or hide map
-		toggleMaps(loc);
+		// Update time
+		$('#timestamp').text('location updated '+loc.tim);
 		
 		// Update marker and map center
+		google.maps.event.trigger(map,'resize');
 		map.setCenter({ lat:loc.lat, lng:loc.lon });
 		marker.setPosition({ lat:loc.lat, lng:loc.lon });
 		
