@@ -316,10 +316,11 @@ router.route('/password/:token')
 					req.flash('success', 'Your password has been changed. ');
 					res.redirect('/settings');
 				}
+				
 				// New user created password
 				else {
 					req.flash('success', 'Password set.  You can use it to log in now. ');
-					res.redirect('/login?next=/settings');
+					res.redirect('/login?next=/map?new=1');
 				}
 				
 			} );

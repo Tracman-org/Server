@@ -44,6 +44,38 @@
 
 {% block main %}
 
+	{% if user and newuserurl %}
+	<div id='welcome'>
+	<style>
+		#welcome {
+			background: #111;
+			padding: 3vw;
+			border-radius: 2vw;
+			z-index: 50;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		#welcome h1 {
+			display: inline-block;
+		}
+		#welcome p {
+			margin: 0;
+		}
+		#welcome .close {
+			cursor: pointer;
+			float: right;
+		}
+	</style>
+	
+		<h1>Welcome!</h1>
+		<span class='close' onclick="$('#welcome').hide();">✖️</span>
+		<p>This is your map.  It's avaliable at <a href="{{newuserurl}}">{{newuserurl}}</a>.  You can change that and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see <a href="/help">the help page</a>.  </p>
+		
+	</div>
+	{% endif %}
+
 	<div id='map'></div>
 	<div id='pano'></div>
 	
