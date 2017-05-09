@@ -1,5 +1,9 @@
 # Tracman Server Changelog
-###### v 0.6.3
+###### v 0.6.4
+
+#### v0.6.4
+
+* [#92](https://github.com/Tracman-org/Server/issues/92) Fixed blank map issue
 
 #### v0.6.3
 
