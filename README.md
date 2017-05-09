@@ -52,6 +52,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.6.4
+
+* [#92](https://github.com/Tracman-org/Server/issues/92) Fixed blank map issue
 
 #### v0.6.3
 
