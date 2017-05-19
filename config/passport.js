@@ -104,6 +104,7 @@ module.exports = (passport)=>{
 									return done(null, user);
 								})
 								.catch( (err)=>{
+									debug(`Failed to save user that exists with old googleId schema!`);
 									mw.throwErr(err,req);
 									return done(err);
 								});
@@ -117,6 +118,7 @@ module.exports = (passport)=>{
 							
 						})
 						.catch ( (err)=>{
+							debug(`Failed to search for user with old googleID field. `);
 							mw.throwErr(err,req);
 							return done(err);
 						});
@@ -140,6 +142,7 @@ module.exports = (passport)=>{
 				
 			})
 			.catch( (err)=>{
+				debug(`Failed to find user with query: ${query}`);
 				mw.throwErr(err,req);
 				return done(err);
 			});
@@ -150,6 +153,7 @@ module.exports = (passport)=>{
 			debug(`Attempting to connect ${service} account...`);
 			
 			// Check for unique profileId
+			debug(`Checking for unique profileId...`);
 			User.findOne(query)
 			.then( (existingUser)=>{
 				
@@ -178,6 +182,7 @@ module.exports = (passport)=>{
 				
 			})
 			.catch( (err)=>{
+				debug(`Failed to check for unique profileId!`);
 				mw.throwErr(err,req);
 				return done(err);
 			});

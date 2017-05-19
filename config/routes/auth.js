@@ -91,6 +91,7 @@ module.exports = (app, passport) => {
 							res.redirect('/login');
 						})
 						.catch((err)=>{
+							debug(`Failed to email new instructions to continue to ${user.email}!`);
 							mw.throwErr(err,req);
 							res.redirect('/login#signup');
 						});
@@ -140,7 +141,7 @@ module.exports = (app, passport) => {
 								if (existingUser){
 									crypto.randomBytes(6, (err,buf)=>{
 										if (err) {
-											debug('Failed to create random bytest for slug');
+											debug('Failed to create random bytes for slug!');
 											mw.throwErr(err,req);
 											reject();
 										}
@@ -155,7 +156,7 @@ module.exports = (app, passport) => {
 								
 							})
 							.catch((err)=>{
-								debug('Failed to create slug');
+								debug('Failed to create slug!');
 								mw.throwErr(err,req);
 								reject();
 							});
@@ -172,7 +173,7 @@ module.exports = (app, passport) => {
 						debug('Creating sk32');
 						crypto.randomBytes(32, (err,buf)=>{
 							if (err) {
-								debug('Failed to create sk32');
+								debug('Failed to create sk32!');
 								mw.throwErr(err,req);
 								reject();
 							}
@@ -189,7 +190,7 @@ module.exports = (app, passport) => {
 					// .then( ()=>{ user.save(); })
 					.then( ()=>{ sendToken(user); })
 					.catch( (err)=>{
-						debug('Failed to save user');
+						debug('Failed to save user after creating slug and sk32!');
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
 					});
@@ -198,6 +199,7 @@ module.exports = (app, passport) => {
 				
 			})
 			.catch( (err)=>{
+				debug(`Failed to check if somebody already has the email ${req.body.email}`);
 				mw.throwErr(err,req);
 				res.redirect('/signup');
 			});
@@ -219,6 +221,7 @@ module.exports = (app, passport) => {
 			req.checkBody('email', 'Please enter a valid email address.').isEmail();
 			req.sanitizeBody('email').normalizeEmail({remove_dots:false});
 			
+			// Check if somebody has that email
 			User.findOne({'email':req.body.email})
 				.then( (user)=>{
 					
@@ -247,6 +250,7 @@ module.exports = (app, passport) => {
 								req.flash('success', `If an account exists with the email <u>${req.body.email}</u>, an email has been sent there with a password reset link. `);
 								res.redirect('/login');
 							}).catch((err)=>{
+								debug(`Failed to send reset link to ${user.email}`);
 								mw.throwErr(err,req);
 								res.redirect('/login');
 							});
@@ -256,6 +260,7 @@ module.exports = (app, passport) => {
 					}
 					
 				}).catch( (err)=>{
+					debug(`Failed to check for if somebody has that email (in reset request)!`);
 					mw.throwErr(err,req);
 					res.redirect('/login/forgot');
 				});
@@ -307,6 +312,7 @@ module.exports = (app, passport) => {
 					res.redirect('/settings');
 				})
 				.catch((err)=>{
+					debug(`Failed to save user after disconnecting ${service} account!`);
 					mw.throwErr(err,req);
 					res.redirect('/settings');
 				});
