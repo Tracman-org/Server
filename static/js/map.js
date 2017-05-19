@@ -3,7 +3,7 @@
 
 
 // Variables
-var map, pano, marker, elevator;
+var map, pano, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
 	panoElem = document.getElementById('pano'),
 	socket = io('//'+window.location.hostname);
@@ -186,29 +186,29 @@ socket.on('get', function(loc) {
 	console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 	
 	// Parse location
-	loc = parseLoc(loc);
+	newLoc = parseLoc(loc);
 		
 	// Update map
 	if (disp!=='1') {
 		
 		// Update time
-		$('#timestamp').text('location updated '+loc.tim);
+		$('#timestamp').text('location updated '+newLoc.tim);
 		
 		// Update marker and map center
 		google.maps.event.trigger(map,'resize');
-		map.setCenter({ lat:loc.lat, lng:loc.lon });
-		marker.setPosition({ lat:loc.lat, lng:loc.lon });
+		map.setCenter({ lat:newLoc.lat, lng:newLoc.lon });
+		marker.setPosition({ lat:newLoc.lat, lng:newLoc.lon });
 		
 		// Update speed
 		if (mapuser.settings.showSpeed) {
-			$('#spd').text( loc.spd.toFixed() );
+			$('#spd').text( newLoc.spd.toFixed() );
 		}
 			
 		// Update altitude
 		if (mapuser.settings.showAlt) {
 			getAltitude({
-				lat:loc.lat,
-				lng:loc.lon
+				lat: newLoc.lat,
+				lng: newLoc.lon
 			}, elevator, function(alt) {
 				if (alt) {
 					$('#alt').text( (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed() );
@@ -220,7 +220,7 @@ socket.on('get', function(loc) {
 
 	// Update street view
 	if (disp!=='0' && mapuser.settings.showStreetview) {
-		updateStreetView(loc,10);
+		updateStreetView(newLoc,10);
 	}
 	
 });
@@ -239,39 +239,41 @@ function getAltitude(loc,elev,cb){
 }
 
 // Get street view imagery
-//TODO: Use global loc object?
 function getStreetViewData(loc,rad,cb) {
-	if (!sv) { var sv=new google.maps.StreetViewService(); }
-	sv.getPanorama({
-		location: {
-			lat: loc.lat,
-			lng: loc.lon
-		},
-		radius:rad
-	}, function(data,status){ switch (status){
-		// Success
-		case google.maps.StreetViewStatus.OK:
-			cb(data);
-			break;
-		// No results in that radius
-		case google.maps.StreetViewStatus.ZERO_RESULTS:
-			// Square the radius and try again
-			getStreetViewData(loc,rad*rad*.5,cb);
-			break;
-		// Error
-		default:
-			console.error(new Error('❌️ Street view not available: '+status).message);
-	} });
+	// Ensure that the location hasn't changed
+	if (loc===newLoc) {
+		if (!sv) { var sv=new google.maps.StreetViewService(); }
+		sv.getPanorama({
+			location: {
+				lat: loc.lat,
+				lng: loc.lon
+			},
+			radius: rad
+		}, function(data,status){ switch (status){
+			// Success
+			case google.maps.StreetViewStatus.OK:
+				cb(data);
+				break;
+			// No results in that radius
+			case google.maps.StreetViewStatus.ZERO_RESULTS:
+				// Try again with a bigger radius
+				getStreetViewData(loc,rad*2,cb);
+				break;
+			// Error
+			default:
+				console.error(new Error('❌️ Street view not available: '+status).message);
+		} });
+	} else { console.log('loc!==newLoc'); }
 }
 
 // Update streetview
 function updateStreetView(loc) {
 	//console.log("Updating streetview...");
 	
-	// Moving
+	// Moving (show stationary image)
 	if (loc.spd>1) {
-		var imgElem = document.getElementById('panoImg');
-		getStreetViewData(loc, 50, function(data){
+		const imgElem = document.getElementById('panoImg');
+		getStreetViewData(loc, 2, function(data){
 			if (!imgElem) {
 				// Create image
 				pano = undefined;
@@ -287,9 +289,9 @@ function updateStreetView(loc) {
 		});
 	}
 	
-	// Not moving and pano not set
+	// Not moving and pano not set (create panoramic image)
 	else if (pano==null) {
-		getStreetViewData(loc, 10, function(data){
+		getStreetViewData(loc, 2, function(data){
 			// Create panorama
 			$('#pano').empty();
 			const panoOptions = {
@@ -305,6 +307,7 @@ function updateStreetView(loc) {
 			pano.setPano(data.location.pano);							
 			pano.setPov({
 				pitch: 0,
+				// Point towards users's location from street
 				heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
 			});
 		});
