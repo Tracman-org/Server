@@ -185,3 +185,27 @@ a.underline:hover:not(.btn) {
 .btn .fa {
 	margin-left: 10px;
 }
+
+
+
+/* Popups */
+.popup {
+	background: #111;
+	padding: 3vw;
+	border-radius: 2vw;
+	z-index: 50;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.popup h1 {
+	display: inline-block;
+}
+.popup p {
+	margin: 0;
+}
+.popup .close {
+	cursor: pointer;
+	float: right;
+}

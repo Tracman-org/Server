@@ -45,29 +45,7 @@
 {% block main %}
 
 	{% if user and newuserurl %}
-	<div id='welcome'>
-	<style>
-		#welcome {
-			background: #111;
-			padding: 3vw;
-			border-radius: 2vw;
-			z-index: 50;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-		}
-		#welcome h1 {
-			display: inline-block;
-		}
-		#welcome p {
-			margin: 0;
-		}
-		#welcome .close {
-			cursor: pointer;
-			float: right;
-		}
-	</style>
+	<div id='welcome' class='popup'>
 	
 		<h1>Welcome!</h1>
 		<span class='close' onclick="$('#welcome').hide();">✖️</span>
