@@ -48,6 +48,8 @@ main {
 
 /* Timestamp */
 #timestamp {
+	z-index: 1000000 !important;
+	text-align: right;
 	color: #000;
 	font-size: 12px;
 	padding-left: 5px;

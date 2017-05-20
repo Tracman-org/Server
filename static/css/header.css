@@ -129,7 +129,8 @@ header .hamburger-inner::after {
 @media (max-width: 800px) {
 	header nav ul li a { padding:15px; }
 }
-@media (max-width: 600px) {
+/* Hamburger menu starts this window width */
+@media (max-width: 655px) {
 	header nav {
 		float: none;
 		position: fixed;

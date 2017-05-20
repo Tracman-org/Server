@@ -203,7 +203,7 @@ a.underline:hover:not(.btn) {
 	box-shadow: 0.5vh 0.4vh 1vh 0.1vh #000;
 }
 .popup .topbar, .popup p {
-	margin: 0 0 3vh 0;
+	margin: 0 0 6vh 0;
 }
 .popup .topbar {
 	display: flex;
