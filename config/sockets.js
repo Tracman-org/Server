@@ -101,7 +101,7 @@ module.exports = {
 							
 							// If Keith, record location to file
 							if (user.id==='56b020279f740067540f96e9'){
-								fs.appendFile('/srv/tracman/demo.txt', loc, function (err) {
+								fs.appendFile('/srv/tracman/demo.txt', JSON.stringify(loc), function (err) {
 									if (err) { console.error('Error saving demo stuff:',err.stack); }
 								});
 							}
