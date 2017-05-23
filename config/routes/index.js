@@ -23,8 +23,7 @@ module.exports = router
 	
 	// Contact
 	.get('/contact', (req,res)=>{
-		res.render('contact',{
-			active: 'contact',
+		res.render('contact', {active:'contact',
 			sitekey: env.recaptchaSitekey
 		});
 	})
