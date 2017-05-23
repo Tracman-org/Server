@@ -55,6 +55,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 #### v0.6.5
 
 * [#96](https://github.com/Tracman-org/Server/issues/96) Fixed google streetview
+* Various minor fixes
 
 #### v0.6.4
 

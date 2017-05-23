@@ -185,3 +185,47 @@ a.underline:hover:not(.btn) {
 .btn .fa {
 	margin-left: 10px;
 }
+
+
+
+/* Popups */
+.popup {
+	background: #111;
+	padding: 4vh 4vw;
+	border-radius: 3vh;
+	z-index: 1000;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	-moz-box-shadow: 0.5vh 0.4vh 1vh 0.1vh #000;
+	-webkit-box-shadow: 0.5vh 0.4vh 1vh 0.1vh #000;
+	box-shadow: 0.5vh 0.4vh 1vh 0.1vh #000;
+}
+.popup .topbar, .popup p {
+	margin: 0 0 6vh 0;
+}
+.popup .topbar {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 0 3vh 0;
+}
+.popup p {
+	margin: 0 0 3vh 0;
+}
+.popup .close {
+	cursor: pointer;
+}
+.popup .buttons {
+	display: flex;
+	justify-content: space-around;
+}
+.page-mask {
+	z-index: 950;
+	background: rgba(0, 0, 0, 0.5);
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}

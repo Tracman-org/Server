@@ -13,17 +13,17 @@ module.exports = router
 	
 	// Index
 	.get('/', (req,res,next)=>{
-		res.render('index');
+		res.render('index', {active:'home'});
 	})
 
 	// Help
 	.get('/help', (req,res)=>{
-		res.render('help');
+		res.render('help', {active:'help'});
 	})
 	
 	// Contact
 	.get('/contact', (req,res)=>{
-		res.render('contact',{
+		res.render('contact', {active:'contact',
 			sitekey: env.recaptchaSitekey
 		});
 	})
@@ -85,10 +85,10 @@ module.exports = router
 	
 	// Terms of Service and Privacy Policy
 	.get('/terms', (req,res)=>{
-		res.render('terms');
+		res.render('terms', {active:'terms'});
 	})
 	.get('/privacy', (req,res)=>{
-		res.render('privacy');
+		res.render('privacy', {active:'privacy'});
 	})
 	
 	// robots.txt
@@ -100,6 +100,7 @@ module.exports = router
 	})
 	
 	// favicon.ico
+	//TODO: Just serve it
 	.get('/favicon.ico', (req,res)=>{
 		res.redirect('/static/img/icon/by/16-32-48.ico');
 	})

@@ -3,8 +3,9 @@
 
 #### v0.6.5
 
-* [#96](https://github.com/Tracman-org/Server/issues/96) Fixed google streetview
-* 
+* [#96](https://github.com/Tracman-org/Server/issues/96) Fixed Google streetview
+* Various minor fixes
+
 #### v0.6.4
 
 * [#92](https://github.com/Tracman-org/Server/issues/92) Fixed blank map issue
@@ -69,4 +70,3 @@
 * Unified map and dashboard UI
 * Security updates
 * New admin UI
-* 

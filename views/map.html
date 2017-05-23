@@ -45,33 +45,19 @@
 {% block main %}
 
 	{% if user and newuserurl %}
-	<div id='welcome'>
-	<style>
-		#welcome {
-			background: #111;
-			padding: 3vw;
-			border-radius: 2vw;
-			z-index: 50;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-		}
-		#welcome h1 {
-			display: inline-block;
-		}
-		#welcome p {
-			margin: 0;
-		}
-		#welcome .close {
-			cursor: pointer;
-			float: right;
-		}
-	</style>
+	<div class='page-mask'></div>
+	<div id='welcome' class='popup'>
 	
-		<h1>Welcome!</h1>
-		<span class='close' onclick="$('#welcome').hide();">✖️</span>
-		<p>This is your map.  It's avaliable at <a href="{{newuserurl}}">{{newuserurl}}</a>.  You can change that and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see <a href="/help">the help page</a>.  </p>
+		<div class='topbar'>
+			<h2>Welcome!</h2>
+			<div class='close' onclick="$('#welcome').hide();$('.page-mask').hide();">✖️</div>
+		</div>
+		
+		<p>This is your map.  It's publicly avaliable at <a href="{{newuserurl}}">{{newuserurl}}</a>.  You can change that URL and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see the <b><a href="/help">help</a></b> page.  </p>
+		
+		<div class='buttons'>
+			<a class='btn main' onclick="$('#welcome').hide();$('.page-mask').hide();">Got it!</a>
+		</div>
 		
 	</div>
 	{% endif %}
