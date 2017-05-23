@@ -23,7 +23,7 @@ router.get('/:slug?', (req,res,next)=>{
 	.then( (mapuser)=>{
 		if (!mapuser){ next(); } //404
 		else {
-			const active = '';
+			var active = '';
 			if (req.user && req.user.id===mapuser.id){ active='map'; }
 			res.render('map', {
 				active: active,
