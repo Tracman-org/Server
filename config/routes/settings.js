@@ -25,7 +25,7 @@ router.route('/')
 
 	// Get settings form
 	.get( (req,res)=>{
-		res.render('settings');
+		res.render('settings', {active:'settings'});
 	} )
 
 	// Set new settings

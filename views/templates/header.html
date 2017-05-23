@@ -12,20 +12,19 @@
 
 	<!-- Navigation -->
 	<nav id='navigation'><ul>
-			<li><a href="/">About</a></li>
-			<li><a href="/contact">Contact</a></li>
+			{% if active!='home' %}<li><a href="/">About</a></li>{% endif %}
+			<li><a href="/contact"{% if active=='contact' %} class='active'{% endif %}>Contact</a></li>
 		{% if user %}
-			<li><a href="/map">Map</a></li>
-			<li><a href="/settings">Settings</a></li>
+			<li><a href="/map"{% if active=='map' %} class='active'{% endif %}>Map</a></li>
+			<li><a href="/settings"{% if active=='settings' %} class='active'{% endif %}>Settings</a></li>
 		{% endif %}
-			<li><a href="/help">Help</a></li>
+			<li><a href="/help"{% if active=='help' %} class='active'{% endif %}>Help</a></li>
 		{% if user %}
-			{% if user.isAdmin %}<li><a href="/admin">Admin</a></li>{% endif %}
+			{% if user.isAdmin %}<li><a href="/admin"{% if active=='admin' %} class='active'{% endif %}>Admin</a></li>{% endif %}
 			<li><a href="/logout">Logout</a></li>
 		{% else %}
-			<li><a href="/map/keith">Demo</a></li>
-			<li><a href="/login#login">Login</a></li>
-			<li><a href="/login#signup">Join</a></li>
+			<li><a href="/map/keith"{% if active=='demo' %} class='active'{% endif %}>Demo</a></li>
+			<li><a href="/login">Login / join</a></li>
 		{% endif %}
 	</ul></nav>
 

@@ -6,7 +6,9 @@ header {
 	top: 0; left: 0;
 	width: 100%;
 	z-index: 200;
-} header a:hover, header a:focus {
+}
+header a:hover,
+header a:focus {
 	color: #fbc93d;
 }
 
@@ -20,15 +22,18 @@ header .logo {
 	font-size: 22px;
 	line-height: 30px;
 	margin: 0;
-} header .logo a {
+}
+header .logo a {
 	color:inherit;
 	font:inherit;
 	text-decoration:inherit;
 	cursor: pointer;
-} header .logo img {
+}
+header .logo img {
 	margin-right: 10px;
 	vertical-align: middle;
-} header .logo:hover {
+}
+header .logo:hover {
 	text-decoration: none;
 	background: rgba(255,255,255,0.1);
 }
@@ -36,24 +41,32 @@ header .logo {
 /* Navigation */
 header nav {
 	float: right;
-} header nav ul {
+}
+header nav ul {
 	padding: 0;
 	margin: 0;
-} header nav ul li {
+}
+header nav ul li {
 	display: inline-block;
 	float: left;
-} header nav ul li a, header nav ul li span {
+}
+header nav ul li a, 
+header nav ul li span {
 	text-decoration:inherit;
 	display: inline-block;
 	padding: 15px 20px;
 	color: #fff;
 	transition: 100ms;
-} header nav ul li a:hover,
-header nav ul li a:focus,
-header nav ul li a.active,
-header .logo:hover {
+}
+header nav ul li a:hover,
+header nav ul li a:focus {
 	text-decoration: none;
 	background: rgba(255,255,255,0.1);
+}
+header nav ul li a.active {
+	color: #fbc93d;
+	pointer-events: none;
+	cursor: default;
 }
 
 /* Hamburger */

@@ -71,10 +71,10 @@ const
 	
 	/* Routes	*/ {
 		
-		// Static files (keep this before setting default locals)
+		// Static files (keep this before default locals)
 		app.use('/static', express.static( __dirname+'/static', {dotfiles:'allow'} ));
 		
-		// Set default locals available to all views (keep this after static files)
+		// Default locals available to all views (keep this after static files)
 		app.get( '*', (req,res,next)=>{
 			
 			// Path for redirects

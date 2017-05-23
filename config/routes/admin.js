@@ -9,6 +9,7 @@ router.get('/', mw.ensureAdmin,  (req,res)=>{
 	User.find({}).sort({lastLogin:-1})
 	.then( (found)=>{
 		res.render('admin', {
+			active: 'admin',
 			noFooter: '1',
 			users: found,
 			total: found.length

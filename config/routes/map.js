@@ -24,6 +24,7 @@ router.get('/:slug?', (req,res,next)=>{
 		if (!mapuser){ next(); } //404
 		else {
 			res.render('map', {
+				active:(req.user.id===mapuser.id)?'map':'',
 				mapuser: mapuser,
 				mapApi: env.googleMapsAPI,
 				user: req.user,
