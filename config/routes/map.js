@@ -23,8 +23,10 @@ router.get('/:slug?', (req,res,next)=>{
 	.then( (mapuser)=>{
 		if (!mapuser){ next(); } //404
 		else {
+			const active = '';
+			if (req.user && req.user.id===mapuser.id){ active='map'; }
 			res.render('map', {
-				active:(req.user.id===mapuser.id)?'map':'',
+				active: active,
 				mapuser: mapuser,
 				mapApi: env.googleMapsAPI,
 				user: req.user,
