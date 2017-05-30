@@ -52,6 +52,12 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.6.6
+
+* Removed demo recording code
+* Moved email server settings to env file
+* Added SMTP check
+* 
 #### v0.6.5
 
 * [#96](https://github.com/Tracman-org/Server/issues/96) Fixed google streetview
