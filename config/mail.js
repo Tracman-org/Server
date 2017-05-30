@@ -16,13 +16,14 @@ let transporter = nodemailer.createTransport({
   // debug: true
 });
 
-/* Confirm login */
-// transporter.verify( (err,success)=>{
-// 	if (err){ console.error(`SMTP Error: ${err}`); }
-// 	console.log(`SMTP ${!success?'not ':''}ready...`);
-// } );
-
 module.exports = {
+	
+	verify: ()=>{
+		transporter.verify( (err,success)=>{
+			if (err){ console.error(`SMTP Error: ${err}`); }
+			console.log(` SMTP ${!success?'not ':''}ready...`);
+		} );
+	},
 	
 	send: transporter.sendMail.bind(transporter),
 	
