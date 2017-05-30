@@ -18,7 +18,7 @@ module.exports = {
 	verify: ()=>{
 		transporter.verify( (err,success)=>{
 			if (err){ console.error(`SMTP Error: ${err}`); }
-			console.log(`📧 SMTP ${!success?'not ':''}ready...`);
+			console.log(`📧 SMTP ${!success?'not ':''}ready`);
 		} );
 	},
 	
