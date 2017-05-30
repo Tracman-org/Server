@@ -20,6 +20,14 @@ module.exports = {
 	url: 'https://localhost:8080',
 	port: 8080,
 	
+	// Mailserver
+	mailserver: 'example.org',
+	mailport: 587,
+	mailauth: {
+		user: 'mailusername',
+		pass: 'XXXXXXXXXX',
+	},
+	
 	// OAuth API keys
 	facebookAppId: 'XXXXXXXXXXXXXXXX',
 	facebookAppSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

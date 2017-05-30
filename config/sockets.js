@@ -1,8 +1,7 @@
 'use strict';
 
 // Imports
-const fs = require('fs'),
-	debug = require('debug')('tracman-sockets'),
+const debug = require('debug')('tracman-sockets'),
 	User = require('./models.js').user;
 
 // Check for tracking clients
@@ -98,12 +97,7 @@ module.exports = {
 							};
 							user.save()
 							.catch( (err)=>{ console.error("❌", err.stack); });
-							
-							// If Keith, record location to file
-							if (user.id==='56b020279f740067540f96e9') {
-								fs.appendFile('/srv/tracman/demo.txt', `${loc.tim} ${loc.lat} ${loc.lon} ${loc.dir} ${loc.spd}\n`, function (err) {});
-							}
-								
+
 						}
 					})
 					.catch( (err)=>{ console.error("❌", err.stack); });
