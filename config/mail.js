@@ -4,14 +4,11 @@ const nodemailer = require('nodemailer'),
 	env = require('./env/env.js');
 
 let transporter = nodemailer.createTransport({
-	host: 'keithirwin.us',
-	port: 587,
+	host: env.mailserver,
+	port: env.mailport,
 	secure: false,
 	requireTLS: true,
-	auth: {
-		user: 'NoReply@tracman.org',
-		pass: 'Ei0UwfrZuE'
-	},
+	auth: env.mailauth,
   // logger: true,
   // debug: true
 });
