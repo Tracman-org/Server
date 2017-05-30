@@ -1,5 +1,5 @@
 # Tracman Server Changelog
-###### v 0.6.5
+###### v 0.6.6
 
 #### v0.6.5
 
