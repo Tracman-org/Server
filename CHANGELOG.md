@@ -1,9 +1,15 @@
 # Tracman Server Changelog
-###### v 0.6.5
+###### v 0.6.6
+
+#### v0.6.6
+
+* Removed demo recording code
+* Moved email server settings to env file
+* Added SMTP check
 
 #### v0.6.5
 
-* [#96](https://github.com/Tracman-org/Server/issues/96) Fixed Google street view
+* [#96](https://github.com/Tracman-org/Server/issues/96) Fixed Google streetview
 * Various minor fixes
 
 #### v0.6.4

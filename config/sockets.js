@@ -97,7 +97,7 @@ module.exports = {
 							};
 							user.save()
 							.catch( (err)=>{ console.error("❌", err.stack); });
-								
+
 						}
 					})
 					.catch( (err)=>{ console.error("❌", err.stack); });

@@ -14,6 +14,7 @@ const
 	flash = require('connect-flash-plus'),
 	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
+	mail = require('./config/mail.js'),
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
@@ -165,6 +166,9 @@ const
 
 /* RUNTIME */ {
 	console.log('🖥  Starting Tracman server...');
+	
+	// Test SMTP server
+	mail.verify();
 	
 	// Listen
 	http.listen( env.port, ()=>{
