@@ -19,11 +19,11 @@ You will need to set up a configuration file at `config/env/env.js`.  Use `confi
 A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
 
 ```sh
-cp config/env/sample.js config/env/my-config.js
-printf "'use strict';\n\nmodule.exports = require('./my-config.js');" > config/env/env.js
+cp config/env/sample.js config/env/local-config.js
+printf "module.exports = require('./local-config.js');" > config/env/env.js
 ```
 
-Then edit `config/env/my-config.js` to match your local environment.  
+Then edit `config/env/local-config.js` to match your local environment.  
 
 
 ## Usage
