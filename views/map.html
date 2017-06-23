@@ -95,18 +95,26 @@
 {% block javascript %}
 {{super()}}
 	
+	<!-- require.js -->
+	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js" integrity="sha256-4FF6zC8o0//sei6CJUD+MJIhewXKgcrV/iA/4HD4A8c=" crossorigin="anonymous"></script>
+	<!-- socket.io -->
 	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
+	<!-- google maps API -->
 	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
+	<!-- client-side javascript -->
 	<script type="application/javascript" src="/static/js/.map.min.js"></script>
-	{% if user.id == mapuser.id %}<script type="application/javascript" src="/static/js/.map-controls.min.js"></script>{% endif %}
-	<script> /* Variables from server */
-		
+	{% if user.id == mapuser.id %}
+		<!-- client-side controls javascript -->
+		<script type="application/javascript" src="/static/js/.map-controls.min.js"></script>
+	{% endif %}
+	
+	<!-- Variables from server-side -->
+	<script>
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
 			noHeader = "{{noHeader |safe}}",
 			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
 			userid = "{{user._id |safe}}",
 			token = "{{user.sk32 |safe}}";
-		
 	</script>
 	
 {% endblock %}
