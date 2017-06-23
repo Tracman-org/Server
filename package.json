@@ -14,7 +14,6 @@
     "express-validator": "^3.1.3",
     "jquery": "^3.2.1",
     "kerberos": "0.0.17",
-    "load-google-maps-api": "^1.0.0",
     "mellt": "^1.0.0",
     "minifier": "^0.8.1",
     "moment": "^2.12.0",
@@ -54,7 +53,7 @@
     "test": "mocha test.js",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
-    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static",
+    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css",
     "update": "sudo n stable && sudo npm update --save && sudo npm prune",
     "pack": "./node_modules/.bin/webpack --config webpack.config.js"
   },
