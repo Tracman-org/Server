@@ -44,14 +44,16 @@
     "karma-mocha": "^1.1.1",
     "mocha": "^2.5.3",
     "nodemon": "^1.10.2",
-    "supertest": "^1.2.0"
+    "supertest": "^1.2.0",
+    "webpack": "^3.0.0"
   },
   "scripts": {
     "test": "mocha test.js",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "minify": "minify --template .{{filename}}.min.{{ext}} --clean static",
-    "update": "sudo n stable && sudo npm update --save && sudo npm prune"
+    "update": "sudo n stable && sudo npm update --save && sudo npm prune",
+    "pack": "webpack --config webpack.config.js"
   },
   "repository": "Tracman-org/Server",
   "keywords": [
