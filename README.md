@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.6.6
+###### v 0.6.7
 
 node.js application to display a sharable map with user's location.
 
@@ -19,11 +19,11 @@ You will need to set up a configuration file at `config/env/env.js`.  Use `confi
 A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
 
 ```sh
-cp config/env/sample.js config/env/my-config.js
-printf "'use strict';\n\nmodule.exports = require('./my-config.js');" > config/env/env.js
+cp config/env/sample.js config/env/local-config.js
+printf "module.exports = require('./local-config.js');" > config/env/env.js
 ```
 
-Then edit `config/env/my-config.js` to match your local environment.  
+Then edit `config/env/local-config.js` to match your local environment.  
 
 
 ## Usage
@@ -52,12 +52,15 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.6.7
+* [#87](https://github.com/Tracman-org/Server/issues/87) Started loading assets with webpack
+
 #### v0.6.6
 
 * Removed demo recording code
 * Moved email server settings to env file
 * Added SMTP check
-* 
+
 #### v0.6.5
 
 * [#96](https://github.com/Tracman-org/Server/issues/96) Fixed google streetview
@@ -103,4 +106,4 @@ This program is free software: you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with this program.  If not, see <[http://www.gnu.org/licenses/](http://www.gnu.org/licenses/)>.
+You should have received a copy of the GNU General Public License along with this program.  If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).

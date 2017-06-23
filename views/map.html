@@ -94,19 +94,21 @@
 
 {% block javascript %}
 {{super()}}
-	
-	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
-	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>
-	<script type="application/javascript" src="/static/js/.map.min.js"></script>
-	{% if user.id == mapuser.id %}<script type="application/javascript" src="/static/js/.map-controls.min.js"></script>{% endif %}
-	<script> /* Variables from server */
-		
+
+	<!-- Variables from server-side -->
+	<script>
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
+			mapKey = "{{mapApi |safe}}",
 			noHeader = "{{noHeader |safe}}",
 			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
 			userid = "{{user._id |safe}}",
 			token = "{{user.sk32 |safe}}";
-		
 	</script>
+	
+	<!-- Webpacked bundles -->
+	<script type="application/javascript" src="/static/js/dist/map.js"></script>
+	{% if user.id == mapuser.id %}
+		<script type="application/javascript" src="/static/js/dist/controls.js"></script>
+	{% endif %}
 	
 {% endblock %}
