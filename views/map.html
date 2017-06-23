@@ -94,23 +94,24 @@
 
 {% block javascript %}
 {{super()}}
-	
-	<!-- google maps API -->
-	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}" async></script>
-	<!-- webpacked javascript -->
-	<script type="application/javascript" src="/static/js/dist/map.js"></script>
-	{% if user.id == mapuser.id %}
-		<!-- client-side controls javascript -->
-		<script type="application/javascript" src="/static/js/map-controls.min.js"></script>
-	{% endif %}
-	
+
 	<!-- Variables from server-side -->
 	<script>
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
+			mapKey = "{{mapApi |safe}}",
 			noHeader = "{{noHeader |safe}}",
 			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
 			userid = "{{user._id |safe}}",
 			token = "{{user.sk32 |safe}}";
 	</script>
+	
+	<!-- google maps API -->
+	<!--<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi}}&callback=gmapsCb" async defer></script>-->
+	<!-- webpacked javascript -->
+	<script type="application/javascript" src="/static/js/dist/map.js"></script>
+	{% if user.id == mapuser.id %}
+		<!-- client-side controls javascript -->
+		<script type="application/javascript" src="/static/js/dist/controls.js"></script>
+	{% endif %}
 	
 {% endblock %}

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 23);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -100,7 +100,7 @@ module.exports = g;
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(25);
+exports = module.exports = __webpack_require__(27);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -280,7 +280,7 @@ function localstorage() {
   } catch (e) {}
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
 
 /***/ }),
 /* 2 */
@@ -290,15 +290,15 @@ function localstorage() {
  * Module dependencies.
  */
 
-var keys = __webpack_require__(35);
+var keys = __webpack_require__(37);
 var hasBinary = __webpack_require__(11);
-var sliceBuffer = __webpack_require__(36);
-var after = __webpack_require__(37);
-var utf8 = __webpack_require__(38);
+var sliceBuffer = __webpack_require__(38);
+var after = __webpack_require__(39);
+var utf8 = __webpack_require__(40);
 
 var base64encoder;
 if (global && global.ArrayBuffer) {
-  base64encoder = __webpack_require__(40);
+  base64encoder = __webpack_require__(42);
 }
 
 /**
@@ -356,7 +356,7 @@ var err = { type: 'error', data: 'parser error' };
  * Create a blob api even for blob builder when vendor prefixes exist
  */
 
-var Blob = __webpack_require__(41);
+var Blob = __webpack_require__(43);
 
 /**
  * Encodes a packet.
@@ -962,7 +962,7 @@ module.exports = function(a, b){
 var debug = __webpack_require__(1)('socket.io-parser');
 var Emitter = __webpack_require__(6);
 var hasBin = __webpack_require__(11);
-var binary = __webpack_require__(28);
+var binary = __webpack_require__(30);
 var isBuf = __webpack_require__(12);
 
 /**
@@ -1531,7 +1531,7 @@ Emitter.prototype.hasListeners = function(event){
 
 /* WEBPACK VAR INJECTION */(function(global) {// browser shim for xmlhttprequest module
 
-var hasCORS = __webpack_require__(33);
+var hasCORS = __webpack_require__(35);
 
 module.exports = function (opts) {
   var xdomain = opts.xdomain;
@@ -1956,7 +1956,7 @@ module.exports = function parseuri(str) {
  * Module requirements.
  */
 
-var isArray = __webpack_require__(27);
+var isArray = __webpack_require__(29);
 
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof global.Blob === 'function' || toString.call(global.Blob) === '[object BlobConstructor]';
@@ -2044,7 +2044,7 @@ function isBuf(obj) {
  * Module dependencies.
  */
 
-var eio = __webpack_require__(30);
+var eio = __webpack_require__(32);
 var Socket = __webpack_require__(18);
 var Emitter = __webpack_require__(6);
 var parser = __webpack_require__(5);
@@ -2052,7 +2052,7 @@ var on = __webpack_require__(19);
 var bind = __webpack_require__(20);
 var debug = __webpack_require__(1)('socket.io-client:manager');
 var indexOf = __webpack_require__(17);
-var Backoff = __webpack_require__(47);
+var Backoff = __webpack_require__(49);
 
 /**
  * IE6+ hasOwnProperty
@@ -2623,9 +2623,9 @@ Manager.prototype.onreconnect = function () {
  */
 
 var XMLHttpRequest = __webpack_require__(7);
-var XHR = __webpack_require__(34);
-var JSONP = __webpack_require__(42);
-var websocket = __webpack_require__(43);
+var XHR = __webpack_require__(36);
+var JSONP = __webpack_require__(44);
+var websocket = __webpack_require__(45);
 
 /**
  * Export transports.
@@ -3026,7 +3026,7 @@ module.exports = function(arr, obj){
 
 var parser = __webpack_require__(5);
 var Emitter = __webpack_require__(6);
-var toArray = __webpack_require__(46);
+var toArray = __webpack_require__(48);
 var on = __webpack_require__(19);
 var bind = __webpack_require__(20);
 var debug = __webpack_require__(1)('socket.io-client:socket');
@@ -3499,19 +3499,24 @@ module.exports = function(obj, fn){
 
 
 /***/ }),
-/* 21 */
+/* 21 */,
+/* 22 */,
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_socket_io_client__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_socket_io_client__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_socket_io_client___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_socket_io_client__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(50);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_load_google_maps_api__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_load_google_maps_api___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_load_google_maps_api__);
 
-/* global google mapuser userid disp noHeader */
+/* global mapuser userid disp noHeader mapKey */
 
 // Webpack imports
+
 
 
 
@@ -3521,35 +3526,21 @@ const mapElem = document.getElementById('map'),
 	panoElem = document.getElementById('pano'),
 	socket = __WEBPACK_IMPORTED_MODULE_0_socket_io_client___default.a('//'+window.location.hostname);
 
-function waitForElements(vars,cb){
-	if ( vars.every(function(v){ return v!==undefined; }) ){
-		cb();
-	} else {
-		setTimeout(waitForElements(vars,cb), 100);
-	}
-}
-
-function onConnect(socket,userid,mapuserid) {
-	
-	// Can get location
-	socket.emit('can-get', mapuserid );
-	console.log("🚹 Receiving updates for",mapuserid);
-
-	// Can set location too
-	if (mapuserid===userid) { 
-		socket.emit('can-set', userid );
-		console.log("🚹 Sending updates for",userid);
-	}
-	
-}
-
 // socket.io stuff
 socket
 	.on('connect', function(){
 		console.log("⬆️ Connected!");
-		waitForElements([mapuser,userid], function() {
-			onConnect(socket,userid,mapuser._id);
-		});
+		
+		// Can get location
+		socket.emit('can-get', mapuser._id );
+		console.log("🚹 Receiving updates for",mapuser._id);
+
+		// Can set location too
+		if (mapuser._id===userid) { 
+			socket.emit('can-set', userid );
+			console.log("🚹 Sending updates for",userid);
+		}
+		
 	})
 	.on('disconnect', function(){
 		console.log("⬇️ Disconnected!");
@@ -3557,17 +3548,6 @@ socket
 	.on('error', function (err){
 		console.error('❌️',err.message);
 	});
-
-// Parse location
-function parseLoc(loc) {
-	loc.spd = (mapuser.settings.units=='standard')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd);
-	loc.dir = parseFloat(loc.dir);
-	loc.lat = parseFloat(loc.lat);
-	loc.lon = parseFloat(loc.lon);
-	loc.tim = new Date(loc.tim).toLocaleString();
-	loc.glatlng = new google.maps.LatLng(loc.lat, loc.lon);
-	return loc;
-}
 
 // Show/hide map if location is set/unset
 function toggleMaps(loc) {
@@ -3587,28 +3567,26 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default.a(function() {
 	toggleMaps(mapuser.last);
 });
 
-// Google maps API callback
-window.gmapsCb = function() {
-	//console.log("gmapsCb() called");
+// Load google maps
+__WEBPACK_IMPORTED_MODULE_2_load_google_maps_api___default.a({ key:mapKey })
+.then(function(googlemaps) {
+	//console.log("Loaded google maps:",googlemaps);
 	
-	// Make sure everything's ready...
-	waitForElements([mapuser,disp,noHeader], function() {
-		
 		// Create map
 		if (disp!=='1') {
 			//console.log("Creating map...");
 			
-			map = new google.maps.Map( mapElem, {
-				center: new google.maps.LatLng( mapuser.last.lat, mapuser.last.lon ),
+			map = new googlemaps.Map( mapElem, {
+				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 				panControl: false,
 				scaleControl: mapuser.settings.showScale,
 				draggable: false,
 				zoom: mapuser.settings.defaultZoom,
 				streetViewControl: false,
-				zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
-				mapTypeId: (mapuser.settings.defaultMap=='road')?google.maps.MapTypeId.ROADMAP:google.maps.MapTypeId.HYBRID
+				zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
+				mapTypeId: (mapuser.settings.defaultMap=='road')?googlemaps.MapTypeId.ROADMAP:googlemaps.MapTypeId.HYBRID
 			});
-			marker = new google.maps.Marker({
+			marker = new googlemaps.Marker({
 				position: { lat:mapuser.last.lat, lng:mapuser.last.lon },
 				title: mapuser.name,
 				map: map,
@@ -3626,7 +3604,7 @@ window.gmapsCb = function() {
 				logoDiv.innerHTML = '<a href="https://tracman.org/">'+
 					'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
 					"<span class='text'>Tracman</span></a>";
-				map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
+				map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
 			}
 			
 			// Create update time block
@@ -3636,7 +3614,7 @@ window.gmapsCb = function() {
 			if (mapuser.last.time) {
 				timeDiv.innerHTML = 'location updated '+new Date(mapuser.last.time).toLocaleString();
 			}
-			map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
+			map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
 			
 			// Create speed block
 			if (mapuser.settings.showSpeed) {
@@ -3655,13 +3633,13 @@ window.gmapsCb = function() {
 				speedSign.appendChild(speedLabel);
 				speedSign.appendChild(speedText);
 				speedSign.appendChild(speedUnit);
-				map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign);
+				map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(speedSign);
 			}
 			
 			// Create altitude block
 			if (mapuser.settings.showAlt) {
 				//console.log("Creating altitude sign...");
-				const elevator = new google.maps.ElevationService,
+				const elevator = new googlemaps.ElevationService,
 					altitudeSign = document.createElement('div'),
 					altitudeLabel = document.createElement('div'),
 					altitudeText = document.createElement('div'),
@@ -3672,14 +3650,14 @@ window.gmapsCb = function() {
 				altitudeSign.id = 'alt-sign';
 				altitudeText.innerHTML = '';
 				altitudeLabel.innerHTML = 'ALTITUDE';
-				getAltitude(new google.maps.LatLng(mapuser.last.lat,mapuser.last.lon), elevator, function(alt) {
+				getAltitude(new googlemaps.LatLng(mapuser.last.lat,mapuser.last.lon), elevator, function(alt) {
 					if (alt) { altitudeText.innerHTML = (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
 				});
 				altitudeUnit.innerHTML = (mapuser.settings.units=='standard')?'feet':'meters';
 				altitudeSign.appendChild(altitudeLabel);
 				altitudeSign.appendChild(altitudeText);
 				altitudeSign.appendChild(altitudeUnit);
-				map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign);
+				map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(altitudeSign);
 			}
 			
 		}
@@ -3689,148 +3667,159 @@ window.gmapsCb = function() {
 			//console.log("Creating streetview...");
 			updateStreetView(parseLoc(mapuser.last),10);
 		}
-		
-	});
-	
-};
-
-// Got location
-socket.on('get', function(loc) {
-	console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 	
 	// Parse location
-	newLoc = parseLoc(loc);
+	function parseLoc(loc) {
+		loc.spd = (mapuser.settings.units=='standard')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd);
+		loc.dir = parseFloat(loc.dir);
+		loc.lat = parseFloat(loc.lat);
+		loc.lon = parseFloat(loc.lon);
+		loc.tim = new Date(loc.tim).toLocaleString();
+		loc.glatlng = new googlemaps.LatLng(loc.lat, loc.lon);
+		return loc;
+	}
+	
+	// Got location
+	socket.on('get', function(loc) {
+		console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 		
-	// Update map
-	if (disp!=='1') {
-		
-		// Update time
-		__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#timestamp').text('location updated '+newLoc.tim);
-		
-		// Update marker and map center
-		google.maps.event.trigger(map,'resize');
-		map.setCenter({ lat:newLoc.lat, lng:newLoc.lon });
-		marker.setPosition({ lat:newLoc.lat, lng:newLoc.lon });
-		
-		// Update speed
-		if (mapuser.settings.showSpeed) {
-			__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#spd').text( newLoc.spd.toFixed() );
-		}
+		// Parse location
+		newLoc = parseLoc(loc);
 			
-		// Update altitude
-		if (mapuser.settings.showAlt) {
-			getAltitude({
-				lat: newLoc.lat,
-				lng: newLoc.lon
-			}, elevator, function(alt) {
-				if (alt) {
-					__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#alt').text( (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed() );
+		// Update map
+		if (disp!=='1') {
+			
+			// Update time
+			__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#timestamp').text('location updated '+newLoc.tim);
+			
+			// Update marker and map center
+			googlemaps.event.trigger(map,'resize');
+			map.setCenter({ lat:newLoc.lat, lng:newLoc.lon });
+			marker.setPosition({ lat:newLoc.lat, lng:newLoc.lon });
+			
+			// Update speed
+			if (mapuser.settings.showSpeed) {
+				__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#spd').text( newLoc.spd.toFixed() );
+			}
+				
+			// Update altitude
+			if (mapuser.settings.showAlt) {
+				getAltitude({
+					lat: newLoc.lat,
+					lng: newLoc.lon
+				}, elevator, function(alt) {
+					if (alt) {
+						__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#alt').text( (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed() );
+					}
+				});
+			}
+			
+		}
+	
+		// Update street view
+		if (disp!=='0' && mapuser.settings.showStreetview) {
+			updateStreetView(newLoc,10);
+		}
+		
+	});
+	
+	// Check altitude
+	function getAltitude(loc,elev,cb){
+		//console.log("Getting altitude...");
+		elev = elev || new googlemaps.ElevationService;
+		elev.getElevationForLocations({
+			'locations': [loc]
+		}, function(results, status) {
+			if (status === googlemaps.ElevationStatus.OK && results[0]) {
+				cb(results[0].elevation);
+			}
+		});
+	}
+	
+	// Get street view imagery
+	function getStreetViewData(loc,rad,cb) {
+		// Ensure that the location hasn't changed
+		if (loc===newLoc) {
+			if (!sv) { var sv=new googlemaps.StreetViewService(); }
+			sv.getPanorama({
+				location: {
+					lat: loc.lat,
+					lng: loc.lon
+				},
+				radius: rad
+			}, function(data,status){ switch (status){
+				// Success
+				case googlemaps.StreetViewStatus.OK:
+					cb(data);
+					break;
+				// No results in that radius
+				case googlemaps.StreetViewStatus.ZERO_RESULTS:
+					// Try again with a bigger radius
+					getStreetViewData(loc,rad*2,cb);
+					break;
+				// Error
+				default:
+					console.error(new Error('❌️ Street view not available: '+status).message);
+			} });
+		} else { console.log('loc!==newLoc'); }
+	}
+	
+	// Update streetview
+	function updateStreetView(loc) {
+		//console.log("Updating streetview...");
+		
+		// Moving (show stationary image)
+		if (loc.spd>1) {
+			const imgElem = document.getElementById('panoImg');
+			getStreetViewData(loc, 2, function(data){
+				if (!imgElem) {
+					// Create image
+					pano = undefined;
+					__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').empty();
+					__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').append(__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('<img>',{
+						alt: 'Street view image',
+						src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
+						id: 'panoImg'
+					}));
 				}
+				// Set image
+				__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').width()+'x'+__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
+			});
+		}
+		
+		// Not moving and pano not set (create panoramic image)
+		else if (pano==null) {
+			getStreetViewData(loc, 2, function(data){
+				// Create panorama
+				__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').empty();
+				const panoOptions = {
+					panControl: false,
+					zoomControl: false,
+					addressControl: false,
+					linksControl: false,
+					motionTracking: false,
+					motionTrackingControl: false
+				};
+				pano = new googlemaps.StreetViewPanorama(panoElem, panoOptions);
+				// Set panorama
+				pano.setPano(data.location.pano);							
+				pano.setPov({
+					pitch: 0,
+					// Point towards users's location from street
+					heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
+				});
 			});
 		}
 		
 	}
 
-	// Update street view
-	if (disp!=='0' && mapuser.settings.showStreetview) {
-		updateStreetView(newLoc,10);
-	}
-	
+}).catch((err) => {
+	console.error(err);
 });
-
-// Check altitude
-function getAltitude(loc,elev,cb){
-	//console.log("Getting altitude...");
-	elev = elev || new google.maps.ElevationService;
-	elev.getElevationForLocations({
-		'locations': [loc]
-	}, function(results, status) {
-		if (status === google.maps.ElevationStatus.OK && results[0]) {
-			cb(results[0].elevation);
-		}
-	});
-}
-
-// Get street view imagery
-function getStreetViewData(loc,rad,cb) {
-	// Ensure that the location hasn't changed
-	if (loc===newLoc) {
-		if (!sv) { var sv=new google.maps.StreetViewService(); }
-		sv.getPanorama({
-			location: {
-				lat: loc.lat,
-				lng: loc.lon
-			},
-			radius: rad
-		}, function(data,status){ switch (status){
-			// Success
-			case google.maps.StreetViewStatus.OK:
-				cb(data);
-				break;
-			// No results in that radius
-			case google.maps.StreetViewStatus.ZERO_RESULTS:
-				// Try again with a bigger radius
-				getStreetViewData(loc,rad*2,cb);
-				break;
-			// Error
-			default:
-				console.error(new Error('❌️ Street view not available: '+status).message);
-		} });
-	} else { console.log('loc!==newLoc'); }
-}
-
-// Update streetview
-function updateStreetView(loc) {
-	//console.log("Updating streetview...");
-	
-	// Moving (show stationary image)
-	if (loc.spd>1) {
-		const imgElem = document.getElementById('panoImg');
-		getStreetViewData(loc, 2, function(data){
-			if (!imgElem) {
-				// Create image
-				pano = undefined;
-				__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').empty();
-				__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').append(__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('<img>',{
-					alt: 'Street view image',
-					src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-					id: 'panoImg'
-				}));
-			}
-			// Set image
-			__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').width()+'x'+__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
-		});
-	}
-	
-	// Not moving and pano not set (create panoramic image)
-	else if (pano==null) {
-		getStreetViewData(loc, 2, function(data){
-			// Create panorama
-			__WEBPACK_IMPORTED_MODULE_1_jquery___default.a('#pano').empty();
-			const panoOptions = {
-				panControl: false,
-				zoomControl: false,
-				addressControl: false,
-				linksControl: false,
-				motionTracking: false,
-				motionTrackingControl: false
-			};
-			pano = new google.maps.StreetViewPanorama(panoElem, panoOptions);
-			// Set panorama
-			pano.setPano(data.location.pano);							
-			pano.setPov({
-				pitch: 0,
-				// Point towards users's location from street
-				heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
-			});
-		});
-	}
-	
-}
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -3838,7 +3827,7 @@ function updateStreetView(loc) {
  * Module dependencies.
  */
 
-var url = __webpack_require__(23);
+var url = __webpack_require__(25);
 var parser = __webpack_require__(5);
 var Manager = __webpack_require__(13);
 var debug = __webpack_require__(1)('socket.io-client');
@@ -3930,7 +3919,7 @@ exports.Socket = __webpack_require__(18);
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -4012,7 +4001,7 @@ function url (uri, loc) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -4202,7 +4191,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -4218,7 +4207,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(26);
+exports.humanize = __webpack_require__(28);
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -4410,7 +4399,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports) {
 
 /**
@@ -4565,7 +4554,7 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -4576,7 +4565,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*global Blob,File*/
@@ -4585,7 +4574,7 @@ module.exports = Array.isArray || function (arr) {
  * Module requirements
  */
 
-var isArray = __webpack_require__(29);
+var isArray = __webpack_require__(31);
 var isBuf = __webpack_require__(12);
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof global.Blob === 'function' || toString.call(global.Blob) === '[object BlobConstructor]';
@@ -4724,7 +4713,7 @@ exports.removeBlobs = function(data, callback) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -4735,19 +4724,19 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(31);
+module.exports = __webpack_require__(33);
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-module.exports = __webpack_require__(32);
+module.exports = __webpack_require__(34);
 
 /**
  * Exports parser
@@ -4759,7 +4748,7 @@ module.exports.parser = __webpack_require__(2);
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -4772,7 +4761,7 @@ var debug = __webpack_require__(1)('engine.io-client:socket');
 var index = __webpack_require__(17);
 var parser = __webpack_require__(2);
 var parseuri = __webpack_require__(10);
-var parsejson = __webpack_require__(45);
+var parsejson = __webpack_require__(47);
 var parseqs = __webpack_require__(3);
 
 /**
@@ -5510,7 +5499,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports) {
 
 
@@ -5533,7 +5522,7 @@ try {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -5953,7 +5942,7 @@ function unloadHandler () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports) {
 
 
@@ -5978,7 +5967,7 @@ module.exports = Object.keys || function keys (obj){
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports) {
 
 /**
@@ -6013,7 +6002,7 @@ module.exports = function(arraybuffer, start, end) {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = after
@@ -6047,7 +6036,7 @@ function noop() {}
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/utf8js v2.1.2 by @mathias */
@@ -6305,10 +6294,10 @@ function noop() {}
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)(module), __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)(module), __webpack_require__(0)))
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -6336,7 +6325,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports) {
 
 /*
@@ -6409,7 +6398,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6512,7 +6501,7 @@ module.exports = (function() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -6750,7 +6739,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -6767,7 +6756,7 @@ var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 var NodeWebSocket;
 if (typeof window === 'undefined') {
   try {
-    NodeWebSocket = __webpack_require__(44);
+    NodeWebSocket = __webpack_require__(46);
   } catch (e) { }
 }
 
@@ -7043,13 +7032,13 @@ WS.prototype.check = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -7087,7 +7076,7 @@ module.exports = function parsejson(data) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = toArray
@@ -7106,7 +7095,7 @@ function toArray(list, index) {
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports) {
 
 
@@ -7197,7 +7186,7 @@ Backoff.prototype.setJitter = function(jitter){
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -17454,6 +17443,60 @@ if ( !noGlobal ) {
 
 return jQuery;
 } );
+
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports) {
+
+var CALLBACK_NAME = '__googleMapsApiOnLoadCallback'
+
+var OPTIONS_KEYS = ['client', 'key', 'language', 'region', 'v']
+
+module.exports = function(options) {
+  options = options || {}
+
+  return new Promise(function(resolve, reject) {
+    // Exit if not running inside a browser.
+    if (typeof window === 'undefined') {
+      return reject(
+        new Error('Can only load the Google Maps API in the browser')
+      )
+    }
+
+    // Reject the promise after a timeout.
+    var timeoutId = setTimeout(function() {
+      window[CALLBACK_NAME] = function() {} // Set the on load callback to a no-op.
+      reject(new Error('Could not load the Google Maps API'))
+    }, options.timeout || 10000)
+
+    // Hook up the on load callback.
+    window[CALLBACK_NAME] = function() {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+      }
+      resolve(window.google.maps)
+      delete window[CALLBACK_NAME]
+    }
+
+    // Prepare the `script` tag to be inserted into the page.
+    var scriptElement = document.createElement('script')
+    var params = ['callback=' + CALLBACK_NAME]
+    OPTIONS_KEYS.forEach(function(key) {
+      if (options[key]) {
+        params.push(key + '=' + options[key])
+      }
+    })
+    if (options.libraries && options.libraries.length) {
+      params.push('libraries=' + options.libraries.join(','))
+    }
+    scriptElement.src =
+      'https://maps.googleapis.com/maps/api/js?' + params.join('&')
+
+    // Insert the `script` tag.
+    document.body.appendChild(scriptElement)
+  })
+}
 
 
 /***/ })
