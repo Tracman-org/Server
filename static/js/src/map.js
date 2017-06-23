@@ -1,6 +1,9 @@
 'use strict';
-/* global $ io google mapuser userid disp noHeader */
+/* global google mapuser userid disp noHeader */
 
+// Webpack imports
+import io from 'socket.io-client';
+import $ from 'jquery';
 
 // Variables
 var map, pano, marker, elevator, newLoc;
