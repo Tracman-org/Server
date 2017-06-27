@@ -24,10 +24,10 @@ router.get('/demo', (req,res,next)=>{
 			_id: 'demo',
 			name: 'Demo',
 			last: {
-				lat: 39.2980269,
-				lon: -76.8988908,
-				dir: 0,
-				spd: 0
+				lat: 40.1165853,
+				lon: -87.5417312,
+				dir: 249.0,
+				spd: 19.015747
 			},
 			settings: {
 				marker: 'marker-red',
@@ -35,7 +35,7 @@ router.get('/demo', (req,res,next)=>{
 				showTemp: false,
 				showSpeed: true,
 				showScale: true,
-				defaultZoom: 12,
+				defaultZoom: 13,
 				defaultMap: 'road',
 				units: 'standard'
 			},
