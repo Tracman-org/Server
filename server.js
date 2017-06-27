@@ -15,6 +15,7 @@ const
 	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
 	mail = require('./config/mail.js'),
+	demo = require('./config/demo.js'),
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
@@ -184,6 +185,9 @@ const
 		.catch( (err)=>{
 			console.error(`❌ ${err.stack}`);
 		});
+		
+		// Start transmitting demo
+		demo(io);
 		
 	});
 	

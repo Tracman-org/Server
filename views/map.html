@@ -73,7 +73,7 @@
 		{% endif %}
 	</div>
 	
-	{% if user.id == mapuser.id %}
+	{% if user.id == mapuser.id and mapuser._id != 'demo' %}
 		<div id='controls'>
 		{% if mapuser.settings.showStreetview and disp!='0' %}
 			<style>

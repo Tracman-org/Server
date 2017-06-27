@@ -3579,7 +3579,7 @@ __WEBPACK_IMPORTED_MODULE_2_load_google_maps_api___default.a({ key:mapKey })
 			map = new googlemaps.Map( mapElem, {
 				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 				panControl: false,
-				scaleControl: mapuser.settings.showScale,
+				scaleControl: (mapuser.settings.showScale)?true:false,
 				draggable: false,
 				zoom: mapuser.settings.defaultZoom,
 				streetViewControl: false,
@@ -3597,7 +3597,7 @@ __WEBPACK_IMPORTED_MODULE_2_load_google_maps_api___default.a({ key:mapKey })
 			});
 			
 			// Create iFrame logo
-			if (noHeader!=='0') {
+			if (noHeader!=='0' && mapuser._id!=='demo') {
 				//console.log("Creating iFrame logo...");
 				const logoDiv = document.createElement('div');
 				logoDiv.id = 'map-logo';

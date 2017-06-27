@@ -1,10 +1,10 @@
 'use strict';
 
 const router = require('express').Router(),
-  mw = require('../middleware.js'),
-  env = require('../env/env.js'),
-  User = require('../models.js').user;
-  
+	mw = require('../middleware.js'),
+	env = require('../env/env.js'),
+	User = require('../models.js').user;
+	
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req,res)=>{
@@ -16,6 +16,39 @@ router.get('/', mw.ensureAuth, (req,res)=>{
 	}
 });
 
+// Demo
+router.get('/demo', (req,res,next)=>{
+	res.render('map', {
+		active: 'demo',
+		mapuser: {
+			_id: 'demo',
+			name: 'Demo',
+			last: {
+				lat: 40.1165853,
+				lon: -87.5417312,
+				dir: 249.0,
+				spd: 19.015747
+			},
+			settings: {
+				marker: 'marker-red',
+				showAlt: false,
+				showTemp: false,
+				showSpeed: false,
+				showScale: false,
+				defaultZoom: 13,
+				defaultMap: 'road',
+				units: 'standard'
+			},
+		},
+		mapApi: env.googleMapsAPI,
+		user: req.user,
+		noFooter: '1',
+		noHeader: (req.query.noheader)?req.query.noheader.match(/\d/)[0]:0,
+		disp: (req.query.disp)?req.query.disp.match(/\d/)[0]:2, // 0=map, 1=streetview, 2=both
+		newuserurl: (req.query.new)? env.url+'/map/'+req.params.slug : ''
+	});
+});
+
 // Show map
 router.get('/:slug?', (req,res,next)=>{
 	
@@ -23,7 +56,7 @@ router.get('/:slug?', (req,res,next)=>{
 	.then( (mapuser)=>{
 		if (!mapuser){ next(); } //404
 		else {
-			var active = '';
+			var active = ''; // For header nav
 			if (req.user && req.user.id===mapuser.id){ active='map'; }
 			res.render('map', {
 				active: active,

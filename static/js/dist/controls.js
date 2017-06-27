@@ -73,7 +73,6 @@
 /* global navigator $ socket userid token mapuser toggleMaps */
 
 $(function(){
-	
 	var wpid, newloc;
 	
 	// Set location
