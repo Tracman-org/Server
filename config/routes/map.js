@@ -33,8 +33,8 @@ router.get('/demo', (req,res,next)=>{
 				marker: 'marker-red',
 				showAlt: false,
 				showTemp: false,
-				showSpeed: true,
-				showScale: true,
+				showSpeed: false,
+				showScale: false,
 				defaultZoom: 13,
 				defaultMap: 'road',
 				units: 'standard'

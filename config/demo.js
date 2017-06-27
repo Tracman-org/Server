@@ -5,6 +5,8 @@ const fs = require('fs'),
 	debug = require('debug')('tracman-demo');
 
 module.exports = (io)=>{
+	
+	// File is space-seperated: delay, lat, lon, dir, spd
 	fs.readFile(__dirname+'/demo.txt', (err,data)=>{
 		if (err){ console.error(`❌ ${err.stack}`); }
 		
@@ -13,6 +15,7 @@ module.exports = (io)=>{
 		(function sendLoc(ln) {
 			if (ln>20754){ sendLoc(0) }
 			else {
+				
 				let loc = lines[ln].split(' ');
 				debug(`Sending demo location: ${loc[1]}, ${loc[2]}`);
 				io.to('demo').emit('get', {
@@ -22,9 +25,12 @@ module.exports = (io)=>{
 					dir: loc[3],
 					spd: loc[4]
 				});
+				
+				// Repeat after delay in milliseconds
 				setTimeout(()=>{
-					sendLoc(ln+1);
+					sendLoc(ln+1); // next line of file
 				}, loc[0]);
+				
 			}
 		})(5667);
 		

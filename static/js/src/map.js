@@ -83,7 +83,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			});
 			
 			// Create iFrame logo
-			if (noHeader!=='0') {
+			if (noHeader!=='0' && mapuser._id!=='demo') {
 				//console.log("Creating iFrame logo...");
 				const logoDiv = document.createElement('div');
 				logoDiv.id = 'map-logo';
