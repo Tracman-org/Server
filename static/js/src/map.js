@@ -65,7 +65,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			map = new googlemaps.Map( mapElem, {
 				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 				panControl: false,
-				scaleControl: mapuser.settings.showScale,
+				scaleControl: (mapuser.settings.showScale)?true:false,
 				draggable: false,
 				zoom: mapuser.settings.defaultZoom,
 				streetViewControl: false,
