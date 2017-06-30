@@ -1,6 +1,5 @@
 # npm
 node_modules
-package-lock.json
 
 # Secret stuff
 config/env/*
