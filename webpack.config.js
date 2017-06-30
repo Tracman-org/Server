@@ -2,15 +2,15 @@ const path = require('path');
 
 module.exports = {
 	entry: {
-		header: './static/js/src/header.js',
-		footer: './static/js/src/footer.js',
-		map: './static/js/src/map.js',
-		controls: './static/js/src/map-controls.js',
-		settings: './static/js/src/settings.js',
-		password: './static/js/src/password.js'
+		header: './static/js/header.js',
+		footer: './static/js/footer.js',
+		map: './static/js/map.js',
+		controls: './static/js/map-controls.js',
+		settings: './static/js/settings.js',
+		password: './static/js/password.js'
 	},
 	output: {
-		filename: '[name].js',
-		path: path.resolve(__dirname, 'static/js/dist')
+		filename: '.[name].bun.js',
+		path: path.resolve(__dirname, 'static/js')
 	}
 };
