@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
 	entry: {
@@ -7,9 +7,7 @@ module.exports = {
 		map: './static/js/src/map.js',
 		controls: './static/js/src/map-controls.js',
 		settings: './static/js/src/settings.js',
-		password: './static/js/src/password.js',
-		mellt: './static/js/src/mellt.js',
-		commonpasswords: './static/js/src/common-passwords.js'
+		password: './static/js/src/password.js'
 	},
 	output: {
 		filename: '[name].js',

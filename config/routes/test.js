@@ -1,7 +1,7 @@
 'use strict';
 
 const router = require('express').Router(),
-	mellt = require('mellt'),
+	zxcvbn = require('zxcvbn'),
   mw = require('../middleware.js'),
   mail = require('../mail.js');
 
@@ -29,9 +29,9 @@ router
 		res.render('password');
 	})
 	.post('/password', (req,res,next)=>{
-		let daysToCrack = mellt.CheckPassword(req.body.password);
-		if (daysToCrack<10) {
-			let err = new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `);
+		let zxcvbnResult = zxcvbn(req.body.password);
+		if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000) { // Less than ten days
+			let err = new Error(`That password could be cracked in ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  Come up with a more complex password that would take at least 10 days to crack. `);
 			mw.throwErr(err,req);
 			next(err);
 		}
