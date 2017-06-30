@@ -42,44 +42,33 @@ $(function(){
 			$('#password-help').show();
 			
 			// Check first password
-			var daysToCrack = mellt.CheckPassword($('#p1').val());
+			var zxcvbnResult = zxcvbn($('#p1').val());
 			
 			// Not good enough
-			if (daysToCrack<0) {
-				$('#password-help').text("That's is one of the world's most commonly used passwords. You may not use it for Tracman and should not use it anywhere. ").css({'color':'#fb6e3d'});
+			if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 3600) { // Less than an hour
+				$('#password-help').text("That password is way too common or simple. You may not use it for Tracman and should not use it anywhere. ").css({'color':'#fb6e3d'});
 				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
 			}
-			else if (daysToCrack<1) {
-				$('#password-help').text("That password is pretty bad.  It could be cracked in less than a day.  Try adding more words, numbers, or symbols. ").css({'color':'#fb6e3d'});
+			else if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 86400) { // Less than a day
+				$('#password-help').text("That password is pretty bad.  It could be cracked in "+zxcvbnResult.crack_times_display.online_no_throttling_10_per_second+".  Try adding more words, numbers, or symbols. ").css({'color':'#fb6e3d'});
 				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
 			}
-			else if (daysToCrack<10) {
-				$('#password-help').text("That password isn't good enough.  It could be cracked in "+daysToCrack+" day"+(daysToCrack!=1?'s':'')+".  Try adding another word, number, or symbol. ").css({'color':'#fb6e3d'});
+			else if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000) { // Less than ten days
+				$('#password-help').text("That password isn't good enough.  It could be cracked in "+zxcvbnResult.crack_times_display.online_no_throttling_10_per_second+".  Try adding another word, number, or symbol. ").css({'color':'#fb6e3d'});
 				$('#submit').prop('disabled',true).prop('title',"You need to come up with a better password. ");
 			}
 			
 			// Good enough
-			else if (daysToCrack<=30) {
-				$('#password-help').text("That password is good enough, but it could still be cracked in "+daysToCrack+" days. ").css({'color':'#eee'});
+			else if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second <= 2592000) { // Less than thirty days
+				$('#password-help').text("That password is good enough, but it could still be cracked in "+zxcvbnResult.crack_times_display.online_no_throttling_10_per_second+". ").css({'color':'#eee'});
 				checkMatch();
 			}
-			else if (daysToCrack<=365) {
-				$('#password-help').text("That password is good.  It would take "+daysToCrack+" days to crack. ").css({'color':'#8ae137'});
+			else if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second <= 1314000) { // Less than a year
+				$('#password-help').text("That password is good.  It would take "+zxcvbnResult.crack_times_display.online_no_throttling_10_per_second+" to crack. ").css({'color':'#8ae137'});
 				checkMatch();
 			}
-			else if (daysToCrack<1000000000) {
-				var years = Math.round(daysToCrack / 365 * 10) / 10;
-				if (years>1000000) {
-					years = (Math.round(years/1000000*10)/10)+' million';
-				}
-				if (years>1000) {
-					years = (Math.round(years/1000))+' thousand';
-				}
-				$('#password-help').text("That password is great!  It could take up to "+years+" years to crack!").css({'color':'#8ae137'});
-				checkMatch();
-			}
-			else {
-				$('#password-help').text("That password is amazing!  It is virtually impossible to crack!").css({'color':'#8ae137'});
+			else { // Long ass time
+				$('#password-help').text("That password is great!  It could take "+zxcvbnResult.crack_times_display.online_no_throttling_10_per_second+" to crack!").css({'color':'#8ae137'});
 				checkMatch();
 			}
 		}
