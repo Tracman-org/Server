@@ -2,7 +2,7 @@
 
 const slug = require('slug'),
 	xss = require('xss'),
-	mellt = require('mellt'),
+	zxcvbn = require('zxcvbn'),
 	moment = require('moment'),
 	mw = require('../middleware.js'),
 	User = require('../models.js').user,

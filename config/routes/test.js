@@ -1,7 +1,7 @@
 'use strict';
 
 const router = require('express').Router(),
-	mellt = require('mellt'),
+	zxcvbn = require('zxcvbn'),
   mw = require('../middleware.js'),
   mail = require('../mail.js');
 

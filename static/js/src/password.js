@@ -1,7 +1,7 @@
 'use strict';
-/* global $ Mellt */
+/* global $ */
 
-const mellt = new Mellt();
+const zxcvbn = require('zxcvbn');
 
 function checkMatch(){
 	$('#submit').prop('title',"You need to type your password again before you can save it. ");
