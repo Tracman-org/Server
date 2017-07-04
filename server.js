@@ -104,7 +104,7 @@ const
 		app.use( '/', require('./config/routes/index.js') );
 		
 		// Contact form
-		app.use( '/contact', require('./config/routes/index.js') );
+		app.use( '/contact', require('./config/routes/contact.js') );
 		
 		// Settings
 		app.use( '/settings', require('./config/routes/settings.js') );
