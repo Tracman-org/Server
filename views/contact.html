@@ -8,8 +8,8 @@
 
 {% block javascript %}
 {{super()}}
-	<script type="application/javascript" src="/static/js/.form.bun.js"></script>
 	<script type="application/javascript" src="/static/js/.contact.bun.js"></script>
+	<script type="application/javascript" src="/static/js/.form.bun.js"></script>
 {% endblock %}
 
 {% block main %}
@@ -19,13 +19,15 @@
 		
 		<form id='contact-form' role="form" method="POST">
 			
-			<input name="subject" id='subject' type="text" maxlength="160" placeholder="Subject">
-			<textarea name="message" id='message' rows="10" maxlength="5000" placeholder="Message" required>{{message}}</textarea>
+			<input id='subject-input' name="subject" id='subject' type="text" maxlength="160" placeholder="Subject">
+			<p id='message-help' class='red help'>You need to enter a message. </p>
+			<textarea id='message-input' name="message" id='message' rows="10" maxlength="5000" placeholder="Message" required>{{message}}</textarea>
 			
-			<input name="name" id='name' type="text" maxlength="160" value="{{user.name}}" placeholder="Your name">
-			<input name="email" id='email' type="email" maxlength="160" value="{{user.email}}" placeholder="Your email" required>
+			<input id='name-input' name="name" id='name' type="text" maxlength="160" value="{{user.name}}" placeholder="Your name">
+			<p id='email-help' class='red help'>You need to enter a valid email. </p>
+			<input id='email-input' name="email" id='email' type="email" maxlength="160" value="{{user.email}}" placeholder="Your email" required>
 			
-			<button class='g-recaptcha main btn' data-sitekey="{{sitekey}}" data-callback="onSubmit">Submit</button>
+			<button id='submit-button' class='g-recaptcha main btn' data-sitekey="{{sitekey}}" data-callback="onSubmit">Submit</button>
 		</form>
 
 	</section>
