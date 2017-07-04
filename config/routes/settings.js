@@ -190,17 +190,20 @@ router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
 		// Set new email
 		req.user.email = req.user.newEmail;
 		req.user.save()
+		
+		// Delete token and newEmail
 		.then( ()=>{
-			// Delete token and newEmail
 			req.user.emailToken = undefined;
 			req.user.newEmail = undefined;
 			req.user.save();
 		})
+		
+		// Report success
 		.then( ()=>{
-			// Report success
 			req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
 			res.redirect('/settings');
 		})
+		
 		.catch( (err)=>{
 			mw.throwErr(err,req);
 			res.redirect(req.session.next||'/settings');
@@ -274,7 +277,8 @@ router.route('/password/:token')
 					debug('Bad token');
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
 					res.redirect( (req.isAuthenticated)?'/settings':'/login' );
-				} else {
+				}
+				else {
 					debug('setting passwordUser');
 					res.locals.passwordUser = user;
 					next();
