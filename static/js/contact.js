@@ -3,9 +3,6 @@
 
 import css from '../css/contact.css';
 
-function onSubmit() {
-	
-	//TODO: Clientside validations
-	
+window.onSubmit = function() {
 	$('#contact-form').submit();
 }

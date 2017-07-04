@@ -16,53 +16,77 @@ module.exports = router
 })
 
 .post('/', (req,res,next)=>{
-		
-	// Confirm captcha
-	request.post( 'https://www.google.com/recaptcha/api/siteverify', {form:{
-		secret: env.recaptchaSecret,
-		response: req.body['g-recaptcha-response'],
-		remoteip: req.ip
-	}}, (err, response, body)=>{
-		
-		// Check for errors
-		if (err){
-			mw.throwErr(err,req);
-			res.redirect('/contact');
-		}
-		if (response.statusCode!==200) {
-			let err = new Error('Bad response from reCaptcha service');
-			mw.throwErr(err,req);
-			res.redirect('/contact');
-		}
-		else {
+	
+	// Check email
+	if (req.body.email==='') {
+		req.flash('warning', `You need to enter an email address.  `);
+		res.redirect('/contact');
+	}
+	else if (!mw.validateEmail(req.body.email)) {
+		req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
+		res.redirect('/contact');
+	}
+	
+	// Check for message
+	else if (req.body.message==='') {
+		req.flash('warning', `You need to enter a message.  `);
+		res.redirect('/contact');
+	}
+	
+	
+	// Passed validations
+	else {
+	
+		// Confirm captcha
+		request.post( 'https://www.google.com/recaptcha/api/siteverify', {form:{
+			secret: env.recaptchaSecret,
+			response: req.body['g-recaptcha-response'],
+			remoteip: req.ip
+		}}, (err, response, body)=>{
 			
-			// Captcha succeeded
-			if (JSON.parse(body).success){
-				mail.send({
-					from: `${req.body.name} <${req.body.email}>`,
-					to: `Tracman Contact <contact@tracman.org>`,
-					subject: req.body.subject||'A message',
-					text: req.body.message
-				})
-				.then(()=>{
-					req.flash('success', `Your message has been sent. `);
-					res.redirect(req.session.next || '/');
-				})
-				.catch((err)=>{
-					mw.throwErr(err,req);
-					res.redirect('/contact');
-				});
+			// Check for errors
+			if (err){
+				mw.throwErr(err,req);
+				res.redirect('/contact');
 			}
-			
-			// Captcha failed
-			else {
-				let err = new Error('Failed reCaptcha');
+			if (response.statusCode!==200) {
+				let err = new Error('Bad response from reCaptcha service');
 				mw.throwErr(err,req);
 				res.redirect('/contact');
 			}
 			
-		}
+			// No errors
+			else {
+				
+				// Captcha failed
+				if (!JSON.parse(body).success){
+					let err = new Error('Failed reCaptcha');
+					mw.throwErr(err,req);
+					res.redirect('/contact');
+				}
+				
+				// Captcha succeeded
+				else {
+					mail.send({
+						from: `${req.body.name} <${req.body.email}>`,
+						to: `Tracman Contact <contact@tracman.org>`,
+						subject: req.body.subject||'A message',
+						text: req.body.message
+					})
+					.then(()=>{
+						req.flash('success', `Your message has been sent. `);
+						res.redirect(req.session.next || '/');
+					})
+					.catch((err)=>{
+						mw.throwErr(err,req);
+						res.redirect('/contact');
+					});
+				}
+				
+			}
+			
+		});
 		
-	});
+	}
 	
 });
