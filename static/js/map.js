@@ -12,6 +12,7 @@ import loadGoogleMapsAPI from 'load-google-maps-api';
 var map, pano, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
 	panoElem = document.getElementById('pano'),
+	imgElem = document.getElementById('panoImg'),
 	socket = io('//'+window.location.hostname);
 
 // socket.io stuff
@@ -249,7 +250,7 @@ loadGoogleMapsAPI({ key:mapKey })
 				default:
 					console.error(new Error('❌️ Street view not available: '+status).message);
 			} });
-		} else { console.log('loc!==newLoc'); }
+		}
 	}
 	
 	// Update streetview
@@ -258,21 +259,23 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 		// Moving (show stationary image)
 		if (loc.spd>1) {
-			const imgElem = document.getElementById('panoImg');
+			
+			// Create image
+			if (!imgElem) {
+				pano = undefined;
+				$('#pano').empty();
+				$('#pano').append($('<img>',{
+					alt: 'Street view image',
+					src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
+					id: 'panoImg'
+				}));
+			}
+			
+			// Set image
 			getStreetViewData(loc, 2, function(data){
-				if (!imgElem) {
-					// Create image
-					pano = undefined;
-					$('#pano').empty();
-					$('#pano').append($('<img>',{
-						alt: 'Street view image',
-						src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-						id: 'panoImg'
-					}));
-				}
-				// Set image
 				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
 			});
+			
 		}
 		
 		// Not moving and pano not set (create panoramic image)
