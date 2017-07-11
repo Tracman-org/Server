@@ -19,12 +19,10 @@ socket
 		
 		// Can get location
 		socket.emit('can-get', mapuser._id );
-		console.log("🚹 Receiving updates for",mapuser._id);
 
 		// Can set location too
 		if (mapuser._id===userid) { 
 			socket.emit('can-set', userid );
-			console.log("🚹 Sending updates for",userid);
 		}
 		
 	})
@@ -56,11 +54,9 @@ $(function() {
 // Load google maps
 loadGoogleMapsAPI({ key:mapKey })
 .then(function(googlemaps) {
-	//console.log("Loaded google maps:",googlemaps);
 	
 		// Create map
 		if (disp!=='1') {
-			//console.log("Creating map...");
 			
 			map = new googlemaps.Map( mapElem, {
 				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
@@ -84,7 +80,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Create iFrame logo
 			if (noHeader!=='0' && mapuser._id!=='demo') {
-				//console.log("Creating iFrame logo...");
 				const logoDiv = document.createElement('div');
 				logoDiv.id = 'map-logo';
 				logoDiv.innerHTML = '<a href="https://tracman.org/">'+
@@ -94,7 +89,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			}
 			
 			// Create update time block
-			//console.log("Creating time block...");
 			const timeDiv = document.createElement('div');
 			timeDiv.id = 'timestamp';
 			if (mapuser.last.time) {
@@ -208,7 +202,6 @@ loadGoogleMapsAPI({ key:mapKey })
 	
 	// Check altitude
 	function getAltitude(loc,elev,cb){
-		//console.log("Getting altitude...");
 		elev = elev || new googlemaps.ElevationService;
 		elev.getElevationForLocations({
 			'locations': [loc]
@@ -249,7 +242,6 @@ loadGoogleMapsAPI({ key:mapKey })
 	
 	// Update streetview
 	function updateStreetView(loc) {
-		//console.log("Updating streetview...");
 		
 		// Moving (show image)
 		if (loc.spd>1) {
@@ -268,7 +260,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Set image
 			getStreetViewData(loc, 2, function(data){
-				console.log('got data:',data);
 				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key='+mapKey);
 			});
 			
@@ -290,7 +281,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Set panorama
 			getStreetViewData(loc, 2, function(data){
-				console.log('setting pano');
 				pano.setPano(data.location.pano);							
 				pano.setPov({
 					pitch: 0,
