@@ -31,6 +31,7 @@
     "slug": "^0.9.1",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
+    "webpack": "^3.0.0",
     "xss": "^0.3.3",
     "zxcvbn": "^4.4.2"
   },
@@ -40,8 +41,7 @@
     "css-loader": "^0.28.4",
     "nodemon": "^1.11.0",
     "style-loader": "^0.18.2",
-    "supertest": "^3.0.0",
-    "webpack": "^3.0.0"
+    "supertest": "^3.0.0"
   },
   "scripts": {
     "test": "mocha test.js",
