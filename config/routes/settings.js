@@ -347,11 +347,11 @@ router.route('/pro')
 				{$set:{ isPro:true }})
 			.then( (user)=>{
 				req.flash('success','You have been signed up for pro. ');
-				res.redirect(req.session.next||'/settings');
+				res.redirect('/settings');
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);
-				res.redirect('/pro');	
+				res.redirect('/settings/pro');	
 			});
 	} );
 
