@@ -32,10 +32,11 @@ module.exports = {
 			//socket.ip = socket.client.request.headers['x-real-ip'];
 			//socket.ua = socket.client.request.headers['user-agent'];
 			
-			/* Log */
+			// Log and errors
 			socket.on('log', (text)=>{
 				debug(`LOG: ${text}`);
 			});
+			socket.on('error', (err)=>{ console.error('❌', err.stack); });
 			
 			// This socket can set location (app)
 			socket.on('can-set', (userId)=>{
@@ -116,9 +117,6 @@ module.exports = {
 				}
 				
 			});
-			
-			// Log errors
-			socket.on('error', (err)=>{ console.error('❌', err.stack); });
 			
 		});
 	}

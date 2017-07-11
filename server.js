@@ -15,6 +15,7 @@ const
 	env = require('./config/env/env.js'),
 	User = require('./config/models.js').user,
 	mail = require('./config/mail.js'),
+	demo = require('./config/demo.js'),
 	app = express(),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
@@ -102,6 +103,9 @@ const
 		// Main routes
 		app.use( '/', require('./config/routes/index.js') );
 		
+		// Contact form
+		app.use( '/contact', require('./config/routes/contact.js') );
+		
 		// Settings
 		app.use( '/settings', require('./config/routes/settings.js') );
 		
@@ -184,6 +188,9 @@ const
 		.catch( (err)=>{
 			console.error(`❌ ${err.stack}`);
 		});
+		
+		// Start transmitting demo
+		demo(io);
 		
 	});
 	

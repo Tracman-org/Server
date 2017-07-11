@@ -136,3 +136,12 @@ form input[type="checkbox"]:focus, form input[type="radio"]:focus {
 form .btn {
 	font-size: 1.5em;
 }
+
+/* Help */
+.help {
+	display: none;
+	width: 100%;
+	margin-top: 2%;
+	margin-bottom: 0;
+	text-align: right;
+}

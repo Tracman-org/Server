@@ -1,12 +1,13 @@
-# npm packages
+# npm
 node_modules
 
 # Secret stuff
 config/env/*
 !config/env/sample.js
 
-# Minified static files (can be built with `npm run minify`)
+# Minified or bundled static files (can be built with `npm run minify && npm run build`)
 static/**/*.min.*
+static/**/*.bun.*
 
 # Ignore docs files
 _gh_pages

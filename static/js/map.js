@@ -1,7 +1,7 @@
 'use strict';
 /* global mapuser userid disp noHeader mapKey */
 
-// Webpack imports
+import css from '../css/map.css';
 import io from 'socket.io-client';
 import $ from 'jquery';
 import loadGoogleMapsAPI from 'load-google-maps-api';
@@ -19,12 +19,10 @@ socket
 		
 		// Can get location
 		socket.emit('can-get', mapuser._id );
-		console.log("🚹 Receiving updates for",mapuser._id);
 
 		// Can set location too
 		if (mapuser._id===userid) { 
 			socket.emit('can-set', userid );
-			console.log("🚹 Sending updates for",userid);
 		}
 		
 	})
@@ -56,16 +54,14 @@ $(function() {
 // Load google maps
 loadGoogleMapsAPI({ key:mapKey })
 .then(function(googlemaps) {
-	//console.log("Loaded google maps:",googlemaps);
 	
 		// Create map
 		if (disp!=='1') {
-			//console.log("Creating map...");
 			
 			map = new googlemaps.Map( mapElem, {
 				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
 				panControl: false,
-				scaleControl: mapuser.settings.showScale,
+				scaleControl: (mapuser.settings.showScale)?true:false,
 				draggable: false,
 				zoom: mapuser.settings.defaultZoom,
 				streetViewControl: false,
@@ -83,8 +79,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			});
 			
 			// Create iFrame logo
-			if (noHeader!=='0') {
-				//console.log("Creating iFrame logo...");
+			if (noHeader!=='0' && mapuser._id!=='demo') {
 				const logoDiv = document.createElement('div');
 				logoDiv.id = 'map-logo';
 				logoDiv.innerHTML = '<a href="https://tracman.org/">'+
@@ -94,7 +89,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			}
 			
 			// Create update time block
-			//console.log("Creating time block...");
 			const timeDiv = document.createElement('div');
 			timeDiv.id = 'timestamp';
 			if (mapuser.last.time) {
@@ -104,7 +98,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Create speed block
 			if (mapuser.settings.showSpeed) {
-				//console.log("Creating speed sign...");
 				const speedSign = document.createElement('div'),
 					speedLabel = document.createElement('div'),
 					speedText = document.createElement('div'),
@@ -124,7 +117,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Create altitude block
 			if (mapuser.settings.showAlt) {
-				//console.log("Creating altitude sign...");
 				const elevator = new googlemaps.ElevationService,
 					altitudeSign = document.createElement('div'),
 					altitudeLabel = document.createElement('div'),
@@ -150,7 +142,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 		// Create streetview
 		if (disp!=='0' && mapuser.settings.showStreetview) {
-			//console.log("Creating streetview...");
 			updateStreetView(parseLoc(mapuser.last),10);
 		}
 	
@@ -211,7 +202,6 @@ loadGoogleMapsAPI({ key:mapKey })
 	
 	// Check altitude
 	function getAltitude(loc,elev,cb){
-		//console.log("Getting altitude...");
 		elev = elev || new googlemaps.ElevationService;
 		elev.getElevationForLocations({
 			'locations': [loc]
@@ -224,8 +214,8 @@ loadGoogleMapsAPI({ key:mapKey })
 	
 	// Get street view imagery
 	function getStreetViewData(loc,rad,cb) {
-		// Ensure that the location hasn't changed
-		if (loc===newLoc) {
+		// Ensure that the location hasn't changed (or this is the initial setting)
+		if ( newLoc == null || loc.tim===newLoc.tim ) {
 			if (!sv) { var sv=new googlemaps.StreetViewService(); }
 			sv.getPanorama({
 				location: {
@@ -247,47 +237,50 @@ loadGoogleMapsAPI({ key:mapKey })
 				default:
 					console.error(new Error('❌️ Street view not available: '+status).message);
 			} });
-		} else { console.log('loc!==newLoc'); }
+		}
 	}
 	
 	// Update streetview
 	function updateStreetView(loc) {
-		//console.log("Updating streetview...");
 		
-		// Moving (show stationary image)
+		// Moving (show image)
 		if (loc.spd>1) {
+			
+			// Create image
 			const imgElem = document.getElementById('panoImg');
+			if (!imgElem) {
+				pano = undefined;
+				$('#pano').empty();
+				$('#pano').append($('<img>',{
+					alt: 'Street view image',
+					src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
+					id: 'panoImg'
+				}));
+			}
+			
+			// Set image
 			getStreetViewData(loc, 2, function(data){
-				if (!imgElem) {
-					// Create image
-					pano = undefined;
-					$('#pano').empty();
-					$('#pano').append($('<img>',{
-						alt: 'Street view image',
-						src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-						id: 'panoImg'
-					}));
-				}
-				// Set image
-				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
+				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key='+mapKey);
 			});
+			
 		}
 		
 		// Not moving and pano not set (create panoramic image)
 		else if (pano==null) {
+			
+			// Create panorama
+			$('#pano').empty();
+			pano = new googlemaps.StreetViewPanorama(panoElem, {
+				panControl: false,
+				zoomControl: false,
+				addressControl: false,
+				linksControl: false,
+				motionTracking: false,
+				motionTrackingControl: false
+			});
+			
+			// Set panorama
 			getStreetViewData(loc, 2, function(data){
-				// Create panorama
-				$('#pano').empty();
-				const panoOptions = {
-					panControl: false,
-					zoomControl: false,
-					addressControl: false,
-					linksControl: false,
-					motionTracking: false,
-					motionTrackingControl: false
-				};
-				pano = new googlemaps.StreetViewPanorama(panoElem, panoOptions);
-				// Set panorama
 				pano.setPano(data.location.pano);							
 				pano.setPov({
 					pitch: 0,

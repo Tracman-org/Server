@@ -1,5 +1,8 @@
 # Tracman Server Changelog
-###### v 0.6.7
+###### v 0.7.0
+
+#### v0.7.0
+* More bug fixes
 
 #### v0.6.7
 * [#87](https://github.com/Tracman-org/Server/issues/87) Started loading assets with webpack

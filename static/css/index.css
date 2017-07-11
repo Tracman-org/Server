@@ -27,6 +27,7 @@
 	position: relative;
 }
 .splash:after, .splash:before  {
+	z-index: 5;
 	content: "";
 	display: block;
 	position: absolute;
@@ -46,15 +47,18 @@
 	position: relative;
 	top: 48%;
 	transform: translateY(-50%);
-	z-index: 5;
+	z-index: 8;
 }
 .splash h1 {
+	z-index: 10;
 	color: #fbc93d;
 }
 .splash h2 {
+	z-index: 10;
 	margin-bottom: 40px;
 }
 .splash .btn {
+	z-index: 20;
 	margin: 0 20px 10px 0;
 }
 .splash .btn:hover {

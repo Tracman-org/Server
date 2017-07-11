@@ -1,9 +1,9 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{super()}} | Admin{% endblock %}
 
-{% block head %}
-	{{ super() }}
-	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
+{% block javascript %}
+	{{super()}}
+	<script type="application/javascript" src="/static/js/.table.bun.js"></script>
 {% endblock %}
 
 {% block main %}

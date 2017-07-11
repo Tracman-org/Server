@@ -17,13 +17,14 @@
 		{% if user %}
 			<li><a href="/map"{% if active=='map' %} class='active'{% endif %}>Map</a></li>
 			<li><a href="/settings"{% if active=='settings' %} class='active'{% endif %}>Settings</a></li>
+		{% else %}
+			<li><a href="/map/demo"{% if active=='demo' %} class='active'{% endif %}>Demo</a></li>
 		{% endif %}
 			<li><a href="/help"{% if active=='help' %} class='active'{% endif %}>Help</a></li>
 		{% if user %}
 			{% if user.isAdmin %}<li><a href="/admin"{% if active=='admin' %} class='active'{% endif %}>Admin</a></li>{% endif %}
 			<li><a href="/logout">Logout</a></li>
 		{% else %}
-			<li><a href="/map/keith"{% if active=='demo' %} class='active'{% endif %}>Demo</a></li>
 			<li><a href="/login">Login / join</a></li>
 		{% endif %}
 	</ul></nav>
@@ -56,4 +57,4 @@
 </div>
 {% endfor %}
 
-<script type="application/javascript" src="/static/js/dist/header.js"></script>
+<script type="application/javascript" src="/static/js/.header.bun.js"></script>

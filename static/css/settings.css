@@ -59,12 +59,3 @@
 #submit-group .main {
 	width: 50%;
 }
-
-/* Help */
-.help {
-	display: none;
-	width: 100%;
-	margin-top: 2%;
-	margin-bottom: 0;
-	text-align: right;
-}

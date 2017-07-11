@@ -3,9 +3,8 @@
 
 {% block head %}
 	{{super()}}
-	<link href="/static/css/.map.min.css" rel="stylesheet">
 	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
-		{% if noHeader!='0' %} main { top:0; } {% endif %}
+		{% if noHeader!='0' %} main { top: 0 !important; } {% endif %}
 		
 		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
 		/* show both */
@@ -73,7 +72,7 @@
 		{% endif %}
 	</div>
 	
-	{% if user.id == mapuser.id %}
+	{% if user.id == mapuser.id and mapuser._id != 'demo' %}
 		<div id='controls'>
 		{% if mapuser.settings.showStreetview and disp!='0' %}
 			<style>
@@ -106,9 +105,9 @@
 	</script>
 	
 	<!-- Webpacked bundles -->
-	<script type="application/javascript" src="/static/js/dist/map.js"></script>
+	<script type="application/javascript" src="/static/js/.map.bun.js"></script>
 	{% if user.id == mapuser.id %}
-		<script type="application/javascript" src="/static/js/dist/controls.js"></script>
+		<script type="application/javascript" src="/static/js/.controls.bun.js"></script>
 	{% endif %}
 	
 {% endblock %}

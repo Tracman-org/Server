@@ -1,10 +1,10 @@
 {% extends 'templates/base.html' %}
 {% block title %}{{super()}} | Settings{% endblock %}
 
-{% block head %}
+{% block javascript %}
 {{super()}}
-	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/.settings.min.css">
+	<script type="application/javascript" src="/static/js/.form.bun.js"></script>
+	<script type="application/javascript" src="/static/js/.settings.bun.js"></script>
 {% endblock %}
 
 {% block main %}
@@ -146,9 +146,4 @@
 		
 	</section>
 	
-{% endblock %}
-
-{% block javascript %}
-{{super()}}
-	<script type="application/javascript" src="/static/js/dist/settings.js"></script>
 {% endblock %}

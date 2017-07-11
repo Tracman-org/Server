@@ -2,7 +2,7 @@
 
 const slug = require('slug'),
 	xss = require('xss'),
-	mellt = require('mellt'),
+	zxcvbn = require('zxcvbn'),
 	moment = require('moment'),
 	mw = require('../middleware.js'),
 	User = require('../models.js').user,
@@ -11,11 +11,7 @@ const slug = require('slug'),
 	debug = require('debug')('tracman-settings'),
 	router = require('express').Router();
 
-// Validate email addresses
-function validateEmail(email) {
-	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test(email);
-}
+
 
 // Settings form
 router.route('/')
@@ -35,7 +31,7 @@ router.route('/')
 		const checkEmail = new Promise( (resolve,reject)=>{
 			
 			// Check validity
-			if (!validateEmail(req.body.email)) {
+			if (!mw.validateEmail(req.body.email)) {
 				req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `);
 				resolve();
 			}
@@ -190,17 +186,20 @@ router.get('/email/:token', mw.ensureAuth, (req,res,next)=>{
 		// Set new email
 		req.user.email = req.user.newEmail;
 		req.user.save()
+		
+		// Delete token and newEmail
 		.then( ()=>{
-			// Delete token and newEmail
 			req.user.emailToken = undefined;
 			req.user.newEmail = undefined;
 			req.user.save();
 		})
+		
+		// Report success
 		.then( ()=>{
-			// Report success
 			req.flash('success',`Your email has been set to <u>${req.user.email}</u>. `);
 			res.redirect('/settings');
 		})
+		
 		.catch( (err)=>{
 			mw.throwErr(err,req);
 			res.redirect(req.session.next||'/settings');
@@ -274,7 +273,8 @@ router.route('/password/:token')
 					debug('Bad token');
 					req.flash('danger', 'Password reset token is invalid or has expired. ');
 					res.redirect( (req.isAuthenticated)?'/settings':'/login' );
-				} else {
+				}
+				else {
 					debug('setting passwordUser');
 					res.locals.passwordUser = user;
 					next();
@@ -296,9 +296,9 @@ router.route('/password/:token')
 	.post( (req,res,next)=>{
 		
 		// Validate password
-		let daysToCrack = mellt.CheckPassword(req.body.password);
-		if (daysToCrack<10) {
-			mw.throwErr(new Error(`That password could be cracked in ${daysToCrack} days!  Come up with a more complex password that would take at least 10 days to crack. `));
+		let zxcvbnResult = zxcvbn(req.body.password);
+		if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000) { // Less than ten days
+			mw.throwErr(new Error(`That password could be cracked in ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  Come up with a more complex password that would take at least 10 days to crack. `));
 			res.redirect(`/settings/password/${req.params.token}`);
 		}
 		
@@ -347,11 +347,11 @@ router.route('/pro')
 				{$set:{ isPro:true }})
 			.then( (user)=>{
 				req.flash('success','You have been signed up for pro. ');
-				res.redirect(req.session.next||'/settings');
+				res.redirect('/settings');
 			})
 			.catch( (err)=>{
 				mw.throwErr(err,req);
-				res.redirect('/pro');	
+				res.redirect('/settings/pro');	
 			});
 	} );
 
