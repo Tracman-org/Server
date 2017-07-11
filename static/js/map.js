@@ -10,7 +10,6 @@ import loadGoogleMapsAPI from 'load-google-maps-api';
 var map, pano, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
 	panoElem = document.getElementById('pano'),
-	imgElem = document.getElementById('panoImg'),
 	socket = io('//'+window.location.hostname);
 
 // socket.io stuff
@@ -105,7 +104,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Create speed block
 			if (mapuser.settings.showSpeed) {
-				//console.log("Creating speed sign...");
 				const speedSign = document.createElement('div'),
 					speedLabel = document.createElement('div'),
 					speedText = document.createElement('div'),
@@ -125,7 +123,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Create altitude block
 			if (mapuser.settings.showAlt) {
-				//console.log("Creating altitude sign...");
 				const elevator = new googlemaps.ElevationService,
 					altitudeSign = document.createElement('div'),
 					altitudeLabel = document.createElement('div'),
@@ -151,7 +148,6 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 		// Create streetview
 		if (disp!=='0' && mapuser.settings.showStreetview) {
-			//console.log("Creating streetview...");
 			updateStreetView(parseLoc(mapuser.last),10);
 		}
 	
@@ -226,7 +222,7 @@ loadGoogleMapsAPI({ key:mapKey })
 	// Get street view imagery
 	function getStreetViewData(loc,rad,cb) {
 		// Ensure that the location hasn't changed
-		if (loc===newLoc) {
+		if ( newLoc == null || loc.tim===newLoc.tim ) {
 			if (!sv) { var sv=new googlemaps.StreetViewService(); }
 			sv.getPanorama({
 				location: {
@@ -255,10 +251,11 @@ loadGoogleMapsAPI({ key:mapKey })
 	function updateStreetView(loc) {
 		//console.log("Updating streetview...");
 		
-		// Moving (show stationary image)
+		// Moving (show image)
 		if (loc.spd>1) {
 			
 			// Create image
+			const imgElem = document.getElementById('panoImg');
 			if (!imgElem) {
 				pano = undefined;
 				$('#pano').empty();
@@ -278,19 +275,21 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 		// Not moving and pano not set (create panoramic image)
 		else if (pano==null) {
+			
+			// Create panorama
+			$('#pano').empty();
+			pano = new googlemaps.StreetViewPanorama(panoElem, {
+				panControl: false,
+				zoomControl: false,
+				addressControl: false,
+				linksControl: false,
+				motionTracking: false,
+				motionTrackingControl: false
+			});
+			
+			// Set panorama
 			getStreetViewData(loc, 2, function(data){
-				// Create panorama
-				$('#pano').empty();
-				const panoOptions = {
-					panControl: false,
-					zoomControl: false,
-					addressControl: false,
-					linksControl: false,
-					motionTracking: false,
-					motionTrackingControl: false
-				};
-				pano = new googlemaps.StreetViewPanorama(panoElem, panoOptions);
-				// Set panorama
+				console.log('setting pano');
 				pano.setPano(data.location.pano);							
 				pano.setPov({
 					pitch: 0,
