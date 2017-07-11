@@ -1,7 +1,24 @@
 'use strict';
-/* global navigator $ socket userid token mapuser toggleMaps */
+/* global navigator $ userid token mapuser toggleMaps */
 
 import css from '../css/controls.css';
+import io from 'socket.io-client';
+
+const socket = io('//'+window.location.hostname);
+
+// Show/hide map if location is set/unset
+function toggleMaps(loc) {
+	if (loc.lat===0&&loc.lon===0) {
+		$('#map').hide();
+		$('#pano').hide();
+		$('#notset').show();
+	}
+	else {
+		$('#map').show();
+		$('#pano').show();
+		$('#notset').hide();
+	}
+}
 
 $(function(){
 	var wpid, newloc;

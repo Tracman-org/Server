@@ -2,8 +2,6 @@
 /* global mapuser userid disp noHeader mapKey */
 
 import css from '../css/map.css';
-
-// Webpack imports
 import io from 'socket.io-client';
 import $ from 'jquery';
 import loadGoogleMapsAPI from 'load-google-maps-api';
