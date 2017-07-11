@@ -221,7 +221,7 @@ loadGoogleMapsAPI({ key:mapKey })
 	
 	// Get street view imagery
 	function getStreetViewData(loc,rad,cb) {
-		// Ensure that the location hasn't changed
+		// Ensure that the location hasn't changed (or this is the initial setting)
 		if ( newLoc == null || loc.tim===newLoc.tim ) {
 			if (!sv) { var sv=new googlemaps.StreetViewService(); }
 			sv.getPanorama({
@@ -268,7 +268,8 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Set image
 			getStreetViewData(loc, 2, function(data){
-				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key={{api}}');
+				console.log('got data:',data);
+				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key='+mapKey);
 			});
 			
 		}
