@@ -31,6 +31,7 @@
     "slug": "^0.9.1",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
+    "webpack": "^3.0.0",
     "xss": "^0.3.3",
     "zxcvbn": "^4.4.2"
   },
@@ -40,15 +41,13 @@
     "css-loader": "^0.28.4",
     "nodemon": "^1.11.0",
     "style-loader": "^0.18.2",
-    "supertest": "^3.0.0",
-    "webpack": "^3.0.0"
+    "supertest": "^3.0.0"
   },
   "scripts": {
     "test": "mocha test.js",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
-    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css",
-    "update": "sudo n stable && sudo npm update --save && sudo npm prune",
+    "update": "sudo n stable && sudo npm update && sudo npm prune",
     "build": "./node_modules/.bin/webpack --config webpack.config.js"
   },
   "repository": "Tracman-org/Server",
