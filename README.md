@@ -52,6 +52,8 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+* Improved debugging
+
 #### v0.7.3
 * Fixed [#102](https://github.com/Tracman-org/Server/issues/102) issue creating account
 

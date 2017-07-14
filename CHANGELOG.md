@@ -1,6 +1,8 @@
 # Tracman Server Changelog
 ###### v 0.7.3
 
+* Improved debugging
+
 #### v0.7.3
 * Fixed [#102](https://github.com/Tracman-org/Server/issues/102) issue creating account
 
