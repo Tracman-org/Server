@@ -62,7 +62,7 @@ module.exports = (app, passport) => {
 			
 			// Send token and alert user
 			function sendToken(user){
-				debug('sendToken(user)');
+				debug(`sendToken() called for user ${user.id}`);
 				
 				// Create a password token
 				user.createPassToken( (err,token,expires)=>{
@@ -111,7 +111,7 @@ module.exports = (app, passport) => {
 				
 				// User already exists
 				if (user && user.auth.password) {
-					req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
+					req.flash('warning',`A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`);
 					res.redirect('/login#login');
 					next();
 				}
@@ -162,7 +162,7 @@ module.exports = (app, passport) => {
 							});
 							
 						})(user.slug, (newSlug)=>{
-							debug('Successfully created slug');
+							debug(`Successfully created slug: ${newSlug}`);
 							user.slug = newSlug;
 							resolve();
 						});
@@ -179,7 +179,7 @@ module.exports = (app, passport) => {
 							}
 							if (buf) {
 								user.sk32 = buf.toString('hex');
-								debug('Successfully created sk32');
+								debug(`Successfully created sk32: ${user.sk32}`);
 								resolve();
 							}
 						});
@@ -187,7 +187,6 @@ module.exports = (app, passport) => {
 					
 					// Save user and send the token by email
 					Promise.all([slug, sk32])
-					// .then( ()=>{ user.save(); })
 					.then( ()=>{ sendToken(user); })
 					.catch( (err)=>{
 						debug('Failed to save user after creating slug and sk32!');
@@ -208,13 +207,19 @@ module.exports = (app, passport) => {
 	
 	// Forgot password
 	app.route('/login/forgot')
+	
+		// Check if user is already logged in
 		.all( (req,res,next)=>{
 			if (req.isAuthenticated()){ loginCallback(req,res); }
 			else { next(); }
 		} )
+		
+		// Show forgot password page
 		.get( (req,res,next)=>{
-			res.render('forgot');
+			res.render('forgot', {email:req.query.email});
 		} )
+		
+		// Submitted forgot password form
 		.post( (req,res,next)=>{
 			
 			// Validate email
