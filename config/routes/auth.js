@@ -89,7 +89,7 @@ module.exports = (app, passport) => {
 							html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>This link will expire at ${expirationTimeString}. </p>`)
 						})
 						.then(()=>{
-							debug(`Successfully emailed new user ${user.id} instructions ton continue`);
+							debug(`Successfully emailed new user ${user.id} instructions to continue`);
 							req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox and follow the link to complete your registration. (Your registration link will expire in one hour). `);
 							res.redirect('/login');
 						})
