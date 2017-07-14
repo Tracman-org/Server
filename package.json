@@ -9,6 +9,7 @@
     "connect-flash-plus": "^0.2.1",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
+    "css-loader": "^0.28.4",
     "debug": "^2.6.8",
     "express": "^4.15.3",
     "express-validator": "^3.2.0",
@@ -31,6 +32,7 @@
     "slug": "^0.9.1",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
+    "style-loader": "^0.18.2",
     "webpack": "^3.0.0",
     "xss": "^0.3.3",
     "zxcvbn": "^4.4.2"
@@ -38,9 +40,7 @@
   "devDependencies": {
     "chai": "^4.0.2",
     "chai-http": "^3.0.0",
-    "css-loader": "^0.28.4",
     "nodemon": "^1.11.0",
-    "style-loader": "^0.18.2",
     "supertest": "^3.0.0"
   },
   "scripts": {
@@ -48,7 +48,8 @@
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo n stable && sudo npm update && sudo npm prune",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js"
+    "build": "./node_modules/.bin/webpack --config webpack.config.js",
+    "subuild": "sudo ./node_modules/.bin/webpack --config webpack.config.js"
   },
   "repository": "Tracman-org/Server",
   "keywords": [
