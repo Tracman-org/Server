@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.0
+###### v 0.7.2
 
 node.js application to display a sharable map with user's location.
 
@@ -52,50 +52,20 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.7.2
+* Added more debugging to fix auth problems
+
 #### v0.7.0
 * More bug fixes
 
-#### v0.6.7
-* [#87](https://github.com/Tracman-org/Server/issues/87) Started loading assets with webpack
-
-#### v0.6.6
-
+#### v0.6.0-7
 * Removed demo recording code
 * Moved email server settings to env file
 * Added SMTP check
-
-#### v0.6.5
-
-* [#96](https://github.com/Tracman-org/Server/issues/96) Fixed google streetview
-* Various minor fixes
-
-#### v0.6.4
-
-* [#92](https://github.com/Tracman-org/Server/issues/92) Fixed blank map issue
-
-#### v0.6.3
-
-* [#84](https://github.com/Tracman-org/Server/issues/84) Fixed password reset page
-
-#### v0.6.2
-
-* [#76](https://github.com/Tracman-org/Server/issues/76) Prevented users with no password from deleting google social login
-* Fixed error when creating user
-
-#### v0.6.1
-
-* [#77](https://github.com/Tracman-org/Server/issues/77) Fixed 500 after password change, swapped `bcrypt` for `bcrypt-nodejs`
-* Removed extraneous packages
-
-#### v0.6.0
-
-* [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60) Added more login options
-* [#50](https://github.com/Tracman-org/Server/issues/50) Replaced some callbacks with promises
 * Minified static files
-* [#51](https://github.com/Tracman-org/Server/issues/51), [#52](https://github.com/Tracman-org/Server/issues/52) Added settings validations
-* [#54](https://github.com/Tracman-org/Server/issues/54), [#55](https://github.com/Tracman-org/Server/issues/55) Made map work better
-* [#61](https://github.com/Tracman-org/Server/issues/61) New MongoDB security
-* [#62](https://github.com/Tracman-org/Server/issues/62) Fixed error handling
+* Fixed error when creating user
+* Removed extraneous packages
+* Fixed [#87](https://github.com/Tracman-org/Server/issues/87), [#96](https://github.com/Tracman-org/Server/issues/96), [#92](https://github.com/Tracman-org/Server/issues/92), [#84](https://github.com/Tracman-org/Server/issues/84), [#76](https://github.com/Tracman-org/Server/issues/76), [#77](https://github.com/Tracman-org/Server/issues/77), [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60), [#50](https://github.com/Tracman-org/Server/issues/50), [#51](https://github.com/Tracman-org/Server/issues/51), [#52](https://github.com/Tracman-org/Server/issues/52), [#54](https://github.com/Tracman-org/Server/issues/54), [#55](https://github.com/Tracman-org/Server/issues/55), [#61](https://github.com/Tracman-org/Server/issues/61), [#62](https://github.com/Tracman-org/Server/issues/62)
 
 
 ## License

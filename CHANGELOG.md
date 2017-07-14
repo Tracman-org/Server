@@ -1,5 +1,8 @@
 # Tracman Server Changelog
-###### v 0.7.0
+###### v 0.7.2
+
+#### v0.7.2
+* Added more debugging to fix auth problems
 
 #### v0.7.0
 * More bug fixes

@@ -62,16 +62,17 @@ module.exports = (app, passport) => {
 			
 			// Send token and alert user
 			function sendToken(user){
-				debug('sendToken(user)');
+				debug(`sendToken() called for user ${user.id}`);
 				
 				// Create a password token
 				user.createPassToken( (err,token,expires)=>{
 					if (err){
-						debug('Error creating password token');
+						debug(`Error creating password token for user ${user.id}!`);
 						mw.throwErr(err,req);
 						res.redirect('/login#signup');
 					}
 					else {
+						debug(`Created password token for user ${user.id} successfully`);
 					
 						// Figure out expiration time
 						let expirationTimeString = (req.query.tz)?
@@ -79,6 +80,7 @@ module.exports = (app, passport) => {
 							moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0])+" UTC";
 						
 						// Email the instructions to continue
+						debug(`Emailing new user ${user.id} at ${user.email} instructions to create a password...`);
 						mail.send({
 							from: mail.noReply,
 							to: `<${user.email}>`,
@@ -87,11 +89,12 @@ module.exports = (app, passport) => {
 							html: mail.html(`<p>Welcome to Tracman! </p><p>To complete your registration, follow this link and set your password:<br><a href="${env.url}/settings/password/${token}">${env.url}/settings/password/${token}</a></p><p>This link will expire at ${expirationTimeString}. </p>`)
 						})
 						.then(()=>{
+							debug(`Successfully emailed new user ${user.id} instructions to continue`);
 							req.flash('success', `An email has been sent to <u>${user.email}</u>. Check your inbox and follow the link to complete your registration. (Your registration link will expire in one hour). `);
 							res.redirect('/login');
 						})
 						.catch((err)=>{
-							debug(`Failed to email new instructions to continue to ${user.email}!`);
+							debug(`Failed to email new user ${user.id} instructions to continue!`);
 							mw.throwErr(err,req);
 							res.redirect('/login#signup');
 						});
@@ -106,24 +109,28 @@ module.exports = (app, passport) => {
 			req.sanitizeBody('email').normalizeEmail({remove_dots:false});
 			
 			// Check if somebody already has that email
+			debug(`Searching for user with email ${req.body.email}...`);
 			User.findOne({'email':req.body.email})
 			.then( (user)=>{
 				
 				// User already exists
 				if (user && user.auth.password) {
-					req.flash('warning','A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot">reset it here</a>.');
+					debug(`User ${user.id} has email ${req.body.email} and has a password`);
+					req.flash('warning',`A user with that email already exists!  If you forgot your password, you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`);
 					res.redirect('/login#login');
 					next();
 				}
 				
 				// User exists but hasn't created a password yet
 				else if (user) {
+					debug(`User ${user.id} has email ${req.body.email} but doesn't have a password`);
 					// Send another token (or the same one if it hasn't expired)
 					sendToken(user);
 				}
 				
 				// Create user
 				else {
+					debug(`User with email ${req.body.email} doesn't exist; creating one`);
 					
 					user = new User();
 					user.created = Date.now();
@@ -132,13 +139,17 @@ module.exports = (app, passport) => {
 					
 					// Generate unique slug
 					const slug = new Promise((resolve,reject) => {
+						debug(`Creating new slug for user...`);
+						
 						(function checkSlug(s,cb){
 							
+							debug(`Checking to see if slug ${s} is taken...`);
 							User.findOne({slug:s})
 							.then((existingUser)=>{
 								
 								// Slug in use: generate a random one and retry
 								if (existingUser){
+									debug(`Slug ${s} is taken; generating another...`);
 									crypto.randomBytes(6, (err,buf)=>{
 										if (err) {
 											debug('Failed to create random bytes for slug!');
@@ -152,7 +163,10 @@ module.exports = (app, passport) => {
 								}
 								
 								// Unique slug: proceed
-								else { cb(s); }
+								else {
+									debug(`Slug ${s} is unique`);
+									cb(s);
+								}
 								
 							})
 							.catch((err)=>{
@@ -162,7 +176,7 @@ module.exports = (app, passport) => {
 							});
 							
 						})(user.slug, (newSlug)=>{
-							debug('Successfully created slug');
+							debug(`Successfully created slug: ${newSlug}`);
 							user.slug = newSlug;
 							resolve();
 						});
@@ -170,7 +184,7 @@ module.exports = (app, passport) => {
 					
 					// Generate sk32
 					const sk32 = new Promise((resolve,reject) => {
-						debug('Creating sk32');
+						debug('Creating sk32 for user...');
 						crypto.randomBytes(32, (err,buf)=>{
 							if (err) {
 								debug('Failed to create sk32!');
@@ -179,7 +193,7 @@ module.exports = (app, passport) => {
 							}
 							if (buf) {
 								user.sk32 = buf.toString('hex');
-								debug('Successfully created sk32');
+								debug(`Successfully created sk32: ${user.sk32}`);
 								resolve();
 							}
 						});
@@ -187,7 +201,6 @@ module.exports = (app, passport) => {
 					
 					// Save user and send the token by email
 					Promise.all([slug, sk32])
-					// .then( ()=>{ user.save(); })
 					.then( ()=>{ sendToken(user); })
 					.catch( (err)=>{
 						debug('Failed to save user after creating slug and sk32!');
@@ -208,13 +221,19 @@ module.exports = (app, passport) => {
 	
 	// Forgot password
 	app.route('/login/forgot')
+	
+		// Check if user is already logged in
 		.all( (req,res,next)=>{
 			if (req.isAuthenticated()){ loginCallback(req,res); }
 			else { next(); }
 		} )
+		
+		// Show forgot password page
 		.get( (req,res,next)=>{
-			res.render('forgot');
+			res.render('forgot', {email:req.query.email});
 		} )
+		
+		// Submitted forgot password form
 		.post( (req,res,next)=>{
 			
 			// Validate email
