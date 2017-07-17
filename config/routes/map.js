@@ -35,6 +35,7 @@ router.get('/demo', (req,res,next)=>{
 				showTemp: false,
 				showSpeed: false,
 				showScale: false,
+				showStreetview: true,
 				defaultZoom: 13,
 				defaultMap: 'road',
 				units: 'standard'
