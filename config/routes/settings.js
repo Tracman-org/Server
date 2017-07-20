@@ -140,7 +140,8 @@ router.route('/')
 				showScale: (req.body.showScale)?true:false,
 				showSpeed: (req.body.showSpeed)?true:false,
 				showAlt: (req.body.showAlt)?true:false,
-				showStreetview: (req.body.showStreet)?true:false
+				showStreetview: (req.body.showStreet)?true:false,
+				marker: req.body.marker
 			};
 			
 			// Save user and send response

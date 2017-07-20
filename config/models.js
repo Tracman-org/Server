@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
 		showSpeed: {type:Boolean, default:false},
 		showTemp: {type:Boolean, default:false},
 		showAlt: {type:Boolean, default:false},
-		showStreetview: {type:Boolean, default:false}
+		showStreetview: {type:Boolean, default:false},
+		marker: {type:String, default:'red'}
 	},
 	last: {
 		time: Date,

@@ -71,6 +71,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			marker = new googlemaps.Marker({
 				position: { lat:mapuser.last.lat, lng:mapuser.last.lon },
 				title: mapuser.name,
+				icon: (mapuser.settings.marker)?'/static/img/marker/'+mapuser.settings.marker+'.png':'/static/img/marker/red.png',
 				map: map,
 				draggable: false
 			});
