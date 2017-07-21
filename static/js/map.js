@@ -53,7 +53,7 @@ $(function() {
 
 // Load google maps
 loadGoogleMapsAPI({ key:mapKey })
-.then(function(googlemaps) {
+.then( function(googlemaps) {
 	
 		// Create map
 		if (disp!=='1') {
@@ -293,6 +293,6 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 	}
 
-}).catch((err) => {
+}).catch( function(err) {
 	console.error(err);
 });
