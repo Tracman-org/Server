@@ -26,7 +26,7 @@ router.get('/delete/:usrid', mw.ensureAdmin,  (req,res,next)=>{
 	
 	User.findOneAndRemove({'_id':req.params.usrid})
 	.then( (user)=>{
-		req.flash('success', '<i>'+user.name+'</i> deleted.');
+		req.flash('success', `<i>${req.params.usrid}</i> deleted.`);
 		res.redirect('/admin');
 	})
 	.catch( (err)=>{
