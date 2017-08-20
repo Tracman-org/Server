@@ -98,22 +98,58 @@
 		</div>
 	</section>
 
-	<section class='disclaimer' id='disclaimer'>
+	{% if not user %}
+
+	<section class='pricing'>
 		<div class='container'>
-			<h2>Warning! </h2>
-			<p>This is beta software, so there are still kinks to be worked out. </p>
-			<p>Keep in mind that publishing your location online could be a bad idea. </p>
+			<h1>Pricing</h1>
+			<h2>Realtime GPS tracking for every budget</h2>
+			
+			<div>
+				<h3>Basic<span><i class="fa fa-star"></i></span></h3>
+				<div class="price">free</div>
+				<ul>
+					<li>Map with URL</li>
+					<li>Realtime updates</li>
+					<li>Android integration</li>
+				</ul>
+				<a class="btn yellow smaller" href="/signup">Signup<i class="fa fa-angle-right"></i></a>
+			</div>
+			
+			<div>
+				<h3>Pro<span><i class="fa fa-star"></i><i class="fa fa-star"></i></span></h3>
+				<div class="price">$5/month</div>
+				<ul>
+					<li>All Basic features</li>
+					<li>Streetview image</li>
+					<li>Show speed</li>
+					<li>Show altitude</li>
+					<li>Hide ads</li>
+				</ul>
+				<a class="btn yellow smaller" href="/signup">Signup<i class="fa fa-angle-right"></i></a>
+			</div>
+
+			<div>
+				<h3>Enterprise<span><i class="fa fa-star"></i><i class="fa fa-star"></i><i class='fa fa-star'></i></span></h3>
+				<div class="price">coming soon</div>
+				<ul>
+					<li>All Pro features</li>
+					<li>Multiple vehicles</li>
+				</ul>
+				<a class="btn yellow smaller" href="/contact">Contact<i class="fa fa-angle-right"></i></a>
+			</div>
+			
 		</div>
 	</section>
-
-	{% if not user %}
+	
 	<section class='join light' id='join'>
 		<div class='container'>
 			<h2>Hook me up!</h2>
-			<p>Just click that there button to create an account. </p>
-			<a class='btn btn-lg' href="/login#signup">Join Tracman</a>
+			<p>Just click the button to create an account. </p>
+			<a class='btn btn-lg' href="/signup">Join Tracman</a>
 		</div>
 	</section>
+
 	{% endif %}
 	
 {% endblock %}

@@ -1,8 +1,10 @@
 # Tracman Server Changelog
-###### v 0.7.4
+###### v 0.7.5
+
+#### v0.7.5
+* Added pricing to homepage
 
 #### v0.7.4
-
 * Improved debugging
 * Fixed bugs [#105](https://github.com/Tracman-org/Server/issues/105) and [#107](https://github.com/Tracman-org/Server/issues/107)
 * [#89](https://github.com/Tracman-org/Server/issues/89) Can change marker color
