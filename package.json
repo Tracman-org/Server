@@ -49,7 +49,8 @@
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo n stable && sudo npm update && sudo npm prune",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js"
+    "build": "./node_modules/.bin/webpack --config webpack.config.js",
+    "subuild": "sudo ./node_modules/.bin/webpack --config webpack.config.js"
   },
   "repository": "Tracman-org/Server",
   "keywords": [
