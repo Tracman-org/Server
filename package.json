@@ -1,6 +1,6 @@
 {
   "name": "tracman",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
@@ -33,6 +33,7 @@
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "style-loader": "^0.18.2",
+    "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
     "xss": "^0.3.3",
     "zxcvbn": "^4.4.2"

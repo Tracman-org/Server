@@ -1,5 +1,11 @@
 # Tracman Server Changelog
-###### v 0.7.3
+###### v 0.7.4
+
+#### v0.7.4
+
+* Improved debugging
+* Fixed bugs [#105](https://github.com/Tracman-org/Server/issues/105) and [#107](https://github.com/Tracman-org/Server/issues/107)
+* [#89](https://github.com/Tracman-org/Server/issues/89) Can change marker color
 
 #### v0.7.3
 * Fixed [#102](https://github.com/Tracman-org/Server/issues/102) issue creating account

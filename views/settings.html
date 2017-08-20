@@ -60,6 +60,20 @@
 					<p id='slug-help' class='red help'></p>
 				</div>
 				
+				<div id='marker' class='form-group' title="The color of the marker that shows your location">
+					<label for="marker">Marker color</label>
+					<select name="marker">
+						<option {% if user.settings.marker=='red' or user.settings.marker=='' %}selected {% endif %}value="red">red</option>
+						<option {% if user.settings.marker=='black' %}selected {% endif %}value="black">black</option>
+						<option {% if user.settings.marker=='green' %}selected {% endif %}value="green">green</option>
+						<option {% if user.settings.marker=='grey' %}selected {% endif %}value="grey">grey</option>
+						<option {% if user.settings.marker=='orange' %}selected {% endif %}value="orange">orange</option>
+						<option {% if user.settings.marker=='purple' %}selected {% endif %}value="purple">purple</option>
+						<option {% if user.settings.marker=='white' %}selected {% endif %}value="white">white</option>
+						<option {% if user.settings.marker=='yellow' %}selected {% endif %}value="yellow">yellow</option>
+					</select>
+				</div>
+				
 				<div id='units' class='form-group' title="Select standard units for feet and miles/hour. Select metric units if you are a commie. ">
 					<label for="units">Units</label>
 						<div class='radio-group'>
@@ -89,7 +103,7 @@
 				</div>
 				
 				<div id='defaultZoom' class='form-group' title="Shows the initial map zoom level on your page. A higher number means more zoom. Note that the size of the viewing window will also have an effect on how much of the map a visitor can see. ">
-					<label for="map">Default zoom</label>
+					<label for="zoom">Default zoom</label>
 					<select name="zoom">
 							<option {% if user.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
 							<option {% if user.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>

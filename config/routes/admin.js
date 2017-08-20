@@ -2,6 +2,7 @@
 
 const router = require('express').Router(),
   mw = require('../middleware.js'),
+	debug = require('debug')('tracman-routes-admin'),
   User = require('../models.js').user;
 
 router.get('/', mw.ensureAdmin,  (req,res)=>{
@@ -21,9 +22,11 @@ router.get('/', mw.ensureAdmin,  (req,res)=>{
 	
 router.get('/delete/:usrid', mw.ensureAdmin,  (req,res,next)=>{
 	
+	debug(`/delete/${req.params.usrid} called`);
+	
 	User.findOneAndRemove({'_id':req.params.usrid})
 	.then( (user)=>{
-		req.flash('success', '<i>'+user.name+'</i> deleted.');
+		req.flash('success', `<i>${req.params.usrid}</i> deleted.`);
 		res.redirect('/admin');
 	})
 	.catch( (err)=>{

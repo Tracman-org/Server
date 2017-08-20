@@ -1,5 +1,5 @@
 const path = require('path'),
-	webpack = require('webpack');
+	uglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
 	
@@ -25,18 +25,23 @@ module.exports = {
 		path: path.resolve(__dirname, 'static/js')
 	},
 	
-	// Optimization
-	// plugins: [
-	// 	new webpack.optimize.UglifyJsPlugin({minimize: true})
-	// ],
+	plugins: [
+		
+		// Minimize JS
+		new uglifyJsPlugin()
+		
+	],
 	
-	// Load CSS into bundles
 	module: {
+		
 		rules: [
+			
+			// Load CSS into bundles
 			{
 				test: /\.css$/,
 				use: [ 'style-loader', 'css-loader' ]
 			}
+			
 		]
 	}
 	

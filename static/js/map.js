@@ -53,7 +53,7 @@ $(function() {
 
 // Load google maps
 loadGoogleMapsAPI({ key:mapKey })
-.then(function(googlemaps) {
+.then( function(googlemaps) {
 	
 		// Create map
 		if (disp!=='1') {
@@ -71,6 +71,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			marker = new googlemaps.Marker({
 				position: { lat:mapuser.last.lat, lng:mapuser.last.lon },
 				title: mapuser.name,
+				icon: (mapuser.settings.marker)?'/static/img/marker/'+mapuser.settings.marker+'.png':'/static/img/marker/red.png',
 				map: map,
 				draggable: false
 			});
@@ -292,6 +293,6 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 	}
 
-}).catch((err) => {
+}).catch( function(err) {
 	console.error(err);
 });

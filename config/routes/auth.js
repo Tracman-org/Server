@@ -237,7 +237,6 @@ module.exports = (app, passport) => {
 			
 			// Validate email
 			req.checkBody('email', 'Please enter a valid email address.').isEmail();
-			req.sanitizeBody('email').normalizeEmail({remove_dots:false});
 			
 			// Check if somebody has that email
 			User.findOne({'email':req.body.email})

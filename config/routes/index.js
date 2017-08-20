@@ -11,7 +11,12 @@ module.exports = router
 	.get('/', (req,res,next)=>{
 		res.render('index', {active:'home'});
 	})
-
+	
+	// Demo redirect
+	.get('/demo', (req,res,next)=>{
+		res.redirect('/map/demo');
+	})
+	
 	// Help
 	.get('/help', (req,res)=>{
 		res.render('help', {active:'help'});
