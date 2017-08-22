@@ -1,7 +1,6 @@
 'use strict';
 /* global navigator $ userid token mapuser toggleMaps */
 
-import css from '../css/controls.css';
 import io from 'socket.io-client';
 
 const socket = io('//'+window.location.hostname);
