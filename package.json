@@ -15,6 +15,7 @@
     "express-validator": "^3.2.0",
     "jquery": "^3.2.1",
     "load-google-maps-api": "^1.0.0",
+    "minifier": "^0.8.1",
     "moment": "^2.18.1",
     "mongoose": "^4.11.0",
     "mongoose-unique-validator": "^1.0.5",
