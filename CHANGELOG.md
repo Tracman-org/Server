@@ -1,5 +1,5 @@
 # Tracman Server Changelog
-###### v 0.7.5
+###### v 0.7.6
 
 #### v0.7.5
 * Added pricing to homepage

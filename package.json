@@ -1,6 +1,6 @@
 {
   "name": "tracman",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
