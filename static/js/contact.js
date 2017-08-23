@@ -1,8 +1,6 @@
 'use strict';
 /* global $ */
 
-import css from '../css/contact.css';
-
 var validEmail, validMessage;
 
 // Validate email addresses

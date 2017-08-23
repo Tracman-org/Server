@@ -1,8 +1,6 @@
 'use strict';
 /* global $ */
 
-import css from '../css/login.css';
-
 $(function(){
 	
 	// On clocking 'show'

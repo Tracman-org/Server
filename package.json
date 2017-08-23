@@ -1,6 +1,6 @@
 {
   "name": "tracman",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
@@ -15,6 +15,7 @@
     "express-validator": "^3.2.0",
     "jquery": "^3.2.1",
     "load-google-maps-api": "^1.0.0",
+    "minifier": "^0.8.1",
     "moment": "^2.18.1",
     "mongoose": "^4.11.0",
     "mongoose-unique-validator": "^1.0.5",
@@ -49,6 +50,7 @@
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo n stable && sudo npm update && sudo npm prune",
+    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*",
     "build": "./node_modules/.bin/webpack --config webpack.config.js",
     "subuild": "sudo ./node_modules/.bin/webpack --config webpack.config.js"
   },

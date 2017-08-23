@@ -1,8 +1,6 @@
 'use strict';
 /* global ga */
 
-import css from '../css/base.css';
-	
 // Google analytics
 (function(t,r,a,c,m,o,n){t['GoogleAnalyticsObject']=m;t[m]=t[m]||function(){
 (t[m].q=t[m].q||[]).push(arguments);},t[m].l=1*new Date();o=r.createElement(a),

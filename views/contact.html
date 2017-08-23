@@ -3,13 +3,14 @@
 
 {% block head %}
 {{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.contact.min.css">
 	<script type="application/javascript" src='https://www.google.com/recaptcha/api.js'></script>
 {% endblock %}
 
 {% block javascript %}
 {{super()}}
 	<script type="application/javascript" src="/static/js/.contact.bun.js"></script>
-	<script type="application/javascript" src="/static/js/.form.bun.js"></script>
 {% endblock %}
 
 {% block main %}

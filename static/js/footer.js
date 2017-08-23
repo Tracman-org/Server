@@ -1,8 +1,6 @@
 'use strict';
 /* global $ */
 
-import css from '../css/footer.css';
-	
 // Push footer to bottom on pages with little content
 function setFooter(){
 	var windowHeight = $(window).height(),

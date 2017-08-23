@@ -2,6 +2,6 @@
 	"verbose": true,
 	"ext": "html, js, json, css",
 	"events": {
-		"start": "npm run build"
+		"start": "npm run build & npm run minify"
 	}
 }

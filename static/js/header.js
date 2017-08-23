@@ -1,8 +1,6 @@
 /* global $ */
 'use strict';
 
-import css from '../css/header.css';
-
 $(document).ready(function(){
 	
 	// Open drawer with hamburger

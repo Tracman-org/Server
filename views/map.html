@@ -3,8 +3,9 @@
 
 {% block head %}
 	{{super()}}
+	<link href="/static/css/.map.min.css" rel="stylesheet">
 	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
-		{% if noHeader!='0' %} main { top: 0 !important; } {% endif %}
+		{% if noHeader!='0' %} main { top: 0; } {% endif %}
 		
 		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
 		/* show both */
@@ -73,6 +74,7 @@
 	</div>
 	
 	{% if user.id == mapuser.id and mapuser._id != 'demo' %}
+		<link rel="stylesheet" type="text/css" href="/static/css/.controls.min.css">
 		<div id='controls'>
 		{% if mapuser.settings.showStreetview and disp!='0' %}
 			<style>
