@@ -1,6 +1,11 @@
 # Tracman Server Changelog
 ###### v 0.7.6
 
+
+#### v0.7.6
+* [#100](https://github.com/Tracman-org/Server/issues/100) Moved CSS out of webpack
+* Fixed [#108](https://github.com/Tracman-org/Server/issues/108)
+
 #### v0.7.5
 * Added pricing to homepage
 
