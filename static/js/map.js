@@ -266,12 +266,14 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 		}
 		
-		// Not moving and pano not set (create panoramic image)
-		else if (pano==null) {
+		// Not moving
+		else {
 			
-			// Create panorama
-			$('#pano').empty();
-			pano = new googlemaps.StreetViewPanorama(panoElem, {
+			// Pano element not created
+			if (pano==null) {
+				// Create panorama
+				$('#pano').empty();
+				pano = new googlemaps.StreetViewPanorama(panoElem, {
 				panControl: false,
 				zoomControl: false,
 				addressControl: false,
@@ -279,6 +281,7 @@ loadGoogleMapsAPI({ key:mapKey })
 				motionTracking: false,
 				motionTrackingControl: false
 			});
+			}
 			
 			// Set panorama
 			getStreetViewData(loc, 2, function(data){
@@ -289,6 +292,7 @@ loadGoogleMapsAPI({ key:mapKey })
 					heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
 				});
 			});
+		
 		}
 		
 	}
