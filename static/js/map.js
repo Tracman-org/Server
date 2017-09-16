@@ -50,100 +50,101 @@ $(function() {
 	toggleMaps(mapuser.last);
 });
 
-// Load google maps
+// Load google maps API
 loadGoogleMapsAPI({ key:mapKey })
 .then( function(googlemaps) {
-	
-		// Create map
-		if (disp!=='1') {
-			
-			map = new googlemaps.Map( mapElem, {
-				center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
-				panControl: false,
-				scaleControl: (mapuser.settings.showScale)?true:false,
-				draggable: false,
-				zoom: mapuser.settings.defaultZoom,
-				streetViewControl: false,
-				zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
-				mapTypeId: (mapuser.settings.defaultMap=='road')?googlemaps.MapTypeId.ROADMAP:googlemaps.MapTypeId.HYBRID
-			});
-			marker = new googlemaps.Marker({
-				position: { lat:mapuser.last.lat, lng:mapuser.last.lon },
-				title: mapuser.name,
-				icon: (mapuser.settings.marker)?'/static/img/marker/'+mapuser.settings.marker+'.png':'/static/img/marker/red.png',
-				map: map,
-				draggable: false
-			});
-			map.addListener('zoom_changed',function(){
-				map.setCenter(marker.getPosition());
-			});
-			
-			// Create iFrame logo
-			if (noHeader!=='0' && mapuser._id!=='demo') {
-				const logoDiv = document.createElement('div');
-				logoDiv.id = 'map-logo';
-				logoDiv.innerHTML = '<a href="https://tracman.org/">'+
-					'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
-					"<span class='text'>Tracman</span></a>";
-				map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
-			}
-			
-			// Create update time block
-			const timeDiv = document.createElement('div');
-			timeDiv.id = 'timestamp';
-			if (mapuser.last.time) {
-				timeDiv.innerHTML = 'location updated '+new Date(mapuser.last.time).toLocaleString();
-			}
-			map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
-			
-			// Create speed block
-			if (mapuser.settings.showSpeed) {
-				const speedSign = document.createElement('div'),
-					speedLabel = document.createElement('div'),
-					speedText = document.createElement('div'),
-					speedUnit = document.createElement('div');
-				speedLabel.id = 'spd-label';
-				speedLabel.innerHTML = 'SPEED';
-				speedText.id = 'spd';
-				speedText.innerHTML = (mapuser.settings.units=='standard')?(parseFloat(mapuser.last.spd)*2.23694).toFixed():mapuser.last.spd.toFixed();
-				speedUnit.id = 'spd-unit';
-				speedUnit.innerHTML = (mapuser.settings.units=='standard')?'m.p.h.':'k.p.h.';
-				speedSign.id = 'spd-sign';
-				speedSign.appendChild(speedLabel);
-				speedSign.appendChild(speedText);
-				speedSign.appendChild(speedUnit);
-				map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(speedSign);
-			}
-			
-			// Create altitude block
-			if (mapuser.settings.showAlt) {
-				const elevator = new googlemaps.ElevationService,
-					altitudeSign = document.createElement('div'),
-					altitudeLabel = document.createElement('div'),
-					altitudeText = document.createElement('div'),
-					altitudeUnit = document.createElement('div');
-				altitudeLabel.id = 'alt-label';
-				altitudeText.id = 'alt';
-				altitudeUnit.id = 'alt-unit';
-				altitudeSign.id = 'alt-sign';
-				altitudeText.innerHTML = '';
-				altitudeLabel.innerHTML = 'ALTITUDE';
-				getAltitude(new googlemaps.LatLng(mapuser.last.lat,mapuser.last.lon), elevator, function(alt) {
-					if (alt) { altitudeText.innerHTML = (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
-				});
-				altitudeUnit.innerHTML = (mapuser.settings.units=='standard')?'feet':'meters';
-				altitudeSign.appendChild(altitudeLabel);
-				altitudeSign.appendChild(altitudeText);
-				altitudeSign.appendChild(altitudeUnit);
-				map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(altitudeSign);
-			}
-			
+
+	// Create map
+	if (disp!=='1') {
+		
+		// Create map and marker elements
+		map = new googlemaps.Map( mapElem, {
+			center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
+			panControl: false,
+			scaleControl: (mapuser.settings.showScale)?true:false,
+			draggable: false,
+			zoom: mapuser.settings.defaultZoom,
+			streetViewControl: false,
+			zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
+			mapTypeId: (mapuser.settings.defaultMap=='road')?googlemaps.MapTypeId.ROADMAP:googlemaps.MapTypeId.HYBRID
+		});
+		marker = new googlemaps.Marker({
+			position: { lat:mapuser.last.lat, lng:mapuser.last.lon },
+			title: mapuser.name,
+			icon: (mapuser.settings.marker)?'/static/img/marker/'+mapuser.settings.marker+'.png':'/static/img/marker/red.png',
+			map: map,
+			draggable: false
+		});
+		map.addListener('zoom_changed',function(){
+			map.setCenter(marker.getPosition());
+		});
+		
+		// Create iFrame logo
+		if (noHeader!=='0' && mapuser._id!=='demo') {
+			const logoDiv = document.createElement('div');
+			logoDiv.id = 'map-logo';
+			logoDiv.innerHTML = '<a href="https://tracman.org/">'+
+				'<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">'+
+				"<span class='text'>Tracman</span></a>";
+			map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv);
 		}
-			
-		// Create streetview
-		if (disp!=='0' && mapuser.settings.showStreetview) {
-			updateStreetView(parseLoc(mapuser.last),10);
+		
+		// Create update time block
+		const timeDiv = document.createElement('div');
+		timeDiv.id = 'timestamp';
+		if (mapuser.last.time) {
+			timeDiv.innerHTML = 'location updated '+new Date(mapuser.last.time).toLocaleString();
 		}
+		map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv);
+		
+		// Create speed block
+		if (mapuser.settings.showSpeed) {
+			const speedSign = document.createElement('div'),
+				speedLabel = document.createElement('div'),
+				speedText = document.createElement('div'),
+				speedUnit = document.createElement('div');
+			speedLabel.id = 'spd-label';
+			speedLabel.innerHTML = 'SPEED';
+			speedText.id = 'spd';
+			speedText.innerHTML = (mapuser.settings.units=='standard')?(parseFloat(mapuser.last.spd)*2.23694).toFixed():mapuser.last.spd.toFixed();
+			speedUnit.id = 'spd-unit';
+			speedUnit.innerHTML = (mapuser.settings.units=='standard')?'m.p.h.':'k.p.h.';
+			speedSign.id = 'spd-sign';
+			speedSign.appendChild(speedLabel);
+			speedSign.appendChild(speedText);
+			speedSign.appendChild(speedUnit);
+			map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(speedSign);
+		}
+		
+		// Create altitude block
+		if (mapuser.settings.showAlt) {
+			const elevator = new googlemaps.ElevationService,
+				altitudeSign = document.createElement('div'),
+				altitudeLabel = document.createElement('div'),
+				altitudeText = document.createElement('div'),
+				altitudeUnit = document.createElement('div');
+			altitudeLabel.id = 'alt-label';
+			altitudeText.id = 'alt';
+			altitudeUnit.id = 'alt-unit';
+			altitudeSign.id = 'alt-sign';
+			altitudeText.innerHTML = '';
+			altitudeLabel.innerHTML = 'ALTITUDE';
+			getAltitude(new googlemaps.LatLng(mapuser.last.lat,mapuser.last.lon), elevator, function(alt) {
+				if (alt) { altitudeText.innerHTML = (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
+			});
+			altitudeUnit.innerHTML = (mapuser.settings.units=='standard')?'feet':'meters';
+			altitudeSign.appendChild(altitudeLabel);
+			altitudeSign.appendChild(altitudeText);
+			altitudeSign.appendChild(altitudeUnit);
+			map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(altitudeSign);
+		}
+		
+	}
+		
+	// Create streetview
+	if (disp!=='0' && mapuser.settings.showStreetview) {
+		updateStreetView(parseLoc(mapuser.last),10);
+	}
 	
 	// Parse location
 	function parseLoc(loc) {
@@ -265,12 +266,14 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 		}
 		
-		// Not moving and pano not set (create panoramic image)
-		else if (pano==null) {
+		// Not moving
+		else {
 			
-			// Create panorama
-			$('#pano').empty();
-			pano = new googlemaps.StreetViewPanorama(panoElem, {
+			// Pano element not created
+			if (pano==null) {
+				// Create panorama
+				$('#pano').empty();
+				pano = new googlemaps.StreetViewPanorama(panoElem, {
 				panControl: false,
 				zoomControl: false,
 				addressControl: false,
@@ -278,6 +281,7 @@ loadGoogleMapsAPI({ key:mapKey })
 				motionTracking: false,
 				motionTrackingControl: false
 			});
+			}
 			
 			// Set panorama
 			getStreetViewData(loc, 2, function(data){
@@ -288,10 +292,12 @@ loadGoogleMapsAPI({ key:mapKey })
 					heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
 				});
 			});
+		
 		}
 		
 	}
 
+// Error loading gmaps API
 }).catch( function(err) {
 	console.error(err);
 });

@@ -1,6 +1,9 @@
 # Tracman Server Changelog
-###### v 0.7.6
+###### v 0.7.7
 
+
+#### v0.7.7
+* [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 
 #### v0.7.6
 * [#100](https://github.com/Tracman-org/Server/issues/100) Moved CSS out of webpack

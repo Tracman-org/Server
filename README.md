@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.6
+###### v 0.7.7
 
 node.js application to display a sharable map with user's location.
 
@@ -31,7 +31,7 @@ Then edit `config/env/local-config.js` to match your local environment.
 Run Tracman with npm: 
 
 ```sh
-npm run minify && npm start
+(npm run minify & npm run build) && npm start
 ```
 
 ...or with [nodemon](https://nodemon.io/):
@@ -40,7 +40,7 @@ npm run minify && npm start
 npm run nodemon
 ```
 
-Nodemon will automatically minify files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
+Nodemon will automatically minify and bundle files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
 
 
 ## Contributing
@@ -51,6 +51,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 ## Changelog
 
 [view full changelog](CHANGELOG.md)
+
+#### v0.7.7
+* [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 
 #### v0.7.6
 * [#100](https://github.com/Tracman-org/Server/issues/100) Moved CSS out of webpack
