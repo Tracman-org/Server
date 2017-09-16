@@ -52,6 +52,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### latest
+* [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
+
 #### v0.7.6
 * [#100](https://github.com/Tracman-org/Server/issues/100) Moved CSS out of webpack
 * Fixed [#108](https://github.com/Tracman-org/Server/issues/108)
