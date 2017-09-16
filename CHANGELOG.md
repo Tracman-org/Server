@@ -1,8 +1,8 @@
 # Tracman Server Changelog
-###### v 0.7.6
+###### v 0.7.7
 
 
-#### latest
+#### v0.7.7
 * [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 
 #### v0.7.6
