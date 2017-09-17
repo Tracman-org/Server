@@ -52,6 +52,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### latest
+* [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
+* 
 #### v0.7.7
 * [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 

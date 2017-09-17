@@ -2,6 +2,9 @@
 ###### v 0.7.7
 
 
+#### latest
+* [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
+
 #### v0.7.7
 * [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 
