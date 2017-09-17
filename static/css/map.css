@@ -18,9 +18,9 @@ main {
 }
 
 /* Map and streetview */
-#map, #pano {position:relative;}
-#pano {float:right;}
-#panoImg { width:100%; height:100%; }
+#map, #view {position:relative;}
+#view {float:right;}
+#viewImg { width:100%; height:100%; }
 #notset {display:none}
 
 /* Tracman logo */
