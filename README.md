@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.7
+###### v 0.7.8
 
 node.js application to display a sharable map with user's location.
 
@@ -52,9 +52,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-#### latest
+#### v0.7.8
 * [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
-* 
+
 #### v0.7.7
 * [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
 

@@ -1,8 +1,8 @@
 # Tracman Server Changelog
-###### v 0.7.7
+###### v 0.7.8
 
 
-#### latest
+#### v0.7.8
 * [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
 
 #### v0.7.7
