@@ -6,9 +6,10 @@ import $ from 'jquery';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
 // Variables
-var map, pano, marker, elevator, newLoc;
+var map, view, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
-	panoElem = document.getElementById('pano'),
+	viewElem = document.getElementById('view'),
+	viewImgElem = document.getElementById('viewImg'),
 	socket = io('//'+window.location.hostname);
 
 // socket.io stuff
@@ -36,12 +37,12 @@ socket
 function toggleMaps(loc) {
 	if (loc.lat===0&&loc.lon===0) {
 		$('#map').hide();
-		$('#pano').hide();
+		$('#view').hide();
 		$('#notset').show();
 	}
 	else {
 		$('#map').show();
-		$('#pano').show();
+		$('#view').show();
 		$('#notset').hide();
 	}
 }
@@ -244,56 +245,25 @@ loadGoogleMapsAPI({ key:mapKey })
 	// Update streetview
 	function updateStreetView(loc) {
 		
-		// Moving (show image)
-		if (loc.spd>1) {
-			
-			// Create image
-			const imgElem = document.getElementById('panoImg');
-			if (!imgElem) {
-				pano = undefined;
-				$('#pano').empty();
-				$('#pano').append($('<img>',{
-					alt: 'Street view image',
-					src: 'https://maps.googleapis.com/maps/api/streetview?size=800x800&location='+loc.lat+','+loc.lon+'&fov=90&heading='+loc.dir+'&key={{api}}',
-					id: 'panoImg'
-				}));
-			}
-			
-			// Set image
-			getStreetViewData(loc, 2, function(data){
-				$('#panoImg').attr('src','https://maps.googleapis.com/maps/api/streetview?size='+$('#pano').width()+'x'+$('#pano').height()+'&location='+data.location.latLng.lat()+','+data.location.latLng.lng()+'&fov=90&heading='+loc.dir+'&key='+mapKey);
-			});
-			
+		// Calculate bearing between user and position of streetview image
+		function getBearing(userLoc, imageLoc) {
+			return Math.atan(
+				(userLoc.lon-imageLoc.latLng.lng())
+				/ (userLoc.lat-imageLoc.latLng.lat())
+			) * (180/Math.PI);
 		}
 		
-		// Not moving
-		else {
-			
-			// Pano element not created
-			if (pano==null) {
-				// Create panorama
-				$('#pano').empty();
-				pano = new googlemaps.StreetViewPanorama(panoElem, {
-				panControl: false,
-				zoomControl: false,
-				addressControl: false,
-				linksControl: false,
-				motionTracking: false,
-				motionTrackingControl: false
-			});
-			}
-			
-			// Set panorama
-			getStreetViewData(loc, 2, function(data){
-				pano.setPano(data.location.pano);							
-				pano.setPov({
-					pitch: 0,
-					// Point towards users's location from street
-					heading: Math.atan((loc.lon-data.location.latLng.lng())/(loc.lat-data.location.latLng.lat()))*(180/Math.PI)
-				});
-			});
-		
-		}
+		// Set image
+		getStreetViewData(loc, 2, function(data){
+			$('#viewImg').attr('src','https://maps.googleapis.com/maps/api/streetview?'+
+				'size='+ $('#view').width() +'x'+ $('#view').height() +
+				'&location='+ data.location.latLng.lat() +','+ data.location.latLng.lng() +
+				'&fov=90' + // Inclination
+				// Show direction if moving, point to user if stationary
+				'&heading='+ ( (loc.spd>2)? loc.dir: getBearing(loc,data.location) ).toString() +
+				'&key='+ mapKey
+			);
+		});
 		
 	}
 
