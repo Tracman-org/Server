@@ -9,12 +9,12 @@ const socket = io('//'+window.location.hostname);
 function toggleMaps(loc) {
 	if (loc.lat===0&&loc.lon===0) {
 		$('#map').hide();
-		$('#pano').hide();
+		$('#view').hide();
 		$('#notset').show();
 	}
 	else {
 		$('#map').show();
-		$('#pano').show();
+		$('#view').show();
 		$('#notset').hide();
 	}
 }
