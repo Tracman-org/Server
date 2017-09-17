@@ -245,7 +245,7 @@ loadGoogleMapsAPI({ key:mapKey })
 	function updateStreetView(loc) {
 		
 		// Moving (show image)
-		if (loc.spd>1) {
+		if (loc.spd>2) {
 			
 			// Create image
 			const imgElem = document.getElementById('panoImg');
@@ -274,13 +274,13 @@ loadGoogleMapsAPI({ key:mapKey })
 				// Create panorama
 				$('#pano').empty();
 				pano = new googlemaps.StreetViewPanorama(panoElem, {
-				panControl: false,
-				zoomControl: false,
-				addressControl: false,
-				linksControl: false,
-				motionTracking: false,
-				motionTrackingControl: false
-			});
+					panControl: false,
+					zoomControl: false,
+					addressControl: false,
+					linksControl: false,
+					motionTracking: false,
+					motionTrackingControl: false
+				});
 			}
 			
 			// Set panorama
