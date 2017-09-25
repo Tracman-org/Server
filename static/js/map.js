@@ -253,10 +253,30 @@ loadGoogleMapsAPI({ key:mapKey })
 				* (180/Math.PI)	) % 360;
 		}
 		
+		// Get dimensions for sv request (images proportional to element up to 640x640)
+		function getDimensions(element) {
+			
+			// Window is smaller than max
+			if ( element.width()<640 && element.height()<640 ){
+				return element.width()+'x'+element.height();
+			}
+			
+			// Width must be made proportional to 640
+			else if (element.width()>element.height()) {
+				return '640x'+element.height()*640/element.width();
+			}
+			
+			// Height must be made proportional to 640
+			else {
+				return element.width()*640/element.height()+'x640';
+			}
+			
+		}
+		
 		// Set image
 		getStreetViewData(loc, 2, function(data){
 			$('#viewImg').attr('src','https://maps.googleapis.com/maps/api/streetview?'+
-				'size='+ $('#view').width() +'x'+ $('#view').height() +
+				'size='+ getDimensions($('#view')) +
 				'&location='+ data.location.latLng.lat() +','+ data.location.latLng.lng() +
 				'&fov=90' + // Inclination
 				// Show direction if moving, point to user if stationary
