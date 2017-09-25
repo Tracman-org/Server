@@ -246,11 +246,11 @@ loadGoogleMapsAPI({ key:mapKey })
 	function updateStreetView(loc) {
 		
 		// Calculate bearing between user and position of streetview image
+		// https://stackoverflow.com/a/26609687/3006854
 		function getBearing(userLoc, imageLoc) {
-			return Math.atan(
-				(userLoc.lon-imageLoc.latLng.lng())
-				/ (userLoc.lat-imageLoc.latLng.lat())
-			) * (180/Math.PI);
+			return 90-(
+				Math.atan2( userLoc.lat-imageLoc.latLng.lat(), userLoc.lon-imageLoc.latLng.lng() )
+				* (180/Math.PI)	) % 360;
 		}
 		
 		// Set image
