@@ -15,7 +15,7 @@ const mapElem = document.getElementById('map'),
 // socket.io stuff
 socket
 	.on('connect', function(){
-		console.log("⬆️ Connected!");
+		//console.log("⬆️ Connected!");
 		
 		// Can get location
 		socket.emit('can-get', mapuser._id );
@@ -27,7 +27,7 @@ socket
 		
 	})
 	.on('disconnect', function(){
-		console.log("⬇️ Disconnected!");
+		//console.log("⬇️ Disconnected!");
 	})
 	.on('error', function (err){
 		console.error('❌️',err.message);
@@ -60,7 +60,14 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 		// Create map and marker elements
 		map = new googlemaps.Map( mapElem, {
-			center: new googlemaps.LatLng( mapuser.last.lat, mapuser.last.lon ),
+			center: new googlemaps.LatLng(
+				mapuser.last.lat,
+				mapuser.last.lon
+			),
+			// center: { 
+			// 	lat: mapuser.last.lat, 
+			// 	lng: mapuser.last.lon
+			// },
 			panControl: false,
 			scaleControl: (mapuser.settings.showScale)?true:false,
 			draggable: false,
@@ -119,8 +126,8 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 		// Create altitude block
 		if (mapuser.settings.showAlt) {
-			const elevator = new googlemaps.ElevationService,
-				altitudeSign = document.createElement('div'),
+			elevator = new googlemaps.ElevationService;
+			const altitudeSign = document.createElement('div'),
 				altitudeLabel = document.createElement('div'),
 				altitudeText = document.createElement('div'),
 				altitudeUnit = document.createElement('div');
@@ -130,9 +137,7 @@ loadGoogleMapsAPI({ key:mapKey })
 			altitudeSign.id = 'alt-sign';
 			altitudeText.innerHTML = '';
 			altitudeLabel.innerHTML = 'ALTITUDE';
-			getAltitude(new googlemaps.LatLng(mapuser.last.lat,mapuser.last.lon), elevator, function(alt) {
-				if (alt) { altitudeText.innerHTML = (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed(); }
-			});
+			altitudeText.innerHTML = parseAlt(mapuser.last);
 			altitudeUnit.innerHTML = (mapuser.settings.units=='standard')?'feet':'meters';
 			altitudeSign.appendChild(altitudeLabel);
 			altitudeSign.appendChild(altitudeText);
@@ -147,20 +152,58 @@ loadGoogleMapsAPI({ key:mapKey })
 		updateStreetView(parseLoc(mapuser.last),10);
 	}
 	
+	// Parse altitude
+	function parseAlt(loc){
+		
+		// Convert to feet if needed
+		function convertUnits(meters){
+			return (mapuser.settings.units=='standard')? (meters*3.28084).toFixed(): meters.toFixed();
+		}
+		
+		// Check if altitude was provided
+		if (typeof loc.alt=='number'){
+			return convertUnits(loc.alt);
+		}
+		
+		// No altitude provided
+		else {
+
+			// Query google altitude API
+			elevator = elevator || new googlemaps.ElevationService;
+			return elevator.getElevationForLocations({
+				'locations': [{ lat:loc.lat, lng:loc.lon }]
+			}, function(results, status, error_message) {
+				
+				// Success; return altitude
+				if (status === googlemaps.ElevationStatus.OK && results[0]) {
+					return convertUnits(results[0].elevation);
+				} 
+				
+				// Unable to get any altitude
+				else { 
+					console.error("Failed to get altitude from API:",status);
+					return "????";
+				}
+				
+			});
+		}
+		
+	}
+	
 	// Parse location
 	function parseLoc(loc) {
 		loc.spd = (mapuser.settings.units=='standard')?parseFloat(loc.spd)*2.23694:parseFloat(loc.spd);
 		loc.dir = parseFloat(loc.dir);
 		loc.lat = parseFloat(loc.lat);
 		loc.lon = parseFloat(loc.lon);
+		loc.alt = parseAlt(loc);
 		loc.tim = new Date(loc.tim).toLocaleString();
-		loc.glatlng = new googlemaps.LatLng(loc.lat, loc.lon);
 		return loc;
 	}
 	
 	// Got location
 	socket.on('get', function(loc) {
-		console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
+		//console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
 		
 		// Parse location
 		newLoc = parseLoc(loc);
@@ -183,14 +226,7 @@ loadGoogleMapsAPI({ key:mapKey })
 				
 			// Update altitude
 			if (mapuser.settings.showAlt) {
-				getAltitude({
-					lat: newLoc.lat,
-					lng: newLoc.lon
-				}, elevator, function(alt) {
-					if (alt) {
-						$('#alt').text( (mapuser.settings.units=='standard')?(alt*3.28084).toFixed():alt.toFixed() );
-					}
-				});
+				$('#alt').text( parseAlt(newLoc) );
 			}
 			
 		}
@@ -201,18 +237,6 @@ loadGoogleMapsAPI({ key:mapKey })
 		}
 		
 	});
-	
-	// Check altitude
-	function getAltitude(loc,elev,cb){
-		elev = elev || new googlemaps.ElevationService;
-		elev.getElevationForLocations({
-			'locations': [loc]
-		}, function(results, status) {
-			if (status === googlemaps.ElevationStatus.OK && results[0]) {
-				cb(results[0].elevation);
-			}
-		});
-	}
 	
 	// Get street view imagery
 	function getStreetViewData(loc,rad,cb) {
