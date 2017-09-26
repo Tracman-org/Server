@@ -60,15 +60,12 @@ loadGoogleMapsAPI({ key:mapKey })
 		
 		// Create map and marker elements
 		map = new googlemaps.Map( mapElem, {
-			center: new googlemaps.LatLng(
-				mapuser.last.lat,
-				mapuser.last.lon
-			),
-			// center: { 
-			// 	lat: mapuser.last.lat, 
-			// 	lng: mapuser.last.lon
-			// },
+			center: { 
+				lat: mapuser.last.lat, 
+				lng: mapuser.last.lon
+			},
 			panControl: false,
+			scrollwheel: true,
 			scaleControl: (mapuser.settings.showScale)?true:false,
 			draggable: false,
 			zoom: mapuser.settings.defaultZoom,
