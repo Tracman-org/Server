@@ -6,10 +6,8 @@ import $ from 'jquery';
 import loadGoogleMapsAPI from 'load-google-maps-api';
 
 // Variables
-var map, view, marker, elevator, newLoc;
+var map, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
-	viewElem = document.getElementById('view'),
-	viewImgElem = document.getElementById('viewImg'),
 	socket = io('//'+window.location.hostname);
 
 // socket.io stuff
@@ -279,17 +277,17 @@ loadGoogleMapsAPI({ key:mapKey })
 			
 			// Window is smaller than max
 			if ( element.width()<640 && element.height()<640 ){
-				return element.width()+'x'+element.height();
+				return element.width().toFixed()+'x'+element.height().toFixed();
 			}
 			
 			// Width must be made proportional to 640
 			else if (element.width()>element.height()) {
-				return '640x'+element.height()*640/element.width();
+				return '640x'+(element.height()*640/element.width()).toFixed();
 			}
 			
 			// Height must be made proportional to 640
 			else {
-				return element.width()*640/element.height()+'x640';
+				return (element.width()*640/element.height()).toFixed()+'x640';
 			}
 			
 		}
