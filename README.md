@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.8
+###### v 0.7.9
 
 node.js application to display a sharable map with user's location.
 
@@ -52,6 +52,13 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v0.7.9
+* Updated packages
+* Added support for browser geolocation
+* Fixed streetview image bugs
+* Added sourcemaps for debugging
+* Fixed streetview bearing
+
 #### v0.7.8
 * [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
 
@@ -77,16 +84,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * Added more debugging to fix auth problems
 
 #### v0.7.0
-* More bug fixes
-
-#### v0.6.0-7
-* Removed demo recording code
-* Moved email server settings to env file
-* Added SMTP check
-* Minified static files
-* Fixed error when creating user
-* Removed extraneous packages
-* Fixed [#87](https://github.com/Tracman-org/Server/issues/87), [#96](https://github.com/Tracman-org/Server/issues/96), [#92](https://github.com/Tracman-org/Server/issues/92), [#84](https://github.com/Tracman-org/Server/issues/84), [#76](https://github.com/Tracman-org/Server/issues/76), [#77](https://github.com/Tracman-org/Server/issues/77), [#32](https://github.com/Tracman-org/Server/issues/32), [#57](https://github.com/Tracman-org/Server/issues/57), [#58](https://github.com/Tracman-org/Server/issues/58), [#60](https://github.com/Tracman-org/Server/issues/60), [#50](https://github.com/Tracman-org/Server/issues/50), [#51](https://github.com/Tracman-org/Server/issues/51), [#52](https://github.com/Tracman-org/Server/issues/52), [#54](https://github.com/Tracman-org/Server/issues/54), [#55](https://github.com/Tracman-org/Server/issues/55), [#61](https://github.com/Tracman-org/Server/issues/61), [#62](https://github.com/Tracman-org/Server/issues/62)
+* Bug fixes
 
 
 ## License

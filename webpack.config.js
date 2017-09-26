@@ -1,4 +1,5 @@
 const path = require('path'),
+	env = require('./config/env/env.js'),
 	uglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
@@ -16,6 +17,9 @@ module.exports = {
 		password: './static/js/password.js'
 	},
 	
+	// Sourcemaps
+	devtool: (env.mode=='development')?'inline-source-map':false,
+	
 	// Output format
 	output: {
 		filename: '.[name].bun.js',
@@ -25,6 +29,6 @@ module.exports = {
 	plugins: [
 		// Minimize JS
 		new uglifyJsPlugin()
-	],
+	]
 	
 };
