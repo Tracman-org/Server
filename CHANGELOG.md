@@ -1,6 +1,13 @@
 # Tracman Server Changelog
-###### v 0.7.8
+###### v 0.7.9
 
+
+#### v0.7.9
+* Updated packages
+* Added support for browser geolocation
+* Fixed streetview image bugs
+* Added sourcemaps for debugging
+* Fixed streetview bearing
 
 #### v0.7.8
 * [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
