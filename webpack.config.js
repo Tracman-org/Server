@@ -18,7 +18,7 @@ module.exports = {
 	},
 	
 	// Sourcemaps
-	devtool: (env.mode=='development')?'source-map':false,
+	devtool: (env.mode=='development')?'inline-source-map':false,
 	
 	// Output format
 	output: {
