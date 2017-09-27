@@ -45,6 +45,11 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 		
 		<link rel="stylesheet" type="text/css" href="/static/css/.base.min.css">
+		
+		<!--[if lt IE 9]>
+			<script src="/scripts/html5shiv.js"></script>
+			<script src="/scripts/respond.min.js"></script>
+		<![endif]-->
 	
 	{% endblock %}
 	{% if not noHeader %}<link href="/static/css/.header.min.css" rel="stylesheet">{% endif %}
