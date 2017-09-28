@@ -52,6 +52,11 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+#### v.0.7.10
+* Added coinhive
+* Updated jQuery
+* Added HTML5 shiv
+
 #### v0.7.9
 * Updated packages
 * Added support for browser geolocation
