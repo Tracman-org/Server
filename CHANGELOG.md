@@ -1,6 +1,11 @@
 # Tracman Server Changelog
-###### v 0.7.9
+###### v 0.7.10
 
+
+#### v.0.7.10
+* Added coinhive
+* Updated jQuery
+* Added HTML5 shiv
 
 #### v0.7.9
 * Updated packages
