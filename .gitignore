@@ -9,7 +9,7 @@ config/env/*
 !config/env/sample.js
 
 # Minified or bundled static files (can be built with `npm run minify && npm run build`)
-static/**/*.min.*
+static/css/*.min.*
 static/**/*.bun.*
 
 # Ignore docs files

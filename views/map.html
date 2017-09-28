@@ -7,7 +7,7 @@
 	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
 		{% if noHeader!='0' %} main { top: 0; } {% endif %}
 		
-		{% if mapuser.settings.showStreetview and disp!='0' and disp!='1' %}
+		{% if mapuser.settings.showStreetview and disp=='2' %}
 		/* show both */
 			@media (orientation: landscape) {
 					#map, #view {
@@ -61,9 +61,16 @@
 		
 	</div>
 	{% endif %}
-
-	<div id='map'></div>
-	<div id='view'><img id='viewImg' alt="Streetview image"/></div>
+	
+	<!-- Map -->
+	{% if disp!='1' %}
+		<div id='map'></div>
+	{% endif %}
+	
+	<!-- Streetview -->
+	{% if mapuser.settings.showStreetview and and disp!='0' %}
+		<div id='view'><img id='viewImg' alt="Streetview image"/></div>
+	{% endif %}
 	
 	<div id='notset' class='centered alert alert-warning'>
 		{% if user.id == mapuser.id %}
