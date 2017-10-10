@@ -49,7 +49,7 @@
     "test": "mocha test.js",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
-    "update": "sudo n stable && sudo npm update && sudo npm prune",
+    "update": "sudo npm update && sudo npm prune",
     "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*",
     "build": "./node_modules/.bin/webpack --config webpack.config.js",
     "subuild": "sudo ./node_modules/.bin/webpack --config webpack.config.js"
