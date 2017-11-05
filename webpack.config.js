@@ -12,7 +12,7 @@ module.exports = {
 		contact: './static/js/contact.js',
 		login: './static/js/login.js',
 		map: './static/js/map.js',
-		controls: './static/js/controls.js',
+		// controls: './static/js/controls.js',
 		settings: './static/js/settings.js',
 		password: './static/js/password.js'
 	},
