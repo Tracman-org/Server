@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.11
+###### v 0.7.12
 
 node.js application to display a sharable map with user's location.
 
@@ -52,7 +52,10 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-#### v.0.7.10
+#### v0.7.12
+* Fixed altitude sign
+
+#### v0.7.10
 * Added coinhive
 * Updated jQuery
 * Added HTML5 shiv
