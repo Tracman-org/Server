@@ -1,8 +1,11 @@
 # Tracman Server Changelog
-###### v 0.7.11
+###### v 0.7.12
 
 
-#### v.0.7.10
+#### v0.7.12
+* Fixed altitude sign
+
+#### v0.7.10
 * Added coinhive
 * Updated jQuery
 * Added HTML5 shiv

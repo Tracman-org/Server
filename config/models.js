@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
 		lat: {type:Number, default:0},
 		lon: {type:Number, default:0},
 		dir: {type:Number, default:0},
-		alt: {type:Number, default:0},
+		alt: {type:Number},
 		spd: {type:Number, default:0}
 	},
 	sk32: {type:String, required:true, unique:true}

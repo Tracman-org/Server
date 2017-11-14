@@ -1,5 +1,5 @@
 'use strict';
-/* global mapuser userid disp noHeader mapKey */
+/* global mapuser userid disp noHeader mapKey navigator $ token */
 
 import io from 'socket.io-client';
 import $ from 'jquery';
@@ -9,11 +9,17 @@ import loadGoogleMapsAPI from 'load-google-maps-api';
 var map, marker, elevator, newLoc;
 const mapElem = document.getElementById('map'),
 	socket = io('//'+window.location.hostname);
+	
+// Convert to feet if needed
+function metersToFeet(meters){
+	//console.log('metersToFeet('+meters+')')
+	return (mapuser.settings.units=='standard')? (meters*3.28084).toFixed(): meters.toFixed()
+}
 
 // socket.io stuff
 socket
 	.on('connect', function(){
-		//console.log("⬆️ Connected!");
+		console.log("Connected!");
 		
 		// Can get location
 		socket.emit('can-get', mapuser._id );
@@ -25,7 +31,7 @@ socket
 		
 	})
 	.on('disconnect', function(){
-		//console.log("⬇️ Disconnected!");
+		console.log("Disconnected!");
 	})
 	.on('error', function (err){
 		console.error('❌️',err.message);
@@ -47,6 +53,123 @@ function toggleMaps(loc) {
 // Toggle maps on page load
 $(function() {
 	toggleMaps(mapuser.last);
+	
+	// Controls
+	var wpid, newloc;
+	
+	// Set location
+	$('#set-loc').click(function(){
+		if (!userid===mapuser._id){ alert('You are not logged in! '); }
+		else { if (!navigator.geolocation){ alert('Geolocation not enabled. '); }
+		
+		else { navigator.geolocation.getCurrentPosition(
+				
+			// Success callback
+			function(pos){
+				var newloc = {
+					ts: Date.now(),
+					tok: token,
+					usr: userid,
+					alt: pos.coords.altitude,
+					lat: pos.coords.latitude,
+					lon: pos.coords.longitude,
+					spd: (pos.coords.speed||0)
+				};
+				socket.emit('set', newloc);
+				toggleMaps(newloc);
+				console.log('Set location:',newloc.lat+", "+newloc.lon);
+			},
+			
+			// Error callback
+			function(err) {
+				alert("Unable to set location.");
+				console.error('❌️',err.message);
+			},
+			
+			// Options
+			{ enableHighAccuracy:true }
+		
+		); } }
+		
+	});
+	
+	// Track location
+	$('#track-loc').click(function(){
+		if (!userid===mapuser._id) { alert('You are not logged in! '); }
+		else {
+			
+			// Start tracking
+			if (!wpid) {
+				if (!navigator.geolocation) { alert('Unable to track location. '); }
+				else {
+					$('#track-loc').html('<i class="fa fa-crosshairs fa-spin"></i>Stop').prop('title',"Click here to stop tracking your location. ");
+					wpid = navigator.geolocation.watchPosition(
+					
+						// Success callback
+						function(pos) {
+							newloc = {
+								ts: Date.now(),
+								tok: token,
+								usr: userid,
+								lat: pos.coords.latitude,
+								lon: pos.coords.longitude,
+								alt: pos.coords.altitude,
+								spd: (pos.coords.speed||0)
+							}
+							socket.emit('set',newloc)
+							toggleMaps(newloc)
+							console.log('Set location:',newloc.lat+", "+newloc.lon)
+						},
+						
+						// Error callback
+						function(err){
+							alert("Unable to track location.");
+							console.error(err.message);
+						},
+						
+						// Options
+						{ enableHighAccuracy:true }
+						
+					);
+				}
+				
+			}
+			
+			// Stop tracking
+			else {
+				$('#track-loc').html('<i class="fa fa-crosshairs"></i>Track').prop('title',"Click here to track your location. ");
+				navigator.geolocation.clearWatch(wpid);
+				wpid = undefined;
+			}
+			
+		}
+	});
+	
+	// Clear location
+	$('#clear-loc').click(function(){
+		if (!userid===mapuser._id) { alert('You are not logged in! '); }
+		else {
+			// Stop tracking
+			if (wpid) {
+				$('#track-loc').html('<i class="fa fa-crosshairs"></i>Track');
+				navigator.geolocation.clearWatch(wpid);
+				wpid = undefined;
+			}
+			
+			// Clear location
+			newloc = {
+				ts: Date.now(),
+				tok: token,
+				usr: userid,
+				lat:0, lon:0, spd:0
+			}; socket.emit('set',newloc);
+			
+			// Turn off map
+			toggleMaps(newloc);
+			console.log('Cleared location');
+		}
+	});
+	
 });
 
 // Load google maps API
@@ -132,7 +255,11 @@ loadGoogleMapsAPI({ key:mapKey })
 			altitudeSign.id = 'alt-sign';
 			altitudeText.innerHTML = '';
 			altitudeLabel.innerHTML = 'ALTITUDE';
-			altitudeText.innerHTML = parseAlt(mapuser.last);
+			parseAlt(mapuser.last).then( function(alt){
+				altitudeText.innerHTML = metersToFeet(alt)
+			}).catch( function(err){
+				console.error("Could not load altitude from last known location: ",err)
+			});
 			altitudeUnit.innerHTML = (mapuser.settings.units=='standard')?'feet':'meters';
 			altitudeSign.appendChild(altitudeLabel);
 			altitudeSign.appendChild(altitudeText);
@@ -147,41 +274,59 @@ loadGoogleMapsAPI({ key:mapKey })
 		updateStreetView(parseLoc(mapuser.last),10);
 	}
 	
+	// Get altitude from Google API
+	function getAlt(loc){
+		return new Promise( function(resolve,reject){
+			
+			// Get elevator service
+			elevator = elevator || new googlemaps.ElevationService;
+				return elevator.getElevationForLocations({
+					
+					// Query API
+					'locations': [{ lat:loc.lat, lng:loc.lon }]
+				}, function(results, status, error_message) {
+					
+					// Success; return altitude
+					if (status === googlemaps.ElevationStatus.OK && results[0]) {
+						console.log("Altitude was retrieved from Google Elevations API as",results[0].elevation,'m')
+						resolve( results[0].elevation )
+					} 
+					
+					// Unable to get any altitude
+					else {
+						reject(Error(error_message))
+					}
+					
+				});
+		})
+	}
+	
 	// Parse altitude
 	function parseAlt(loc){
+		//console.log('parseAlt('+loc+'})')
 		
-		// Convert to feet if needed
-		function convertUnits(meters){
-			return (mapuser.settings.units=='standard')? (meters*3.28084).toFixed(): meters.toFixed();
-		}
-		
-		// Check if altitude was provided
-		if (typeof loc.alt=='number'){
-			return convertUnits(loc.alt);
-		}
-		
-		// No altitude provided
-		else {
-
-			// Query google altitude API
-			elevator = elevator || new googlemaps.ElevationService;
-			return elevator.getElevationForLocations({
-				'locations': [{ lat:loc.lat, lng:loc.lon }]
-			}, function(results, status, error_message) {
+		return new Promise( function(resolve,reject){
+			
+			// Check if altitude was provided
+			if (typeof loc.alt=='number'){
+				console.log('Altitude was provided in loc as ',loc.alt,'m')
+				resolve(loc.alt)
+			}
+			
+			// No altitude provided
+			else {
+				console.log('No altitude was provided in loc')
+	
+				// Query google altitude API
+				getAlt(loc).then( function(alt){
+					resolve(alt)
+				}).catch( function (err) {
+					reject(err)
+				})
 				
-				// Success; return altitude
-				if (status === googlemaps.ElevationStatus.OK && results[0]) {
-					return convertUnits(results[0].elevation);
-				} 
-				
-				// Unable to get any altitude
-				else { 
-					console.error("Failed to get altitude from API:",status);
-					return "????";
-				}
-				
-			});
-		}
+			}
+			
+		})
 		
 	}
 	
@@ -191,20 +336,21 @@ loadGoogleMapsAPI({ key:mapKey })
 		loc.dir = parseFloat(loc.dir);
 		loc.lat = parseFloat(loc.lat);
 		loc.lon = parseFloat(loc.lon);
-		loc.alt = parseAlt(loc);
+		//loc.alt = parseAlt(loc);
 		loc.tim = new Date(loc.tim).toLocaleString();
 		return loc;
 	}
 	
 	// Got location
 	socket.on('get', function(loc) {
-		//console.log("🌐️ Got location:",loc.lat+", "+loc.lon);
+		console.log("Got location:",loc.lat+", "+loc.lon);
 		
 		// Parse location
 		newLoc = parseLoc(loc);
 			
 		// Update map
 		if (disp!=='1') {
+			//console.log('Updating map...')
 			
 			// Update time
 			$('#timestamp').text('location updated '+newLoc.tim);
@@ -221,7 +367,13 @@ loadGoogleMapsAPI({ key:mapKey })
 				
 			// Update altitude
 			if (mapuser.settings.showAlt) {
-				$('#alt').text( parseAlt(newLoc) );
+				//console.log('updating altitude...');
+				parseAlt(loc).then(function(alt){
+					$('#alt').text( metersToFeet(alt) )
+				}).catch(function(err){
+					$('#alt').text( '????' )
+					console.error(err);
+				})
 			}
 			
 		}
