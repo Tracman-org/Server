@@ -1,8 +1,8 @@
-const chai = require('chai'),
-	chaiHttp = require('chai-http'),
-	request = require('supertest'),
-	server = require('./server');
-chai.use(chaiHttp);
+const chai = require('chai')
+const chaiHttp = require('chai-http')
+const request = require('supertest')
+const server = require('./server')
+const chai.use(chaiHttp);
 
 
 describe('Public Pages', () => {
@@ -27,7 +27,8 @@ describe('Public Pages', () => {
 	
 	it('Displays privacy policy', (done) => {
 		getPublicPage ('/privacy', done)
-	
+	})
+
 	it('Displays robots.txt', done) => {
 		request(server).get('/robots.txt')
 		.expect(200)
@@ -36,16 +37,22 @@ describe('Public Pages', () => {
 	})
 	
 	it('Displays demo map', (done) => {
-		getPublicPage ('/demo', done)
+		getPublicPage ('/map/demo', done)
 	})
 	
 	it('Displays help page', (done) => {
 		getPublicPage ('/help', done)
 	})
 	
+	it('Displays contact page', (done) => {
+		getPublicPage('/contact', done)
+	})
+	
+	
+	
 })
 
-describe('User', () => {
+describe('Accounts', () => {
 	
 	it('Creates an account', (done) => {
 		request(server).post('/signup',{"email":"test@tracman.org"})

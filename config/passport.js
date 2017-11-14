@@ -1,30 +1,29 @@
-'use strict';
-
-const
-	LocalStrategy = require('passport-local').Strategy,
-	GoogleStrategy = require('passport-google-oauth20').Strategy,
-	FacebookStrategy = require('passport-facebook').Strategy,
-	TwitterStrategy = require('passport-twitter').Strategy,
-	GoogleTokenStrategy = require('passport-google-id-token'),
-	FacebookTokenStrategy = require('passport-facebook-token'),
-	TwitterTokenStrategy = require('passport-twitter-token'),
-	debug = require('debug')('tracman-passport'),
-	env = require('./env/env.js'),
-	mw = require('./middleware.js'),
-	User = require('./models.js').user;
+const LocalStrategy = require('passport-local').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy
+const FacebookStrategy = require('passport-facebook').Strategy
+const TwitterStrategy = require('passport-twitter').Strategy
+const GoogleTokenStrategy = require('passport-google-id-token')
+//const FacebookTokenStrategy = require('passport-facebook-token')
+//const TwitterTokenStrategy = require('passport-twitter-token')
+const debug = require('debug')('tracman-passport')
+const env = require('./env/env.js')
+const mw = require('./middleware.js')
+const User = require('./models.js').user
 	
 module.exports = (passport)=>{
 	
 	// Serialize/deserialize users
-	passport.serializeUser((user,done)=>{
+	passport.serializeUser( (user, done) => {
+		debug(`serializeUser(${user.id})`)
 		done(null, user.id);
-	});
-	passport.deserializeUser((id,done)=>{
+	})
+	passport.deserializeUser( (id, done) => {
+		debug(`deserializeUser(${user.id})`)
 		User.findById(id, (err,user)=>{
 			if(!err){ done(null, user); }
 			else { done(err, null); }
-		});
-	});
+		})
+	})
 	
 	// Local
 	passport.use('local', new LocalStrategy({
@@ -38,12 +37,14 @@ module.exports = (passport)=>{
 			
 			// No user with that email
 			if (!user) {
+				debug(`No user with email ${email}`)
 				req.session.next = undefined;
 				return done( null, false, req.flash('warning','Incorrect email or password.') );
 			}
 			
 			// User exists
 			else {
+				debug(`User ${user.id} has email ${email}. Checking password ${password}...`)
 				
 				// Check password
 				user.validPassword( password, (err,res)=>{
@@ -51,22 +52,25 @@ module.exports = (passport)=>{
 					
 					// Password incorrect
 					if (!res) {
+						debug(`Password ${password} was incorrect`)
 						req.session.next = undefined;
 						return done( null, false, req.flash('warning','Incorrect email or password.') );
 					}
 					
 					// Successful login
-					else { 
+					else {
+						debug(`User ${user.id} logged in with successful local login`)
 						user.lastLogin = Date.now();
 						user.save();
-						return done(null,user);
+						return done(null, user);
 					}
 					
 				} );
 			}
 			
 		})
-		.catch( (err)=>{
+		.catch( (err) => {
+			debug(`Error searching for user with email ${email}`)
 			return done(err);
 		});
 	}
@@ -86,9 +90,11 @@ module.exports = (passport)=>{
 				
 				// Can't find user
 				if (!user){
+					debug("Can't find user")
 					
 					// Lazy update from old googleId field
 					if (service==='google') {
+						debug('Checking for old googleId field')
 						User.findOne({ 'googleID': parseInt(profileId,10) })
 						.then( (user)=>{
 							
@@ -134,9 +140,9 @@ module.exports = (passport)=>{
 					}
 				}
 				
-				// Successfull social login
+				// Successful social login
 				else {
-					debug(`Found user: ${user.id}; logging in...`);
+					debug(`Successfully logged in user ${user.id} using ${service}`);
 					req.session.flashType = 'success';
 					req.session.flashMessage = "You have been logged in.";
 					return done(null, user);
@@ -144,7 +150,7 @@ module.exports = (passport)=>{
 				
 			})
 			.catch( (err)=>{
-				debug(`Failed to find user with query: ${query}`);
+				debug(`Failed to search for user with query: ${query}`);
 				mw.throwErr(err,req);
 				return done(err);
 			});
@@ -220,15 +226,15 @@ module.exports = (passport)=>{
 			passReqToCallback: true
 		}, (req, accessToken, refreshToken, profile, done)=>{
 			socialLogin(req, 'facebook', profile.id, done);
-		}
-	)).use('facebook-token', new FacebookTokenStrategy({
-			clientID: env.facebookAppId,
-			clientSecret: env.facebookAppSecret,
-			passReqToCallback: true
-		}, (req, accessToken, refreshToken, profile, done)=>{
-			socialLogin(req,'facebook', profile.id, done);
-		}
-	));
+		}))
+//	.use('facebook-token', new FacebookTokenStrategy({
+//			clientID: env.facebookAppId,
+//			clientSecret: env.facebookAppSecret,
+//			passReqToCallback: true
+//		}, (req, accessToken, refreshToken, profile, done)=>{
+//			socialLogin(req,'facebook', profile.id, done);
+//		}
+//	))
 	
 	// Twitter
 	passport.use(new TwitterStrategy({
@@ -239,14 +245,15 @@ module.exports = (passport)=>{
 		}, (req, token, tokenSecret, profile, done)=>{
 			socialLogin(req, 'twitter', profile.id, done);
 		}
-	)).use('twitter-token', new TwitterTokenStrategy({
-			consumerKey: env.twitterConsumerKey,
-			consumerSecret: env.twitterConsumerSecret,
-			passReqToCallback: true
-		}, (req, token, tokenSecret, profile, done)=>{
-			socialLogin(req,'twitter', profile.id, done);
-		}
-	));
+	))
+//	.use('twitter-token', new TwitterTokenStrategy({
+//			consumerKey: env.twitterConsumerKey,
+//			consumerSecret: env.twitterConsumerSecret,
+//			passReqToCallback: true
+//		}, (req, token, tokenSecret, profile, done)=>{
+//			socialLogin(req,'twitter', profile.id, done);
+//		}
+//	))
 
-	return passport;
+	return passport
 };

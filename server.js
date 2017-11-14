@@ -1,25 +1,22 @@
-'use strict';
-
 /* IMPORTS */
-const
-	express = require('express'),
-	bodyParser = require('body-parser'),
-	expressValidator = require('express-validator'),
-	cookieParser = require('cookie-parser'),
-	cookieSession = require('cookie-session'),
-	debug = require('debug')('tracman-server'),
-	mongoose = require('mongoose'),
-	nunjucks = require('nunjucks'),
-	passport = require('passport'),
-	flash = require('connect-flash-plus'),
-	env = require('./config/env/env.js'),
-	User = require('./config/models.js').user,
-	mail = require('./config/mail.js'),
-	demo = require('./config/demo.js'),
-	app = express(),
-	http = require('http').Server(app),
-	io = require('socket.io')(http),
-	sockets = require('./config/sockets.js');
+const express = require('express')
+const bodyParser = require('body-parser')
+const expressValidator = require('express-validator')
+const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
+const debug = require('debug')('tracman-server')
+const mongoose = require('mongoose')
+const nunjucks = require('nunjucks')
+const passport = require('passport')
+const flash = require('connect-flash-plus')
+const env = require('./config/env/env.js')
+const User = require('./config/models.js').user
+const mail = require('./config/mail.js')
+const demo = require('./config/demo.js')
+const app = express()
+const http = require('http').Server(app)
+const io = require('socket.io')(http)
+const sockets = require('./config/sockets.js')
 
 
 /* SETUP */ {
@@ -36,8 +33,8 @@ const
 			replset:{socketOptions:{
 				keepAlive:1, connectTimeoutMS:30000 }}
 		})
-		.then( ()=>{ console.log(`💿 Mongoose connected to mongoDB`); })
-		.catch( (err)=>{ console.error(`❌ ${err.stack}`); });
+		.then( () => { console.log(`💿 Mongoose connected to mongoDB`); })
+		.catch( (err) => { console.error(`❌ ${err.stack}`); });
 		
 	}
 
@@ -45,24 +42,24 @@ const
 		nunjucks.configure(__dirname+'/views', {
 			autoescape: true,
 			express: app
-		});
-		app.set('view engine','html');
+		})
+		app.set('view engine','html')
 	}
 
 	/* Session */ {
-		app.use(cookieParser(env.cookie));
+		app.use(cookieParser(env.cookie))
 		app.use(cookieSession({
 			cookie: {maxAge:60000},
 			secret: env.session,
 			saveUninitialized: true,
 			resave: true
-		}));
-		app.use(bodyParser.json());
+		}))
+		app.use(bodyParser.json())
 		app.use(bodyParser.urlencoded({
 			extended: true
-		}));
-		app.use(expressValidator());
-		app.use(flash());
+		}))
+		app.use(expressValidator())
+		app.use(flash())
 	}
 	
 	/* Auth */ {

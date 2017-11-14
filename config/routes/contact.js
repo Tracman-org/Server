@@ -1,10 +1,9 @@
-'use strict';
-
-const env = require('../env/env.js'),
-	request = require('request'),
-	mw = require('../middleware.js'),
-	mail = require('../mail.js'),
-	router = require('express').Router();
+const debut = require('debug')('tracman-routes-contact')
+const env = require('../env/env.js')
+const request = require('request')
+const mw = require('../middleware.js')
+const mail = require('../mail.js')
+const router = require('express').Router()
 
 module.exports = router
 
