@@ -43,6 +43,7 @@
     "chai": "^4.0.2",
     "chai-http": "^3.0.0",
     "nodemon": "^1.11.0",
+    "standard": "^10.0.3",
     "supertest": "^3.0.0"
   },
   "scripts": {
