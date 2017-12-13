@@ -15,21 +15,21 @@ mv Server tracman-server && cd tracman-server &&\
 exec npm install
 ```
 
-You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).  
+You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).
 
-A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version: 
+A good method is to simply copy the sample configuration and point `config/env/env.js` to the new version:
 
 ```sh
 cp config/env/sample.js config/env/local-config.js
 echo "module.exports = require('./local-config.js');" > config/env/env.js
 ```
 
-Then edit `config/env/local-config.js` to match your local environment.  
+Then edit `config/env/local-config.js` to match your local environment.
 
 
 ## Usage
 
-Run Tracman with npm: 
+Run Tracman with npm:
 
 ```sh
 (npm run minify & npm run build) && npm start
@@ -41,12 +41,12 @@ Run Tracman with npm:
 npm run nodemon
 ```
 
-Nodemon will automatically minify and bundle files and restart the app when you make changes.  Check out the `nodemon.json` configuration.  
+Nodemon will automatically minify and bundle files and restart the app when you make changes.  Check out the `nodemon.json` configuration.
 
 
 ## Contributing
 
-Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.  
+Tracman will be updated according to [this branching model](http://nvie.com/posts/a-successful-git-branching-model)... more or less.  If you know anything about programming Android, [the Tracman android app](https://github.com/Tracman-org/Android) is more desperate for help.
 
 
 ## Changelog
@@ -56,6 +56,8 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 #### develop
 * [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
 * Removed emojis
+* [#113](https://github.com/Tracman-org/Server/issues/113) [#114](https://github.com/Tracman-org/Server/issues/114) Switched to useMongoClient
+* [#67](https://github.com/Tracman-org/Server/issues/67) Fixed invisible marker in demo
 
 #### v0.7.12
 * Fixed altitude sign

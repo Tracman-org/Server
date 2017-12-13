@@ -3,6 +3,9 @@
 
 #### develop
 * [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
+* Removed emojis
+* [#113](https://github.com/Tracman-org/Server/issues/113) [#114](https://github.com/Tracman-org/Server/issues/114) Switched to useMongoClient
+* [#67](https://github.com/Tracman-org/Server/issues/67) Fixed invisible marker in demo
 
 #### v0.7.12
 * Fixed altitude sign
