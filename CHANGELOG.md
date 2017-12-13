@@ -1,6 +1,8 @@
 # Tracman Server Changelog
 ###### v 0.7.12
 
+#### develop
+* [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
 
 #### v0.7.12
 * Fixed altitude sign

@@ -1,150 +1,142 @@
-'use strict';
+'use strict'
 
-const mongoose = require('mongoose'),
-	unique = require('mongoose-unique-validator'),
-	bcrypt = require('bcrypt'),
-	crypto = require('crypto'),
-	debug = require('debug')('tracman-models');
+const mongoose = require('mongoose')
+const unique = require('mongoose-unique-validator')
+const bcrypt = require('bcrypt')
+const crypto = require('crypto')
+const debug = require('debug')('tracman-models')
 
 const userSchema = new mongoose.Schema({
-	name: {type:String},
-	email: {type:String, unique:true},
-	newEmail: String,
-	emailToken: String,
-	slug: {type:String, required:true, unique:true},
-	auth: {
-		password: String,
-		passToken: String,
-		passTokenExpires: Date,
-		google: String,
-		facebook: String,
-		twitter: String,
-	},
-	isAdmin: {type:Boolean, required:true, default:false},
-	isPro: {type:Boolean, required:true, default:false},
-	created: {type:Date, required:true},
-	lastLogin: Date,
-	settings: {
-		units: {type:String, default:'standard'},
-		defaultMap: {type:String, default:'road'},
-		defaultZoom: {type:Number, default:11},
-		showScale: {type:Boolean, default:false},
-		showSpeed: {type:Boolean, default:false},
-		showTemp: {type:Boolean, default:false},
-		showAlt: {type:Boolean, default:false},
-		showStreetview: {type:Boolean, default:false},
-		marker: {type:String, default:'red'}
-	},
-	last: {
-		time: Date,
-		lat: {type:Number, default:0},
-		lon: {type:Number, default:0},
-		dir: {type:Number, default:0},
-		alt: {type:Number},
-		spd: {type:Number, default:0}
-	},
-	sk32: {type:String, required:true, unique:true}
-}).plugin(unique);
+  name: {type: String},
+  email: {type: String, unique: true},
+  newEmail: String,
+  emailToken: String,
+  slug: {type: String, required: true, unique: true},
+  auth: {
+    password: String,
+    passToken: String,
+    passTokenExpires: Date,
+    google: String,
+    facebook: String,
+    twitter: String
+  },
+  isAdmin: {type: Boolean, required: true, default: false},
+  isPro: {type: Boolean, required: true, default: false},
+  created: {type: Date, required: true},
+  lastLogin: Date,
+  settings: {
+    units: {type: String, default: 'standard'},
+    defaultMap: {type: String, default: 'road'},
+    defaultZoom: {type: Number, default: 11},
+    showScale: {type: Boolean, default: false},
+    showSpeed: {type: Boolean, default: false},
+    showTemp: {type: Boolean, default: false},
+    showAlt: {type: Boolean, default: false},
+    showStreetview: {type: Boolean, default: false},
+    marker: {type: String, default: 'red'}
+  },
+  last: {
+    time: Date,
+    lat: {type: Number, default: 0},
+    lon: {type: Number, default: 0},
+    dir: {type: Number, default: 0},
+    alt: {type: Number},
+    spd: {type: Number, default: 0}
+  },
+  sk32: {type: String, required: true, unique: true}
+}).plugin(unique)
 
-/* User methods */ {
-	
-	//TODO: Return promises instead of taking callbacks
-	// See https://gist.github.com/7h1b0/5154fda207e68ad1cefc#file-random-js
-	// For an example
-	
-	// Create email confirmation token
-	userSchema.methods.createEmailToken = function(next){ // next(err,token)
-		debug('user.createEmailToken() called');
-		var user = this;
-		
-		crypto.randomBytes(16, (err,buf)=>{
-			if (err){ next(err,null); }
-			if (buf){
-				debug(`Buffer ${buf.toString('hex')} created`);
-				user.emailToken = buf.toString('hex');
-				user.save()
-				.then( ()=>{
-					return next(null,user.emailToken);
-				})
-				.catch( (err)=>{
-					return next(err,null);
-				});
-				
-			}
-		});
-		
-	};
+/* User methods */
+// TODO: Return promises instead of taking callbacks
+// See https://gist.github.com/7h1b0/5154fda207e68ad1cefc#file-random-js
+// For an example
 
-	// Create password reset token
-	userSchema.methods.createPassToken = function(next){ // next(err,token,expires)
-		var user = this;
-		
-		// Reuse old token, resetting clock
-		if ( user.auth.passTokenExpires >= Date.now() ){
-			debug(`Reusing old password token...`);
-			user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-			user.save()
-			.then( ()=>{
-				return next(null,user.auth.passToken,user.auth.passTokenExpires);
-			})
-			.catch( (err)=>{
-				return next(err,null,null);
-			});
-		}
-		
-		// Create new token
-		else {
-			debug(`Creating new password token...`);
-			crypto.randomBytes(16, (err,buf)=>{
-				if (err){ return next(err,null,null); }
-				if (buf) {
-					user.auth.passToken = buf.toString('hex');
-					user.auth.passTokenExpires = Date.now() + 3600000; // 1 hour
-					user.save()
-					.then( ()=>{
-						debug('successfully saved user in createPassToken');
-						return next(null,user.auth.passToken,user.auth.passTokenExpires);
-					})
-					.catch( (err)=>{
-						debug('error saving user in createPassToken');
-						return next(err,null,null);
-					});
-				}
-			});
-		}
-		
-	};
-	
-	// Generate hash for new password and save it to the database
-	userSchema.methods.generateHashedPassword = function(password,next){
-		// next(err);
-		
-		// Delete token
-		this.auth.passToken = undefined;
-		this.auth.passTokenExpires = undefined;
-		
-		// Generate hash
-		bcrypt.genSalt(8, (err,salt)=>{
-			if (err){ return next(err); }
-			bcrypt.hash(password, salt, (err,hash)=>{
-				if (err){ return next(err); }
-				this.auth.password = hash;
-				this.save();
-				next();
-			});
-		});
-		
-	};
-	
-	// Check for valid password
-	userSchema.methods.validPassword = function(password,next){
-		// next(err,res);
-		// res = true/false
-		bcrypt.compare(password, this.auth.password, next);
-	};
-	
+// Create email confirmation token
+userSchema.methods.createEmailToken = function (next) { // next(err,token)
+  debug('user.createEmailToken() called')
+  var user = this
+
+  crypto.randomBytes(16, (err, buf) => {
+    if (err) { next(err, null) }
+    if (buf) {
+      debug(`Buffer ${buf.toString('hex')} created`)
+      user.emailToken = buf.toString('hex')
+      user.save()
+      .then(() => {
+        return next(null, user.emailToken)
+      })
+      .catch((err) => {
+        return next(err, null)
+      })
+    }
+  })
+}
+
+// Create password reset token
+userSchema.methods.createPassToken = function (next) { // next(err,token,expires)
+  var user = this
+
+  // Reuse old token, resetting clock
+  if (user.auth.passTokenExpires >= Date.now()) {
+    debug(`Reusing old password token...`)
+    user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
+    user.save()
+    .then(() => {
+      return next(null, user.auth.passToken, user.auth.passTokenExpires)
+    })
+    .catch((err) => {
+      return next(err, null, null)
+    })
+
+  // Create new token
+  } else {
+    debug(`Creating new password token...`)
+    crypto.randomBytes(16, (err, buf) => {
+      if (err) { return next(err, null, null) }
+      if (buf) {
+        user.auth.passToken = buf.toString('hex')
+        user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
+        user.save()
+        .then(() => {
+          debug('successfully saved user in createPassToken')
+          return next(null, user.auth.passToken, user.auth.passTokenExpires)
+        })
+        .catch((err) => {
+          debug('error saving user in createPassToken')
+          return next(err, null, null)
+        })
+      }
+    })
+  }
+}
+
+// Generate hash for new password and save it to the database
+userSchema.methods.generateHashedPassword = function (password, next) {
+  // next(err);
+
+  // Delete token
+  this.auth.passToken = undefined
+  this.auth.passTokenExpires = undefined
+
+  // Generate hash
+  bcrypt.genSalt(8, (err, salt) => {
+    if (err) { return next(err) }
+    bcrypt.hash(password, salt, (err, hash) => {
+      if (err) { return next(err) }
+      this.auth.password = hash
+      this.save()
+      next()
+    })
+  })
+}
+
+// Check for valid password
+userSchema.methods.validPassword = function (password, next) {
+  // next(err,res);
+  // res = true/false
+  bcrypt.compare(password, this.auth.password, next)
 }
 
 module.exports = {
-	'user': mongoose.model('User', userSchema)
-};
+  'user': mongoose.model('User', userSchema)
+}

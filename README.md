@@ -3,6 +3,7 @@
 
 node.js application to display a sharable map with user's location.
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Installation
 
@@ -51,6 +52,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 ## Changelog
 
 [view full changelog](CHANGELOG.md)
+
+#### develop
+* [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
 
 #### v0.7.12
 * Fixed altitude sign
