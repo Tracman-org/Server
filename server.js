@@ -20,20 +20,20 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const sockets = require('./config/sockets.js')
 
-/* SETUP */
 /* Database */ {
   // Setup with native ES6 promises
   mongoose.Promise = global.Promise
 
   // Connect to database
   mongoose.connect(env.mongoSetup, {
-    server: {socketOptions: {
-      keepAlive: 1, connectTimeoutMS: 30000 }},
-    replset: {socketOptions: {
-      keepAlive: 1, connectTimeoutMS: 30000 }}
+    useMongoClient: true,
+    socketTimeoutMS: 30000,
+    //reconnectTries: 30,
+    keepAlive: true
   })
-  .then(() => { console.log(`Mongoose connected to mongoDB`) })
-  .catch((err) => { console.error(err.stack) })
+  .then( (db) => { console.log(`Mongoose connected to mongoDB ${db.name}`); } )
+  .catch( (err) => { console.error(err.stack); } )
+
 }
 
 /* Templates */ {
