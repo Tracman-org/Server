@@ -9,10 +9,38 @@ import loadGoogleMapsAPI from 'load-google-maps-api'
 var map, marker, elevator, newLoc
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
+const IDLE_TIMEOUT = 300 // 5 minutes in seconds
+var _idleSecondsCounter = 0
+
+// Idle timeout listeners
+function resetIdleSecondsCounter () {
+  _idleSecondsCounter = 0
+}
+document.onclick = resetIdleSecondsCounter
+document.onmousemove = resetIdleSecondsCounter
+document.onkeypress = resetIdleSecondsCounter
+
+// Disconnect socket.io if user is idle for longer than IDLE_TIMEOUT seconds
+window.setInterval( function CheckIdleTime () {
+  _idleSecondsCounter++
+  // Disconnect idle user if still connected
+  if (_idleSecondsCounter >= IDLE_TIMEOUT) {
+    if (socket.connected) {
+      console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
+      socket.disconnect()
+    }
+  // Connect user if disconnected
+  } else {
+    if (!socket.connected) {
+      console.log('Reconnecting the user because they are no longer idle.')
+      socket.connect()
+    }
+  }
+}, 1000)
 
 // Convert to feet if needed
 function metersToFeet (meters) {
-  // console.log('metersToFeet('+meters+')')
+  //console.log('metersToFeet('+meters+')')
   return (mapuser.settings.units === 'standard') ? (meters * 3.28084).toFixed() : meters.toFixed()
 }
 
@@ -49,6 +77,7 @@ function toggleMaps (loc) {
 
 // On page load
 $(function () {
+
   toggleMaps(mapuser.last)
 
   // Controls
@@ -163,11 +192,13 @@ $(function () {
       console.log('Cleared location')
     }
   })
+
 })
 
 // Load google maps API
 loadGoogleMapsAPI({ key: mapKey })
 .then(function (googlemaps) {
+
   // Create map
   if (disp !== '1') {
     // Create map and marker elements
