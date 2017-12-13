@@ -32,8 +32,8 @@ const sockets = require('./config/sockets.js')
     replset: {socketOptions: {
       keepAlive: 1, connectTimeoutMS: 30000 }}
   })
-  .then(() => { console.log(`💿 Mongoose connected to mongoDB`) })
-  .catch((err) => { console.error(`❌ ${err.stack}`) })
+  .then(() => { console.log(`Mongoose connected to mongoDB`) })
+  .catch((err) => { console.error(err.stack) })
 }
 
 /* Templates */ {
@@ -125,7 +125,7 @@ const sockets = require('./config/sockets.js')
   // Production handlers
   if (env.mode !== 'development') {
     app.use((err, req, res, next) => {
-      if (err.status !== 404 && err.status !== 401) { console.error(`❌ ${err.stack}`) }
+      if (err.status !== 404 && err.status !== 401) { console.error(err.stack) }
       if (res.headersSent) { return next(err) }
       res.status(err.status || 500)
       res.render('error', {
@@ -137,7 +137,7 @@ const sockets = require('./config/sockets.js')
   // Development handlers
   } else {
     app.use((err, req, res, next) => {
-      if (err.status !== 404) { console.error(`❌ ${err.stack}`) }
+      if (err.status !== 404) { console.error(err.stack) }
       if (res.headersSent) { return next(err) }
       res.status(err.status || 500)
       res.render('error', {
@@ -154,14 +154,14 @@ const sockets = require('./config/sockets.js')
 }
 
 /* RUNTIME */
-console.log('🖥  Starting Tracman server...')
+console.log('Starting Tracman server...')
 
 // Test SMTP server
 mail.verify()
 
 // Listen
 http.listen(env.port, () => {
-  console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `)
+  console.log(`Listening in ${env.mode} mode on port ${env.port}... `)
 
   // Check for clients for each user
   User.find({})
@@ -170,9 +170,7 @@ http.listen(env.port, () => {
       sockets.checkForUsers(io, user.id)
     })
   })
-  .catch((err) => {
-    console.error(`❌ ${err.stack}`)
-  })
+  .catch((err) => { console.error(err.stack) })
 
   // Start transmitting demo
   demo(io)

@@ -55,6 +55,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 #### develop
 * [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
+* Removed emojis
 
 #### v0.7.12
 * Fixed altitude sign

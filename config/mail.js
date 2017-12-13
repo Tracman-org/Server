@@ -19,8 +19,8 @@ module.exports = {
 	verify: () => {
 		debug(`Verifying SMTP connection...`)
 		transporter.verify( (err,success) => {
-			if (err){ console.error(`📧 SMTP ${err}`); }
-			console.log(`📧 SMTP${(success)?'':' not'} ready`)
+			if (err){ console.error(err.stack); }
+			console.log(`SMTP${(success)?'':' not'} ready`)
 		} )
 	},
 	
