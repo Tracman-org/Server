@@ -57,7 +57,7 @@ userSchema.methods.createEmailToken = function (next) { // next(err,token)
   var user = this
 
   crypto.randomBytes(16, (err, buf) => {
-    if (err) { next(err, null) }
+    if (err) return next(err)
     if (buf) {
       debug(`Buffer ${buf.toString('hex')} created`)
       user.emailToken = buf.toString('hex')
@@ -85,14 +85,14 @@ userSchema.methods.createPassToken = function (next) { // next(err,token,expires
       return next(null, user.auth.passToken, user.auth.passTokenExpires)
     })
     .catch((err) => {
-      return next(err, null, null)
+      return next(err)
     })
 
   // Create new token
   } else {
     debug(`Creating new password token...`)
     crypto.randomBytes(16, (err, buf) => {
-      if (err) { return next(err, null, null) }
+      if (err) return next(err)
       if (buf) {
         user.auth.passToken = buf.toString('hex')
         user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
@@ -103,7 +103,7 @@ userSchema.methods.createPassToken = function (next) { // next(err,token,expires
         })
         .catch((err) => {
           debug('error saving user in createPassToken')
-          return next(err, null, null)
+          return next(err)
         })
       }
     })
@@ -120,9 +120,9 @@ userSchema.methods.generateHashedPassword = function (password, next) {
 
   // Generate hash
   bcrypt.genSalt(8, (err, salt) => {
-    if (err) { return next(err) }
+    if (err) return next(err)
     bcrypt.hash(password, salt, (err, hash) => {
-      if (err) { return next(err) }
+      if (err) return next(err)
       this.auth.password = hash
       this.save()
       next()

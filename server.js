@@ -73,8 +73,13 @@ const sockets = require('./config/sockets.js')
   // Default locals available to all views (keep this after static files)
   app.get('*', (req, res, next) => {
     // Path for redirects
-    let nextPath = ((req.query.next) ? req.query.next : req.path.substring(0, req.path.indexOf('#')) || req.path)
-    if (nextPath.substring(0, 6) !== '/login' && nextPath.substring(0, 7) !== 'signup' && nextPath.substring(0, 7) !== '/logout' && nextPath.substring(0, 7) !== '/static' && nextPath.substring(0, 6) !== '/admin') {
+    let nextPath = (
+      (req.query.next) ? req.query.next
+      : req.path.substring(0, req.path.indexOf('#')) || req.path)
+    if (
+      nextPath.substring(0, 6) !== '/login'||'/admin' &&
+      nextPath.substring(0, 7) !== 'signup'||'/logout'||'/static'
+    ) {
       req.session.next = nextPath + '#'
       debug(`Set redirect path to ${nextPath}#`)
     }
@@ -109,10 +114,10 @@ const sockets = require('./config/sockets.js')
   app.use('/admin', require('./config/routes/admin.js'))
 
   // Testing
-  if (env.mode == 'development') {
-    app.use('/test', require('./config/routes/test.js'))
-  }
+  if (env.mode == 'development') app.use('/test', require('./config/routes/test.js'))
+
 } {
+
   // Catch-all for 404s
   app.use((req, res, next) => {
     if (!res.headersSent) {
@@ -125,8 +130,8 @@ const sockets = require('./config/sockets.js')
   // Production handlers
   if (env.mode !== 'development') {
     app.use((err, req, res, next) => {
-      if (err.status !== 404 && err.status !== 401) { console.error(err.stack) }
-      if (res.headersSent) { return next(err) }
+      if (err.status !== 404 && err.status !== 401) console.error(err.stack)
+      if (res.headersSent) return next(err)
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,
@@ -137,8 +142,8 @@ const sockets = require('./config/sockets.js')
   // Development handlers
   } else {
     app.use((err, req, res, next) => {
-      if (err.status !== 404) { console.error(err.stack) }
-      if (res.headersSent) { return next(err) }
+      if (err.status !== 404) console.error(err.stack)
+      if (res.headersSent) return next(err)
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,

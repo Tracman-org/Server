@@ -53,13 +53,11 @@ socket
     socket.emit('can-get', mapuser._id)
 
     // Can set location too
-    if (mapuser._id === userid) {
-      socket.emit('can-set', userid)
-    }
+    if (mapuser._id === userid) socket.emit('can-set', userid)
   }).on('disconnect', function () {
     console.log('Disconnected!')
   }).on('error', function (err) {
-    console.error('❌️', err.message)
+    console.error(err.stack)
   })
 
 // Show/hide map if location is set/unset
@@ -85,8 +83,11 @@ $(function () {
 
   // Set location
   $('#set-loc').click(function () {
-    if (!userid === mapuser._id) { alert('You are not logged in! ') } else {
-      if (!navigator.geolocation) { alert('Geolocation not enabled. ') } else {
+
+    // Check if logged in and enabled
+    if (!userid === mapuser._id) alert('You are not logged in! '); else {
+      if (!navigator.geolocation) alert('Geolocation not enabled. '); else {
+
         navigator.geolocation.getCurrentPosition(
 
           // Success callback
@@ -108,7 +109,7 @@ $(function () {
           // Error callback
           function (err) {
             alert('Unable to set location.')
-            console.error('❌️', err.message)
+            console.error(err.stack)
           },
 
           // Options
@@ -121,13 +122,18 @@ $(function () {
 
   // Track location
   $('#track-loc').click(function () {
-    if (!userid === mapuser._id) { alert('You are not logged in! ') } else {
+    
+    // Check for login
+    if (!userid === mapuser._id) alert('You are not logged in! '); else {
+      
       // Start tracking
       if (!wpid) {
-        if (!navigator.geolocation) {
-          alert('Unable to track location. ')
-        } else {
-          $('#track-loc').html('<i class="fa fa-crosshairs fa-spin"></i>Stop').prop('title', 'Click here to stop tracking your location. ')
+        if (!navigator.geolocation) alert('Unable to track location. '); else {
+          $('#track-loc').html(
+            '<i class="fa fa-crosshairs fa-spin"></i>Stop'
+          ).prop('title', 
+            'Click here to stop tracking your location. '
+          )
           wpid = navigator.geolocation.watchPosition(
 
             // Success callback
@@ -149,7 +155,7 @@ $(function () {
             // Error callback
             function (err) {
               alert('Unable to track location.')
-              console.error(err.message)
+              console.error(err.stack)
             },
 
             // Options
@@ -169,7 +175,7 @@ $(function () {
 
   // Clear location
   $('#clear-loc').click(function () {
-    if (!userid === mapuser._id) { alert('You are not logged in! ') } else {
+    if (!userid === mapuser._id) alert('You are not logged in! '); else {
       // Stop tracking
       if (wpid) {
         $('#track-loc').html('<i class="fa fa-crosshairs"></i>Track')
@@ -300,9 +306,8 @@ loadGoogleMapsAPI({ key: mapKey })
     return new Promise(function (resolve, reject) {
       // Get elevator service
       elevator = elevator || new googlemaps.ElevationService()
+      // Query API
       return elevator.getElevationForLocations({
-
-          // Query API
         'locations': [{ lat: loc.lat, lng: loc.lon }]
       }, function (results, status, errorMessage) {
           // Success; return altitude
@@ -310,10 +315,8 @@ loadGoogleMapsAPI({ key: mapKey })
           console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
           resolve(results[0].elevation)
 
-          // Unable to get any altitude
-        } else {
-          reject(Error(errorMessage))
-        }
+        // Unable to get any altitude
+        } else reject(Error(errorMessage))
       })
     })
   }
@@ -335,9 +338,7 @@ loadGoogleMapsAPI({ key: mapKey })
         // Query google altitude API
         getAlt(loc).then(function (alt) {
           resolve(alt)
-        }).catch(function (err) {
-          reject(err)
-        })
+        }).catch(function (err) { reject(err) })
       }
     })
   }
@@ -373,9 +374,7 @@ loadGoogleMapsAPI({ key: mapKey })
       marker.setPosition({ lat: newLoc.lat, lng: newLoc.lon })
 
       // Update speed
-      if (mapuser.settings.showSpeed) {
-        $('#spd').text(newLoc.spd.toFixed())
-      }
+      if (mapuser.settings.showSpeed) $('#spd').text(newLoc.spd.toFixed())
 
       // Update altitude
       if (mapuser.settings.showAlt) {
@@ -384,22 +383,21 @@ loadGoogleMapsAPI({ key: mapKey })
           $('#alt').text(metersToFeet(alt))
         }).catch(function (err) {
           $('#alt').text('????')
-          console.error(err)
+          console.error(err.stack)
         })
       }
     }
 
     // Update street view
-    if (disp !== '0' && mapuser.settings.showStreetview) {
-      updateStreetView(newLoc, 10)
-    }
+    if (disp !== '0' && mapuser.settings.showStreetview) updateStreetView(newLoc, 10)
+
   })
 
   // Get street view imagery
   function getStreetViewData (loc, rad, cb) {
     // Ensure that the location hasn't changed (or this is the initial setting)
     if (newLoc == null || loc.tim === newLoc.tim) {
-      if (!sv) { var sv = new googlemaps.StreetViewService() }
+      if (!sv) var sv = new googlemaps.StreetViewService()
       sv.getPanorama({
         location: {
           lat: loc.lat,
@@ -419,7 +417,7 @@ loadGoogleMapsAPI({ key: mapKey })
             break
         // Error
           default:
-            console.error(new Error('❌️ Street view not available: ' + status).message)
+            console.error(new Error('Street view not available: ' + status).message)
         }
       })
     }
@@ -446,9 +444,7 @@ loadGoogleMapsAPI({ key: mapKey })
         return '640x' + (element.height() * 640 / element.width()).toFixed()
 
       // Height must be made proportional to 640
-      } else {
-        return (element.width() * 640 / element.height()).toFixed() + 'x640'
-      }
+      } else return (element.width() * 640 / element.height()).toFixed() + 'x640'
     }
 
     // Set image
@@ -466,5 +462,5 @@ loadGoogleMapsAPI({ key: mapKey })
 
 // Error loading gmaps API
 }).catch(function (err) {
-  console.error(err)
+  console.error(err.stack)
 })

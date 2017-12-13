@@ -36,7 +36,7 @@ module.exports = {
       socket.on('log', (text) => {
         debug(`LOG: ${text}`)
       })
-      socket.on('error', (err) => { console.error('❌', err.stack) })
+      socket.on('error', (err) => { console.error(err.stack) })
 
       // This socket can set location (app)
       socket.on('can-set', (userId) => {
@@ -63,20 +63,34 @@ module.exports = {
         debug(`Location was set to: ${JSON.stringify(loc)}`)
 
         // Get android timestamp or use server timestamp
-        if (loc.ts) { loc.tim = Date(loc.ts) } else { loc.tim = Date.now() }
+        if (loc.ts) loc.tim = Date(loc.ts)
+        else loc.tim = Date.now()
 
         // Check for user and sk32 token
         if (!loc.usr) {
-          console.error('❌', new Error(`Recieved an update from ${socket.ip} without a usr!`).message)
+          console.error(
+            new Error(
+              `Recieved an update from ${socket.ip} without a usr!`
+            ).message
+          )
         } else if (!loc.tok) {
-          console.error('❌', new Error(`Recieved an update from ${socket.ip} for usr ${loc.usr} without an sk32!`).message)
+          console.error(
+            new Error(
+              `Recieved an update from ${socket.ip} for usr ${loc.usr} without an sk32!`
+            ).message
+          )
         } else {
           // Get loc.usr
           User.findById(loc.usr)
           .where('sk32').equals(loc.tok)
           .then((user) => {
             if (!user) {
-              console.error('❌', new Error(`Recieved an update from ${socket.ip} for ${loc.usr} with tok of ${loc.tok}, but no such user was found in the db!`).message)
+              console.error(
+                new Error(
+                  `Recieved an update from ${socket.ip} for ${loc.usr} with \
+                  tok of ${loc.tok}, but no such user was found in the db!`
+                ).message
+              )
             } else {
               // Broadcast location
               io.to(loc.usr).emit('get', loc)
@@ -91,10 +105,10 @@ module.exports = {
                 time: loc.tim
               }
               user.save()
-              .catch((err) => { console.error('❌', err.stack) })
+              .catch((err) => { console.error(err.stack) })
             }
           })
-          .catch((err) => { console.error('❌', err.stack) })
+          .catch((err) => { console.error(err.stack) })
         }
       })
 

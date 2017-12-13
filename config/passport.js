@@ -19,7 +19,8 @@ module.exports = (passport) => {
   })
   passport.deserializeUser((id, done) => {
     User.findById(id, (err, user) => {
-      if (!err) { done(null, user) } else { done(err, null) }
+      if (err) done(err)
+      else done(null, user)
     })
   })
 
@@ -41,7 +42,7 @@ module.exports = (passport) => {
       } else {
         // Check password
         user.validPassword(password, (err, res) => {
-          if (err) { return done(err) }
+          if (err) return done(err)
 
           // Password incorrect
           if (!res) {

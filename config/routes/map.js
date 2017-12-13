@@ -7,11 +7,8 @@ const User = require('../models.js').user
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req, res) => {
-  if (req.query.new) {
-    res.redirect(`/map/${req.user.slug}?new=1`)
-  } else {
-    res.redirect(`/map/${req.user.slug}`)
-  }
+  if (req.query.new) res.redirect(`/map/${req.user.slug}?new=1`)
+  else res.redirect(`/map/${req.user.slug}`)
 })
 
 // Demo
@@ -52,11 +49,10 @@ router.get('/demo', (req, res, next) => {
 router.get('/:slug?', (req, res, next) => {
   User.findOne({slug: req.params.slug})
   .then((mapuser) => {
-    if (!mapuser) {
-      next() // 404
-    } else {
+    if (!mapuser) next() // 404
+    else {
       var active = '' // For header nav
-      if (req.user && req.user.id === mapuser.id) { active = 'map' }
+      if (req.user && req.user.id === mapuser.id) active = 'map'
       res.render('map', {
         active: active,
         mapuser: mapuser,

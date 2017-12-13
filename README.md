@@ -58,6 +58,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * Removed emojis
 * [#113](https://github.com/Tracman-org/Server/issues/113) [#114](https://github.com/Tracman-org/Server/issues/114) Switched to useMongoClient
 * [#67](https://github.com/Tracman-org/Server/issues/67) Fixed invisible marker in demo
+* Shortened if statements and long lines
 
 #### v0.7.12
 * Fixed altitude sign

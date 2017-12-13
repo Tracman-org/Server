@@ -8,12 +8,14 @@ const debug = require('debug')('tracman-demo')
 module.exports = (io) => {
   // File is space-seperated: delay, lat, lon, dir, spd
   fs.readFile(path.join(__dirname, '/demo.txt'), (err, data) => {
-    if (err) { console.error(`❌ ${err.stack}`) }
+    if (err) console.error(err.stack)
 
     const lines = data.toString().split('\n');
 
     (function sendLoc (ln) {
-      if (ln > 20754) { sendLoc(0) } else {
+      if (ln > 20754) {
+        sendLoc(0)
+      } else {
         let loc = lines[ln].split(' ')
         debug(`Sending demo location: ${loc[1]}, ${loc[2]}`)
         io.to('demo').emit('get', {
