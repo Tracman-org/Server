@@ -12,7 +12,7 @@ On unix-based systems:
 ```sh
 git clone https://github.com/Tracman-org/Server.git &&\
 mv Server tracman-server && cd tracman-server &&\
-exec npm install
+npm install
 ```
 
 You will need to set up a configuration file at `config/env/env.js`.  Use `config/env/sample.js` for an example.  You can get API keys at the [google developer's console](https://console.developers.google.com/apis/credentials).  You will need to set up approved hosts and auth callbacks.  There is more information in [their documentation](https://support.google.com/googleapi/answer/6158857?hl=en).
