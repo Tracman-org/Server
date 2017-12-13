@@ -28,7 +28,7 @@ router.get('/demo', (req, res, next) => {
         spd: 19.015747
       },
       settings: {
-        marker: 'marker-red',
+        marker: 'red',
         showAlt: false,
         showTemp: false,
         showSpeed: false,
