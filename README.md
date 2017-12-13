@@ -10,8 +10,8 @@ node.js application to display a sharable map with user's location.
 On unix-based systems:
 
 ```sh
-git clone https://github.com/Tracman-org/Server.git &&\
-mv Server tracman-server && cd tracman-server &&\
+git clone https://github.com/Tracman-org/Server.git tracman-server &&\
+cd tracman-server &&\
 npm install
 ```
 
