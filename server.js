@@ -20,19 +20,30 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const sockets = require('./config/sockets.js')
 
+// Promises marking a ready server
+let ready_promise_list = []
+
 /* Database */ {
   // Setup with native ES6 promises
   mongoose.Promise = global.Promise
 
   // Connect to database
-  mongoose.connect(env.mongoSetup, {
-    useMongoClient: true,
-    socketTimeoutMS: 30000,
-    //reconnectTries: 30,
-    keepAlive: true
-  })
-  .then( (db) => { console.log(`Mongoose connected to mongoDB ${db.name}`); } )
-  .catch( (err) => { console.error(err.stack); } )
+  ready_promise_list.push( new Promise( (resolve, reject) => {
+    mongoose.connect(env.mongoSetup, {
+      useMongoClient: true,
+      socketTimeoutMS: 30000,
+      //reconnectTries: 30,
+      keepAlive: true
+    })
+    .then( (db) => {
+      console.log(`  Mongoose connected to ${db.name} database`)
+      resolve()
+    } )
+    .catch( (err) => {
+      console.error(err.stack)
+      reject()
+    } )
+  }) )
 
 }
 
@@ -159,26 +170,46 @@ const sockets = require('./config/sockets.js')
 }
 
 /* RUNTIME */
-console.log('Starting Tracman server...')
+console.log(`Starting Tracman server in ${env.mode} mode...`)
 
 // Test SMTP server
-mail.verify()
+ready_promise_list.push(mail.verify())
 
 // Listen
-http.listen(env.port, () => {
-  console.log(`Listening in ${env.mode} mode on port ${env.port}... `)
+ready_promise_list.push( new Promise( (resolve, reject) => {
+  http.listen(env.port, () => {
 
-  // Check for clients for each user
-  User.find({})
-  .then((users) => {
-    users.forEach((user) => {
-      sockets.checkForUsers(io, user.id)
+    console.log(`  Listening on port ${env.port}`)
+    resolve()
+
+    // Check for clients for each user
+    ready_promise_list.push( new Promise( (resolve, reject) => {
+      User.find({})
+      .then((users) => {
+        users.forEach((user) => {
+          sockets.checkForUsers(io, user.id)
+        })
+        resolve()
+      })
+      .catch( (err) => {
+        console.error(err.stack)
+        reject()
+      })
+    }) )
+
+    // Start transmitting demo
+    ready_promise_list.push( demo(io) )
+
+    // Mark everything when working correctly
+    Promise.all(ready_promise_list).then( () => {
+      console.log('Tracman server is running properly\n')
+      app.emit('ready') // Used for tests
+    }).catch( (err) => {
+      if (err) console.error(err.message)
+      console.log(`Tracman server is not running properly!\n`)
     })
-  })
-  .catch((err) => { console.error(err.stack) })
 
-  // Start transmitting demo
-  demo(io)
-})
+  })
+}) )
 
 module.exports = app
