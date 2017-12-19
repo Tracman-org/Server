@@ -48,7 +48,8 @@
     "supertest": "^3.0.0"
   },
   "scripts": {
-    "test": "standard && mocha test.js",
+    "test": "mocha",
+    "lint": "standard",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo npm update && sudo npm prune",
