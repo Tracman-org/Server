@@ -187,7 +187,7 @@ userSchema.methods.generateHashedPassword = function (password, next) {
         if (err) return next(err)
         this.auth.password = hash
         this.save()
-        .then(next)
+        .then(() => { next(); })
         .catch((err) => next(err) )
       })
     })
@@ -196,9 +196,9 @@ userSchema.methods.generateHashedPassword = function (password, next) {
 
     // Generate hash
     bcrypt.genSalt(8, (err, salt) => {
-      if (err) reject(err)
+      if (err) return reject(err)
       bcrypt.hash(password, salt, (err, hash) => {
-        if (err) reject(err)
+        if (err) return reject(err)
         this.auth.password = hash
         this.save()
         .then(resolve)
