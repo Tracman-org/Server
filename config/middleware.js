@@ -7,7 +7,7 @@ module.exports = {
 
 	// Throw error
 	throwErr: (err, req=null) => {
-		debug(`throwErr(${err.message},${req.url})`)
+		debug(`throwErr(${err.message},${req?req.url:'null'})`)
 		console.error(err.stack)
 		if (req) {
 			if (env.mode==='production') {
