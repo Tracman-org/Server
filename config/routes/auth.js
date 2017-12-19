@@ -53,11 +53,12 @@ module.exports = (app, passport) => {
       res.redirect('/login#signup')
     })
     .post((req, res, next) => {
+
       // Send token and alert user
       function sendToken (user) {
         debug(`sendToken() called for user ${user.id}`)
 
-        // Create a password token
+        // Create a new password token
         user.createPassToken((err, token, expires) => {
           if (err) {
             debug(`Error creating password token for user ${user.id}!`)
@@ -92,18 +93,36 @@ module.exports = (app, passport) => {
             })
             .then(() => {
               debug(`Successfully emailed new user ${user.id} instructions to continue`)
-              req.flash('success', 
+              req.flash('success',
                 `An email has been sent to <u>${user.email}</u>. Check your \
                 inbox and follow the link to complete your registration. (Your \
                 registration link will expire in one hour). `
               )
               res.redirect('/login')
             })
-            .catch((err) => {
-              debug(`Failed to email new user ${user.id} instructions to continue!`)
-              mw.throwErr(err, req)
-              res.redirect('/login#signup')
-            })
+            .catch((err) => { switch (err.responseCode) {
+
+              // Mailbox doesn't exist
+              case 550:
+                debug(`Failed to email new user ${user.id} instructions to create a password because the mailbox for ${user.email} wasn't found. `)
+
+                // Remove user
+                user.remove().catch( (err) => {
+                  console.error(`Failed to remove new user ${user.id}, with a nonexistant email of ${user.email}:\n`,err.stack)
+                })
+
+                // Redirect back
+                req.flash('danger', `Mailbox for <u>${user.email}</u> not found.  Did you enter that correctly?`)
+                res.redirect('/login#signup')
+
+                break
+
+              // Other error
+              default:
+                debug(`Failed to email new user ${user.id} instructions to create a password!`)
+                mw.throwErr(err, req)
+                res.redirect('/login#signup')
+            } })
           }
         })
       }
@@ -115,10 +134,11 @@ module.exports = (app, passport) => {
       debug(`Searching for user with email ${req.body.email}...`)
       User.findOne({'email': req.body.email})
       .then((user) => {
+
         // User already exists
         if (user && user.auth.password) {
           debug(`User ${user.id} has email ${req.body.email} and has a password`)
-          req.flash('warning', 
+          req.flash('warning',
             `A user with that email already exists!  If you forgot your password, \
             you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`
           )
@@ -128,17 +148,20 @@ module.exports = (app, passport) => {
         // User exists but hasn't created a password yet
         } else if (user) {
           debug(`User ${user.id} has email ${req.body.email} but doesn't have a password`)
-          // Send another token (or the same one if it hasn't expired)
+
+          // Send another token
           sendToken(user)
 
         // Create user
         } else {
           debug(`User with email ${req.body.email} doesn't exist; creating one`)
 
+          let email = req.body.email
+
           user = new User()
           user.created = Date.now()
-          user.email = req.body.email
-          user.slug = slugify(user.email.substring(0, user.email.indexOf('@')))
+          user.email = email
+          user.slug = slugify(email.substring(0, email.indexOf('@')))
 
           // Generate unique slug
           const slug = new Promise((resolve, reject) => {
@@ -210,7 +233,7 @@ module.exports = (app, passport) => {
       .catch((err) => {
         debug(`Failed to check if somebody already has the email ${req.body.email}`)
         mw.throwErr(err, req)
-        res.redirect('/signup')
+        res.redirect('/login#signup')
       })
     })
 
@@ -239,7 +262,7 @@ module.exports = (app, passport) => {
           // No user with that email
           if (!user) {
             // Don't let on that no such user exists, to prevent dictionary attacks
-            req.flash('success', 
+            req.flash('success',
               `If an account exists with the email <u>${req.body.email}</u>, \
               an email has been sent there with a password reset link. `
             )
@@ -271,7 +294,7 @@ module.exports = (app, passport) => {
                 )
               }).then(() => {
                 req.flash(
-                  'success', 
+                  'success',
                   `If an account exists with the email <u>${req.body.email}</u>, \
                   an email has been sent there with a password reset link. `)
                 res.redirect('/login')
@@ -321,7 +344,7 @@ module.exports = (app, passport) => {
       // set passwords yet...
       if (!req.user.auth.password && service === 'google') {
         req.flash(
-          'warning', 
+          'warning',
           `Hey, you need to <a href="/settings/password">set a password</a> \
           before you can disconnect your google account.  Otherwise, you \
           won't be able to log in! `
