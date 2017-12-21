@@ -455,7 +455,7 @@ loadGoogleMapsAPI({ key: mapKey })
         '&location=' + data.location.latLng.lat() + ',' + data.location.latLng.lng() +
         '&fov=90' + // Inclination
         // Show direction if moving, point to user if stationary
-        '&heading=' + ((loc.spd > 2) ? loc.dir : getBearing(loc, data.location)).toString() +
+        '&heading=' + ((loc.spd > 2) ? loc.dir : String(getBearing(loc, data.location))) +
         '&key=' + mapKey
       )
     })

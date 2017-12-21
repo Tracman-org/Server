@@ -15,7 +15,7 @@ module.exports = (io) => {
         reject()
       } else {
 
-        const lines = data.toString().split('\n');
+        const lines = String(data).split('\n');
 
         (function sendLoc (ln) {
           if (ln > 20754) {
