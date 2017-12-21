@@ -32,9 +32,10 @@ module.exports = router
 
   // robots.txt
   .get('/robots.txt', (req, res) => {
-    res.type('text/plain')
-    res.send('User-agent: *\n' +
-      'Disallow: /map/*\n'
+    res.set('Content-Type', 'text/plain')
+    .send('User-agent: *\n' +
+      'Disallow: /map/*\n' +
+      'Allow: /map/demo'
     )
   })
 
@@ -50,9 +51,8 @@ module.exports = router
     if (req.query.slug) {
       User.findOne({ slug: slug(req.query.slug) })
       .then((existingUser) => {
-        if (existingUser && existingUser.id !== req.user.id) {
-          res.sendStatus(400)
-        } else { res.sendStatus(200) }
+        if (existingUser && existingUser.id!==req.user.id) res.sendStatus(400)
+        else res.sendStatus(200)
       })
       .catch((err) => {
         console.error(err)
@@ -73,15 +73,13 @@ module.exports = router
       })
 
     // Create slug
-    } else if (req.query.slugify) {
-      res.send(slug(xss(req.query.slugify)))
+    } else if (req.query.slugify) res.send(slug(xss(req.query.slugify)))
 
     // Sanitize for XSS
-    } else if (req.query.xss) {
-      res.send(xss(req.query.xss))
+    else if (req.query.xss) res.send(xss(req.query.xss))
 
     // 404
-    } else { next() }
+    else next()
   })
 
   // Link to androidapp in play store

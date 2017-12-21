@@ -20,20 +20,31 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const sockets = require('./config/sockets.js')
 
-/* SETUP */
+// Promises marking a ready server
+let ready_promise_list = []
+
 /* Database */ {
   // Setup with native ES6 promises
   mongoose.Promise = global.Promise
 
   // Connect to database
-  mongoose.connect(env.mongoSetup, {
-    server: {socketOptions: {
-      keepAlive: 1, connectTimeoutMS: 30000 }},
-    replset: {socketOptions: {
-      keepAlive: 1, connectTimeoutMS: 30000 }}
-  })
-  .then(() => { console.log(`Mongoose connected to mongoDB`) })
-  .catch((err) => { console.error(err.stack) })
+  ready_promise_list.push( new Promise( (resolve, reject) => {
+    mongoose.connect(env.mongoSetup, {
+      useMongoClient: true,
+      socketTimeoutMS: 30000,
+      //reconnectTries: 30,
+      keepAlive: true
+    })
+    .then( (db) => {
+      console.log(`  Mongoose connected to ${db.name} database`)
+      resolve()
+    } )
+    .catch( (err) => {
+      console.error(err.stack)
+      reject()
+    } )
+  }) )
+
 }
 
 /* Templates */ {
@@ -73,8 +84,13 @@ const sockets = require('./config/sockets.js')
   // Default locals available to all views (keep this after static files)
   app.get('*', (req, res, next) => {
     // Path for redirects
-    let nextPath = ((req.query.next) ? req.query.next : req.path.substring(0, req.path.indexOf('#')) || req.path)
-    if (nextPath.substring(0, 6) !== '/login' && nextPath.substring(0, 7) !== 'signup' && nextPath.substring(0, 7) !== '/logout' && nextPath.substring(0, 7) !== '/static' && nextPath.substring(0, 6) !== '/admin') {
+    let nextPath = (
+      (req.query.next) ? req.query.next
+      : req.path.substring(0, req.path.indexOf('#')) || req.path)
+    if (
+      nextPath.substring(0, 6) !== '/login'||'/admin' &&
+      nextPath.substring(0, 7) !== 'signup'||'/logout'||'/static'
+    ) {
       req.session.next = nextPath + '#'
       debug(`Set redirect path to ${nextPath}#`)
     }
@@ -109,10 +125,10 @@ const sockets = require('./config/sockets.js')
   app.use('/admin', require('./config/routes/admin.js'))
 
   // Testing
-  if (env.mode == 'development') {
-    app.use('/test', require('./config/routes/test.js'))
-  }
+  if (env.mode == 'development') app.use('/test', require('./config/routes/test.js'))
+
 } {
+
   // Catch-all for 404s
   app.use((req, res, next) => {
     if (!res.headersSent) {
@@ -125,8 +141,8 @@ const sockets = require('./config/sockets.js')
   // Production handlers
   if (env.mode !== 'development') {
     app.use((err, req, res, next) => {
-      if (err.status !== 404 && err.status !== 401) { console.error(err.stack) }
-      if (res.headersSent) { return next(err) }
+      if (err.status !== 404 && err.status !== 401) console.error(err.stack)
+      if (res.headersSent) return next(err)
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,
@@ -137,8 +153,8 @@ const sockets = require('./config/sockets.js')
   // Development handlers
   } else {
     app.use((err, req, res, next) => {
-      if (err.status !== 404) { console.error(err.stack) }
-      if (res.headersSent) { return next(err) }
+      if (err.status !== 404) console.error(err.stack)
+      if (res.headersSent) return next(err)
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,
@@ -154,26 +170,46 @@ const sockets = require('./config/sockets.js')
 }
 
 /* RUNTIME */
-console.log('Starting Tracman server...')
+console.log(`Starting Tracman server in ${env.mode} mode...`)
 
 // Test SMTP server
-mail.verify()
+ready_promise_list.push(mail.verify())
 
 // Listen
-http.listen(env.port, () => {
-  console.log(`Listening in ${env.mode} mode on port ${env.port}... `)
+ready_promise_list.push( new Promise( (resolve, reject) => {
+  http.listen(env.port, () => {
 
-  // Check for clients for each user
-  User.find({})
-  .then((users) => {
-    users.forEach((user) => {
-      sockets.checkForUsers(io, user.id)
+    console.log(`  Listening on port ${env.port}`)
+    resolve()
+
+    // Check for clients for each user
+    ready_promise_list.push( new Promise( (resolve, reject) => {
+      User.find({})
+      .then((users) => {
+        users.forEach((user) => {
+          sockets.checkForUsers(io, user.id)
+        })
+        resolve()
+      })
+      .catch( (err) => {
+        console.error(err.stack)
+        reject()
+      })
+    }) )
+
+    // Start transmitting demo
+    ready_promise_list.push( demo(io) )
+
+    // Mark everything when working correctly
+    Promise.all(ready_promise_list).then( () => {
+      console.log('Tracman server is running properly\n')
+      app.emit('ready') // Used for tests
+    }).catch( (err) => {
+      if (err) console.error(err.message)
+      console.log(`Tracman server is not running properly!\n`)
     })
-  })
-  .catch((err) => { console.error(err.stack) })
 
-  // Start transmitting demo
-  demo(io)
-})
+  })
+}) )
 
 module.exports = app

@@ -14,7 +14,7 @@ module.exports = {
   // Or use the test database from mLab
   // mongoSetup: 'mongodb://tracman:MUPSLXQ34f9cQTc5@ds133961.mlab.com:33961/tracman',
   // You can log in there with:
-  // mongo ds133961.mlab.com:33961/tracman-dev -u contributor -p opensourcerules
+  // mongo ds133961.mlab.com:33961/tracman -u contributor -p KTiCsMEwaE
 
   // URL and port where this will run
   url: 'https://localhost:8080',

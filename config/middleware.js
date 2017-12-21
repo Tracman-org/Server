@@ -7,14 +7,17 @@ module.exports = {
 
 	// Throw error
 	throwErr: (err, req=null) => {
-		debug(`throwErr(${err.message},${req.url})`)
+		debug(`throwErr(${err.message},${req?req.url:'null'})`)
 		console.error(err.stack)
-		if (req){
+		if (req) {
 			if (env.mode==='production') {
-				req.flash('danger', 'An error occured. <br>Would you like to <a href="https://github.com/Tracman-org/Server/issues/new">report it</a>?');
-			} else { // development
-				req.flash('danger', err.message)
-			}
+				req.flash(
+					'danger',
+					'An error occured. <br>Would you like to \
+					<a href="https://github.com/Tracman-org/Server/issues/new">report it</a>?'
+				)
+			// development
+			} else req.flash('danger', err.message)
 		}
 	},
 
@@ -34,15 +37,15 @@ module.exports = {
 	// Ensure authentication
 	ensureAuth: (req, res, next) => {
 		debug(`ensureAuth(${req.url}, ${res.status}, ${next})`)
-		if (req.isAuthenticated()) { return next()
-		} else { res.redirect('/login'); }
+		if (req.isAuthenticated()) return next()
+		else res.redirect('/login')
 	},
 
 	// Ensure administrator
 	ensureAdmin: (req, res, next) => {
 		debug(`ensureAdmin(${req.url}, ${res.status}, ${next})`)
-		if (req.isAuthenticated() && req.user.isAdmin){ return next()
-		} else { 
+		if (req.isAuthenticated() && req.user.isAdmin) return next()
+		else { 
 			let err = new Error("Unauthorized")
 			err.status = 401
 			next(err)

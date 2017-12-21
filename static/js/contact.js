@@ -5,7 +5,7 @@ var validEmail, validMessage
 
 // Validate email addresses
 function validateEmail (email) {
-  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email)
 }
 
@@ -50,9 +50,11 @@ function validateForm (input) {
 
 // Initial check
 $(function () {
-  if (validateEmail($('#email-input').val())) { validEmail = true } else { validEmail = false }
+  if (validateEmail($('#email-input').val())) validEmail = true
+  else validEmail = false
 
-  if (!$('#message-input').val() === '') { validMessage = true } else { validMessage = false }
+  if (!$('#message-input').val() === '')validMessage = true
+  else validMessage = false
 
   // Use a one-second timout because reCaptcha re-enables the button by default
   setTimeout(validateForm, 1000)
@@ -60,7 +62,7 @@ $(function () {
 
 // Submit form (reCaptcha callback)
 window.onSubmit = function () {
-  if (validateForm()) { $('#contact-form').submit() }
+  if (validateForm()) $('#contact-form').submit()
 }
 
 // Form change listener

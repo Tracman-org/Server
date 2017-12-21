@@ -30,8 +30,14 @@ router
   })
   .post('/password', (req, res, next) => {
     let zxcvbnResult = zxcvbn(req.body.password)
-    if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000) { // Less than ten days
-      let err = new Error(`That password could be cracked in ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  Come up with a more complex password that would take at least 10 days to crack. `)
+    if ( // Less than ten days
+      zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000
+    ) {
+      let err = new Error(
+        `That password could be cracked in \
+        ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  \
+        Come up with a more complex password that would take at least 10 days to crack. `
+      )
       mw.throwErr(err, req)
       next(err)
     } else {
