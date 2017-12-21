@@ -22,7 +22,12 @@ module.exports = {
     return new Promise( (resolve, reject) => {
       transporter.verify()
       .then( (success) => {
-        console.log(`  SMTP${(success)?'':' not'} ready`)
+        if (success) {
+          console.log(`  Nodemailer connected to smtp:/\/${env.mailserver}:${env.mailport}`)
+          resolve()
+        } else reject(new Error(
+          `Failed to connect to smtp:/\/${env.mailserver}:${env.mailport}`
+        ))
         resolve()
       }).catch( (err) => {
         console.log(err.stack)
