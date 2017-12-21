@@ -5,11 +5,11 @@ const fs = require('fs')
 const path = require('path')
 const debug = require('debug')('tracman-demo')
 
-module.exports = (io) => {
+module.exports = (io, filename='demo.txt') => {
   return new Promise( (resolve, reject) => {
 
     // File is space-seperated: delay, lat, lon, dir, spd
-    fs.readFile(path.join(__dirname, '/demo.txt'), (err, data) => {
+    fs.readFile(path.join(__dirname, filename), (err, data) => {
       if (err) {
         console.error(err.message)
         reject()
@@ -38,7 +38,7 @@ module.exports = (io) => {
           }
         })(5667)
 
-        console.log('  Demo running')
+        console.log(`  Demo running from ./${filename}`)
         resolve()
 
       }

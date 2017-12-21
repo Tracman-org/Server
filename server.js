@@ -36,7 +36,7 @@ let ready_promise_list = []
       keepAlive: true
     })
     .then( (db) => {
-      console.log(`  Mongoose connected to ${db.name} database`)
+      console.log(`  Mongoose connected to ${env.mongoSetup}`)
       resolve()
     } )
     .catch( (err) => {
@@ -170,7 +170,7 @@ let ready_promise_list = []
 }
 
 /* RUNTIME */
-console.log(`Starting Tracman server in ${env.mode} mode...`)
+console.log(`Starting ${env.mode} server at ${__dirname}...`)
 
 // Test SMTP server
 ready_promise_list.push(mail.verify())
@@ -179,7 +179,7 @@ ready_promise_list.push(mail.verify())
 ready_promise_list.push( new Promise( (resolve, reject) => {
   http.listen(env.port, () => {
 
-    console.log(`  Listening on port ${env.port}`)
+    console.log(`  Express listening on ${env.url}`)
     resolve()
 
     // Check for clients for each user
@@ -201,7 +201,11 @@ ready_promise_list.push( new Promise( (resolve, reject) => {
     ready_promise_list.push( demo(io) )
 
     // Mark everything when working correctly
-    Promise.all(ready_promise_list).then( () => {
+    Promise.all(ready_promise_list.map(
+      // Also wait for rejected promises
+      // https://stackoverflow.com/a/36115549/3006854
+      p => p.catch(e => e)
+    )).then( () => {
       console.log('Tracman server is running properly\n')
       app.emit('ready') // Used for tests
     }).catch( (err) => {
