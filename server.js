@@ -207,7 +207,6 @@ ready_promise_list.push( new Promise( (resolve, reject) => {
       p => p.catch(e => e)
     )).then( () => {
       console.log('Tracman server is running properly\n')
-      app.emit('ready') // Used for tests
     }).catch( (err) => {
       if (err) console.error(err.message)
       console.log(`Tracman server is not running properly!\n`)

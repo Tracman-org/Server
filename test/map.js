@@ -1,21 +1,21 @@
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-const request = require('supertest')
-const server = require('../server')
-chai.use(chaiHttp)
+'use strict'
 
-// Ensure server is ready
-before((done) => { server.on('ready', done) })
+const chai = require('chai')
+const request = require('supertest')
+  .agent(require('../server'))
+chai.use(
+  require('chai-http')
+)
 
 describe('Mapping', () => {
 
   it('Displays demo map', async () => {
-    let res = await request(server).get('/map/demo')
+    let res = await request.get('/map/demo')
     chai.expect(res).to.have.status(200).to.be.html
   })
 
   // TODO: it('Shows own map', async () => {
-  //   request(server).get('/map')
+  //   request.get('/map')
   //   .expect(200)
   //   .end(function(err,res){ done(); })
   // })

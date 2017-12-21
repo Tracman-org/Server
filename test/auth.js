@@ -1,9 +1,9 @@
 'use strict'
 
-const request = require('supertest')
-const server = require('../server')
-const User = require('../config/models').user
 const chai = require('chai')
+const User = require('../config/models').user
+const request = require('supertest')
+  .agent(require('../server'))
 chai.use(
   require('chai-http')
 )
@@ -13,9 +13,6 @@ const FAKE_EMAIL = 'nobody@tracman.org'
 const TEST_EMAIL = 'test@tracman.org'
 const TEST_PASSWORD = 'mDAQYe2VYE'
 const BAD_PASSWORD = 'password123'
-
-// Ensure server is ready
-before((done) => { server.on('ready', done) })
 
 describe('Authentication', () => {
 
@@ -31,7 +28,7 @@ describe('Authentication', () => {
     it('Fails to create an account with a fake email', async () => {
 
       // Confirm redirect
-      chai.expect( await request(server).post('/signup')
+      chai.expect( await request.post('/signup')
         .type('form').send({ 'email':FAKE_EMAIL })
       ).to.redirectTo('/login#signup')
 
@@ -50,7 +47,7 @@ describe('Authentication', () => {
     it('Creates an account with a valid email', async () => {
 
       // Set email address
-      chai.expect( await request(server).post('/signup')
+      chai.expect( await request.post('/signup')
         .type('form').send({ 'email':TEST_EMAIL })
       ).to.redirectTo('/login')
 
@@ -62,13 +59,13 @@ describe('Authentication', () => {
 
     it('Loads password page', async () => {
       // Load password page
-      chai.expect(await request(server)
+      chai.expect(await request
         .get(`/settings/password/${passwordless_user.auth.passToken}`)
       ).html.to.have.status(200)
     })
 
     it('Fails to set a weak password', async () => {
-      chai.expect( await request(server)
+      chai.expect( await request
         .post(`/settings/password/${passwordless_user.auth.passToken}`)
         .type('form').send({ 'password':BAD_PASSWORD })
       ).to.redirectTo(`/settings/password/${passwordless_user.auth.passToken}`)
@@ -77,7 +74,7 @@ describe('Authentication', () => {
     it('Sets a strong password', () => {
 
       // Set password
-      return request(server)
+      return request
         .post(`/settings/password/${passwordless_user.auth.passToken}`)
         .type('form').send({ 'password':TEST_PASSWORD })
       .then( async (res) => {
