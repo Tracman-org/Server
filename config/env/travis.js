@@ -7,7 +7,7 @@ module.exports = {
 	session: process.env.SESSION,
 	cookie: process.env.COOKIE,
 	mongoSetup: process.env.MONGOSETUP,
-	//url: 'https://tracman.org',
+	url: 'travis://tracman.org',
 	port: 8080,
 	
 	// Mailserver
