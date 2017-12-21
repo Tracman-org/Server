@@ -406,18 +406,19 @@ loadGoogleMapsAPI({ key: mapKey })
         radius: rad
       }, function (data, status) {
         switch (status) {
-        // Success
-          case googlemaps.StreetViewStatus.OK:
+          // Success
+          case googlemaps.StreetViewStatus.OK: {
             cb(data)
             break
-        // No results in that radius
-          case googlemaps.StreetViewStatus.ZERO_RESULTS:
-          // Try again with a bigger radius
+          // No results in that radius
+          } case googlemaps.StreetViewStatus.ZERO_RESULTS: {
+            // Try again with a bigger radius
             getStreetViewData(loc, rad * 2, cb)
             break
-        // Error
-          default:
+          // Error
+          } default:
             console.error(new Error('Street view not available: ' + status).message)
+          }
         }
       })
     }

@@ -103,7 +103,7 @@ module.exports = (app, passport) => {
             .catch((err) => { switch (err.responseCode) {
 
               // Mailbox doesn't exist
-              case 550:
+              case 550: {
                 debug(`Failed to email new user ${user.id} instructions to create a password because the mailbox for ${user.email} wasn't found. `)
 
                 // Remove user
@@ -118,10 +118,12 @@ module.exports = (app, passport) => {
                 break
 
               // Other error
-              default:
+              } default: {
                 debug(`Failed to email new user ${user.id} instructions to create a password!`)
                 mw.throwErr(err, req)
                 res.redirect('/login#signup')
+              }
+              
             } })
           }
         })
