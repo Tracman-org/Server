@@ -3,9 +3,9 @@
 
 node.js application to display a sharable map with user's location.
 
+[![Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/Tracman-org/Server.svg?columns=all)](https://waffle.io/Tracman-org/Server)
-[![Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
 
 ## Installation
 
