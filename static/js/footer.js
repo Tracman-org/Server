@@ -3,10 +3,10 @@
 
 // Push footer to bottom on pages with little content
 function setFooter () {
-  var windowHeight = $(window).height()
-  var footerBottom = $('footer').offset().top + $('footer').height()
-  if (windowHeight > footerBottom) {
-    $('footer').css('margin-top', windowHeight - footerBottom)
+  var $windowHeight = $(window).height()
+  var $footerBottom = $('footer').offset().top + $('footer').height()
+  if ($windowHeight > $footerBottom) {
+    $('footer').css('margin-top', $windowHeight - $footerBottom)
   }
 }
 
