@@ -81,9 +81,7 @@ userSchema.methods.createEmailToken = function (next) {
         .then(() => {
           resolve(user.emailToken)
         })
-        .catch((err) => {
-          reject(err)
-        })
+        .catch(reject)
       }
     })
   })
@@ -140,12 +138,10 @@ userSchema.methods.createPassToken = function (next) {
       debug(`Reusing old password token...`)
       user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
       user.save()
-      .then(() => {
-        resolve(user.auth.passToken, user.auth.passTokenExpires)
-      })
-      .catch((err) => {
-        reject(err)
-      })
+        .then(() => {
+          resolve(user.auth.passToken, user.auth.passTokenExpires)
+        })
+        .catch(reject)
 
     // Create new token
     } else {
@@ -201,8 +197,8 @@ userSchema.methods.generateHashedPassword = function (password, next) {
         if (err) return reject(err)
         this.auth.password = hash
         this.save()
-        .then(resolve)
-        .catch( (err) => reject(err) )
+          .then(resolve)
+          .catch(reject)
       })
     })
 
@@ -213,12 +209,14 @@ userSchema.methods.generateHashedPassword = function (password, next) {
 userSchema.methods.validPassword = function (password, next) {
   // Callback next(err, res)
   if (typeof next === 'function') bcrypt.compare(password, this.auth.password, next)
-  else bcrypt.compare(password, this.auth.password)
-    .then((result) => {
-      if (result===true) resolve()
-      else reject(new Error('Passwords don\'t match'))
-    })
-    .catch( (err) => reject(err) )
+  else return new Promise( (resolve, reject) => {
+    bcrypt.compare(password, this.auth.password)
+      .then( (result) => {
+        if (result===true) resolve()
+        else reject(new Error('Passwords don\'t match'))
+      })
+      .catch( (err) => reject(err) )
+  })
 }
 
 module.exports = {
