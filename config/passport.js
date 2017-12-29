@@ -40,22 +40,28 @@ module.exports = (passport) => {
 
       // User exists
       } else {
+        
         // Check password
-        user.validPassword(password, (err, res) => {
-          if (err) return done(err)
+        user.validPassword(password)
+          .then( (res) => {
 
-          // Password incorrect
-          if (!res) {
-            req.session.next = undefined
-            return done(null, false, req.flash('warning', 'Incorrect email or password.'))
+            // Password incorrect
+            if (!res) {
+              req.session.next = undefined
+              return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
-          // Successful login
-          } else {
-            user.lastLogin = Date.now()
-            user.save()
-            return done(null, user)
-          }
-        })
+            // Successful login
+            } else {
+              user.lastLogin = Date.now()
+              user.save()
+              return done(null, user)
+            }
+          
+          })
+          .catch( (err) => {
+            return done(err)
+          })
+
       }
     })
     .catch((err) => {

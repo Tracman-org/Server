@@ -59,12 +59,8 @@ module.exports = (app, passport) => {
         debug(`sendToken() called for user ${user.id}`)
 
         // Create a new password token
-        user.createPassToken((err, token, expires) => {
-          if (err) {
-            debug(`Error creating password token for user ${user.id}!`)
-            mw.throwErr(err, req)
-            res.redirect('/login#signup')
-          } else {
+        user.createPassToken()
+        .then( (token, expires) => {
             debug(`Created password token for user ${user.id} successfully`)
 
             // Figure out expiration time
@@ -125,10 +121,15 @@ module.exports = (app, passport) => {
               }
               
             } })
-          }
         })
+        .catch( (err) => {
+          debug(`Error creating password token for user ${user.id}!`)
+          mw.throwErr(err, req)
+          res.redirect('/login#signup')
+        })
+      
       }
-
+      
       // Validate email
       req.checkBody('email', 'Please enter a valid email address.').isEmail()
 
@@ -273,8 +274,8 @@ module.exports = (app, passport) => {
           // User with that email does exist
           } else {
             // Create reset token
-            user.createPassToken((err, token) => {
-              if (err) return next(err)
+            user.createPassToken()
+            .then( (token) => {
 
               // Email reset link
               mail.send({
@@ -294,24 +295,31 @@ module.exports = (app, passport) => {
                   ${env.url}/settings/password/${token}</a></p>\
                   <p>If you didn't initiate this request, just ignore this email. </p>`
                 )
-              }).then(() => {
+              })
+              .then(() => {
                 req.flash(
                   'success',
                   `If an account exists with the email <u>${req.body.email}</u>, \
                   an email has been sent there with a password reset link. `)
                 res.redirect('/login')
-              }).catch((err) => {
+              })
+              .catch((err) => {
                 debug(`Failed to send reset link to ${user.email}`)
                 mw.throwErr(err, req)
                 res.redirect('/login')
               })
             })
+            .catch( (err) => {
+              return next(err)
+            })
           }
-        }).catch((err) => {
+        })
+        .catch((err) => {
           debug(`Failed to check for if somebody has that email (in reset request)!`)
           mw.throwErr(err, req)
           res.redirect('/login/forgot')
         })
+    
     })
 
   // Android
