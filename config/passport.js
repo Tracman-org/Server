@@ -13,6 +13,7 @@ const mw = require('./middleware.js')
 const User = require('./models.js').user
 
 module.exports = (passport) => {
+  
   // Serialize/deserialize users
   passport.serializeUser((user, done) => {
     done(null, user.id)
@@ -33,13 +34,16 @@ module.exports = (passport) => {
     debug(`Perfoming local login for ${email}`)
     User.findOne({'email': email})
     .then((user) => {
+      
       // No user with that email
       if (!user) {
+        debug(`No user with that email`)
         req.session.next = undefined
         return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
       // User exists
       } else {
+        debug(`User exists. Checking password...`)
         
         // Check password
         user.validPassword(password)
@@ -47,6 +51,7 @@ module.exports = (passport) => {
 
             // Password incorrect
             if (!res) {
+              debug(`Incorrect password`)
               req.session.next = undefined
               return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
@@ -71,7 +76,7 @@ module.exports = (passport) => {
   ))
 
   // Social login
-  function socialLogin (req, service, profileId, done) {
+  function socialLogin(req, service, profileId, done) {
     debug(`socialLogin() called for ${service} account ${profileId}`)
     let query = {}
     query['auth.' + service] = profileId

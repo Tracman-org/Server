@@ -47,33 +47,17 @@ const userSchema = new mongoose.Schema({
 }).plugin(unique)
 
 /* User methods */
+// Do not replace with arrow functions!
+// https://stackoverflow.com/a/37875212
 
 // Create email confirmation token
-userSchema.methods.createEmailToken = function (next) {
-  debug('user.createEmailToken() called')
-  var user = this
+userSchema.methods.createEmailToken = function () {
+  debug(`user.createEmailToken() called for ${user.id}`)
+  let user = this
 
-  // Callback next(err, token)
-  if (typeof next === 'function') {
+  return new Promise((resolve, reject) => {
     crypto.randomBytes(16, (err, buf) => {
-      if (err) return next(err)
-      if (buf) {
-        debug(`Buffer ${buf.toString('hex')} created`)
-        user.emailToken = buf.toString('hex')
-        user.save()
-        .then(() => {
-          return next(null, user.emailToken)
-        })
-        .catch((err) => {
-          return next(err)
-        })
-      }
-    })
-
-  // Promise
-  } else return new Promise((resolve, reject) => {
-    crypto.randomBytes(16, (err, buf) => {
-      if (err) reject(err)
+      if (err) return reject(err)
       if (buf) {
         debug(`Buffer ${buf.toString('hex')} created`)
         user.emailToken = buf.toString('hex')
@@ -89,49 +73,11 @@ userSchema.methods.createEmailToken = function (next) {
 }
 
 // Create password reset token
-userSchema.methods.createPassToken = function (next) {
-  debug('user.createPassToken() called')
-  var user = this
+userSchema.methods.createPassToken = function () {
+  let user = this
+  debug(`user.createPassToken() called for ${user.id}`)
 
-  // Callback next(err, token, expires)
-  if (typeof next === 'function') {
-
-    // Reuse old token, resetting clock
-    if (user.auth.passTokenExpires >= Date.now()) {
-      debug(`Reusing old password token...`)
-      user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-      user.save()
-      .then(() => {
-        return next(null, user.auth.passToken, user.auth.passTokenExpires)
-      })
-      .catch((err) => {
-        return next(err)
-      })
-
-    // Create new token
-    } else {
-      debug(`Creating new password token...`)
-      crypto.randomBytes(16, (err, buf) => {
-        if (err) return next(err)
-        if (buf) {
-          user.auth.passToken = buf.toString('hex')
-          user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-          user.save()
-          .then(() => {
-            debug('successfully saved user in createPassToken')
-            return next(null, user.auth.passToken, user.auth.passTokenExpires)
-          })
-          .catch((err) => {
-            debug('error saving user in createPassToken')
-            return next(err)
-          })
-        }
-      })
-    }
-
-  // Promise
-
-  } else return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
     // Reuse old token, resetting clock
     if (user.auth.passTokenExpires >= Date.now()) {
@@ -147,7 +93,7 @@ userSchema.methods.createPassToken = function (next) {
     } else {
       debug(`Creating new password token...`)
       crypto.randomBytes(16, (err, buf) => {
-        if (err) return next(err)
+        if (err) return reject(err)
         if (buf) {
           user.auth.passToken = buf.toString('hex')
           user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
@@ -163,32 +109,20 @@ userSchema.methods.createPassToken = function (next) {
         }
       })
     }
+
   })
+
 }
 
 // Generate hash for new password and save it to the database
-userSchema.methods.generateHashedPassword = function (password, next) {
+userSchema.methods.generateHashedPassword = function (password) {
+  debug(`user.generateHashedPassword() called for ${this.id}`)
 
   // Delete token
   this.auth.passToken = undefined
   this.auth.passTokenExpires = undefined
 
-  // Callback next(err, token, expires)
-  if (typeof next === 'function') {
-
-    // Generate hash
-    bcrypt.genSalt(8, (err, salt) => {
-      if (err) return next(err)
-      bcrypt.hash(password, salt, (err, hash) => {
-        if (err) return next(err)
-        this.auth.password = hash
-        this.save()
-        .then(() => { next(); })
-        .catch((err) => next(err) )
-      })
-    })
-
-  } else return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
     // Generate hash
     bcrypt.genSalt(8, (err, salt) => {
@@ -206,17 +140,12 @@ userSchema.methods.generateHashedPassword = function (password, next) {
 }
 
 // Check for valid password
-userSchema.methods.validPassword = function (password, next) {
-  // Callback next(err, res)
-  if (typeof next === 'function') bcrypt.compare(password, this.auth.password, next)
-  else return new Promise( (resolve, reject) => {
-    bcrypt.compare(password, this.auth.password)
-      .then( (result) => {
-        if (result===true) resolve()
-        else reject(new Error('Passwords don\'t match'))
-      })
-      .catch( (err) => reject(err) )
-  })
+userSchema.methods.validPassword = function (password) {
+  let user = this
+  debug(`user.validPassword() called for ${user.id}`)
+
+  return bcrypt.compare(password, user.auth.password)
+
 }
 
 module.exports = {

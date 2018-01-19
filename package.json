@@ -45,6 +45,7 @@
     "mocha": "^4.0.1",
     "nodemon": "^1.11.0",
     "standard": "^10.0.3",
+    "superagent": "^3.8.2",
     "supertest": "^3.0.0"
   },
   "scripts": {

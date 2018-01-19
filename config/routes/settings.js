@@ -8,7 +8,7 @@ const mw = require('../middleware.js')
 const User = require('../models.js').user
 const mail = require('../mail.js')
 const env = require('../env/env.js')
-const debug = require('debug')('tracman-settings')
+const debug = require('debug')('tracman-routes-settings')
 const router = require('express').Router()
 
 // Settings form

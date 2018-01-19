@@ -1,18 +1,19 @@
 'use strict'
 
 const chai = require('chai')
+const app = require('../server')
 const User = require('../config/models').user
-const request = require('supertest')
-  .agent(require('../server'))
+// const superagent = require('superagent').agent()
+const request = require('supertest').agent(app)
 chai.use(
   require('chai-http')
 )
 
-// Constants for dummy accounts
-const FAKE_EMAIL = 'nobody@tracman.org'
-const TEST_EMAIL = 'test@tracman.org'
-const TEST_PASSWORD = 'mDAQYe2VYE'
-const BAD_PASSWORD = 'password123'
+// Import test config by object destructuring
+const { FAKE_EMAIL, TEST_EMAIL,
+  TEST_PASSWORD, BAD_PASSWORD,
+  FUZZED_EMAIL_TRIES, FUZZED_PASSWORD_TRIES,
+} = require('../config/test.js')
 
 describe('Authentication', () => {
 
@@ -20,9 +21,131 @@ describe('Authentication', () => {
     let passwordless_user
 
     // Make sure test user doesn't exist
-    before( async () => {
-      let existing_test_user = await User.findOne({'email':TEST_EMAIL})
-      if (existing_test_user) existing_test_user.remove()
+    before( (done) => {
+      User.findOne({'email':TEST_EMAIL})
+      .then( (user) => {
+        if (!user) done()
+        else {
+          user.remove()
+          .then( (user) => { done() })
+          .catch(console.error)
+        }
+      }).catch(console.error)
+    })
+
+    // These tests require the test user to have been created
+    after( () => {
+      console.log('running after tests')
+
+      describe('Logged out', () => {
+
+        it('Fails to log in with bad password', async () => {
+
+          // Confirm redirect
+          chai.expect( await request.post('/login')
+            .type('form').send({
+              'email': TEST_EMAIL,
+              'password': BAD_PASSWORD
+            })
+          ).to.redirectTo('/login')  // Hey! Incorrect email or password.
+
+        })
+
+        // TODO: Implement fuzzer
+        it.skip(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
+
+          // Fuzz passwords
+          // loop with let fuzzed_password
+
+           // Confirm redirect
+            // chai.expect( await request.post('/login')
+            //   .type('form').send({
+            //     'email': TEST_EMAIL,
+            //     'password': fuzzed_password
+            //   })
+            // ).to.redirectTo('/login') // Hey! Incorrect email or password.
+
+        })
+
+        it('Logs in with password', async () => {
+          let res = await request.post('/login')
+            .type('form').send({
+              email: TEST_EMAIL,
+              password: TEST_PASSWORD
+            })
+          request.saveCookies(res)
+          chai.expect(res).to.redirectTo('/map')
+        })
+
+        // it('Forgets password', async () => {
+
+        // })
+
+        // it('Changes forgotten password', async () => {
+
+        // })
+
+      })
+
+      describe('Logged in', () => {
+
+        it('Logs out', async () => {
+          let res = request.get('/logout')
+          request.attachCookies(res)
+          chai.expect(res).to.redirectTo('/')
+
+        })
+
+        // it('Changes email address', async () => {
+
+        // })
+
+        // it('Changes password', async () => {
+
+        // })
+
+        // it('Changes settings', async () => {
+
+        // })
+
+        // it('Connects a Google account', async () => {
+
+        // })
+
+        // it('Connects a Facebook account', async () => {
+
+        // })
+
+        // it('Connects a Twitter account', async () => {
+
+        // })
+
+        // it('Logs in with Google', async () => {
+
+        // })
+
+        // it('Logs in with Facebook', async () => {
+
+        // })
+
+        // it('Logs in with Twitter', async () => {
+
+        // })
+
+        // it('Disconnects a Google account', async () => {
+
+        // })
+
+        // it('Disconnects a Facebook account', async () => {
+
+        // })
+
+        // it('Disconnects a Twitter account', async () => {
+
+        // })
+
+      })
+
     })
 
     it('Fails to create an account with a fake email', async () => {
@@ -32,15 +155,40 @@ describe('Authentication', () => {
         .type('form').send({ 'email':FAKE_EMAIL })
       ).to.redirectTo('/login#signup')
 
-      // Ensure user was deleted after email failed to send
-      // Users with bad emails are removed asynchronously and may happen after
-      // the response was recieved. Ensure it's happened in a kludgy way by
-      // waiting 2 seconds before asserting that the user doesn't exist
+      /* Ensure user was deleted after email failed to send
+      /* Users with bad emails are removed asynchronously and may happen after
+      /* the response was recieved. Ensure it's happened in a kludgy way by
+      /* waiting 2 seconds before asserting that the user doesn't exist
+      */
       setTimeout( async () => {
         chai.assert.isNull( await User.findOne({
           'email': FAKE_EMAIL
         }), 'Account with fake email was created')
       }, 2000)
+
+    })
+
+    // TODO: Implement fuzzer
+    it.skip(`Fails to create accounts with ${FUZZED_EMAIL_TRIES} fuzzed emails`, () => {
+
+      // Fuzz emails
+      // loop with let fuzzed_email
+
+        // Confirm redirect
+        // chai.expect( await request.post('/signup')
+        //   .type('form').send({ 'email':fuzzed_email  })
+        // ).to.redirectTo('/login#signup')
+
+      /* Ensure user was deleted after email failed to send
+      /* Users with bad emails are removed asynchronously and may happen after
+      /* the response was recieved. Ensure it's happened in a kludgy way by
+      /* waiting 2 seconds before asserting that the user doesn't exist
+      */
+      // setTimeout( async () => {
+      //   chai.assert.isNull( await User.findOne({
+      //     'email': FAKE_EMAIL
+      //   }), 'Account with fake email was created')
+      // }, 2000)
 
     })
 
@@ -93,84 +241,6 @@ describe('Authentication', () => {
       })
 
     })
-
-  })
-
-  describe('Account usage', () => {
-
-    // Create account to play with
-    before( () => {
-      // Create user
-      // Set password
-    })
-
-    // it('Logs in', async () => {
-
-    // })
-
-    // it('Logs out', async () => {
-
-    // })
-
-    // it('Forgets password', async () => {
-
-    // })
-
-    // it('Changes forgotten password', async () => {
-
-    // })
-
-    // it('Logs back in', async () => {
-
-    // })
-
-    // it('Changes email address', async () => {
-
-    // })
-
-    // it('Changes password', async () => {
-
-    // })
-
-    // it('Changes settings', async () => {
-
-    // })
-
-    // it('Connects a Google account', async () => {
-
-    // })
-
-    // it('Connects a Facebook account', async () => {
-
-    // })
-
-    // it('Connects a Twitter account', async () => {
-
-    // })
-
-    // it('Logs in with Google', async () => {
-
-    // })
-
-    // it('Logs in with Facebook', async () => {
-
-    // })
-
-    // it('Logs in with Twitter', async () => {
-
-    // })
-
-    // it('Disconnects a Google account', async () => {
-
-    // })
-
-    // it('Disconnects a Facebook account', async () => {
-
-    // })
-
-    // it('Disconnects a Twitter account', async () => {
-
-    // })
 
   })
 

@@ -10,6 +10,7 @@ const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env.js')
 
 module.exports = (app, passport) => {
+
   // Methods for success and failure
   const loginOutcome = {
     failureRedirect: '/login',
@@ -55,7 +56,7 @@ module.exports = (app, passport) => {
     .post((req, res, next) => {
 
       // Send token and alert user
-      function sendToken (user) {
+      function sendToken(user) {
         debug(`sendToken() called for user ${user.id}`)
 
         // Create a new password token
@@ -119,7 +120,7 @@ module.exports = (app, passport) => {
                 mw.throwErr(err, req)
                 res.redirect('/login#signup')
               }
-              
+
             } })
         })
         .catch( (err) => {
@@ -127,9 +128,9 @@ module.exports = (app, passport) => {
           mw.throwErr(err, req)
           res.redirect('/login#signup')
         })
-      
+
       }
-      
+
       // Validate email
       req.checkBody('email', 'Please enter a valid email address.').isEmail()
 
@@ -225,6 +226,7 @@ module.exports = (app, passport) => {
 
           // Save user and send the token by email
           Promise.all([slug, sk32])
+          //.then(() => { user.save() })
           .then(() => { sendToken(user) })
           .catch((err) => {
             debug('Failed to save user after creating slug and sk32!')
@@ -273,6 +275,7 @@ module.exports = (app, passport) => {
 
           // User with that email does exist
           } else {
+
             // Create reset token
             user.createPassToken()
             .then( (token) => {
@@ -319,7 +322,7 @@ module.exports = (app, passport) => {
           mw.throwErr(err, req)
           res.redirect('/login/forgot')
         })
-    
+
     })
 
   // Android
