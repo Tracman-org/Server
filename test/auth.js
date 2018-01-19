@@ -33,121 +33,6 @@ describe('Authentication', () => {
       }).catch(console.error)
     })
 
-    // These tests require the test user to have been created
-    after( () => {
-      console.log('running after tests')
-
-      describe('Logged out', () => {
-
-        it('Fails to log in with bad password', async () => {
-
-          // Confirm redirect
-          chai.expect( await request.post('/login')
-            .type('form').send({
-              'email': TEST_EMAIL,
-              'password': BAD_PASSWORD
-            })
-          ).to.redirectTo('/login')  // Hey! Incorrect email or password.
-
-        })
-
-        // TODO: Implement fuzzer
-        it.skip(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
-
-          // Fuzz passwords
-          // loop with let fuzzed_password
-
-           // Confirm redirect
-            // chai.expect( await request.post('/login')
-            //   .type('form').send({
-            //     'email': TEST_EMAIL,
-            //     'password': fuzzed_password
-            //   })
-            // ).to.redirectTo('/login') // Hey! Incorrect email or password.
-
-        })
-
-        it('Logs in with password', async () => {
-          let res = await request.post('/login')
-            .type('form').send({
-              email: TEST_EMAIL,
-              password: TEST_PASSWORD
-            })
-          request.saveCookies(res)
-          chai.expect(res).to.redirectTo('/map')
-        })
-
-        // it('Forgets password', async () => {
-
-        // })
-
-        // it('Changes forgotten password', async () => {
-
-        // })
-
-      })
-
-      describe('Logged in', () => {
-
-        it('Logs out', async () => {
-          let res = request.get('/logout')
-          request.attachCookies(res)
-          chai.expect(res).to.redirectTo('/')
-
-        })
-
-        // it('Changes email address', async () => {
-
-        // })
-
-        // it('Changes password', async () => {
-
-        // })
-
-        // it('Changes settings', async () => {
-
-        // })
-
-        // it('Connects a Google account', async () => {
-
-        // })
-
-        // it('Connects a Facebook account', async () => {
-
-        // })
-
-        // it('Connects a Twitter account', async () => {
-
-        // })
-
-        // it('Logs in with Google', async () => {
-
-        // })
-
-        // it('Logs in with Facebook', async () => {
-
-        // })
-
-        // it('Logs in with Twitter', async () => {
-
-        // })
-
-        // it('Disconnects a Google account', async () => {
-
-        // })
-
-        // it('Disconnects a Facebook account', async () => {
-
-        // })
-
-        // it('Disconnects a Twitter account', async () => {
-
-        // })
-
-      })
-
-    })
-
     it('Fails to create an account with a fake email', async () => {
 
       // Confirm redirect
@@ -241,6 +126,129 @@ describe('Authentication', () => {
       })
 
     })
+
+
+    // These tests require the test user to have been created
+    after( () => {
+
+      describe('Logged out', () => {
+
+        it('Fails to log in with bad password', async () => {
+
+          // Confirm redirect
+          chai.expect( await request.post('/login')
+            .type('form').send({
+              'email': TEST_EMAIL,
+              'password': BAD_PASSWORD
+            })
+          ).to.redirectTo('/login')  // Hey! Incorrect email or password.
+
+        })
+
+        // TODO: Implement fuzzer
+        it.skip(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
+
+          // Fuzz passwords
+          // loop with let fuzzed_password
+
+           // Confirm redirect
+            // chai.expect( await request.post('/login')
+            //   .type('form').send({
+            //     'email': TEST_EMAIL,
+            //     'password': fuzzed_password
+            //   })
+            // ).to.redirectTo('/login') // Hey! Incorrect email or password.
+
+        })
+
+        // TODO: Create test for forgetten password
+        // it('Forgets password', async () => {
+
+        // })
+
+        // TODO: Create test for changing forgetten password
+        // it('Changes forgotten password', async () => {
+
+        // })
+
+        // Finally log in successfully
+        after( () => {
+
+          it('Logs in with password', async () => {
+            let res = await request.post('/login')
+              .type('form').send({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD
+              })
+            chai.expect(res).to.redirectTo('/map')
+
+            // Then do tests requiring login
+            after( () => {
+              describe('Logged in', () => {
+
+                it('Logs out', async () => {
+                  let res = request.get('/logout')
+                  chai.expect(res).to.redirectTo('/')
+                })
+
+                // it('Changes email address', async () => {
+
+                // })
+
+                // it('Changes password', async () => {
+
+                // })
+
+                // it('Changes settings', async () => {
+
+                // })
+
+                // it('Connects a Google account', async () => {
+
+                // })
+
+                // it('Connects a Facebook account', async () => {
+
+                // })
+
+                // it('Connects a Twitter account', async () => {
+
+                // })
+
+                // it('Logs in with Google', async () => {
+
+                // })
+
+                // it('Logs in with Facebook', async () => {
+
+                // })
+
+                // it('Logs in with Twitter', async () => {
+
+                // })
+
+                // it('Disconnects a Google account', async () => {
+
+                // })
+
+                // it('Disconnects a Facebook account', async () => {
+
+                // })
+
+                // it('Disconnects a Twitter account', async () => {
+
+                // })
+
+              })
+            })
+
+          })
+        })
+
+      })
+
+    })
+
 
   })
 
