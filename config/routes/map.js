@@ -46,16 +46,16 @@ router.get('/demo', (req, res, next) => {
 })
 
 // Show map
-router.get('/:slug?', (req, res, next) => {
-  User.findOne({slug: req.params.slug})
-  .then((mapuser) => {
-    if (!mapuser) next() // 404
+router.get('/:slug?', async (req, res, next) => {
+  try {
+    let map_user = await User.findOne({slug: req.params.slug})
+    if (!map_user) next() // 404
     else {
       var active = '' // For header nav
-      if (req.user && req.user.id === mapuser.id) active = 'map'
+      if (req.user && req.user.id === map_user.id) active = 'map'
       res.render('map', {
         active: active,
-        mapuser: mapuser,
+        mapuser: map_user,
         mapApi: env.googleMapsAPI,
         user: req.user,
         noFooter: '1',
@@ -64,9 +64,7 @@ router.get('/:slug?', (req, res, next) => {
         newuserurl: (req.query.new) ? env.url + '/map/' + req.params.slug : ''
       })
     }
-  }).catch((err) => {
-    mw.throwErr(err, req)
-  })
+  } catch (err) { mw.throwErr(err, req) }
 })
 
 module.exports = router

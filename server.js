@@ -28,21 +28,20 @@ let ready_promise_list = []
   mongoose.Promise = global.Promise
 
   // Connect to database
-  ready_promise_list.push( new Promise( (resolve, reject) => {
-    mongoose.connect(env.mongoSetup, {
-      useMongoClient: true,
-      socketTimeoutMS: 30000,
-      //reconnectTries: 30,
-      keepAlive: true
-    })
-    .then( (db) => {
+  ready_promise_list.push( new Promise( async (resolve, reject) => {
+    try {
+      mongoose.connect(env.mongoSetup, {
+        useMongoClient: true,
+        socketTimeoutMS: 30000,
+        //reconnectTries: 30,
+        keepAlive: true
+      })
       console.log(`  Mongoose connected to ${env.mongoSetup}`)
       resolve()
-    } )
-    .catch( (err) => {
+    } catch (err) {
       console.error(err.stack)
       reject()
-    } )
+    }
   }) )
 
 }
@@ -177,40 +176,40 @@ ready_promise_list.push(mail.verify())
 
 // Listen
 ready_promise_list.push( new Promise( (resolve, reject) => {
-  http.listen(env.port, () => {
+  http.listen(env.port, async () => {
 
     console.log(`  Express listening on ${env.url}`)
     resolve()
 
     // Check for clients for each user
-    ready_promise_list.push( new Promise( (resolve, reject) => {
-      User.find({})
-      .then((users) => {
+    ready_promise_list.push( new Promise( async (resolve, reject) => {
+      try {
+        let users = await User.find({})
         users.forEach((user) => {
           sockets.checkForUsers(io, user.id)
         })
         resolve()
-      })
-      .catch( (err) => {
+      } catch (err) {
         console.error(err.stack)
-        reject()
-      })
+        reject(err)
+      }
     }) )
 
     // Start transmitting demo
     ready_promise_list.push( demo(io) )
 
     // Mark everything when working correctly
-    Promise.all(ready_promise_list.map(
-      // Also wait for rejected promises
-      // https://stackoverflow.com/a/36115549/3006854
-      p => p.catch(e => e)
-    )).then( () => {
+    try {
+      await Promise.all(ready_promise_list.map(
+        // Also wait for rejected promises
+        // https://stackoverflow.com/a/36115549/3006854
+        p => p.catch(e => e)
+      ))
       console.log('Tracman server is running properly\n')
-    }).catch( (err) => {
-      if (err) console.error(err.message)
+    } catch (err) {
+      console.error(err.message)
       console.log(`Tracman server is not running properly!\n`)
-    })
+    }
 
   })
 }) )

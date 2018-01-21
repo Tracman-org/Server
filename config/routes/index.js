@@ -46,31 +46,31 @@ module.exports = router
   })
 
   // Endpoint to validate forms
-  .get('/validate', (req, res, next) => {
+  .get('/validate', async (req, res, next) => {
     // Validate unique slug
     if (req.query.slug) {
-      User.findOne({ slug: slug(req.query.slug) })
-      .then((existingUser) => {
+      try {
+        let existingUser = await User.findOne({
+          slug: slug(req.query.slug)
+        })
         if (existingUser && existingUser.id!==req.user.id) res.sendStatus(400)
         else res.sendStatus(200)
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err)
         res.sendStatus(500)
-      })
+      }
 
     // Validate unique email
     } else if (req.query.email) {
-      User.findOne({ email: req.query.email })
-      .then((existingUser) => {
+      try {
+        let existingUser = User.findOne({ email: req.query.email })
         if (existingUser && existingUser.id !== req.user.id) {
           res.sendStatus(400)
         } else { res.sendStatus(200) }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err)
         res.sendStatus(500)
-      })
+      }
 
     // Create slug
     } else if (req.query.slugify) res.send(slug(xss(req.query.slugify)))

@@ -7,22 +7,21 @@ const router = require('express').Router(),
 
 router
 
-  .get('/mail', (req, res, next) => {
-    mail.send({
-      to: `"Keith Irwin" <hypergeek14@gmail.com>`,
-      from: mail.noReply,
-      subject: 'Test email',
-      text: mail.text("Looks like everything's working! "),
-      html: mail.html("<p>Looks like everything's working! </p>")
-    })
-    .then(() => {
+  .get('/mail', async (req, res, next) => {
+    try {
+      await mail.send({
+        to: `"Keith Irwin" <hypergeek14@gmail.com>`,
+        from: mail.noReply,
+        subject: 'Test email',
+        text: mail.text("Looks like everything's working! "),
+        html: mail.html("<p>Looks like everything's working! </p>")
+      })
       console.log('Test email should have sent...')
       res.sendStatus(200)
-    })
-    .catch((err) => {
+    } catch (err) {
       mw.throwErr(err, req)
       res.sendStatus(500)
-    })
+    }
   })
 
   .get('/password', (req, res) => {

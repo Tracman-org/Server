@@ -36,7 +36,7 @@ module.exports = router
       secret: env.recaptchaSecret,
       response: req.body['g-recaptcha-response'],
       remoteip: req.ip
-    }}, (err, response, body) => {
+    }}, async (err, response, body) => {
       // Check for errors
       if (err) {
         mw.throwErr(err, req)
@@ -57,20 +57,19 @@ module.exports = router
 
         // Captcha succeeded
         } else {
-          mail.send({
-            from: `${req.body.name} <${req.body.email}>`,
-            to: `Tracman Contact <contact@tracman.org>`,
-            subject: req.body.subject || 'A message',
-            text: req.body.message
-          })
-          .then(() => {
+          try {
+            await mail.send({
+              from: `${req.body.name} <${req.body.email}>`,
+              to: `Tracman Contact <contact@tracman.org>`,
+              subject: req.body.subject || 'A message',
+              text: req.body.message
+            })
             req.flash('success', `Your message has been sent. `)
             res.redirect(req.session.next || '/')
-          })
-          .catch((err) => {
+          } catch (err) {
             mw.throwErr(err, req)
             res.redirect('/contact')
-          })
+          }
         }
       }
     })

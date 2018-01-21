@@ -13,7 +13,7 @@ const mw = require('./middleware.js')
 const User = require('./models.js').user
 
 module.exports = (passport) => {
-  
+
   // Serialize/deserialize users
   passport.serializeUser((user, done) => {
     done(null, user.id)
@@ -30,11 +30,11 @@ module.exports = (passport) => {
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true
-  }, (req, email, password, done) => {
+  }, async (req, email, password, done) => {
     debug(`Perfoming local login for ${email}`)
-    User.findOne({'email': email})
-    .then((user) => {
-      
+    try {
+      let user = await User.findOne({'email': email})
+
       // No user with that email
       if (!user) {
         debug(`No user with that email`)
@@ -44,39 +44,33 @@ module.exports = (passport) => {
       // User exists
       } else {
         debug(`User exists. Checking password...`)
-        
+
         // Check password
-        user.validPassword(password)
-          .then( (res) => {
+        let res = await user.validPassword(password)
 
-            // Password incorrect
-            if (!res) {
-              debug(`Incorrect password`)
-              req.session.next = undefined
-              return done(null, false, req.flash('warning', 'Incorrect email or password.'))
+        // Password incorrect
+        if (!res) {
+          debug(`Incorrect password`)
+          req.session.next = undefined
+          return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
-            // Successful login
-            } else {
-              user.lastLogin = Date.now()
-              user.save()
-              return done(null, user)
-            }
-          
-          })
-          .catch( (err) => {
-            return done(err)
-          })
+        // Successful login
+        } else {
+          user.lastLogin = Date.now()
+          user.save()
+          return done(null, user)
+        }
+
 
       }
-    })
-    .catch((err) => {
+    } catch (err) {
       return done(err)
-    })
+    }
   }
   ))
 
   // Social login
-  function socialLogin(req, service, profileId, done) {
+  async function socialLogin(req, service, profileId, done) {
     debug(`socialLogin() called for ${service} account ${profileId}`)
     let query = {}
     query['auth.' + service] = profileId
@@ -84,31 +78,32 @@ module.exports = (passport) => {
     // Intent to log in
     if (!req.user) {
       debug(`Searching for user with query ${query}...`)
-      User.findOne(query)
-      .then((user) => {
+      try {
+        let user = await User.findOne(query)
+
         // Can't find user
         if (!user) {
           // Lazy update from old googleId field
           if (service === 'google') {
-            User.findOne({ 'googleID': parseInt(profileId, 10) })
-            .then((user) => {
+            try {
+              let user = await User.findOne({ 'googleID': parseInt(profileId, 10) })
+              
               // User exists with old schema
               if (user) {
                 debug(`User ${user.id} exists with old schema.  Lazily updating...`)
                 user.auth.google = profileId
                 user.googleId = undefined
-                user.save()
-                .then(() => {
+                try {
+                  await user.save()
                   debug(`Lazily updated ${user.id}...`)
                   req.session.flashType = 'success'
                   req.session.flashMessage = 'You have been logged in. '
                   return done(null, user)
-                })
-                .catch((err) => {
+                } catch (err) {
                   debug(`Failed to save user that exists with old googleId schema!`)
                   mw.throwErr(err, req)
                   return done(err)
-                })
+                }
 
               // No such user
               } else {
@@ -116,12 +111,11 @@ module.exports = (passport) => {
                 req.flash('warning', `There's no user for that ${service} account. `)
                 return done()
               }
-            })
-            .catch((err) => {
+            } catch (err) {
               debug(`Failed to search for user with old googleID of ${profileId}. `)
               mw.throwErr(err, req)
               return done(err)
-            })
+            }
 
           // No googleId either
           } else {
@@ -137,12 +131,11 @@ module.exports = (passport) => {
           req.session.flashMessage = 'You have been logged in.'
           return done(null, user)
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         debug(`Failed to find user with query: ${query}`)
         mw.throwErr(err, req)
         return done(err)
-      })
+      }
 
     // Intent to connect account
     } else {
@@ -150,8 +143,9 @@ module.exports = (passport) => {
 
       // Check for unique profileId
       debug(`Checking for unique account with query ${query}...`)
-      User.findOne(query)
-      .then((existingUser) => {
+      try {
+        let user = await User.findOne(query)
+
         // Social account already in use
         if (existingUser) {
           debug(`${service} account already in use with user ${existingUser.id}`)
@@ -163,24 +157,22 @@ module.exports = (passport) => {
         } else {
           debug(`${service} account (${profileId}) is unique; Connecting to ${req.user.id}...`)
           req.user.auth[service] = profileId
-          req.user.save()
-          .then(() => {
+          try {
+            await req.user.save()
             debug(`Successfully connected ${service} account to ${req.user.id}`)
             req.session.flashType = 'success'
             req.session.flashMessage = `${mw.capitalize(service)} account connected. `
             return done(null, req.user)
-          })
-          .catch((err) => {
+          } catch (err) {
             debug(`Failed to connect ${service} account to ${req.user.id}!`)
             return done(err)
-          })
+          }
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         debug(`Failed to check for unique ${service} profileId of ${profileId}!`)
         mw.throwErr(err, req)
         return done(err)
-      })
+      }
     }
   }
 

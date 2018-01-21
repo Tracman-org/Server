@@ -23,9 +23,9 @@ router.route('/')
   })
 
   // Set new settings
-  .post((req, res, next) => {
+  .post( async (req, res, next) => {
     // Validate email
-    const checkEmail = new Promise((resolve, reject) => {
+    const checkEmail = new Promise( async (resolve, reject) => {
       // Check validity
       if (!mw.validateEmail(req.body.email)) {
         req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `)
@@ -36,9 +36,9 @@ router.route('/')
 
       // Check uniqueness
       else {
-        User.findOne({ email: req.body.email })
-        .then((existingUser) => {
-          
+        try {
+          let existingUser = await User.findOne({ email: req.body.email })
+
           // Not unique!
           if (existingUser && existingUser.id !== req.user.id) {
             debug('Email not unique!')
@@ -54,45 +54,39 @@ router.route('/')
 
             // Create token
             debug(`Creating email token...`)
-            return req.user.createEmailToken()
-          }
-          
-        })
-        .then( (token) => {
-          
-          // Send token to user by email
-          debug(`Mailing new email token to ${req.body.email}...`)
-          return mail.send({
-            to: `"${req.user.name}" <${req.body.email}>`,
-            from: mail.noReply,
-            subject: 'Confirm your new email address for Tracman',
-            text: mail.text(
-              `A request has been made to change your Tracman email address.  \
-              If you did not initiate this request, please disregard it.  \n\n\
-              To confirm your email, follow this link:\n${env.url}/settings/email/${token}. `
-            ),
-            html: mail.html(
-              `<p>A request has been made to change your Tracman email address.  \
-              If you did not initiate this request, please disregard it.  </p>\
-              <p>To confirm your email, follow this link:\
-              <br><a href="${env.url}/settings/email/${token}">\
-              ${env.url}/settings/email/${token}</a>. </p>`
+            let token = await req.user.createEmailToken()
+
+            // Send token to user by email
+            debug(`Mailing new email token to ${req.body.email}...`)
+            await mail.send({
+              to: `"${req.user.name}" <${req.body.email}>`,
+              from: mail.noReply,
+              subject: 'Confirm your new email address for Tracman',
+              text: mail.text(
+                `A request has been made to change your Tracman email address.  \
+                If you did not initiate this request, please disregard it.  \n\n\
+                To confirm your email, follow this link:\n${env.url}/settings/email/${token}. `
+              ),
+              html: mail.html(
+                `<p>A request has been made to change your Tracman email address.  \
+                If you did not initiate this request, please disregard it.  </p>\
+                <p>To confirm your email, follow this link:\
+                <br><a href="${env.url}/settings/email/${token}">\
+                ${env.url}/settings/email/${token}</a>. </p>`
+              )
+            })
+
+            req.flash('warning',
+              `An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `
             )
-          })
-          
-        })
-        .then( () => {
-          req.flash('warning',
-            `An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `
-          )
-          resolve()
-        })
-        .catch(reject)
+            resolve()
+          }
+        } catch (err) { reject() }
       }
     })
 
     // Validate slug
-    const checkSlug = new Promise((resolve, reject) => {
+    const checkSlug = new Promise( async (resolve, reject) => {
       // Check existence
       if (req.body.slug === '') {
         req.flash('warning', `You must supply a slug.  `)
@@ -103,8 +97,9 @@ router.route('/')
 
       // Check uniqueness
       else {
-        User.findOne({ slug: req.body.slug })
-        .then((existingUser) => {
+        try {
+          let existingUser = await User.findOne({ slug: req.body.slug })
+
           // Not unique!
           if (existingUser && existingUser.id !== req.user.id) {
             req.flash( 'warning',
@@ -113,15 +108,15 @@ router.route('/')
 
           // It's unique
           } else req.user.slug = slug(xss(req.body.slug))
-        })
-        .then(resolve)
-        .catch(reject)
+
+          resolve()
+        } catch (err) { reject() }
       }
     })
 
     // Set settings when done
-    Promise.all([checkEmail, checkSlug])
-    .then(() => {
+    try {
+      await Promise.all([checkEmail, checkSlug])
       debug('Setting settings... ')
 
       // Set values
@@ -139,61 +134,48 @@ router.route('/')
 
       // Save user and send response
       debug(`Saving new settings for user ${req.user.name}...`)
-      req.user.save()
-      .then(() => {
-        debug(`DONE!  Redirecting user...`)
-        req.flash('success', 'Settings updated. ')
-        res.redirect('/settings')
-      })
-      .catch((err) => {
-        mw.throwErr(err, req)
-        res.redirect('/settings')
-      })
-    })
-    .catch((err) => {
-      mw.throwErr(err, req)
-      res.redirect('/settings')
-    })
+      await req.user.save()
+      debug(`DONE!  Redirecting user...`)
+      req.flash('success', 'Settings updated. ')
+
+    } catch (err) { mw.throwErr(err, req) }
+    finally { res.redirect('/settings') }
   })
 
 // Delete account
-router.get('/delete', (req, res) => {
-  User.findByIdAndRemove(req.user)
-  .then(() => {
+router.get('/delete', async (req, res) => {
+  try {
+    await User.findByIdAndRemove(req.user)
     req.flash('success', 'Your account has been deleted. ')
     res.redirect('/')
-  })
-  .catch((err) => {
+  } catch (err) {
     mw.throwErr(err, req)
     res.redirect('/settings')
-  })
+  }
 })
 
 // Confirm email address
-router.get('/email/:token', mw.ensureAuth, (req, res, next) => {
+router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
   // Check token
   if (req.user.emailToken === req.params.token) {
-    // Set new email
-    req.user.email = req.user.newEmail
-    req.user.save()
+    try {
+      // Set new email
+      req.user.email = req.user.newEmail
 
-    // Delete token and newEmail
-    .then(() => {
+      // Delete token and newEmail
       req.user.emailToken = undefined
       req.user.newEmail = undefined
-      req.user.save()
-    })
 
-    // Report success
-    .then(() => {
+      await req.user.save()
+
+      // Report success
       req.flash('success', `Your email has been set to <u>${req.user.email}</u>. `)
       res.redirect('/settings')
-    })
 
-    .catch((err) => {
+    } catch (err) {
       mw.throwErr(err, req)
       res.redirect(req.session.next || '/settings')
-    })
+    }
 
   // Invalid token
   } else {
@@ -209,17 +191,17 @@ router.route('/password')
   })
 
   // Email user a token, proceed at /password/:token
-  .get((req, res, next) => {
+  .get( async (req, res, next) => {
     // Create token for password change
-    req.user.createPassToken()
-    .then( (token, expires) => {
+    try {
+      let [token, expires] = await req.user.createPassToken()
       // Figure out expiration time
       let expirationTimeString = (req.query.tz)
         ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
         : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
 
       // Confirm password change request by email.
-      return mail.send({
+      return await mail.send({
         to: mail.to(req.user),
         from: mail.noReply,
         subject: 'Request to change your Tracman password',
@@ -240,46 +222,45 @@ router.route('/password')
           <p>This request will expire at ${expirationTimeString}. </p>`
         )
       })
-      
-    })
-    .then(() => {
+
       // Alert user to check email.
       req.flash('success',
         `An link has been sent to <u>${req.user.email}</u>.  \
         Click on the link to complete your password change.  \
         This link will expire in one hour (${expirationTimeString}). `
       )
-      res.redirect((req.user) ? '/settings' : '/login')
-    })
-    .catch( (err) => {
+    } catch (err) {
       mw.throwErr(err, req)
+    } finally {
       res.redirect((req.user) ? '/settings' : '/login')
-    })
+    }
   })
 
 router.route('/password/:token')
 
   // Check token
-  .all((req, res, next) => {
+  .all( async (req, res, next) => {
     debug('/settings/password/:token .all() called')
-    User
-      .findOne({'auth.passToken': req.params.token})
-      .where('auth.passTokenExpires').gt(Date.now())
-      .then((user) => {
-        if (!user) {
-          debug('Bad token')
-          req.flash('danger', 'Password reset token is invalid or has expired. ')
-          res.redirect((req.isAuthenticated) ? '/settings' : '/login')
-        } else {
-          debug('setting passwordUser')
-          res.locals.passwordUser = user
-          next()
-        }
-      })
-      .catch((err) => {
-        mw.throwErr(err, req)
-        res.redirect('/password')
-      })
+    try {
+      let user = await User
+        .findOne({'auth.passToken': req.params.token})
+        .where('auth.passTokenExpires').gt(Date.now())
+
+      if (!user) {
+        debug('Bad token')
+        req.flash('danger', 'Password reset token is invalid or has expired. ')
+        res.redirect((req.isAuthenticated) ? '/settings' : '/login')
+      } else {
+        debug('setting passwordUser')
+        res.locals.passwordUser = user
+        next()
+      }
+
+    } catch (err) {
+      mw.throwErr(err, req)
+      res.redirect('/password')
+    }
+
   })
 
   // Show password change form
@@ -289,7 +270,7 @@ router.route('/password/:token')
   })
 
   // Set new password
-  .post((req, res, next) => {
+  .post( async (req, res, next) => {
     debug('/settings/password/:token .post() called')
 
     // Validate password strength
@@ -302,26 +283,27 @@ router.route('/password/:token')
     } else {
 
       // Create hashed password and save to db
-      res.locals.passwordUser.generateHashedPassword(req.body.password)
-        .then( () => {
-          // User changed password
-          if (req.user) {
-            debug('User saved password')
-            req.flash('success', 'Your password has been changed. ')
-            res.redirect('/settings')
+      try {
+        await res.locals.passwordUser.generateHashedPassword(req.body.password)
 
-          // New user created password
-          } else {
-            debug('New user created password')
-            req.flash('success', 'Password set.  You can use it to log in now. ')
-            res.redirect('/login?next=/map?new=1')
-          }
-        })
-        .catch( (err) => {
-          debug('Error creating hashed password and saving to db')
-          mw.throwErr(err, req)
-          res.redirect(`/settings/password/${req.params.token}`)
-        })
+        // User changed password
+        if (req.user) {
+          debug('User saved password')
+          req.flash('success', 'Your password has been changed. ')
+          res.redirect('/settings')
+
+        // New user created password
+        } else {
+          debug('New user created password')
+          req.flash('success', 'Password set.  You can use it to log in now. ')
+          res.redirect('/login?next=/map?new=1')
+        }
+
+      } catch (err) {
+        debug('Error creating hashed password and saving to db')
+        mw.throwErr(err, req)
+        res.redirect(`/settings/password/${req.params.token}`)
+      }
 
     }
   })
@@ -338,17 +320,16 @@ router.route('/pro')
   })
 
   // Join Tracman pro
-  .post((req, res) => {
-    User.findByIdAndUpdate(req.user.id,
+  .post( async (req, res) => {
+    try {
+      let user = await User.findByIdAndUpdate(req.user.id,
         {$set: { isPro: true }})
-      .then((user) => {
-        req.flash('success', 'You have been signed up for pro. ')
-        res.redirect('/settings')
-      })
-      .catch((err) => {
-        mw.throwErr(err, req)
-        res.redirect('/settings/pro')
-      })
+      req.flash('success', 'You have been signed up for pro. ')
+      res.redirect('/settings')
+    } catch (err) {
+      mw.throwErr(err, req)
+      res.redirect('/settings/pro')
+    }
   })
 
 module.exports = router

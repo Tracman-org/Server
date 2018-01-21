@@ -58,7 +58,7 @@ module.exports = {
       })
 
       // Set location
-      socket.on('set', (loc) => {
+      socket.on('set', async (loc) => {
         debug(`${socket.id} set location for ${loc.usr}`)
         debug(`Location was set to: ${JSON.stringify(loc)}`)
 
@@ -80,10 +80,11 @@ module.exports = {
             ).message
           )
         } else {
-          // Get loc.usr
-          User.findById(loc.usr)
-          .where('sk32').equals(loc.tok)
-          .then((user) => {
+          try {
+            // Get loc.usr
+            let user = await User.findById(loc.usr)
+              .where('sk32').equals(loc.tok)
+
             if (!user) {
               console.error(
                 new Error(
@@ -105,10 +106,8 @@ module.exports = {
                 time: loc.tim
               }
               user.save()
-              .catch((err) => { console.error(err.stack) })
             }
-          })
-          .catch((err) => { console.error(err.stack) })
+          } catch (err) { console.error(err.stack) }
         }
       })
 

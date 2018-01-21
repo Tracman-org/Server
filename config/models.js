@@ -56,16 +56,15 @@ userSchema.methods.createEmailToken = function () {
   let user = this
 
   return new Promise((resolve, reject) => {
-    crypto.randomBytes(16, (err, buf) => {
+    crypto.randomBytes(16, async (err, buf) => {
       if (err) return reject(err)
       if (buf) {
         debug(`Buffer ${buf.toString('hex')} created`)
         user.emailToken = buf.toString('hex')
-        user.save()
-        .then(() => {
+        try {
+          await user.save()
           resolve(user.emailToken)
-        })
-        .catch(reject)
+        } catch (err) { reject(err) }
       }
     })
   })
@@ -77,35 +76,33 @@ userSchema.methods.createPassToken = function () {
   let user = this
   debug(`user.createPassToken() called for ${user.id}`)
 
-  return new Promise((resolve, reject) => {
+  return new Promise( async (resolve, reject) => {
 
     // Reuse old token, resetting clock
     if (user.auth.passTokenExpires >= Date.now()) {
       debug(`Reusing old password token...`)
       user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-      user.save()
-        .then(() => {
-          resolve(user.auth.passToken, user.auth.passTokenExpires)
-        })
-        .catch(reject)
+      try {
+        await user.save()
+        resolve([user.auth.passToken, user.auth.passTokenExpires])
+      } catch (err) { reject(err) }
 
     // Create new token
     } else {
       debug(`Creating new password token...`)
-      crypto.randomBytes(16, (err, buf) => {
+      crypto.randomBytes(16, async (err, buf) => {
         if (err) return reject(err)
         if (buf) {
           user.auth.passToken = buf.toString('hex')
           user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-          user.save()
-          .then(() => {
-            debug('successfully saved user in createPassToken')
-            resolve(user.auth.passToken, user.auth.passTokenExpires)
-          })
-          .catch((err) => {
-            debug('error saving user in createPassToken')
+          try {
+            await user.save()
+            debug('Successfully saved user in createPassToken')
+            resolve([user.auth.passToken, user.auth.passTokenExpires])
+          } catch (err) {
+            debug('Error saving user in createPassToken')
             reject(err)
-          })
+          }
         }
       })
     }
@@ -127,12 +124,13 @@ userSchema.methods.generateHashedPassword = function (password) {
     // Generate hash
     bcrypt.genSalt(8, (err, salt) => {
       if (err) return reject(err)
-      bcrypt.hash(password, salt, (err, hash) => {
+      bcrypt.hash(password, salt, async (err, hash) => {
         if (err) return reject(err)
         this.auth.password = hash
-        this.save()
-          .then(resolve)
-          .catch(reject)
+        try {
+          await this.save()
+          resolve()
+        } catch (err) { reject() }
       })
     })
 
@@ -143,9 +141,7 @@ userSchema.methods.generateHashedPassword = function (password) {
 userSchema.methods.validPassword = function (password) {
   let user = this
   debug(`user.validPassword() called for ${user.id}`)
-
   return bcrypt.compare(password, user.auth.password)
-
 }
 
 module.exports = {

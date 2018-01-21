@@ -19,20 +19,15 @@ module.exports = {
   verify: () => {
     debug(`Verifying SMTP connection...`)
 
-    return new Promise( (resolve, reject) => {
-      transporter.verify()
-      .then( (success) => {
-        if (success) {
+    return new Promise( async (resolve, reject) => {
+      try {
+        if (await transporter.verify()) {
           console.log(`  Nodemailer connected to ${env.mailserver}:${env.mailport} as ${env.mailauth.user}`)
           resolve()
-        } else reject(new Error(
+        } else reject( new Error(
           `Nodemailer failed to connect to SMTP server at smtp:/\/${env.mailauth.user}:${env.mailauth.pass}@${env.mailserver}:${env.mailport}`
-        ))
-        resolve()
-      }).catch( (err) => {
-        console.log(err.stack)
-        reject()
-      })
+        ) )
+      } catch (err) { reject(err) }
     })
 
   },
