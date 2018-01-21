@@ -62,7 +62,6 @@ module.exports = (app, passport) => {
         // Create a new password token
         try {
           let [token, expires] = await user.createPassToken()
-          console.log(token,expires)
           debug(`Created password token for user ${user.id} successfully`)
 
           // Figure out expiration time string
