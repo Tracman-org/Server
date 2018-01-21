@@ -4,6 +4,7 @@
 	"author": "Keith Irwin",
 	"description": "GPS tracking service",
 	"homepage_url": "https://github.com/Tracman-org/Server",
+	"start_url": "/map"
 
 	"theme_color": "#222222",
 	"background_color": "#080808",

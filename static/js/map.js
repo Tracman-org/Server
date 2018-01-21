@@ -122,16 +122,16 @@ $(function () {
 
   // Track location
   $('#track-loc').click(function () {
-    
+
     // Check for login
     if (!userid === mapuser._id) alert('You are not logged in! '); else {
-      
+
       // Start tracking
       if (!wpid) {
         if (!navigator.geolocation) alert('Unable to track location. '); else {
           $('#track-loc').html(
             '<i class="fa fa-crosshairs fa-spin"></i>Stop'
-          ).prop('title', 
+          ).prop('title',
             'Click here to stop tracking your location. '
           )
           wpid = navigator.geolocation.watchPosition(
@@ -418,7 +418,6 @@ loadGoogleMapsAPI({ key: mapKey })
           // Error
           } default:
             console.error(new Error('Street view not available: ' + status).message)
-          }
         }
       })
     }

