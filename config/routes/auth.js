@@ -246,6 +246,7 @@ module.exports = (app, passport) => {
   app.route('/login/forgot')
 
     // Check if user is already logged in
+    // TODO: Write test for this situation
     .all((req, res, next) => {
       if (req.isAuthenticated()) loginCallback(req, res)
       else next()
@@ -264,6 +265,7 @@ module.exports = (app, passport) => {
       // Check if somebody has that email
       User.findOne({'email': req.body.email})
         .then((user) => {
+          
           // No user with that email
           if (!user) {
             // Don't let on that no such user exists, to prevent dictionary attacks

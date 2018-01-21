@@ -161,15 +161,32 @@ describe('Authentication', () => {
 
         })
 
-        // TODO: Create test for forgetten password
-        // it('Forgets password', async () => {
+        it('Loads forgot password page', async () => {
+          let res = await request.get('/login/forgot')
+          chai.expect(res).html.to.have.status(200)
+        })
 
-        // })
+        // TODO: Test already-logged-in forgot password requests
 
-        // TODO: Create test for changing forgetten password
-        // it('Changes forgotten password', async () => {
+        // TODO: Test invalid and fuzzed forgot password requests
 
-        // })
+        it('Sends valid forgot password request', async () => {
+
+          // Responds with 200
+          let res = await request.post('/login/forgot')
+            .type('form').send({
+              email: TEST_EMAIL,
+            })
+          chai.expect(res).html.to.have.status(200)
+
+          // Assert password was set
+
+
+        })
+
+        //it('Changes forgotten password', async () => {
+          // TODO: Create test for changing forgetten password
+        //})
 
         // Finally log in successfully
         after( () => {
