@@ -1,199 +1,206 @@
-'use strict';
+'use strict'
 
 /* IMPORTS */
-const
-	express = require('express'),
-	bodyParser = require('body-parser'),
-	expressValidator = require('express-validator'),
-	cookieParser = require('cookie-parser'),
-	cookieSession = require('cookie-session'),
-	debug = require('debug')('tracman-server'),
-	mongoose = require('mongoose'),
-	nunjucks = require('nunjucks'),
-	passport = require('passport'),
-	flash = require('connect-flash-plus'),
-	env = require('./config/env/env.js'),
-	User = require('./config/models.js').user,
-	mail = require('./config/mail.js'),
-	demo = require('./config/demo.js'),
-	app = express(),
-	http = require('http').Server(app),
-	io = require('socket.io')(http),
-	sockets = require('./config/sockets.js');
+const express = require('express')
+const bodyParser = require('body-parser')
+const expressValidator = require('express-validator')
+const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
+const debug = require('debug')('tracman-server')
+const mongoose = require('mongoose')
+const nunjucks = require('nunjucks')
+const passport = require('passport')
+const flash = require('connect-flash-plus')
+const env = require(process.env.ENV_FILE||'./config/env/env.js')
+const User = require('./config/models.js').user
+const mail = require('./config/mail.js')
+const demo = require('./config/demo.js')
+const app = express()
+const http = require('http').Server(app)
+const io = require('socket.io')(http)
+const sockets = require('./config/sockets.js')
 
+// Promises marking a ready server
+let ready_promise_list = []
 
-/* SETUP */ {
-	
-	/* Database */ {
-		
-		// Setup with native ES6 promises
-		mongoose.Promise = global.Promise;
-		
-    // Connect to database
-		mongoose.connect(env.mongoSetup, {
-			server:{socketOptions:{
-				keepAlive:1, connectTimeoutMS:30000 }},
-			replset:{socketOptions:{
-				keepAlive:1, connectTimeoutMS:30000 }}
-		})
-		.then( ()=>{ console.log(`💿 Mongoose connected to mongoDB`); })
-		.catch( (err)=>{ console.error(`❌ ${err.stack}`); });
-		
-	}
+/* Database */ {
+  // Setup with native ES6 promises
+  mongoose.Promise = global.Promise
 
-	/* Templates */ {
-		nunjucks.configure(__dirname+'/views', {
-			autoescape: true,
-			express: app
-		});
-		app.set('view engine','html');
-	}
+  // Connect to database
+  ready_promise_list.push( new Promise( async (resolve, reject) => {
+    try {
+      mongoose.connect(env.mongoSetup, {
+        useMongoClient: true,
+        socketTimeoutMS: 30000,
+        //reconnectTries: 30,
+        keepAlive: true
+      })
+      console.log(`  Mongoose connected to ${env.mongoSetup}`)
+      resolve()
+    } catch (err) {
+      console.error(err.stack)
+      reject()
+    }
+  }) )
 
-	/* Session */ {
-		app.use(cookieParser(env.cookie));
-		app.use(cookieSession({
-			cookie: {maxAge:60000},
-			secret: env.session,
-			saveUninitialized: true,
-			resave: true
-		}));
-		app.use(bodyParser.json());
-		app.use(bodyParser.urlencoded({
-			extended: true
-		}));
-		app.use(expressValidator());
-		app.use(flash());
-	}
-	
-	/* Auth */ {
-		require('./config/passport.js')(passport);
-		app.use(passport.initialize());
-		app.use(passport.session());
-	}
-	
-	/* Routes	*/ {
-		
-		// Static files (keep this before default locals)
-		app.use('/static', express.static( __dirname+'/static', {dotfiles:'allow'} ));
-		
-		// Default locals available to all views (keep this after static files)
-		app.get( '*', (req,res,next)=>{
-			
-			// Path for redirects
-			let nextPath = ((req.query.next)?req.query.next: req.path.substring(0,req.path.indexOf('#')) || req.path );
-			if ( nextPath.substring(0,6)!=='/login' && nextPath.substring(0,7)!=='signup' && nextPath.substring(0,7)!=='/logout' && nextPath.substring(0,7)!=='/static' && nextPath.substring(0,6)!=='/admin' ){
-				req.session.next = nextPath+'#';
-				debug(`Set redirect path to ${nextPath}#`);
-			}
-			
-			// User account
-			res.locals.user = req.user;
-			
-			// Flash messages
-			res.locals.successes = req.flash('success');
-			res.locals.dangers = req.flash('danger');
-			res.locals.warnings = req.flash('warning');
-			
-			next();
-		} );
-		
-		// Auth routes
-		require('./config/routes/auth.js')(app, passport);
-		
-		// Main routes
-		app.use( '/', require('./config/routes/index.js') );
-		
-		// Contact form
-		app.use( '/contact', require('./config/routes/contact.js') );
-		
-		// Settings
-		app.use( '/settings', require('./config/routes/settings.js') );
-		
-		// Map
-		app.use( ['/map','/trac'], require('./config/routes/map.js') );
-		
-		// Site administration
-		app.use( '/admin', require('./config/routes/admin.js') );
-		
-		// Testing
-		if (env.mode == 'development') {
-			app.use( '/test', require('./config/routes/test.js' ) );
-		}
-		
-	}
-	
-	/* Errors */	{
-		
-		// Catch-all for 404s
-		app.use( (req,res,next)=>{
-			if (!res.headersSent) {
-				var err = new Error(`Not found: ${req.url}`);
-				err.status = 404;
-				next(err);
-			}
-		} );
-
-		// Production handlers
-		if (env.mode!=='development') {
-			app.use( (err,req,res,next)=>{
-				if (err.status!==404&&err.status!==401){ console.error(`❌ ${err.stack}`); }
-				if (res.headersSent) { return next(err); }
-				res.status(err.status||500);
-				res.render('error', {
-					code: err.status||500,
-					message: (err.status<=499)?err.message:"Server error"
-				});
-			} );
-		}
-		
-		// Development handlers
-		else {
-			app.use( (err,req,res,next)=>{
-				if (err.status!==404) { console.error(`❌ ${err.stack}`); }
-				if (res.headersSent) { return next(err); }
-				res.status(err.status||500);
-				res.render('error', {
-					code: err.status||500,
-					message: err.message,
-					stack: err.stack
-				});
-			} );
-		}
-		
-	}
-	
-	/* Sockets */ {
-		sockets.init(io);
-	}
-	
 }
 
-/* RUNTIME */ {
-	console.log('🖥  Starting Tracman server...');
-	
-	// Test SMTP server
-	mail.verify();
-	
-	// Listen
-	http.listen( env.port, ()=>{
-		console.log(`🌐 Listening in ${env.mode} mode on port ${env.port}... `);
-		
-		// Check for clients for each user
-		User.find({})
-		.then( (users)=>{
-			users.forEach( (user)=>{
-				sockets.checkForUsers( io, user.id );
-			});
-		})
-		.catch( (err)=>{
-			console.error(`❌ ${err.stack}`);
-		});
-		
-		// Start transmitting demo
-		demo(io);
-		
-	});
-	
+/* Templates */ {
+  nunjucks.configure(__dirname + '/views', {
+    autoescape: true,
+    express: app
+  })
+  app.set('view engine', 'html')
 }
 
-module.exports = app;
+/* Session */ {
+  app.use(cookieParser(env.cookie))
+  app.use(cookieSession({
+    cookie: {maxAge: 60000},
+    secret: env.session,
+    saveUninitialized: true,
+    resave: true
+  }))
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }))
+  app.use(expressValidator())
+  app.use(flash())
+}
+
+/* Auth */ {
+  require('./config/passport.js')(passport)
+  app.use(passport.initialize())
+  app.use(passport.session())
+}
+
+/* Routes  */ {
+  // Static files (keep this before default locals)
+  app.use('/static', express.static(__dirname + '/static', {dotfiles: 'allow'}))
+
+  // Default locals available to all views (keep this after static files)
+  app.get('*', (req, res, next) => {
+
+    // User account
+    res.locals.user = req.user
+
+    // Flash messages
+    res.locals.successes = req.flash('success')
+    res.locals.dangers = req.flash('danger')
+    res.locals.warnings = req.flash('warning')
+
+    next()
+  })
+
+  // Auth routes
+  require('./config/routes/auth.js')(app, passport)
+
+  // Main routes
+  app.use('/', require('./config/routes/index.js'))
+
+  // Contact form
+  app.use('/contact', require('./config/routes/contact.js'))
+
+  // Settings
+  app.use('/settings', require('./config/routes/settings.js'))
+
+  // Map
+  app.use(['/map', '/trac'], require('./config/routes/map.js'))
+
+  // Site administration
+  app.use('/admin', require('./config/routes/admin.js'))
+
+  // Testing
+  if (env.mode == 'development') app.use('/test', require('./config/routes/test.js'))
+
+} {
+
+  // Catch-all for 404s
+  app.use((req, res, next) => {
+    if (!res.headersSent) {
+      var err = new Error(`Not found: ${req.url}`)
+      err.status = 404
+      next(err)
+    }
+  })
+
+  // Production handlers
+  if (env.mode !== 'development') {
+    app.use((err, req, res, next) => {
+      if (err.status !== 404 && err.status !== 401) console.error(err.stack)
+      if (res.headersSent) return next(err)
+      res.status(err.status || 500)
+      res.render('error', {
+        code: err.status || 500,
+        message: (err.status <= 499) ? err.message : 'Server error'
+      })
+    })
+
+  // Development handlers
+  } else {
+    app.use((err, req, res, next) => {
+      if (err.status !== 404) console.error(err.stack)
+      if (res.headersSent) return next(err)
+      res.status(err.status || 500)
+      res.render('error', {
+        code: err.status || 500,
+        message: err.message,
+        stack: err.stack
+      })
+    })
+  }
+}
+
+/* Sockets */ {
+  sockets.init(io)
+}
+
+/* RUNTIME */
+console.log(`Starting ${env.mode} server at ${__dirname}...`)
+
+// Test SMTP server
+ready_promise_list.push(mail.verify())
+
+// Listen
+ready_promise_list.push( new Promise( (resolve, reject) => {
+  http.listen(env.port, async () => {
+
+    console.log(`  Express listening on ${env.url}`)
+    resolve()
+
+    // Check for clients for each user
+    ready_promise_list.push( new Promise( async (resolve, reject) => {
+      try {
+        let users = await User.find({})
+        users.forEach((user) => {
+          sockets.checkForUsers(io, user.id)
+        })
+        resolve()
+      } catch (err) {
+        console.error(err.stack)
+        reject(err)
+      }
+    }) )
+
+    // Start transmitting demo
+    ready_promise_list.push( demo(io) )
+
+    // Mark everything when working correctly
+    try {
+      await Promise.all(ready_promise_list.map(
+        // Also wait for rejected promises
+        // https://stackoverflow.com/a/36115549/3006854
+        p => p.catch(e => e)
+      ))
+      console.log('Tracman server is running properly\n')
+    } catch (err) {
+      console.error(err.message)
+      console.log(`Tracman server is not running properly!\n`)
+    }
+
+  })
+}) )
+
+module.exports = app

@@ -7,6 +7,7 @@ Dockerfile
 # Secret stuff
 config/env/*
 !config/env/sample.js
+!config/env/travis.js
 
 # Minified or bundled static files (can be built with `npm run minify && npm run build`)
 static/css/*.min.*

@@ -4,10 +4,12 @@
 	"author": "Keith Irwin",
 	"description": "GPS tracking service",
 	"homepage_url": "https://github.com/Tracman-org/Server",
-	
+	"start_url": "/map"
+
 	"theme_color": "#222222",
 	"background_color": "#080808",
 	"display": "standalone",
+
 	"icons": [{
 		"src": "static/img/icon/by/228.png",
 		"sizes": "228x228",
@@ -44,5 +46,14 @@
 		"src": "static/img/icon/by/16-32-48.ico",
 		"sizes": "16x16 32x32 48x48",
 		"type": "image/ico"
-	}]
+	}],
+
+	"prefer_related_applications": false,
+	"related_applications": [
+  {
+    "platform": "play",
+    "url": "https://play.google.com/store/apps/details?id=us.keithirwin.tracman",
+    "id": "us.keithirwin.tracman"
+  }]
+
 }
