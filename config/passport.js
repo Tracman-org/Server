@@ -38,7 +38,6 @@ module.exports = (passport) => {
       // No user with that email
       if (!user) {
         debug(`No user with that email`)
-        req.session.next = undefined
         return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
       // User exists
@@ -51,11 +50,11 @@ module.exports = (passport) => {
         // Password incorrect
         if (!res) {
           debug(`Incorrect password`)
-          req.session.next = undefined
           return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
         // Successful login
         } else {
+          if (!user.lastLogin) req.forNewUser = true
           user.lastLogin = Date.now()
           user.save()
           return done(null, user)
@@ -87,7 +86,7 @@ module.exports = (passport) => {
           if (service === 'google') {
             try {
               let user = await User.findOne({ 'googleID': parseInt(profileId, 10) })
-              
+
               // User exists with old schema
               if (user) {
                 debug(`User ${user.id} exists with old schema.  Lazily updating...`)

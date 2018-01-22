@@ -65,7 +65,7 @@ module.exports = router
               text: req.body.message
             })
             req.flash('success', `Your message has been sent. `)
-            res.redirect(req.session.next || '/')
+            res.redirect('/')
           } catch (err) {
             mw.throwErr(err, req)
             res.redirect('/contact')

@@ -17,11 +17,11 @@ module.exports = (app, passport) => {
     failureFlash: true
   }
   const loginCallback = (req, res) => {
-    debug(`Login callback called... redirecting to ${req.session.next}`)
+    debug(`Logged in... redirecting to /map`)
     req.flash(req.session.flashType, req.session.flashMessage)
     req.session.flashType = undefined
     req.session.flashMessage = undefined
-    res.redirect(req.session.next || '/map')
+    res.redirect('/map'+(req.forNewUser)?'/map?new=1':'')
   }
   const appLoginCallback = (req, res, next) => {
     debug('appLoginCallback called.')
@@ -44,8 +44,9 @@ module.exports = (app, passport) => {
     .post(passport.authenticate('local', loginOutcome), loginCallback)
   app.get('/logout', (req, res) => {
     req.logout()
+    debug(`Logged out, redirecting to /`)
     req.flash('success', `You have been logged out.`)
-    res.redirect(req.session.next || '/')
+    res.redirect( '/')
   })
 
   // Signup
