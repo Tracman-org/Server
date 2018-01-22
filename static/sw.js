@@ -46,7 +46,7 @@ self.addEventListener('activate', function(event) {
       return Promise.all(cachesToDelete.map( function(cacheToDelete) {
         return caches.delete(cacheToDelete)
       }))
-    }).then( function(){ self.clients.claim() )
+    }).then( function(){ self.clients.claim() } )
   )
 })
 
