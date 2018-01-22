@@ -1,8 +1,8 @@
 # Tracman Server Changelog
-### v0.8.1
+### v0.8.2
 
-###### v0.8.1
-* Hotfixed service worker bug
+###### v0.8.1/2
+* Hotfixed service worker bugs
 
 ###### v0.8.0
 * Added check to ensure only the newest location is sent

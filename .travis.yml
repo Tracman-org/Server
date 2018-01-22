@@ -4,3 +4,5 @@ node_js:
 branches:
   only:
   - master
+build:
+  echo "module.exports = require('./travis.js');" > config/env/env.js
