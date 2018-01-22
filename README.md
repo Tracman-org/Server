@@ -1,5 +1,5 @@
-# <img align="left" src="/static/img/icon/by/48.png" alt="[]" title="The Tracman Logo">Tracman
-###### v 0.7.12
+# <img align="left" src="/static/img/icon/by/48.png" alt="T" title="The Tracman Logo">Tracman
+###### v 0.8.0
 
 node.js application to display a sharable map with user's location.
 
@@ -55,54 +55,34 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-#### develop
+#### v0.8.0
+* Added check to ensure only the newest location is sent
+* Removed buggy login/-out redirects
+* [#111](https://github.com/Tracman-org/Server/issues/111) Implemented service worker
+* [#116](https://github.com/Tracman-org/Server/issues/116) Switched promises for async/await
+* [#64](https://github.com/Tracman-org/Server/issues/64) Started using promises in model methods
+* [#63](https://github.com/Tracman-org/Server/issues/63) Disconnect inactive clients
 * [#110](https://github.com/Tracman-org/Server/issues/110) Implemented [StandardJS](https://standardjs.com/)
 * Removed emojis
 * [#113](https://github.com/Tracman-org/Server/issues/113) [#114](https://github.com/Tracman-org/Server/issues/114) Switched to useMongoClient
 * [#67](https://github.com/Tracman-org/Server/issues/67) Fixed invisible marker in demo
 * Shortened if statements and long lines
 
-#### v0.7.12
+#### v0.7.x
 * Fixed altitude sign
-
-#### v0.7.10
 * Added coinhive
-* Updated jQuery
 * Added HTML5 shiv
-
-#### v0.7.9
-* Updated packages
 * Added support for browser geolocation
 * Fixed streetview image bugs
 * Added sourcemaps for debugging
 * Fixed streetview bearing
-
-#### v0.7.8
 * [#96](https://github.com/Tracman-org/Server/issues/96) Replaced panorama with static images
-
-#### v0.7.7
 * [#96](https://github.com/Tracman-org/Server/issues/96) Continue to update panorama after creating element
-
-#### v0.7.6
 * [#100](https://github.com/Tracman-org/Server/issues/100) Moved CSS out of webpack
 * Fixed [#108](https://github.com/Tracman-org/Server/issues/108)
-
-#### v0.7.5
-* Added pricing to homepage
-
-#### v0.7.4
-* Improved debugging
 * Fixed bugs [#105](https://github.com/Tracman-org/Server/issues/105) and [#107](https://github.com/Tracman-org/Server/issues/107)
 * [#89](https://github.com/Tracman-org/Server/issues/89) Can change marker color
-
-#### v0.7.3
 * Fixed [#102](https://github.com/Tracman-org/Server/issues/102) issue creating account
-
-#### v0.7.2
-* Added more debugging to fix auth problems
-
-#### v0.7.0
-* Bug fixes
 
 
 ## License

@@ -109,7 +109,7 @@ describe('Authentication', () => {
           .type('form').send({ 'password':TEST_PASSWORD })
 
         // Expect redirect
-        chai.expect(res).to.redirectTo('/login?next=/map?new=1')
+        chai.expect(res).to.redirectTo('/login')
 
         // Retrieve user with password saved
         let passworded_user = await User.findOne({'email':TEST_EMAIL} )

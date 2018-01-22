@@ -63,7 +63,7 @@ module.exports = {
         debug(`Location was set to: ${JSON.stringify(loc)}`)
 
         // Get android timestamp or use server timestamp
-        if (loc.ts) loc.tim = Date(loc.ts)
+        if (loc.ts) loc.tim = +loc.ts
         else loc.tim = Date.now()
 
         // Check for user and sk32 token
@@ -93,19 +93,27 @@ module.exports = {
                 ).message
               )
             } else {
-              // Broadcast location
-              io.to(loc.usr).emit('get', loc)
-              debug(`Broadcasting ${loc.lat}, ${loc.lon} to ${loc.usr}`)
 
-              // Save in db as last seen
-              user.last = {
-                lat: parseFloat(loc.lat),
-                lon: parseFloat(loc.lon),
-                dir: parseFloat(loc.dir || 0),
-                spd: parseFloat(loc.spd || 0),
-                time: loc.tim
+              // Check that loc is newer than lastLoc
+              debug(`Checking that loc of ${loc.tim} is newer than last of ${user.last.time.getTime()}...`)
+              if (!user.last.time || loc.tim > user.last.time.getTime()) {
+
+                // Broadcast location
+                io.to(loc.usr).emit('get', loc)
+                debug(`Broadcasting ${loc.lat}, ${loc.lon} to ${loc.usr}`)
+
+                // Save in db as last seen
+                user.last = {
+                  lat: parseFloat(loc.lat),
+                  lon: parseFloat(loc.lon),
+                  dir: parseFloat(loc.dir || 0),
+                  spd: parseFloat(loc.spd || 0),
+                  time: loc.tim
+                }
+                user.save()
+
               }
-              user.save()
+
             }
           } catch (err) { console.error(err.stack) }
         }

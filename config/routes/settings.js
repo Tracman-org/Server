@@ -174,7 +174,7 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
 
     } catch (err) {
       mw.throwErr(err, req)
-      res.redirect(req.session.next || '/settings')
+      res.redirect('/settings')
     }
 
   // Invalid token
@@ -296,7 +296,7 @@ router.route('/password/:token')
         } else {
           debug('New user created password')
           req.flash('success', 'Password set.  You can use it to log in now. ')
-          res.redirect('/login?next=/map?new=1')
+          res.redirect('/login')
         }
 
       } catch (err) {

@@ -82,17 +82,6 @@ let ready_promise_list = []
 
   // Default locals available to all views (keep this after static files)
   app.get('*', (req, res, next) => {
-    // Path for redirects
-    let nextPath = (
-      (req.query.next) ? req.query.next
-      : req.path.substring(0, req.path.indexOf('#')) || req.path)
-    if (
-      nextPath.substring(0, 6) !== '/login'||'/admin' &&
-      nextPath.substring(0, 7) !== 'signup'||'/logout'||'/static'
-    ) {
-      req.session.next = nextPath + '#'
-      debug(`Set redirect path to ${nextPath}#`)
-    }
 
     // User account
     res.locals.user = req.user
