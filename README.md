@@ -56,6 +56,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 [view full changelog](CHANGELOG.md)
 
 #### v0.8.0
+* Added check to ensure only the newest location is sent
 * Removed buggy login/-out redirects
 * [#111](https://github.com/Tracman-org/Server/issues/111) Implemented service worker
 * [#116](https://github.com/Tracman-org/Server/issues/116) Switched promises for async/await
