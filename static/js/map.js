@@ -237,8 +237,8 @@ loadGoogleMapsAPI({ key: mapKey })
     if (noHeader !== '0' && mapuser._id !== 'demo') {
       const logoDiv = document.createElement('div')
       logoDiv.id = 'map-logo'
-      logoDiv.innerHTML = '<a href="https://tracman.org/">' +
-        '<img src="https://tracman.org/static/img/style/logo-28.png" alt="[]">' +
+      logoDiv.innerHTML = '<a href="https://www.tracman.org/">' +
+        '<img src="https://www.tracman.org/static/img/style/logo-28.png" alt="[]">' +
         "<span class='text'>Tracman</span></a>"
       map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv)
     }
