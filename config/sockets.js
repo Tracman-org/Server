@@ -95,7 +95,8 @@ module.exports = {
             } else {
 
               // Check that loc is newer than lastLoc
-              debug(`Checking that loc of ${loc.tim} is newer than last of ${user.last.time.getTime()}...`)
+              debug(`Checking that loc of ${loc.tim} is newer than last of 
+                ${(user.last.time)?user.last.time.getTime():user.last.time}...`)
               if (!user.last.time || loc.tim > user.last.time.getTime()) {
 
                 // Broadcast location
