@@ -55,6 +55,9 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
+###### latest
+* Fixed showing welcome message on every login
+
 ###### v0.8.1/2
 * Hotfixed service worker bugs
 
