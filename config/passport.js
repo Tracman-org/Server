@@ -45,16 +45,16 @@ module.exports = (passport) => {
         debug(`User exists. Checking password...`)
 
         // Check password
-        let res = await user.validPassword(password)
+        let correct_password = await user.validPassword(password)
 
         // Password incorrect
-        if (!res) {
+        if (!correct_password) {
           debug(`Incorrect password`)
           return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
         // Successful login
         } else {
-          if (!user.lastLogin) req.forNewUser = true
+          user.isNewUser = !Boolean(user.lastLogin)
           user.lastLogin = Date.now()
           user.save()
           return done(null, user)

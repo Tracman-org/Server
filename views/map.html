@@ -6,7 +6,7 @@
 	<link href="/static/css/.map.min.css" rel="stylesheet">
 	<style>/* These styles include values passed from to the template from the server.  Other styles are in map.css */
 		{% if noHeader!='0' %} main { top: 0; } {% endif %}
-		
+
 		{% if mapuser.settings.showStreetview and disp=='2' %}
 		/* show both */
 			@media (orientation: landscape) {
@@ -44,42 +44,42 @@
 
 {% block main %}
 
-	{% if user and newuserurl %}
+	{% if user and user.isNewUser %}
 	<div class='page-mask'></div>
 	<div id='welcome' class='popup'>
-	
+
 		<div class='topbar'>
 			<h2>Welcome!</h2>
 			<div class='close' onclick="$('#welcome').hide();$('.page-mask').hide();">✖️</div>
 		</div>
-		
+
 		<p>This is your map.  It's publicly avaliable at <a href="{{newuserurl}}">{{newuserurl}}</a>.  You can change that URL and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see the <b><a href="/help">help</a></b> page.  </p>
-		
+
 		<div class='buttons'>
 			<a class='btn main' onclick="$('#welcome').hide();$('.page-mask').hide();">Got it!</a>
 		</div>
-		
+
 	</div>
 	{% endif %}
-	
+
 	<!-- Map -->
 	{% if disp!='1' %}
 		<div id='map'></div>
 	{% endif %}
-	
+
 	<!-- Streetview -->
 	{% if mapuser.settings.showStreetview and disp!='0' %}
 		<div id='view'><img id='viewImg' alt="Streetview image"/></div>
 	{% endif %}
-	
+
 	<div id='notset' class='centered alert alert-warning'>
 		{% if user.id == mapuser.id %}
 			Your location is unset. You can click 'set' below to set it to your current position.
 		{% else %}
-			This user has no location set.  
+			This user has no location set.
 		{% endif %}
 	</div>
-	
+
 	{% if user.id == mapuser.id and mapuser._id != 'demo' %}
 		<link rel="stylesheet" type="text/css" href="/static/css/.controls.min.css">
 		<div id='controls'>
@@ -90,14 +90,14 @@
 				}
 			</style>
 		{% endif %}
-			
+
 			<button id='set-loc' class='btn set' title="Click here to set your location">Set</button>
 			<button id='track-loc' class='btn track' title="Click here to track your location"><i class='fa fa-crosshairs'></i>Track</button>
 			<button id='clear-loc' class='btn clear' title="Click here to clear your location">Clear</button>
-			
+
 		</div>
 	{% endif %}
-	
+
 {% endblock %}
 
 {% block javascript %}
@@ -112,11 +112,11 @@
 			userid = "{{user._id |safe}}",
 			token = "{{user.sk32 |safe}}";
 	</script>
-	
+
 	<!-- Webpacked bundles -->
 	<script type="application/javascript" src="/static/js/.map.bun.js"></script>
 	<!--{% if user.id == mapuser.id %}-->
 		<!--<script type="application/javascript" src="/static/js/.controls.bun.js"></script>-->
 	<!--{% endif %}-->
-	
+
 {% endblock %}

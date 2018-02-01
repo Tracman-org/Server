@@ -7,11 +7,7 @@ const User = require('../models.js').user
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req, res) => {
-  res.redirect(
-    (req.forNewUser)?
-      `/map/${req.user.slug}?new=1`:
-      `/map/${req.user.slug}`
-  )
+  res.redirect(`/map/${req.user.slug}`)
 })
 
 // Demo

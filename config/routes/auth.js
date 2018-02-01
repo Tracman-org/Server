@@ -21,7 +21,7 @@ module.exports = (app, passport) => {
     req.flash(req.session.flashType, req.session.flashMessage)
     req.session.flashType = undefined
     req.session.flashMessage = undefined
-    res.redirect('/map'+(req.forNewUser)?'/map?new=1':'')
+    res.redirect('/map')
   }
   const appLoginCallback = (req, res, next) => {
     debug('appLoginCallback called.')

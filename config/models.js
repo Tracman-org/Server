@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   isPro: {type: Boolean, required: true, default: false},
   created: {type: Date, required: true},
   lastLogin: Date,
+  isNewUser: Boolean,
   settings: {
     units: {type: String, default: 'standard'},
     defaultMap: {type: String, default: 'road'},
