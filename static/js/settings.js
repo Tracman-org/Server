@@ -21,7 +21,7 @@ $(function () {
   var slugNotUnique, emailNotUnique
 
   // Set timezone in password change link
-  $('#password').attr('href', '/settings/password?tz=' + new Date().getTimezoneOffset())
+  $('#password').attr('href', '/account/password?tz=' + new Date().getTimezoneOffset())
 
   // Delete account
   $('#delete').click(function () {

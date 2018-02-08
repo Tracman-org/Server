@@ -80,14 +80,14 @@ module.exports = (app, passport) => {
               subject: 'Complete your Tracman registration',
               text: mail.text(
                 `Welcome to Tracman!  \n\nTo complete your registration, follow \
-                this link and set your password:\n${env.url}/settings/password/${token}\n\n\
+                this link and set your password:\n${env.url}/account/password/${token}\n\n\
                 This link will expire at ${expiration_time_string}.  `
               ),
               html: mail.html(
                 `<p>Welcome to Tracman! </p><p>To complete your registration, \
                 follow this link and set your password:\
-                <br><a href="${env.url}/settings/password/${token}">\
-                ${env.url}/settings/password/${token}</a></p>\
+                <br><a href="${env.url}/account/password/${token}">\
+                ${env.url}/account/password/${token}</a></p>\
                 <p>This link will expire at ${expiration_time_string}. </p>`
               )
             })
@@ -291,14 +291,14 @@ module.exports = (app, passport) => {
                 text: mail.text(
                   `Hi, \n\nDid you request to reset your Tracman password?  \
                   If so, follow this link to do so:\
-                  \n${env.url}/settings/password/${token}\n\n\
+                  \n${env.url}/account/password/${token}\n\n\
                   If you didn't initiate this request, just ignore this email. `
                 ),
                 html: mail.html(
                   `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
                   If so, follow this link to do so:<br>\
-                  <a href="${env.url}/settings/password/${token}">\
-                  ${env.url}/settings/password/${token}</a></p>\
+                  <a href="${env.url}/account/password/${token}">\
+                  ${env.url}/account/password/${token}</a></p>\
                   <p>If you didn't initiate this request, just ignore this email. </p>`
                 )
               })
@@ -355,7 +355,7 @@ module.exports = (app, passport) => {
       if (!req.user.auth.password && service === 'google') {
         req.flash(
           'warning',
-          `Hey, you need to <a href="/settings/password">set a password</a> \
+          `Hey, you need to <a href="/account/password">set a password</a> \
           before you can disconnect your google account.  Otherwise, you \
           won't be able to log in! `
         )

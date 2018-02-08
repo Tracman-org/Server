@@ -104,6 +104,9 @@ let ready_promise_list = []
 
   // Settings
   app.use('/settings', require('./config/routes/settings.js'))
+  
+  // Account settings
+  app.use('/account', require('./config/routes/account.js'))
 
   // Map
   app.use(['/map', '/trac'], require('./config/routes/map.js'))

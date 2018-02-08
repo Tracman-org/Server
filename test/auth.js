@@ -89,15 +89,15 @@ describe('Authentication', () => {
     it('Loads password page', async () => {
       // Load password page
       chai.expect(await request
-        .get(`/settings/password/${passwordless_user.auth.passToken}`)
+        .get(`/account/password/${passwordless_user.auth.passToken}`)
       ).html.to.have.status(200)
     })
 
     it('Fails to set a weak password', async () => {
       chai.expect( await request
-        .post(`/settings/password/${passwordless_user.auth.passToken}`)
+        .post(`/account/password/${passwordless_user.auth.passToken}`)
         .type('form').send({ 'password':BAD_PASSWORD })
-      ).to.redirectTo(`/settings/password/${passwordless_user.auth.passToken}`)
+      ).to.redirectTo(`/account/password/${passwordless_user.auth.passToken}`)
     })
 
     it('Sets a strong password', async () => {
@@ -105,7 +105,7 @@ describe('Authentication', () => {
 
         // Perform request
         let res = await request
-          .post(`/settings/password/${passwordless_user.auth.passToken}`)
+          .post(`/account/password/${passwordless_user.auth.passToken}`)
           .type('form').send({ 'password':TEST_PASSWORD })
 
         // Expect redirect
