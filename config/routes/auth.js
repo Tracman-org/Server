@@ -57,7 +57,7 @@ module.exports = (app, passport) => {
     .post( async (req, res, next) => {
 
       // Send token and alert user
-      async function sendToken(user) {
+      const sendToken = async function(user) {
         debug(`sendToken() called for user ${user.id}`)
 
         // Create a new password token
@@ -131,114 +131,124 @@ module.exports = (app, passport) => {
 
       }
 
-      // Validate email
-      req.checkBody('email', 'Please enter a valid email address.').isEmail()
+      // Invalid email
+      if (!mw.validateEmail(req.body.email)) {
+        debug(`Email ${req.body.email} was found invalid!`)
+        req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
+        res.redirect('/login#login')
+        next()
 
-      // Check if somebody already has that email
-      try {
-        debug(`Searching for user with email ${req.body.email}...`)
-        let user = await User.findOne({'email': req.body.email})
+      // Valid email
+      } else {
+        debug(`Email ${req.body.email} was found valid.`)
 
-        // User already exists
-        if (user && user.auth.password) {
-          debug(`User ${user.id} has email ${req.body.email} and has a password`)
-          req.flash('warning',
-            `A user with that email already exists!  If you forgot your password, \
-            you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`
-          )
-          res.redirect('/login#login')
-          next()
+        // Check if somebody already has that email
+        try {
+          debug(`Searching for user with email ${req.body.email}...`)
+          let user = await User.findOne({'email': req.body.email})
 
-        // User exists but hasn't created a password yet
-        } else if (user) {
-          debug(`User ${user.id} has email ${req.body.email} but doesn't have a password`)
+          // User already exists
+          if (user && user.auth.password) {
+            debug(`User ${user.id} has email ${req.body.email} and has a password`)
+            req.flash('warning',
+              `A user with that email already exists!  If you forgot your password, \
+              you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`
+            )
+            res.redirect('/login#login')
+            next()
 
-          // Send another token
-          sendToken(user)
+          // User exists but hasn't created a password yet
+          } else if (user) {
+            debug(`User ${user.id} has email ${req.body.email} but doesn't have a password`)
 
-        // Create user
-        } else {
-          debug(`User with email ${req.body.email} doesn't exist; creating one`)
-
-          let email = req.body.email
-
-          user = new User()
-          user.created = Date.now()
-          user.email = email
-          user.slug = slugify(email.substring(0, email.indexOf('@')))
-
-          // Generate unique slug
-          const slug = new Promise((resolve, reject) => {
-            debug(`Creating new slug for user...`);
-
-            (async function checkSlug (s, cb) {
-              try {
-                debug(`Checking to see if slug ${s} is taken...`)
-                let existingUser = await User.findOne({slug: s})
-
-                // Slug in use: generate a random one and retry
-                if (existingUser) {
-                  debug(`Slug ${s} is taken; generating another...`)
-                  crypto.randomBytes(6, (err, buf) => {
-                    if (err) {
-                      debug('Failed to create random bytes for slug!')
-                      mw.throwErr(err, req)
-                      reject()
-                    }
-                    if (buf) {
-                      checkSlug(buf.toString('hex'), cb)
-                    }
-                  })
-
-                // Unique slug: proceed
-                } else {
-                  debug(`Slug ${s} is unique`)
-                  cb(s)
-                }
-              } catch (err) {
-                debug('Failed to create slug!')
-                mw.throwErr(err, req)
-                reject()
-              }
-
-            })(user.slug, (newSlug) => {
-              debug(`Successfully created slug: ${newSlug}`)
-              user.slug = newSlug
-              resolve()
-            })
-          })
-
-          // Generate sk32
-          const sk32 = new Promise((resolve, reject) => {
-            debug('Creating sk32 for user...')
-            crypto.randomBytes(32, (err, buf) => {
-              if (err) {
-                debug('Failed to create sk32!')
-                mw.throwErr(err, req)
-                reject()
-              }
-              if (buf) {
-                user.sk32 = buf.toString('hex')
-                debug(`Successfully created sk32: ${user.sk32}`)
-                resolve()
-              }
-            })
-          })
-
-          // Save user and send the token by email
-          try {
-            await Promise.all([slug, sk32])
+            // Send another token
             sendToken(user)
-          } catch (err) {
-            debug('Failed to save user after creating slug and sk32!')
-            mw.throwErr(err, req)
-            res.redirect('/login#signup')
+
+          // Create user
+          } else {
+            debug(`User with email ${req.body.email} doesn't exist; creating one`)
+
+            let email = req.body.email
+
+            user = new User()
+            user.created = Date.now()
+            user.email = email
+            user.slug = slugify(email.substring(0, email.indexOf('@')))
+
+            // Generate unique slug
+            const slug = new Promise((resolve, reject) => {
+              debug(`Creating new slug for user...`);
+
+              (async function checkSlug (s, cb) {
+                try {
+                  debug(`Checking to see if slug ${s} is taken...`)
+                  let existingUser = await User.findOne({slug: s})
+
+                  // Slug in use: generate a random one and retry
+                  if (existingUser) {
+                    debug(`Slug ${s} is taken; generating another...`)
+                    crypto.randomBytes(6, (err, buf) => {
+                      if (err) {
+                        debug('Failed to create random bytes for slug!')
+                        mw.throwErr(err, req)
+                        reject()
+                      }
+                      if (buf) {
+                        checkSlug(buf.toString('hex'), cb)
+                      }
+                    })
+
+                  // Unique slug: proceed
+                  } else {
+                    debug(`Slug ${s} is unique`)
+                    cb(s)
+                  }
+                } catch (err) {
+                  debug('Failed to create slug!')
+                  mw.throwErr(err, req)
+                  reject()
+                }
+
+              })(user.slug, (newSlug) => {
+                debug(`Successfully created slug: ${newSlug}`)
+                user.slug = newSlug
+                resolve()
+              })
+            })
+
+            // Generate sk32
+            const sk32 = new Promise((resolve, reject) => {
+              debug('Creating sk32 for user...')
+              crypto.randomBytes(32, (err, buf) => {
+                if (err) {
+                  debug('Failed to create sk32!')
+                  mw.throwErr(err, req)
+                  reject()
+                }
+                if (buf) {
+                  user.sk32 = buf.toString('hex')
+                  debug(`Successfully created sk32: ${user.sk32}`)
+                  resolve()
+                }
+              })
+            })
+
+            // Save user and send the token by email
+            try {
+              await Promise.all([slug, sk32])
+              sendToken(user)
+            } catch (err) {
+              debug('Failed to save user after creating slug and sk32!')
+              mw.throwErr(err, req)
+              res.redirect('/login#signup')
+            }
           }
+        } catch (err) {
+          debug(`Failed to check if somebody already has the email ${req.body.email}`)
+          mw.throwErr(err, req)
+          res.redirect('/login#signup')
         }
-      } catch (err) {
-        debug(`Failed to check if somebody already has the email ${req.body.email}`)
-        mw.throwErr(err, req)
-        res.redirect('/login#signup')
+
       }
     })
 
@@ -259,65 +269,84 @@ module.exports = (app, passport) => {
 
     // Submitted forgot password form
     .post( async (req, res, next) => {
-      // Validate email
-      req.checkBody('email', 'Please enter a valid email address.').isEmail()
 
-      // Check if somebody has that email
-      try {
-        let user = await User.findOne({'email': req.body.email})
-
-        // No user with that email
-        if (!user) {
-          // Don't let on that no such user exists, to prevent dictionary attacks
-          req.flash('success',
-            `If an account exists with the email <u>${req.body.email}</u>, \
-            an email has been sent there with a password reset link. `
-          )
-          res.redirect('/login')
-
-        // User with that email does exist
-        } else {
-
-          // Create reset token
-          try {
-            let [token, expires] = await user.createPassToken()
-
-            // Email reset link
-            try {
-              await mail.send({
-                from: mail.noReply,
-                to: mail.to(user),
-                subject: 'Reset your Tracman password',
-                text: mail.text(
-                  `Hi, \n\nDid you request to reset your Tracman password?  \
-                  If so, follow this link to do so:\
-                  \n${env.url}/account/password/${token}\n\n\
-                  If you didn't initiate this request, just ignore this email. `
-                ),
-                html: mail.html(
-                  `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
-                  If so, follow this link to do so:<br>\
-                  <a href="${env.url}/account/password/${token}">\
-                  ${env.url}/account/password/${token}</a></p>\
-                  <p>If you didn't initiate this request, just ignore this email. </p>`
-                )
-              })
-              req.flash(
-                'success',
-                `If an account exists with the email <u>${req.body.email}</u>, \
-                an email has been sent there with a password reset link. `)
-              res.redirect('/login')
-            } catch (err) {
-              debug(`Failed to send reset link to ${user.email}`)
-              mw.throwErr(err, req)
-              res.redirect('/login')
-            }
-          } catch (err) { return next(err) }
-        }
-      } catch (err) {
-        debug(`Failed to check for if somebody has that email (in reset request)!`)
-        mw.throwErr(err, req)
+      // Invalid email
+      if (!mw.validateEmail(req.body.email)) {
+        debug(`Email ${req.body.email} was found invalid!`)
+        req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
         res.redirect('/login/forgot')
+        next()
+
+      // Valid email
+      } else {
+
+        // Check if somebody has that email
+        try {
+          let user = await User.findOne({'email': req.body.email})
+
+          // No user with that email
+          if (!user) {
+            // Don't let on that no such user exists, to prevent dictionary attacks
+            req.flash('success',
+              `If an account exists with the email <u>${req.body.email}</u>, \
+              an email has been sent there with a password reset link. `
+            )
+            res.redirect('/login')
+
+          // User with that email does exist
+          } else {
+
+            // Create reset token
+            try {
+              let [token, expires] = await user.createPassToken()
+              
+              // Figure out expiration time string
+              debug(`Determining expiration time string for ${expires}...`)
+              let expiration_time_string = (req.query.tz)
+                ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
+                : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
+
+              // Email reset link
+              try {
+                await mail.send({
+                  from: mail.noReply,
+                  to: mail.to(user),
+                  subject: 'Reset your Tracman password',
+                  text: mail.text(
+                    `Hi, \n\nDid you request to reset your Tracman password?  \
+                    If so, follow this link to do so:\
+                    \n${env.url}/account/password/${token}\n\n\
+                    This link will expire at ${expiration_time_string}.  \n\n\
+                    If you didn't initiate this request, just ignore this email. \n\n`
+                  ),
+                  html: mail.html(
+                    `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
+                    If so, follow this link to do so:<br>\
+                    <a href="${env.url}/account/password/${token}">\
+                    ${env.url}/account/password/${token}</a>.  \
+                    This link will expire at ${expiration_time_string}.  </p>\
+                    <p>If you didn't initiate this request, just ignore this email. </p>`
+                  )
+                })
+                req.flash(
+                  'success',
+                  `If an account exists with the email <u>${req.body.email}</u>, \
+                  an email has been sent there with a password reset link.\
+                  (Your reset link will expire in one hour.)`)
+                res.redirect('/login')
+              } catch (err) {
+                debug(`Failed to send reset link to ${user.email}`)
+                mw.throwErr(err, req)
+                res.redirect('/login')
+              }
+            } catch (err) { return next(err) }
+          }
+        } catch (err) {
+          debug(`Failed to check for if somebody has that email (in reset request)!`)
+          mw.throwErr(err, req)
+          res.redirect('/login/forgot')
+        }
+
       }
 
     })
@@ -377,4 +406,5 @@ module.exports = (app, passport) => {
   app.get('/login/google/cb', passport.authenticate('google', loginOutcome), loginCallback)
   app.get('/login/facebook/cb', passport.authenticate('facebook', loginOutcome), loginCallback)
   app.get('/login/twitter/cb', passport.authenticate('twitter', loginOutcome), loginCallback)
+
 }

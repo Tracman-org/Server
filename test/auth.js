@@ -2,6 +2,7 @@
 
 const chai = require('chai')
 const app = require('../server')
+const froth = require('mocha-froth')
 const User = require('../config/models').user
 // const superagent = require('superagent').agent()
 const request = require('supertest').agent(app)
@@ -49,27 +50,28 @@ describe('Authentication', () => {
 
     })
 
-    // TODO: Implement fuzzer
-    it.skip(`Fails to create accounts with ${FUZZED_EMAIL_TRIES} fuzzed emails`, () => {
+    it(`Fails to create accounts with ${FUZZED_EMAIL_TRIES} fuzzed emails`, () => {
 
       // Fuzz emails
-      // loop with let fuzzed_email
+      froth(FUZZED_EMAIL_TRIES).forEach( async (fuzzed_email) => {
 
         // Confirm redirect
-        // chai.expect( await request.post('/signup')
-        //   .type('form').send({ 'email':fuzzed_email  })
-        // ).to.redirectTo('/login#signup')
+        chai.expect( await request.post('/signup')
+          .type('form').send({ 'email':fuzzed_email })
+        ).to.redirectTo('/login#signup')
 
-      /* Ensure user was deleted after email failed to send
-      /* Users with bad emails are removed asynchronously and may happen after
-      /* the response was recieved. Ensure it's happened in a kludgy way by
-      /* waiting 2 seconds before asserting that the user doesn't exist
-      */
-      // setTimeout( async () => {
-      //   chai.assert.isNull( await User.findOne({
-      //     'email': FAKE_EMAIL
-      //   }), 'Account with fake email was created')
-      // }, 2000)
+        /* Ensure user was deleted after email failed to send
+        /* Users with bad emails are removed asynchronously and may happen after
+        /* the response was recieved. Ensure it's happened in a kludgy way by
+        /* waiting 2 seconds before asserting that the user doesn't exist
+        */
+        setTimeout( async () => {
+          chai.assert.isNull( await User.findOne({
+            'email': fuzzed_email
+          }), 'Account with fake email was created')
+        }, 2000)
+
+      })
 
     })
 
@@ -140,23 +142,24 @@ describe('Authentication', () => {
 
         })
 
-        // TODO: Implement fuzzer
-        it.skip(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
+        it(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
 
           // Fuzz passwords
-          // loop with let fuzzed_password
+          froth(FUZZED_PASSWORD_TRIES).forEach( async (fuzzed_password) => {
 
-           // Confirm redirect
-            // chai.expect( await request.post('/login')
-            //   .type('form').send({
-            //     'email': TEST_EMAIL,
-            //     'password': fuzzed_password
-            //   })
-            // ).to.redirectTo('/login') // Hey! Incorrect email or password.
+            // Confirm redirect
+            chai.expect( await request.post('/login')
+              .type('form').send({
+                'email': TEST_EMAIL,
+                'password': fuzzed_password
+              })
+            ).to.redirectTo('/login') // Hey! Incorrect email or password.
+
+          })
 
         })
 
-        it('Loads forgot password page', async () => {
+        it.skip('Loads forgot password page', async () => {
           let res = await request.get('/login/forgot')
           chai.expect(res).html.to.have.status(200)
         })
@@ -257,6 +260,7 @@ describe('Authentication', () => {
             })
 
           })
+
         })
 
       })
