@@ -3,7 +3,6 @@
 /* IMPORTS */
 const express = require('express')
 const bodyParser = require('body-parser')
-const expressValidator = require('express-validator')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const mongoose = require('mongoose')
@@ -65,7 +64,6 @@ let ready_promise_list = []
   app.use(bodyParser.urlencoded({
     extended: true
   }))
-  app.use(expressValidator())
   app.use(flash())
 }
 
@@ -104,7 +102,7 @@ let ready_promise_list = []
 
   // Settings
   app.use('/settings', require('./config/routes/settings.js'))
-  
+
   // Account settings
   app.use('/account', require('./config/routes/account.js'))
 
