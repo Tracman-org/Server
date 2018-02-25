@@ -279,6 +279,7 @@ module.exports = (app, passport) => {
 
       // Valid email
       } else {
+        debug(`Email ${req.body.email} was found valid.`)
 
         // Check if somebody has that email
         try {
@@ -286,6 +287,7 @@ module.exports = (app, passport) => {
 
           // No user with that email
           if (!user) {
+            debug(`No user found with email ${req.body.email}; ignoring password request.`)
             // Don't let on that no such user exists, to prevent dictionary attacks
             req.flash('success',
               `If an account exists with the email <u>${req.body.email}</u>, \
@@ -295,11 +297,12 @@ module.exports = (app, passport) => {
 
           // User with that email does exist
           } else {
-
+            debug(`User ${user.id} found with that email.  Creating reset token...`)
+            
             // Create reset token
             try {
               let [token, expires] = await user.createPassToken()
-              
+
               // Figure out expiration time string
               debug(`Determining expiration time string for ${expires}...`)
               let expiration_time_string = (req.query.tz)

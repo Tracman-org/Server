@@ -127,19 +127,10 @@ describe('Authentication', () => {
     // These tests require the test user to have been created
     after( () => {
 
-      describe('Logged out', () => {
+      describe('Logged out', function() {
 
-        it('Fails to log in with bad password', async () => {
-
-          // Confirm redirect
-          chai.expect( await request.post('/login')
-            .type('form').send({
-              'email': TEST_EMAIL,
-              'password': BAD_PASSWORD
-            })
-          ).to.redirectTo('/login')  // Hey! Incorrect email or password.
-
-        })
+        // Password fuzzing could take a while... give it five seconds
+        this.timeout(5000)
 
         it(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
 
@@ -167,21 +158,19 @@ describe('Authentication', () => {
 
         // TODO: Test invalid and fuzzed forgot password requests
 
-        // TODO: Fix this test
-        it.only('Sends valid forgot password request', async () => {
+        it('Sends valid forgot password request', async () => {
 
           // Responds with 200
           chai.expect( await request.post('/login/forgot')
             .type('form').send({
               'email': TEST_EMAIL,
             })
-          ).to.be.html.and.have.status(200)
+          ).to.redirectTo('/login')
 
-          // Assert password was set
+          // Assert password token was set
           let requesting_user = await User.findOne({'email':TEST_EMAIL} )
-          chai.assert.isString(
-            requesting_user.auth.passwordToken, 'Failed to correctly save password token'
-          )
+          chai.expect(requesting_user.auth.passToken)
+            .to.be.a('string').and.to.have.lengthOf(32)
 
         })
 
