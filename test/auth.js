@@ -38,10 +38,10 @@ describe('Authentication', () => {
       ).to.redirectTo('/login#signup')
 
       /* Ensure user was deleted after email failed to send
-      /* Users with bad emails are removed asynchronously and may happen after
-      /* the response was recieved. Ensure it's happened in a kludgy way by
-      /* waiting 2 seconds before asserting that the user doesn't exist
-      */
+       * Users with bad emails are removed asynchronously and may happen after
+       * the response was recieved. Ensure it's happened in a kludgy way by
+       * waiting 2 seconds before asserting that the user doesn't exist
+       */
       setTimeout( async () => {
         chai.assert.isNull( await User.findOne({
           'email': FAKE_EMAIL
@@ -61,10 +61,10 @@ describe('Authentication', () => {
         ).to.redirectTo('/login#signup')
 
         /* Ensure user was deleted after email failed to send
-        /* Users with bad emails are removed asynchronously and may happen after
-        /* the response was recieved. Ensure it's happened in a kludgy way by
-        /* waiting 2 seconds before asserting that the user doesn't exist
-        */
+         * Users with bad emails are removed asynchronously and may happen after
+         * the response was recieved. Ensure it's happened in a kludgy way by
+         * waiting 2 seconds before asserting that the user doesn't exist
+         */
         setTimeout( async () => {
           chai.assert.isNull( await User.findOne({
             'email': fuzzed_email
@@ -159,7 +159,7 @@ describe('Authentication', () => {
 
         })
 
-        it.skip('Loads forgot password page', async () => {
+        it('Loads forgot password page', async () => {
           let res = await request.get('/login/forgot')
           chai.expect(res).html.to.have.status(200)
         })

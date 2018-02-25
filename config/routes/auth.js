@@ -135,7 +135,7 @@ module.exports = (app, passport) => {
       if (!mw.validateEmail(req.body.email)) {
         debug(`Email ${req.body.email} was found invalid!`)
         req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
-        res.redirect('/login#login')
+        res.redirect('/login#signup')
         next()
 
       // Valid email
