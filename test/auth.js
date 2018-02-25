@@ -92,7 +92,7 @@ describe('Authentication', () => {
       // Load password page
       chai.expect(await request
         .get(`/account/password/${passwordless_user.auth.passToken}`)
-      ).html.to.have.status(200)
+      ).to.be.html.and.have.status(200)
     })
 
     it('Fails to set a weak password', async () => {
@@ -103,26 +103,25 @@ describe('Authentication', () => {
     })
 
     it('Sets a strong password', async () => {
-      try {
 
-        // Perform request
-        let res = await request
-          .post(`/account/password/${passwordless_user.auth.passToken}`)
-          .type('form').send({ 'password':TEST_PASSWORD })
+      // Perform request
+      let res = await request
+        .post(`/account/password/${passwordless_user.auth.passToken}`)
+        .type('form').send({ 'password':TEST_PASSWORD })
 
-        // Expect redirect
-        chai.expect(res).to.redirectTo('/login')
+      // Expect redirect
+      chai.expect(res).to.redirectTo('/login')
 
-        // Retrieve user with password saved
-        let passworded_user = await User.findOne({'email':TEST_EMAIL} )
+      // Retrieve user with password saved
+      let passworded_user = await User.findOne({'email':TEST_EMAIL} )
 
-        // Assert password was set
-        chai.assert.isString(
-          passworded_user.auth.password, 'Failed to correctly save password'
-        )
+      // Assert password was set
+      chai.assert.isString(
+        passworded_user.auth.password, 'Failed to correctly save password'
+      )
 
-        return res
-      } catch (err) { throw err }
+      return res
+
     })
 
     // These tests require the test user to have been created
@@ -161,7 +160,7 @@ describe('Authentication', () => {
 
         it('Loads forgot password page', async () => {
           let res = await request.get('/login/forgot')
-          chai.expect(res).html.to.have.status(200)
+          chai.expect(res).to.be.html.and.have.status(200)
         })
 
         // TODO: Test already-logged-in forgot password requests
@@ -169,14 +168,14 @@ describe('Authentication', () => {
         // TODO: Test invalid and fuzzed forgot password requests
 
         // TODO: Fix this test
-        it.skip('Sends valid forgot password request', async () => {
+        it.only('Sends valid forgot password request', async () => {
 
           // Responds with 200
-          let res = await request.post('/login/forgot')
+          chai.expect( await request.post('/login/forgot')
             .type('form').send({
-              email: TEST_EMAIL,
+              'email': TEST_EMAIL,
             })
-          chai.expect(res).html.to.have.status(200)
+          ).to.be.html.and.have.status(200)
 
           // Assert password was set
           let requesting_user = await User.findOne({'email':TEST_EMAIL} )
