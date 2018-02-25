@@ -5,4 +5,4 @@ branches:
   only:
   - master
 build:
-  - echo "module.exports = require('./travis.js');" > config/env/env.js
+  - echo "module.exports = require('./travis.js')" > config/env/env.js
