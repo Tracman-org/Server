@@ -2,8 +2,8 @@
 
 const router = require('express').Router(),
   zxcvbn = require('zxcvbn'),
-  mw = require('../middleware.js'),
-  mail = require('../mail.js')
+  mw = require('../middleware'),
+  mail = require('../mail')
 
 router
 

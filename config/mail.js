@@ -1,7 +1,7 @@
 'use strict'
 
 const nodemailer = require('nodemailer')
-const env = require('./env/env.js')
+const env = require('./env/env')
 const debug = require('debug')('tracman-mail')
 
 let transporter = nodemailer.createTransport({

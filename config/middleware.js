@@ -1,6 +1,6 @@
 'use strict'
 
-const env = require('./env/env.js')
+const env = require('./env/env')
 const debug = require('debug')('tracman-middleware')
 
 module.exports = {
@@ -26,7 +26,7 @@ module.exports = {
 		debug(`capitalize(${str})`)
 		return str.charAt(0).toUpperCase() + str.slice(1)
 	},
-	
+
 	// Validate an email address
 	validateEmail: (email) => {
 		debug(`validateEmail(${email})`)
@@ -44,13 +44,13 @@ module.exports = {
 	// Ensure administrator
 	ensureAdmin: (req, res, next) => {
 		debug(`ensureAdmin(${req.url}, ${res.status}, ${next})`)
-		if (req.isAuthenticated() && req.user.isAdmin) return next()
-		else { 
+		if (req.isAuthenticated() && req.user.isSiteAdmin) return next()
+		else {
 			let err = new Error("Unauthorized")
 			err.status = 401
 			next(err)
 		}
-		//TODO: test this by logging in as !isAdmin and go to /admin
+		//TODO: test this by logging in as !isSiteAdmin and go to /admin
 	}
 
 }

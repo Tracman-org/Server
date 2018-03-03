@@ -1,16 +1,16 @@
 'use strict'
-/* global alert mapuser userid disp noHeader mapKey navigator token */
+/* global alert mapData userid setVehicleId disp noHeader mapKey navigator token */
 
 import io from 'socket.io-client'
 import $ from 'jquery'
 import loadGoogleMapsAPI from 'load-google-maps-api'
 
 // Variables
-var map, marker, elevator, newLoc
+let map, markers, elevator, newLoc
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
-const IDLE_TIMEOUT = 300 // 5 minutes in seconds
-var _idleSecondsCounter = 0
+const IDLE_TIMEOUT = 300 // 5 minutes
+let _idleSecondsCounter = 0
 
 // Idle timeout listeners
 function resetIdleSecondsCounter () {
@@ -41,7 +41,7 @@ window.setInterval( function CheckIdleTime () {
 // Convert to feet if needed
 function metersToFeet (meters) {
   //console.log('metersToFeet('+meters+')')
-  return (mapuser.settings.units === 'standard') ? (meters * 3.28084).toFixed() : meters.toFixed()
+  return (mapData.settings.units === 'standard') ? (meters * 3.28084).toFixed() : meters.toFixed()
 }
 
 // socket.io stuff
@@ -50,33 +50,18 @@ socket
     console.log('Connected!')
 
     // Can get location
-    socket.emit('can-get', mapuser._id)
+    socket.emit('can-get', mapData._id)
 
     // Can set location too
-    if (mapuser._id === userid) socket.emit('can-set', userid)
+    if (setVehicleId) socket.emit('can-set', setVehicleId)
   }).on('disconnect', function () {
     console.log('Disconnected!')
   }).on('error', function (err) {
     console.error(err.stack)
   })
 
-// Show/hide map if location is set/unset
-function toggleMaps (loc) {
-  if (loc.lat === 0 && loc.lon === 0) {
-    $('#map').hide()
-    $('#view').hide()
-    $('#notset').show()
-  } else {
-    $('#map').show()
-    $('#view').show()
-    $('#notset').hide()
-  }
-}
-
 // On page load
 $(function () {
-
-  toggleMaps(mapuser.last)
 
   // Controls
   var wpid, newloc
@@ -85,7 +70,7 @@ $(function () {
   $('#set-loc').click(function () {
 
     // Check if logged in and enabled
-    if (!userid === mapuser._id) alert('You are not logged in! '); else {
+    if (!setVehicleId.length) alert('You are not logged in! '); else {
       if (!navigator.geolocation) alert('Geolocation not enabled. '); else {
 
         navigator.geolocation.getCurrentPosition(
@@ -95,14 +80,13 @@ $(function () {
             var newloc = {
               ts: Date.now(),
               tok: token,
-              usr: userid,
+              veh: setVehicleId,
               alt: pos.coords.altitude,
               lat: pos.coords.latitude,
               lon: pos.coords.longitude,
               spd: (pos.coords.speed || 0)
             }
             socket.emit('set', newloc)
-            toggleMaps(newloc)
             console.log('Set location:', newloc.lat + ', ' + newloc.lon)
           },
 
@@ -123,59 +107,62 @@ $(function () {
   // Track location
   $('#track-loc').click(function () {
 
-    // Check for login
-    if (!userid === mapuser._id) alert('You are not logged in! '); else {
+    // Check if logged in and enabled
+    if (!setVehicleId.length) alert('You are not logged in! '); else {
+      if (!navigator.geolocation) alert('Geolocation not enabled. '); else {
 
-      // Start tracking
-      if (!wpid) {
-        if (!navigator.geolocation) alert('Unable to track location. '); else {
-          $('#track-loc').html(
-            '<i class="fa fa-crosshairs fa-spin"></i>Stop'
-          ).prop('title',
-            'Click here to stop tracking your location. '
-          )
-          wpid = navigator.geolocation.watchPosition(
+        // Start tracking
+        if (!wpid) {
+          if (!navigator.geolocation) alert('Unable to track location. '); else {
+            $('#track-loc').html(
+              '<i class="fa fa-crosshairs fa-spin"></i>Stop'
+            ).prop('title',
+              'Click here to stop tracking your location. '
+            )
+            wpid = navigator.geolocation.watchPosition(
 
-            // Success callback
-            function (pos) {
-              newloc = {
-                ts: Date.now(),
-                tok: token,
-                usr: userid,
-                lat: pos.coords.latitude,
-                lon: pos.coords.longitude,
-                alt: pos.coords.altitude,
-                spd: (pos.coords.speed || 0)
-              }
-              socket.emit('set', newloc)
-              toggleMaps(newloc)
-              console.log('Set location:', newloc.lat + ', ' + newloc.lon)
-            },
+              // Success callback
+              function (pos) {
+                newloc = {
+                  ts: Date.now(),
+                  tok: token,
+                  veh: setVehicleId,
+                  lat: pos.coords.latitude,
+                  lon: pos.coords.longitude,
+                  alt: pos.coords.altitude,
+                  spd: (pos.coords.speed || 0)
+                }
+                socket.emit('set', newloc)
+                console.log('Set location:', newloc.lat + ', ' + newloc.lon)
+              },
 
-            // Error callback
-            function (err) {
-              alert('Unable to track location.')
-              console.error(err.stack)
-            },
+              // Error callback
+              function (err) {
+                alert('Unable to track location.')
+                console.error(err.stack)
+              },
 
-            // Options
-            { enableHighAccuracy: true }
+              // Options
+              { enableHighAccuracy: true }
 
-          )
+            )
+          }
+
+        // Stop tracking
+        } else {
+          $('#track-loc').html('<i class="fa fa-crosshairs"></i>Track').prop('title', 'Click here to track your location. ')
+          navigator.geolocation.clearWatch(wpid)
+          wpid = undefined
         }
 
-      // Stop tracking
-      } else {
-        $('#track-loc').html('<i class="fa fa-crosshairs"></i>Track').prop('title', 'Click here to track your location. ')
-        navigator.geolocation.clearWatch(wpid)
-        wpid = undefined
       }
     }
   })
 
   // Clear location
   $('#clear-loc').click(function () {
-    if (!userid === mapuser._id) alert('You are not logged in! '); else {
+    if (!setVehicleId.length) alert('You are not logged in! '); else {
+
       // Stop tracking
       if (wpid) {
         $('#track-loc').html('<i class="fa fa-crosshairs"></i>Track')
@@ -184,17 +171,14 @@ $(function () {
       }
 
       // Clear location
-      newloc = {
+      socket.emit('set', {
         ts: Date.now(),
         tok: token,
-        usr: userid,
+        veh: setVehicleId,
         lat: 0,
         lon: 0,
         spd: 0
-      }; socket.emit('set', newloc)
-
-      // Turn off map
-      toggleMaps(newloc)
+      })
       console.log('Cleared location')
     }
   })
@@ -210,31 +194,35 @@ loadGoogleMapsAPI({ key: mapKey })
     // Create map and marker elements
     map = new googlemaps.Map(mapElem, {
       center: {
-        lat: mapuser.last.lat,
-        lng: mapuser.last.lon
+        lat: (mapData.vehicles.length>1)? mapData.settings.defaultMap.lat : mapData.vehicles[0].last.lat,
+        lng: (mapData.vehicles.length>1)? mapData.settings.defaultMap.lon : mapData.vehicles[0].last.lon
       },
       panControl: false,
-      scrollwheel: true,
-      scaleControl: !!(mapuser.settings.showScale),
+      scrollwheel: (mapData.vehicles.length===1)? true: false,
+      scaleControl: !!(mapData.settings.showScale),
       draggable: false,
-      zoom: mapuser.settings.defaultZoom,
+      zoom: mapData.settings.defaultMap.zoom,
       streetViewControl: false,
       zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
-      mapTypeId: (mapuser.settings.defaultMap === 'road') ? googlemaps.MapTypeId.ROADMAP : googlemaps.MapTypeId.HYBRID
+      mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? googlemaps.MapTypeId.HYBRID : googlemaps.MapTypeId.ROADMAP
     })
-    marker = new googlemaps.Marker({
-      position: { lat: mapuser.last.lat, lng: mapuser.last.lon },
-      title: mapuser.name,
-      icon: (mapuser.settings.marker) ? '/static/img/marker/' + mapuser.settings.marker + '.png' : '/static/img/marker/red.png',
-      map: map,
-      draggable: false
+    mapData.vehicles.forEach(function(vehicle){
+      markers[vehicle.id] = new googlemaps.Marker({
+        position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
+        title: vehicle.name,
+        icon: (vehicle.marker) ? '/static/img/marker/' + vehicle.marker + '.png' : '/static/img/marker/red.png',
+        map: map,
+        draggable: false
+      })
     })
-    map.addListener('zoom_changed', function () {
-      map.setCenter(marker.getPosition())
-    })
+    if (Object.keys(markers).length === 1) {
+      map.addListener('zoom_changed', function () {
+        map.setCenter(markers[Object.keys(markers)[0]].getPosition())
+      })
+    }
 
     // Create iFrame logo
-    if (noHeader !== '0' && mapuser._id !== 'demo') {
+    if (noHeader !== '0' && mapData._id !== 'demo') {
       const logoDiv = document.createElement('div')
       logoDiv.id = 'map-logo'
       logoDiv.innerHTML = '<a href="https://www.tracman.org/">' +
@@ -246,13 +234,13 @@ loadGoogleMapsAPI({ key: mapKey })
     // Create update time block
     const timeDiv = document.createElement('div')
     timeDiv.id = 'timestamp'
-    if (mapuser.last.time) {
-      timeDiv.innerHTML = 'location updated ' + new Date(mapuser.last.time).toLocaleString()
+    if (mapData.lastUpdate) {
+      timeDiv.innerHTML = 'location updated ' + new Date(mapData.lastUpdate).toLocaleString()
     }
     map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
 
     // Create speed block
-    if (mapuser.settings.showSpeed) {
+    if (mapData.settings.showSpeed && mapData.vehicles.length===1) {
       const speedSign = document.createElement('div')
       const speedLabel = document.createElement('div')
       const speedText = document.createElement('div')
@@ -260,9 +248,9 @@ loadGoogleMapsAPI({ key: mapKey })
       speedLabel.id = 'spd-label'
       speedLabel.innerHTML = 'SPEED'
       speedText.id = 'spd'
-      speedText.innerHTML = (mapuser.settings.units === 'standard') ? (parseFloat(mapuser.last.spd) * 2.23694).toFixed() : mapuser.last.spd.toFixed()
+      speedText.innerHTML = (mapData.settings.units === 'standard') ? (parseFloat(mapData.last.spd) * 2.23694).toFixed() : mapData.last.spd.toFixed()
       speedUnit.id = 'spd-unit'
-      speedUnit.innerHTML = (mapuser.settings.units === 'standard') ? 'm.p.h.' : 'k.p.h.'
+      speedUnit.innerHTML = (mapData.settings.units === 'standard') ? 'm.p.h.' : 'k.p.h.'
       speedSign.id = 'spd-sign'
       speedSign.appendChild(speedLabel)
       speedSign.appendChild(speedText)
@@ -271,7 +259,7 @@ loadGoogleMapsAPI({ key: mapKey })
     }
 
     // Create altitude block
-    if (mapuser.settings.showAlt) {
+    if (mapData.settings.showAlt && mapData.vehicles.length===1) {
       elevator = new googlemaps.ElevationService()
       const altitudeSign = document.createElement('div')
       const altitudeLabel = document.createElement('div')
@@ -283,12 +271,12 @@ loadGoogleMapsAPI({ key: mapKey })
       altitudeSign.id = 'alt-sign'
       altitudeText.innerHTML = ''
       altitudeLabel.innerHTML = 'ALTITUDE'
-      parseAlt(mapuser.last).then(function (alt) {
+      parseAlt(mapData.last).then(function (alt) {
         altitudeText.innerHTML = metersToFeet(alt)
       }).catch(function (err) {
         console.error('Could not load altitude from last known location: ', err)
       })
-      altitudeUnit.innerHTML = (mapuser.settings.units === 'standard') ? 'feet' : 'meters'
+      altitudeUnit.innerHTML = (mapData.settings.units === 'standard') ? 'feet' : 'meters'
       altitudeSign.appendChild(altitudeLabel)
       altitudeSign.appendChild(altitudeText)
       altitudeSign.appendChild(altitudeUnit)
@@ -297,8 +285,8 @@ loadGoogleMapsAPI({ key: mapKey })
   }
 
   // Create streetview
-  if (disp !== '0' && mapuser.settings.showStreetview) {
-    updateStreetView(parseLoc(mapuser.last), 10)
+  if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length===1) {
+    updateStreetView(parseLoc(mapData.vehicles[0].last), 10)
   }
 
   // Get altitude from Google API
@@ -323,7 +311,7 @@ loadGoogleMapsAPI({ key: mapKey })
 
   // Parse altitude
   function parseAlt (loc) {
-    // console.log('parseAlt('+loc+'})')
+    //console.log('parseAlt('+loc+'})')
 
     return new Promise(function (resolve, reject) {
       // Check if altitude was provided
@@ -345,39 +333,39 @@ loadGoogleMapsAPI({ key: mapKey })
 
   // Parse location
   function parseLoc (loc) {
-    loc.spd = (mapuser.settings.units === 'standard') ? parseFloat(loc.spd) * 2.23694 : parseFloat(loc.spd)
+    loc.spd = (mapData.settings.units === 'standard') ? parseFloat(loc.spd) * 2.23694 : parseFloat(loc.spd)
     loc.dir = parseFloat(loc.dir)
     loc.lat = parseFloat(loc.lat)
     loc.lon = parseFloat(loc.lon)
-    // loc.alt = parseAlt(loc);
+    //loc.alt = parseAlt(loc) // TODO: Check if this is needed
     loc.tim = new Date(loc.tim).toLocaleString()
     return loc
   }
 
   // Got location
   socket.on('get', function (loc) {
-    console.log('Got location:', loc.lat + ', ' + loc.lon)
+    console.log('Got location:', loc.lat + ', ' + loc.lon+' for '+loc.veh)
 
     // Parse location
     newLoc = parseLoc(loc)
 
     // Update map
     if (disp !== '1') {
-      // console.log('Updating map...')
+      //console.log('Updating map...')
 
       // Update time
       $('#timestamp').text('location updated ' + newLoc.tim)
 
-      // Update marker and map center
+      // Update marker and recenter map
       googlemaps.event.trigger(map, 'resize')
-      map.setCenter({ lat: newLoc.lat, lng: newLoc.lon })
-      marker.setPosition({ lat: newLoc.lat, lng: newLoc.lon })
+      markers[loc.veh].setPosition({ lat: newLoc.lat, lng: newLoc.lon })
+      if (mapData.vehicles.length === 1) map.setCenter({ lat: newLoc.lat, lng: newLoc.lon })
 
       // Update speed
-      if (mapuser.settings.showSpeed) $('#spd').text(newLoc.spd.toFixed())
+      if (mapData.settings.showSpeed && mapData.vehicles.length === 1) $('#spd').text(newLoc.spd.toFixed())
 
       // Update altitude
-      if (mapuser.settings.showAlt) {
+      if (mapData.settings.showAlt && mapData.vehicles.length === 1) {
         // console.log('updating altitude...');
         parseAlt(loc).then(function (alt) {
           $('#alt').text(metersToFeet(alt))
@@ -389,7 +377,7 @@ loadGoogleMapsAPI({ key: mapKey })
     }
 
     // Update street view
-    if (disp !== '0' && mapuser.settings.showStreetview) updateStreetView(newLoc, 10)
+    if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length === 1) updateStreetView(newLoc, 10)
 
   })
 

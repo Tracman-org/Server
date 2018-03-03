@@ -1,12 +1,11 @@
 'use strict'
 
-const slug = require('slug')
 const xss = require('xss')
-const mw = require('../middleware.js')
-const User = require('../models.js').user
-const mail = require('../mail.js')
-const env = require('../env/env.js')
-const debug = require('debug')('tracman-routes-settings')
+const mw = require('../middleware')
+const User = require('../models').user
+const mail = require('../mail')
+const env = require('../env/env')
+const debug = require('debug')('tracman-routes-user-settings')
 const router = require('express').Router()
 
 // Settings form
@@ -17,13 +16,15 @@ router.route('/')
 
   // Get settings form
   .get((req, res) => {
-    res.render('settings', {active: 'settings'})
+    res.render('user-settings', {active: 'user-settings'})
   })
 
   // Set new settings
   .post( async (req, res, next) => {
+
     // Validate email
     const checkEmail = new Promise( async (resolve, reject) => {
+
       // Check validity
       if (!mw.validateEmail(req.body.email)) {
         req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `)
@@ -83,52 +84,13 @@ router.route('/')
       }
     })
 
-    // Validate slug
-    const checkSlug = new Promise( async (resolve, reject) => {
-      // Check existence
-      if (req.body.slug === '') {
-        req.flash('warning', `You must supply a slug.  `)
-        resolve()
-
-      // Check if unchanged
-      } else if (req.user.slug === slug(xss(req.body.slug))) resolve()
-
-      // Check uniqueness
-      else {
-        try {
-          let existingUser = await User.findOne({ slug: req.body.slug })
-
-          // Not unique!
-          if (existingUser && existingUser.id !== req.user.id) {
-            req.flash( 'warning',
-            `That slug, <u>${req.body.slug}</u>, is already in use by another user! `
-            )
-
-          // It's unique
-          } else req.user.slug = slug(xss(req.body.slug))
-
-          resolve()
-        } catch (err) { reject() }
-      }
-    })
-
     // Set settings when done
     try {
-      await Promise.all([checkEmail, checkSlug])
-      debug('Setting settings... ')
+      await checkEmail
+      debug('Setting account settings... ')
 
       // Set values
       req.user.name = xss(req.body.name)
-      req.user.settings = {
-        units: req.body.units,
-        defaultMap: req.body.map,
-        defaultZoom: req.body.zoom,
-        showScale: !!(req.body.showScale),
-        showSpeed: !!(req.body.showSpeed),
-        showAlt: !!(req.body.showAlt),
-        showStreetview: !!(req.body.showStreet),
-        marker: req.body.marker
-      }
 
       // Save user and send response
       debug(`Saving new settings for user ${req.user.name}...`)
@@ -137,7 +99,7 @@ router.route('/')
       req.flash('success', 'Settings updated. ')
 
     } catch (err) { mw.throwErr(err, req) }
-    finally { res.redirect('/settings') }
+    finally { res.redirect('/user-settings') }
   })
 
 

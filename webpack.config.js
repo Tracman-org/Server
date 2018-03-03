@@ -1,5 +1,5 @@
 const path = require('path')
-const env = require('./config/env/env.js')
+const env = require('./config/env/env')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {

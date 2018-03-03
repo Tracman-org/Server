@@ -9,14 +9,14 @@ const mongoose = require('mongoose')
 const nunjucks = require('nunjucks')
 const passport = require('passport')
 const flash = require('connect-flash-plus')
-const env = require('./config/env/env.js')
-const User = require('./config/models.js').user
-const mail = require('./config/mail.js')
-const demo = require('./config/demo.js')
+const env = require('./config/env/env')
+const User = require('./config/models').user
+const mail = require('./config/mail')
+const demo = require('./config/demo')
 const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
-const sockets = require('./config/sockets.js')
+const sockets = require('./config/sockets')
 
 // Promises marking a ready server
 let ready_promise_list = []
@@ -68,7 +68,7 @@ let ready_promise_list = []
 }
 
 /* Auth */ {
-  require('./config/passport.js')(passport)
+  require('./config/passport')(passport)
   app.use(passport.initialize())
   app.use(passport.session())
 }
@@ -92,28 +92,29 @@ let ready_promise_list = []
   })
 
   // Auth routes
-  require('./config/routes/auth.js')(app, passport)
+  require('./config/routes/auth')(app, passport)
 
   // Main routes
-  app.use('/', require('./config/routes/index.js'))
+  app.use('/', require('./config/routes/index'))
 
   // Contact form
-  app.use('/contact', require('./config/routes/contact.js'))
+  app.use('/contact', require('./config/routes/contact'))
 
   // Settings
-  app.use('/settings', require('./config/routes/settings.js'))
+  app.use('/user-settings', require('./config/routes/user-settings'))
+  app.use('/map-settings', require('./config/routes/map-settings'))
 
   // Account settings
-  app.use('/account', require('./config/routes/account.js'))
+  app.use('/account', require('./config/routes/account'))
 
   // Map
-  app.use(['/map', '/trac'], require('./config/routes/map.js'))
+  app.use(['/map', '/trac'], require('./config/routes/map'))
 
   // Site administration
-  app.use('/admin', require('./config/routes/admin.js'))
+  app.use('/admin', require('./config/routes/admin'))
 
   // Testing
-  if (env.mode == 'development') app.use('/test', require('./config/routes/test.js'))
+  if (env.mode == 'development') app.use('/test', require('./config/routes/test'))
 
 } {
 
@@ -170,11 +171,10 @@ ready_promise_list.push( new Promise( (resolve, reject) => {
     console.log(`  Express listening on ${env.url}`)
     resolve()
 
-    // Check for clients for each user
+    // Check for spectators for all users
     ready_promise_list.push( new Promise( async (resolve, reject) => {
       try {
-        let users = await User.find({})
-        users.forEach((user) => {
+        (await User.find({})).forEach( (user) => {
           sockets.checkForUsers(io, user.id)
         })
         resolve()
@@ -194,10 +194,10 @@ ready_promise_list.push( new Promise( (resolve, reject) => {
         // https://stackoverflow.com/a/36115549/3006854
         p => p.catch(e => e)
       ))
-      console.log('Tracman server is running properly\n')
+      console.log('Tracman server is running properly.\n')
     } catch (err) {
       console.error(err.message)
-      console.log(`Tracman server is not running properly!\n`)
+      console.log(`Tracman server is NOT running properly!\n`)
     }
 
   })

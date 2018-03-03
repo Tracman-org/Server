@@ -1,9 +1,9 @@
 'use strict'
 
-const env = require('../env/env.js')
+const env = require('../env/env')
 const request = require('request')
-const mw = require('../middleware.js')
-const mail = require('../mail.js')
+const mw = require('../middleware')
+const mail = require('../mail')
 const router = require('express').Router()
 
 module.exports = router

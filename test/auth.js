@@ -14,7 +14,7 @@ chai.use(
 const { FAKE_EMAIL, TEST_EMAIL,
   TEST_PASSWORD, BAD_PASSWORD,
   FUZZED_EMAIL_TRIES, FUZZED_PASSWORD_TRIES,
-} = require('../config/test.js')
+} = require('../config/test')
 
 describe('Authentication', () => {
 

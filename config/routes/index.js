@@ -3,7 +3,7 @@
 const router = require('express').Router()
 const slug = require('slug')
 const xss = require('xss')
-const User = require('../models.js').user
+const User = require('../models').user
 
 module.exports = router
 

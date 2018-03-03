@@ -6,36 +6,8 @@ const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const debug = require('debug')('tracman-models')
 
-const userSchema = new mongoose.Schema({
-  name: {type: String},
-  email: {type: String, unique: true},
-  newEmail: String,
-  emailToken: String,
-  slug: {type: String, required: true, unique: true},
-  auth: {
-    password: String,
-    passToken: String,
-    passTokenExpires: Date,
-    google: String,
-    facebook: String,
-    twitter: String
-  },
-  isAdmin: {type: Boolean, required: true, default: false},
-  isPro: {type: Boolean, required: true, default: false},
-  created: {type: Date, required: true},
-  lastLogin: Date,
-  isNewUser: Boolean,
-  settings: {
-    units: {type: String, default: 'standard'},
-    defaultMap: {type: String, default: 'road'},
-    defaultZoom: {type: Number, default: 11},
-    showScale: {type: Boolean, default: false},
-    showSpeed: {type: Boolean, default: false},
-    showTemp: {type: Boolean, default: false},
-    showAlt: {type: Boolean, default: false},
-    showStreetview: {type: Boolean, default: false},
-    marker: {type: String, default: 'red'}
-  },
+const vehicleSchema = new mongoose.Schema({
+  name: String,
   last: {
     time: Date,
     lat: {type: Number, default: 0},
@@ -44,7 +16,51 @@ const userSchema = new mongoose.Schema({
     alt: {type: Number},
     spd: {type: Number, default: 0}
   },
-  sk32: {type: String, required: true, unique: true}
+  sk32: {type: String, required: true},
+  marker: {type: String, default: 'red'},
+}).plugin(unique)
+
+const mapSchema = new mongoose.Schema({
+  name: {type: String, unique: true},
+  slug: {type: String, required: true, unique: true},
+  settings: {
+    units: {type: String, default: 'standard'},
+    defaultMap: {
+      type: {type: String, default: 'road'},
+      lat: {type: Number, default: 0},
+      lon: {type: Number, default: 0},
+      zoom: {type: Number, default: 11},
+    },
+    showScale: {type: Boolean, default: false},
+    showSpeed: {type: Boolean, default: false},
+    showTemp: {type: Boolean, default: false},
+    showAlt: {type: Boolean, default: false},
+    showStreetview: {type: Boolean, default: false},
+  },
+  lastUpdate: Date,
+  vehicles: [vehicleSchema],
+}).plugin(unique)
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: {type: String, unique: true},
+  newEmail: String,
+  emailToken: String,
+  auth: {
+    password: String,
+    passToken: String,
+    passTokenExpires: Date,
+    google: String,
+    facebook: String,
+    twitter: String,
+  },
+  isSiteAdmin: {type: Boolean, required: true, default: false},
+  isPro: {type: Boolean, required: true, default: false},
+  created: {type: Date, required: true},
+  lastLogin: Date,
+  isNewUser: Boolean,
+  maps: [mapSchema],
+  setVehicles: [vehicleSchema],
 }).plugin(unique)
 
 /* User methods */
@@ -146,5 +162,7 @@ userSchema.methods.validPassword = function (password) {
 }
 
 module.exports = {
-  'user': mongoose.model('User', userSchema)
+  'user': mongoose.model('User', userSchema),
+  'map': mongoose.model('Map', mapSchema),
+  'vehicle': mongoose.model('Vehicle', vehicleSchema),
 }

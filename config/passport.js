@@ -8,9 +8,10 @@ const GoogleTokenStrategy = require('passport-google-id-token')
 const FacebookTokenStrategy = require('passport-facebook-token')
 const TwitterTokenStrategy = require('passport-twitter-token')
 const debug = require('debug')('tracman-passport')
-const env = require('./env/env.js')
-const mw = require('./middleware.js')
-const User = require('./models.js').user
+const env = require('./env/env')
+const mw = require('./middleware')
+const User = require('./models').user
+const rescheme = require('./rescheme')
 
 module.exports = (passport) => {
 
@@ -54,12 +55,22 @@ module.exports = (passport) => {
 
         // Successful login
         } else {
-          user.isNewUser = !Boolean(user.lastLogin)
-          user.lastLogin = Date.now()
-          user.save()
-          return done(null, user)
+          try {
+            let reschemed_user = await rescheme(user)
+            reschemed_user.isNewUser = !Boolean(user.lastLogin)
+            reschemed_user.lastLogin = Date.now()
+            try {
+              reschemed_user.save()
+              return done(null, reschemed_user)
+            } catch (err) {
+              debug(`Unable to save reschemed and logged-in user ${reschemed_user.id}!`)
+              return done(err)
+            }
+          } catch (err) {
+            debug(`Unable to rescheme user ${user.id}!`)
+            return done(err)
+          }
         }
-
 
       }
     } catch (err) {
@@ -82,27 +93,17 @@ module.exports = (passport) => {
 
         // Can't find user
         if (!user) {
-          // Lazy update from old googleId field
+
+          // Check for old googleID field
           if (service === 'google') {
             try {
               let user = await User.findOne({ 'googleID': parseInt(profileId, 10) })
 
               // User exists with old schema
               if (user) {
-                debug(`User ${user.id} exists with old schema.  Lazily updating...`)
-                user.auth.google = profileId
-                user.googleId = undefined
-                try {
-                  await user.save()
-                  debug(`Lazily updated ${user.id}...`)
-                  req.session.flashType = 'success'
-                  req.session.flashMessage = 'You have been logged in. '
-                  return done(null, user)
-                } catch (err) {
-                  debug(`Failed to save user that exists with old googleId schema!`)
-                  mw.throwErr(err, req)
-                  return done(err)
-                }
+                req.session.flashType = 'success'
+                req.session.flashMessage = 'You have been logged in. '
+                return done(null, user)
 
               // No such user
               } else {
@@ -116,7 +117,7 @@ module.exports = (passport) => {
               return done(err)
             }
 
-          // No googleId either
+          // No googleID either
           } else {
             debug(`Couldn't find ${service} user with profileID ${profileId}.`)
             req.flash('warning', `There's no user for that ${service} account. `)
@@ -143,11 +144,11 @@ module.exports = (passport) => {
       // Check for unique profileId
       debug(`Checking for unique account with query ${query}...`)
       try {
-        let user = await User.findOne(query)
+        let existing_user = await User.findOne(query)
 
         // Social account already in use
-        if (existingUser) {
-          debug(`${service} account already in use with user ${existingUser.id}`)
+        if (existing_user) {
+          debug(`${service} account already in use with user ${existing_user.id}`)
           req.session.flashType = 'warning'
           req.session.flashMessage = `Another user is already connected to that ${service} account. `
           return done()

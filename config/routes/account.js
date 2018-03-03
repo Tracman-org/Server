@@ -1,9 +1,9 @@
 'use strict'
 
-const mw = require('../middleware.js')
-const User = require('../models.js').user
-const mail = require('../mail.js')
-const env = require('../env/env.js')
+const mw = require('../middleware')
+const User = require('../models').user
+const mail = require('../mail')
+const env = require('../env/env')
 const zxcvbn = require('zxcvbn')
 const moment = require('moment')
 const debug = require('debug')('tracman-routes-account')

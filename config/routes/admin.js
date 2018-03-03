@@ -1,9 +1,9 @@
 'use strict'
 
 const router = require('express').Router()
-const mw = require('../middleware.js')
+const mw = require('../middleware')
 const debug = require('debug')('tracman-routes-admin')
-const User = require('../models.js').user
+const User = require('../models').user
 
 router.get('/', mw.ensureAdmin, async (req, res) => {
   try {

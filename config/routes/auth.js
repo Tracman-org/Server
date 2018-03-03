@@ -1,13 +1,15 @@
 'use strict'
 
-const mw = require('../middleware.js')
-const mail = require('../mail.js')
-const User = require('../models.js').user
+const mw = require('../middleware')
+const mail = require('../mail')
+const User = require('../models').user
+const Map = require('../models').map
+const Vehicle = require('../models').vehicle
 const crypto = require('crypto')
 const moment = require('moment')
 const slugify = require('slug')
 const debug = require('debug')('tracman-routes-auth')
-const env = require('../env/env.js')
+const env = require('../env/env')
 
 module.exports = (app, passport) => {
 
@@ -145,11 +147,11 @@ module.exports = (app, passport) => {
         // Check if somebody already has that email
         try {
           debug(`Searching for user with email ${req.body.email}...`)
-          let user = await User.findOne({'email': req.body.email})
+          let existing_user = await User.findOne({'email': req.body.email})
 
           // User already exists
-          if (user && user.auth.password) {
-            debug(`User ${user.id} has email ${req.body.email} and has a password`)
+          if (existing_user && existing_user.auth.password) {
+            debug(`User ${existing_user.id} has email ${req.body.email} and has a password`)
             req.flash('warning',
               `A user with that email already exists!  If you forgot your password, \
               you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`
@@ -158,11 +160,11 @@ module.exports = (app, passport) => {
             next()
 
           // User exists but hasn't created a password yet
-          } else if (user) {
-            debug(`User ${user.id} has email ${req.body.email} but doesn't have a password`)
+          } else if (existing_user) {
+            debug(`User ${existing_user.id} has email ${req.body.email} but doesn't have a password`)
 
             // Send another token
-            sendToken(user)
+            sendToken(existing_user)
 
           // Create user
           } else {
@@ -170,22 +172,24 @@ module.exports = (app, passport) => {
 
             let email = req.body.email
 
-            user = new User()
+            // Create new user, map, and vehicle
+            let user = new User()
+            let map = new Map()
+            let vehicle = new Vehicle()
             user.created = Date.now()
             user.email = email
-            user.slug = slugify(email.substring(0, email.indexOf('@')))
 
             // Generate unique slug
             const slug = new Promise((resolve, reject) => {
-              debug(`Creating new slug for user...`);
+              debug(`Creating new slug for map...`);
 
               (async function checkSlug (s, cb) {
                 try {
                   debug(`Checking to see if slug ${s} is taken...`)
-                  let existingUser = await User.findOne({slug: s})
+                  let existing_map = await Map.findOne({slug: s})
 
                   // Slug in use: generate a random one and retry
-                  if (existingUser) {
+                  if (existing_map) {
                     debug(`Slug ${s} is taken; generating another...`)
                     crypto.randomBytes(6, (err, buf) => {
                       if (err) {
@@ -209,16 +213,17 @@ module.exports = (app, passport) => {
                   reject()
                 }
 
-              })(user.slug, (newSlug) => {
+              // Start recursive function chain using first part of email as initial slug
+              })(slugify(email.substring(0,email.indexOf('@'))), (newSlug) => {
                 debug(`Successfully created slug: ${newSlug}`)
-                user.slug = newSlug
+                map.slug = newSlug
                 resolve()
               })
             })
 
             // Generate sk32
             const sk32 = new Promise((resolve, reject) => {
-              debug('Creating sk32 for user...')
+              debug('Creating sk32 for vehicle...')
               crypto.randomBytes(32, (err, buf) => {
                 if (err) {
                   debug('Failed to create sk32!')
@@ -226,8 +231,8 @@ module.exports = (app, passport) => {
                   reject()
                 }
                 if (buf) {
-                  user.sk32 = buf.toString('hex')
-                  debug(`Successfully created sk32: ${user.sk32}`)
+                  vehicle.sk32 = buf.toString('hex')
+                  debug(`Successfully created sk32: ${vehicle.sk32}`)
                   resolve()
                 }
               })
@@ -236,6 +241,8 @@ module.exports = (app, passport) => {
             // Save user and send the token by email
             try {
               await Promise.all([slug, sk32])
+              map.vehicles.push(vehicle)
+              user.maps.push(map)
               sendToken(user)
             } catch (err) {
               debug('Failed to save user after creating slug and sk32!')
@@ -298,7 +305,7 @@ module.exports = (app, passport) => {
           // User with that email does exist
           } else {
             debug(`User ${user.id} found with that email.  Creating reset token...`)
-            
+
             // Create reset token
             try {
               let [token, expires] = await user.createPassToken()
