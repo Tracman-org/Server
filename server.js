@@ -2,6 +2,7 @@
 
 /* IMPORTS */
 const express = require('express')
+const helmet = helmet = require('helmet')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
@@ -52,7 +53,8 @@ let ready_promise_list = []
   app.set('view engine', 'html')
 }
 
-/* Session */ {
+/* Express session and settings */ {
+  app.use(helmet())
   app.use(cookieParser(env.cookie))
   app.use(cookieSession({
     cookie: {maxAge: 60000},
