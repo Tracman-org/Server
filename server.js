@@ -3,6 +3,7 @@
 /* IMPORTS */
 const express = require('express')
 const helmet = require('helmet')
+const ratelimiter = require('express-better-ratelimit')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
@@ -72,6 +73,10 @@ let ready_promise_list = []
     extended: true
   }))
   app.use(flash())
+  app.use(ratelimiter({
+    max: 20,
+    duration: 120000, // 2 minutes
+  }))
 }
 
 /* Auth */ {
