@@ -2,7 +2,7 @@
 
 /* IMPORTS */
 const express = require('express')
-const helmet = helmet = require('helmet')
+const helmet = require('helmet')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
@@ -57,7 +57,12 @@ let ready_promise_list = []
   app.use(helmet())
   app.use(cookieParser(env.cookie))
   app.use(cookieSession({
-    cookie: {maxAge: 60000},
+    cookie: {
+      maxAge: 60000,
+      secure: true,
+      httpOnly: true,
+      domain: env.url.substring(env.url.indexOf('//')+2),
+    },
     secret: env.session,
     saveUninitialized: true,
     resave: true
