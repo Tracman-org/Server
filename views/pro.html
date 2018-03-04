@@ -28,6 +28,7 @@
 		<a href="https://www.keithirwin.us/">Keith Irwin</a></p>
 
 		<form class='flex' action="#" method="POST">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			{% if user.isPro %}
 				<div id='already-pro' class='inline-block alert alert-success'>
 					<i class="fa fa-check-circle"></i>

@@ -7,6 +7,7 @@ const rateLimit = require('express-request-limit')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
+const csurf = require('csurf')
 const mongoose = require('mongoose')
 const nunjucks = require('nunjucks')
 const passport = require('passport')
@@ -49,7 +50,7 @@ let ready_promise_list = []
 /* Templates */ {
   nunjucks.configure(__dirname + '/views', {
     autoescape: true,
-    express: app
+    express: app,
   })
   app.set('view engine', 'html')
 }
@@ -66,11 +67,11 @@ let ready_promise_list = []
     },
     secret: env.session,
     saveUninitialized: true,
-    resave: true
+    resave: true,
   }))
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({
-    extended: true
+    extended: true,
   }))
   app.use(flash())
 }
@@ -149,7 +150,7 @@ let ready_promise_list = []
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,
-        message: (err.status <= 499) ? err.message : 'Server error'
+        message: (err.status < 500) ? err.message : 'Server error'
       })
     })
 
@@ -167,6 +168,11 @@ let ready_promise_list = []
     })
   }
 }
+
+// CSRF Protection
+app.use(csurf({
+  cookie: true,
+}))
 
 /* Sockets */ {
   sockets.init(io)

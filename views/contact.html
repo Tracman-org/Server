@@ -19,6 +19,7 @@
 		<h1>Contact</h1>
 		
 		<form id='contact-form' role="form" method="POST">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			
 			<input id='subject-input' name="subject" id='subject' type="text" maxlength="160" placeholder="Subject">
 			<p id='message-help' class='red help'>You need to enter a message. </p>
