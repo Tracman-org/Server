@@ -3,7 +3,7 @@
 /* IMPORTS */
 const express = require('express')
 const helmet = require('helmet')
-const ratelimiter = require('express-better-ratelimit')
+const rateLimit = require('express-request-limit')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
@@ -59,7 +59,7 @@ let ready_promise_list = []
   app.use(cookieParser(env.cookie))
   app.use(cookieSession({
     cookie: {
-      maxAge: 60000,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       secure: true,
       httpOnly: true,
       domain: env.url.substring(env.url.indexOf('//')+2),
@@ -73,10 +73,6 @@ let ready_promise_list = []
     extended: true
   }))
   app.use(flash())
-  app.use(ratelimiter({
-    max: 20,
-    duration: 120000, // 2 minutes
-  }))
 }
 
 /* Auth */ {
@@ -91,6 +87,13 @@ let ready_promise_list = []
 
   // Default locals available to all views (keep this after static files)
   app.get('*', (req, res, next) => {
+
+    // Rate limit
+    rateLimit({
+      timeout: 1000 * 60 * 30, // 30 minutes
+      exactPath: true,
+      cleanUpInterval: 1000 * 60 * 60 * 24 * 7, // 1 week
+    })
 
     // User account
     res.locals.user = req.user
