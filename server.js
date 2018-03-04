@@ -169,7 +169,7 @@ let ready_promise_list = []
   }
 }
 
-// CSRF Protection
+// CSRF Protection (keep after routes)
 app.use(csurf({
   cookie: true,
 }))

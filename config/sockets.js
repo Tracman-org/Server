@@ -2,6 +2,7 @@
 
 // Imports
 const debug = require('debug')('tracman-sockets')
+const sanitize = require('mongo-sanitize')
 const User = require('./models.js').user
 
 // Check for tracking clients
@@ -82,7 +83,7 @@ module.exports = {
         } else {
           try {
             // Get loc.usr
-            let user = await User.findById(loc.usr)
+            let user = await User.findById(sanitize(loc.usr))
               .where('sk32').equals(loc.tok)
 
             if (!user) {

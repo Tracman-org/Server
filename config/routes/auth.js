@@ -6,6 +6,7 @@ const User = require('../models.js').user
 const crypto = require('crypto')
 const moment = require('moment')
 const slugify = require('slug')
+const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env.js')
 
@@ -145,7 +146,7 @@ module.exports = (app, passport) => {
         // Check if somebody already has that email
         try {
           debug(`Searching for user with email ${req.body.email}...`)
-          let user = await User.findOne({'email': req.body.email})
+          let user = await User.findOne({'email': sanitize(req.body.email)})
 
           // User already exists
           if (user && user.auth.password) {
@@ -182,7 +183,7 @@ module.exports = (app, passport) => {
               (async function checkSlug (s, cb) {
                 try {
                   debug(`Checking to see if slug ${s} is taken...`)
-                  let existingUser = await User.findOne({slug: s})
+                  let existingUser = await User.findOne({slug: sanitize(s)})
 
                   // Slug in use: generate a random one and retry
                   if (existingUser) {
@@ -283,7 +284,7 @@ module.exports = (app, passport) => {
 
         // Check if somebody has that email
         try {
-          let user = await User.findOne({'email': req.body.email})
+          let user = await User.findOne({'email': sanitize(req.body.email)})
 
           // No user with that email
           if (!user) {
@@ -298,7 +299,7 @@ module.exports = (app, passport) => {
           // User with that email does exist
           } else {
             debug(`User ${user.id} found with that email.  Creating reset token...`)
-            
+
             // Create reset token
             try {
               let [token, expires] = await user.createPassToken()

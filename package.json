@@ -19,6 +19,7 @@
     "load-google-maps-api": "^1.0.0",
     "minifier": "^0.8.1",
     "moment": "^2.18.1",
+    "mongo-sanitize": "^1.0.0",
     "mongoose": "^4.11.13",
     "mongoose-unique-validator": "^1.0.6",
     "nodemailer": "^4.1.1",

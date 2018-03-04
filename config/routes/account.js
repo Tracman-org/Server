@@ -1,6 +1,7 @@
 'use strict'
 
 const mw = require('../middleware.js')
+const sanitize = require('mongo-sanitize')
 const User = require('../models.js').user
 const mail = require('../mail.js')
 const env = require('../env/env.js')
@@ -100,7 +101,7 @@ router.route('/password/:token')
     debug('/account/password/:token .all() called')
     try {
       let user = await User
-        .findOne({'auth.passToken': req.params.token})
+        .findOne({'auth.passToken': sanitize(req.params.token)})
         .where('auth.passTokenExpires').gt(Date.now())
 
       if (!user) {
