@@ -3,6 +3,7 @@
 /* IMPORTS */
 const express = require('express')
 const helmet = require('helmet')
+const csp = require('helmet-csp')
 const rateLimit = require('express-request-limit')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -55,10 +56,12 @@ let ready_promise_list = []
   app.set('view engine', 'html')
 }
 
-/* Express session and settings */ {
-  app.use(helmet())
-  app.use(cookieParser(env.cookie))
-  app.use(cookieSession({
+/* Express session and settings */  app.use(
+  helmet.referrerPolicy({
+    policy: 'strict-origin',
+  }),
+  cookieParser(env.cookie),
+  cookieSession({
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       secure: true,
@@ -68,18 +71,23 @@ let ready_promise_list = []
     secret: env.session,
     saveUninitialized: true,
     resave: true,
-  }))
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({
+  }),
+  bodyParser.json(),
+  bodyParser.urlencoded({
     extended: true,
-  }))
-  app.use(flash())
-}
+  }),
+  flash()
+)
+
+/* Report CSP violations */
+app.post('/csp-violation', (req, res) => {
+  console.log(`CSP Violation! \n${JSON.stringify(req.body)}`)
+  res.status(204).end()
+})
 
 /* Auth */ {
   require('./config/passport.js')(passport)
-  app.use(passport.initialize())
-  app.use(passport.session())
+  app.use(passport.initialize(), passport.session())
 }
 
 /* Routes  */ {
@@ -169,10 +177,33 @@ let ready_promise_list = []
   }
 }
 
-// CSRF Protection (keep after routes)
-app.use(csurf({
-  cookie: true,
-}))
+// CSRF and CSP Protection (keep after routes)
+app.use(
+  csurf({
+    cookie: true,
+  }),
+  csp({directives:{
+    'default-src': ["'self'"],
+    'script-src': ["'self'",
+      (req, res) => `'nonce-${res.locals.nonce}'`,
+      'https://code.jquery.com',
+      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
+      'https://www.google.com/recaptcha',
+      'https://www.google-analytics.com',
+      'https://coin-hive.com',
+      'https://coinhive.com',
+    ],
+    'style-src': ["'self'",
+      'https://fonts.googleapis.com',
+      'https://maxcdn.bootstrapcdn.com',
+    ],
+    'img-src': ["'self'",
+      'https://http.cat',
+    ],
+    'object-src': ["'none'"],
+    'report-uri': '/csp-violation',
+  }})
+)
 
 /* Sockets */ {
   sockets.init(io)
