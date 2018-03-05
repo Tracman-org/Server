@@ -4,6 +4,7 @@
 node.js application to display a sharable map with user's location.
 
 [![Travis Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
+[![Coverage Status](https://coveralls.io/repos/github/Tracman-org/Server/badge.svg?branch=master)](https://coveralls.io/github/Tracman-org/Server?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Snyk Vulnerabilities](https://snyk.io/test/github/Tracman-org/Server/badge.svg)](https://snyk.io/test/github/Tracman-org/Servr)
 

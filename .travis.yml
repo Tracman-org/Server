@@ -6,3 +6,8 @@ branches:
   - master
 build:
   - echo "module.exports = require('./travis.js')" > config/env/env.js
+script:
+  - npm run cover
+
+# Send coverage data to Coveralls
+after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"

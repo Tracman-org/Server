@@ -45,6 +45,8 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
+    "coveralls": "^3.0.0",
+    "istanbul": "^1.0.0-alpha.2",
     "mocha": "^4.0.1",
     "mocha-froth": "^0.2.1",
     "nodemon": "^1.11.0",
@@ -53,7 +55,8 @@
     "supertest": "^3.0.0"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "node_modules/mocha/bin/_mocha --exit",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --exit test/*",
     "lint": "standard",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
