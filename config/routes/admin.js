@@ -1,13 +1,11 @@
 'use strict'
 
 const router = require('express').Router()
-const uuid = require('node-uuid')
 const mw = require('../middleware.js')
 const debug = require('debug')('tracman-routes-admin')
 const User = require('../models.js').user
 
 router.get('/', mw.ensureAdmin, async (req, res) => {
-  res.locals.nonce = uuid.v4()
   try {
     let found = await User.find({}).sort({lastLogin: -1})
     res.render('admin', {

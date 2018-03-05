@@ -60,6 +60,40 @@ let ready_promise_list = []
   helmet.referrerPolicy({
     policy: 'strict-origin',
   }),
+  csp({directives:{
+    'default-src': ["'self'"],
+    'script-src': ["'self'",
+      "'unsafe-inline'", // TODO: Get rid of this
+      'https://code.jquery.com',
+      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
+      'https://www.google.com/recaptcha',
+      'https://www.google-analytics.com',
+      'https://maps.googleapis.com',
+      'https://coin-hive.com',
+      'https://coinhive.com',
+    ],
+    'worker-src': ["'self'",
+      'blob:', // for coinhive
+    ],
+    'connect-src': ["'self'",
+      'wss://*.tracman.org',
+      'wss://*.coinhive.com',
+    ],
+    'style-src': ["'self'",
+      "'unsafe-inline'",
+      'https://fonts.googleapis.com',
+      'https://maxcdn.bootstrapcdn.com',
+    ],
+    'font-src': ['https://fonts.gstatic.com'],
+    'img-src': ["'self'",
+      'https://www.google-analytics.com',
+      'https://maps.gstatic.com',
+      'https://maps.googleapis.com',
+      'https://http.cat',
+    ],
+    'object-src': ["'none'"],
+    'report-uri': '/csp-violation',
+  }}),
   cookieParser(env.cookie),
   cookieSession({
     cookie: {
@@ -81,7 +115,7 @@ let ready_promise_list = []
 
 /* Report CSP violations */
 app.post('/csp-violation', (req, res) => {
-  console.log(`CSP Violation! \n${JSON.stringify(req.body)}`)
+  console.log(`CSP Violation: ${JSON.stringify(req.body)}`)
   res.status(204).end()
 })
 
@@ -177,33 +211,10 @@ app.post('/csp-violation', (req, res) => {
   }
 }
 
-// CSRF and CSP Protection (keep after routes)
-app.use(
-  csurf({
+// CSRF Protection (keep after routes)
+app.use(csurf({
     cookie: true,
-  }),
-  csp({directives:{
-    'default-src': ["'self'"],
-    'script-src': ["'self'",
-      (req, res) => `'nonce-${res.locals.nonce}'`,
-      'https://code.jquery.com',
-      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
-      'https://www.google.com/recaptcha',
-      'https://www.google-analytics.com',
-      'https://coin-hive.com',
-      'https://coinhive.com',
-    ],
-    'style-src': ["'self'",
-      'https://fonts.googleapis.com',
-      'https://maxcdn.bootstrapcdn.com',
-    ],
-    'img-src': ["'self'",
-      'https://http.cat',
-    ],
-    'object-src': ["'none'"],
-    'report-uri': '/csp-violation',
-  }})
-)
+  }))
 
 /* Sockets */ {
   sockets.init(io)

@@ -104,6 +104,7 @@
 {{super()}}
 
 	<!-- Variables from server-side -->
+	<!-- TODO: Move to own script file, maybe with https://github.com/brooklynDev/JShare -->
 	<script>
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
 			mapKey = "{{mapApi |safe}}",
