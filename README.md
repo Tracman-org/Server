@@ -24,7 +24,7 @@ A good method is to simply copy the sample configuration and point `config/env/e
 
 ```sh
 cp config/env/sample.js config/env/local-config.js
-echo "module.exports = require('./local-config.js');" > config/env/env.js
+echo "module.exports = require('./local-config.js')" > config/env/env.js
 ```
 
 Then edit `config/env/local-config.js` to match your local environment.
