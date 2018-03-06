@@ -13,6 +13,7 @@
 	<p>Enter your email below to recieve a link to reset your password.  </p>
 	
 	<form method="post" role="form">
+		<input type="hidden" name="_csrf" value="{{csrfToken}}">
 		
 		<div class='form-group'>
 			<label for="email">Email:</label>

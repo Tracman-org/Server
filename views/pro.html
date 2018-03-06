@@ -25,9 +25,10 @@
 		<p>That said, just click the button below to try pro out.  </p>
 
 		<p>Cheers, <br>
-		<a href="https://keithirwin.us/">Keith Irwin</a></p>
+		<a href="https://www.keithirwin.us/">Keith Irwin</a></p>
 
 		<form class='flex' action="#" method="POST">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			{% if user.isPro %}
 				<div id='already-pro' class='inline-block alert alert-success'>
 					<i class="fa fa-check-circle"></i>

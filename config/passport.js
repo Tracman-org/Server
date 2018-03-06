@@ -7,6 +7,7 @@ const TwitterStrategy = require('passport-twitter').Strategy
 const GoogleTokenStrategy = require('passport-google-id-token')
 const FacebookTokenStrategy = require('passport-facebook-token')
 const TwitterTokenStrategy = require('passport-twitter-token')
+const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-passport')
 const env = require('./env/env.js')
 const mw = require('./middleware.js')
@@ -33,7 +34,7 @@ module.exports = (passport) => {
   }, async (req, email, password, done) => {
     debug(`Perfoming local login for ${email}`)
     try {
-      let user = await User.findOne({'email': email})
+      let user = await User.findOne({'email': sanitize(email)})
 
       // No user with that email
       if (!user) {
@@ -45,16 +46,16 @@ module.exports = (passport) => {
         debug(`User exists. Checking password...`)
 
         // Check password
-        let res = await user.validPassword(password)
+        let correct_password = await user.validPassword(password)
 
         // Password incorrect
-        if (!res) {
+        if (!correct_password) {
           debug(`Incorrect password`)
           return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
         // Successful login
         } else {
-          if (!user.lastLogin) req.forNewUser = true
+          user.isNewUser = !Boolean(user.lastLogin)
           user.lastLogin = Date.now()
           user.save()
           return done(null, user)
@@ -143,11 +144,11 @@ module.exports = (passport) => {
       // Check for unique profileId
       debug(`Checking for unique account with query ${query}...`)
       try {
-        let user = await User.findOne(query)
+        let existing_user = await User.findOne(query)
 
         // Social account already in use
-        if (existingUser) {
-          debug(`${service} account already in use with user ${existingUser.id}`)
+        if (existing_user) {
+          debug(`${service} account already in use with user ${existing_user.id}`)
           req.session.flashType = 'warning'
           req.session.flashMessage = `Another user is already connected to that ${service} account. `
           return done()

@@ -19,6 +19,7 @@
 		<h1>Settings</h1>
 		
 		<form id='settings-form' role="form" method="post">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			
 			<h2>Account settings</h2>
 				
@@ -50,7 +51,7 @@
 				</div>
 				
 				<div id='password-delete' class='form-group'>
-					<a id='password' class='underline' href="/settings/password" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
+					<a id='password' class='underline' href="/account/password" title="Click here to {% if user.auth.password %}change{% else %}set{% endif %} your password. ">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
 					<a id='delete' class='red underline' style="text-align:right" href="#" title="Permently delete your Tracman account. ">Delete account</a>
 				</div>
 				

@@ -1,6 +1,6 @@
 {
   "name": "tracman",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
@@ -10,13 +10,17 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
     "css-loader": "^0.28.7",
+    "csurf": "^1.9.0",
     "debug": "^2.6.9",
     "express": "^4.15.5",
-    "express-validator": "^3.2.1",
+    "express-request-limit": "^1.0.2",
+    "helmet": "^3.12.0",
+    "helmet-csp": "^2.7.0",
     "jquery": "^3.2.1",
     "load-google-maps-api": "^1.0.0",
     "minifier": "^0.8.1",
     "moment": "^2.18.1",
+    "mongo-sanitize": "^1.0.0",
     "mongoose": "^4.11.13",
     "mongoose-unique-validator": "^1.0.6",
     "nodemailer": "^4.1.1",
@@ -42,21 +46,27 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
+    "coveralls": "^3.0.0",
+    "istanbul": "^1.0.0-alpha.2",
     "mocha": "^4.0.1",
+    "mocha-froth": "^0.2.1",
     "nodemon": "^1.11.0",
+    "nsp": "^3.2.1",
     "standard": "^10.0.3",
     "superagent": "^3.8.2",
     "supertest": "^3.0.0"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "node_modules/mocha/bin/_mocha --exit",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --exit test/*",
+    "audit": "node_modules/nsp/bin/nsp audit-package ; node_modules/nsp/bin/nsp audit-shrinkwrap",
     "lint": "standard",
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo npm update && sudo npm prune",
     "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js",
-    "subuild": "sudo ./node_modules/.bin/webpack --config webpack.config.js"
+    "build": "node_modules/.bin/webpack --config webpack.config.js",
+    "subuild": "sudo node_modules/.bin/webpack --config webpack.config.js"
   },
   "repository": "Tracman-org/Server",
   "keywords": [
@@ -69,5 +79,5 @@
   "license": "GPL-3.0",
   "README": "README.md",
   "bugs": "https://github.com/Tracman-org/Server/issues",
-  "homepage": "https://tracman.org/"
+  "homepage": "https://www.tracman.org/"
 }

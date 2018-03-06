@@ -2,10 +2,13 @@
 
 /* IMPORTS */
 const express = require('express')
+const helmet = require('helmet')
+const csp = require('helmet-csp')
+const rateLimit = require('express-request-limit')
 const bodyParser = require('body-parser')
-const expressValidator = require('express-validator')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
+const csurf = require('csurf')
 const mongoose = require('mongoose')
 const nunjucks = require('nunjucks')
 const passport = require('passport')
@@ -48,31 +51,77 @@ let ready_promise_list = []
 /* Templates */ {
   nunjucks.configure(__dirname + '/views', {
     autoescape: true,
-    express: app
+    express: app,
   })
   app.set('view engine', 'html')
 }
 
-/* Session */ {
-  app.use(cookieParser(env.cookie))
-  app.use(cookieSession({
-    cookie: {maxAge: 60000},
+/* Express session and settings */  app.use(
+  helmet.referrerPolicy({
+    policy: 'strict-origin',
+  }),
+  csp({directives:{
+    'default-src': ["'self'"],
+    'script-src': ["'self'",
+      "'unsafe-inline'", // TODO: Get rid of this
+      'https://code.jquery.com',
+      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
+      'https://www.google.com/recaptcha',
+      'https://www.google-analytics.com',
+      'https://maps.googleapis.com',
+      'https://coin-hive.com',
+      'https://coinhive.com',
+    ],
+    'worker-src': ["'self'",
+      'blob:', // for coinhive
+    ],
+    'connect-src': ["'self'",
+      'wss://*.tracman.org',
+      'wss://*.coinhive.com',
+    ],
+    'style-src': ["'self'",
+      "'unsafe-inline'",
+      'https://fonts.googleapis.com',
+      'https://maxcdn.bootstrapcdn.com',
+    ],
+    'font-src': ['https://fonts.gstatic.com'],
+    'img-src': ["'self'",
+      'https://www.google-analytics.com',
+      'https://maps.gstatic.com',
+      'https://maps.googleapis.com',
+      'https://http.cat',
+    ],
+    'object-src': ["'none'"],
+    'report-uri': '/csp-violation',
+  }}),
+  cookieParser(env.cookie),
+  cookieSession({
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      secure: true,
+      httpOnly: true,
+      domain: env.url.substring(env.url.indexOf('//')+2),
+    },
     secret: env.session,
     saveUninitialized: true,
-    resave: true
-  }))
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }))
-  app.use(expressValidator())
-  app.use(flash())
-}
+    resave: true,
+  }),
+  bodyParser.json(),
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+  flash()
+)
+
+/* Report CSP violations */
+app.post('/csp-violation', (req, res) => {
+  console.log(`CSP Violation: ${JSON.stringify(req.body)}`)
+  res.status(204).end()
+})
 
 /* Auth */ {
   require('./config/passport.js')(passport)
-  app.use(passport.initialize())
-  app.use(passport.session())
+  app.use(passport.initialize(), passport.session())
 }
 
 /* Routes  */ {
@@ -81,6 +130,13 @@ let ready_promise_list = []
 
   // Default locals available to all views (keep this after static files)
   app.get('*', (req, res, next) => {
+
+    // Rate limit
+    rateLimit({
+      timeout: 1000 * 60 * 30, // 30 minutes
+      exactPath: true,
+      cleanUpInterval: 1000 * 60 * 60 * 24 * 7, // 1 week
+    })
 
     // User account
     res.locals.user = req.user
@@ -104,6 +160,9 @@ let ready_promise_list = []
 
   // Settings
   app.use('/settings', require('./config/routes/settings.js'))
+
+  // Account settings
+  app.use('/account', require('./config/routes/account.js'))
 
   // Map
   app.use(['/map', '/trac'], require('./config/routes/map.js'))
@@ -133,7 +192,7 @@ let ready_promise_list = []
       res.status(err.status || 500)
       res.render('error', {
         code: err.status || 500,
-        message: (err.status <= 499) ? err.message : 'Server error'
+        message: (err.status < 500) ? err.message : 'Server error'
       })
     })
 
@@ -151,6 +210,11 @@ let ready_promise_list = []
     })
   }
 }
+
+// CSRF Protection (keep after routes)
+app.use(csurf({
+    cookie: true,
+  }))
 
 /* Sockets */ {
   sockets.init(io)

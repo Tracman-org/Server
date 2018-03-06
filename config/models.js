@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   isPro: {type: Boolean, required: true, default: false},
   created: {type: Date, required: true},
   lastLogin: Date,
+  isNewUser: Boolean,
   settings: {
     units: {type: String, default: 'standard'},
     defaultMap: {type: String, default: 'road'},
@@ -78,14 +79,10 @@ userSchema.methods.createPassToken = function () {
 
   return new Promise( async (resolve, reject) => {
 
-    // Reuse old token, resetting clock
+    // Reuse old token
     if (user.auth.passTokenExpires >= Date.now()) {
       debug(`Reusing old password token...`)
-      user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-      try {
-        await user.save()
-        resolve([user.auth.passToken, user.auth.passTokenExpires])
-      } catch (err) { reject(err) }
+      resolve([user.auth.passToken, user.auth.passTokenExpires])
 
     // Create new token
     } else {

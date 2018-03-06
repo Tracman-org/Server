@@ -2,6 +2,7 @@
 
 const chai = require('chai')
 const app = require('../server')
+const froth = require('mocha-froth')
 const User = require('../config/models').user
 // const superagent = require('superagent').agent()
 const request = require('supertest').agent(app)
@@ -37,10 +38,10 @@ describe('Authentication', () => {
       ).to.redirectTo('/login#signup')
 
       /* Ensure user was deleted after email failed to send
-      /* Users with bad emails are removed asynchronously and may happen after
-      /* the response was recieved. Ensure it's happened in a kludgy way by
-      /* waiting 2 seconds before asserting that the user doesn't exist
-      */
+       * Users with bad emails are removed asynchronously and may happen after
+       * the response was recieved. Ensure it's happened in a kludgy way by
+       * waiting 2 seconds before asserting that the user doesn't exist
+       */
       setTimeout( async () => {
         chai.assert.isNull( await User.findOne({
           'email': FAKE_EMAIL
@@ -49,27 +50,28 @@ describe('Authentication', () => {
 
     })
 
-    // TODO: Implement fuzzer
-    it.skip(`Fails to create accounts with ${FUZZED_EMAIL_TRIES} fuzzed emails`, () => {
+    it(`Fails to create accounts with ${FUZZED_EMAIL_TRIES} fuzzed emails`, () => {
 
       // Fuzz emails
-      // loop with let fuzzed_email
+      froth(FUZZED_EMAIL_TRIES).forEach( async (fuzzed_email) => {
 
         // Confirm redirect
-        // chai.expect( await request.post('/signup')
-        //   .type('form').send({ 'email':fuzzed_email  })
-        // ).to.redirectTo('/login#signup')
+        chai.expect( await request.post('/signup')
+          .type('form').send({ 'email':fuzzed_email })
+        ).to.redirectTo('/login#signup')
 
-      /* Ensure user was deleted after email failed to send
-      /* Users with bad emails are removed asynchronously and may happen after
-      /* the response was recieved. Ensure it's happened in a kludgy way by
-      /* waiting 2 seconds before asserting that the user doesn't exist
-      */
-      // setTimeout( async () => {
-      //   chai.assert.isNull( await User.findOne({
-      //     'email': FAKE_EMAIL
-      //   }), 'Account with fake email was created')
-      // }, 2000)
+        /* Ensure user was deleted after email failed to send
+         * Users with bad emails are removed asynchronously and may happen after
+         * the response was recieved. Ensure it's happened in a kludgy way by
+         * waiting 2 seconds before asserting that the user doesn't exist
+         */
+        setTimeout( async () => {
+          chai.assert.isNull( await User.findOne({
+            'email': fuzzed_email
+          }), 'Account with fake email was created')
+        }, 2000)
+
+      })
 
     })
 
@@ -89,97 +91,86 @@ describe('Authentication', () => {
     it('Loads password page', async () => {
       // Load password page
       chai.expect(await request
-        .get(`/settings/password/${passwordless_user.auth.passToken}`)
-      ).html.to.have.status(200)
+        .get(`/account/password/${passwordless_user.auth.passToken}`)
+      ).to.be.html.and.have.status(200)
     })
 
     it('Fails to set a weak password', async () => {
       chai.expect( await request
-        .post(`/settings/password/${passwordless_user.auth.passToken}`)
+        .post(`/account/password/${passwordless_user.auth.passToken}`)
         .type('form').send({ 'password':BAD_PASSWORD })
-      ).to.redirectTo(`/settings/password/${passwordless_user.auth.passToken}`)
+      ).to.redirectTo(`/account/password/${passwordless_user.auth.passToken}`)
     })
 
     it('Sets a strong password', async () => {
-      try {
 
-        // Perform request
-        let res = await request
-          .post(`/settings/password/${passwordless_user.auth.passToken}`)
-          .type('form').send({ 'password':TEST_PASSWORD })
+      // Perform request
+      let res = await request
+        .post(`/account/password/${passwordless_user.auth.passToken}`)
+        .type('form').send({ 'password':TEST_PASSWORD })
 
-        // Expect redirect
-        chai.expect(res).to.redirectTo('/login')
+      // Expect redirect
+      chai.expect(res).to.redirectTo('/login')
 
-        // Retrieve user with password saved
-        let passworded_user = await User.findOne({'email':TEST_EMAIL} )
+      // Retrieve user with password saved
+      let passworded_user = await User.findOne({'email':TEST_EMAIL} )
 
-        // Assert password was set
-        chai.assert.isString(
-          passworded_user.auth.password, 'Failed to correctly save password'
-        )
+      // Assert password was set
+      chai.assert.isString(
+        passworded_user.auth.password, 'Failed to correctly save password'
+      )
 
-        return res
-      } catch (err) { throw err }
+      return res
+
     })
 
     // These tests require the test user to have been created
     after( () => {
 
-      describe('Logged out', () => {
+      describe('Logged out', function() {
 
-        it('Fails to log in with bad password', async () => {
+        // Password fuzzing could take a while... give it five seconds
+        this.timeout(5000)
 
-          // Confirm redirect
-          chai.expect( await request.post('/login')
-            .type('form').send({
-              'email': TEST_EMAIL,
-              'password': BAD_PASSWORD
-            })
-          ).to.redirectTo('/login')  // Hey! Incorrect email or password.
-
-        })
-
-        // TODO: Implement fuzzer
-        it.skip(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
+        it(`Fails to log in with ${FUZZED_PASSWORD_TRIES} fuzzed passwords`, () => {
 
           // Fuzz passwords
-          // loop with let fuzzed_password
+          froth(FUZZED_PASSWORD_TRIES).forEach( async (fuzzed_password) => {
 
-           // Confirm redirect
-            // chai.expect( await request.post('/login')
-            //   .type('form').send({
-            //     'email': TEST_EMAIL,
-            //     'password': fuzzed_password
-            //   })
-            // ).to.redirectTo('/login') // Hey! Incorrect email or password.
+            // Confirm redirect
+            chai.expect( await request.post('/login')
+              .type('form').send({
+                'email': TEST_EMAIL,
+                'password': fuzzed_password
+              })
+            ).to.redirectTo('/login') // Hey! Incorrect email or password.
+
+          })
 
         })
 
         it('Loads forgot password page', async () => {
           let res = await request.get('/login/forgot')
-          chai.expect(res).html.to.have.status(200)
+          chai.expect(res).to.be.html.and.have.status(200)
         })
 
         // TODO: Test already-logged-in forgot password requests
 
         // TODO: Test invalid and fuzzed forgot password requests
 
-        // TODO: Fix this test
-        it.skip('Sends valid forgot password request', async () => {
+        it('Sends valid forgot password request', async () => {
 
           // Responds with 200
-          let res = await request.post('/login/forgot')
+          chai.expect( await request.post('/login/forgot')
             .type('form').send({
-              email: TEST_EMAIL,
+              'email': TEST_EMAIL,
             })
-          chai.expect(res).html.to.have.status(200)
+          ).to.redirectTo('/login')
 
-          // Assert password was set
+          // Assert password token was set
           let requesting_user = await User.findOne({'email':TEST_EMAIL} )
-          chai.assert.isString(
-            requesting_user.auth.passwordToken, 'Failed to correctly save password token'
-          )
+          chai.expect(requesting_user.auth.passToken)
+            .to.be.a('string').and.to.have.lengthOf(32)
 
         })
 
@@ -257,6 +248,7 @@ describe('Authentication', () => {
             })
 
           })
+
         })
 
       })
