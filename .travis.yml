@@ -4,10 +4,11 @@ node_js:
 branches:
   only:
   - master
-before_install:
+before_script:
   - echo "module.exports = require('./travis.js')" > config/env/env.js
 script:
-  - npm run cover
+  - npm run minify & npm run build
 
 # Send coverage data to Coveralls
-after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
+after_script:
+  - npm run cover && cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js

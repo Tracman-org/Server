@@ -88,7 +88,7 @@ let ready_promise_list = []
     'img-src': ["'self'",
       'https://www.google-analytics.com',
       'https://maps.gstatic.com',
-      'https://maps.googleapis.com',
+      'https://*.googleapis.com',
       'https://http.cat',
     ],
     'object-src': ["'none'"],
