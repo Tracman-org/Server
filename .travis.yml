@@ -4,7 +4,7 @@ node_js:
 branches:
   only:
   - master
-build:
+before_install:
   - echo "module.exports = require('./travis.js')" > config/env/env.js
 script:
   - npm run cover
