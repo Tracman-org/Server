@@ -1,5 +1,5 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="T" title="The Tracman Logo">Tracman
-###### v 0.8.2
+###### v 0.9.0
 
 node.js application to display a sharable map with user's location.
 
@@ -24,7 +24,7 @@ A good method is to simply copy the sample configuration and point `config/env/e
 
 ```sh
 cp config/env/sample.js config/env/local-config.js
-echo "module.exports = require('./local-config.js');" > config/env/env.js
+echo "module.exports = require('./local-config.js')" > config/env/env.js
 ```
 
 Then edit `config/env/local-config.js` to match your local environment.
@@ -56,13 +56,16 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-###### latest
+###### v0.9.0
+* [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
+* [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication
+* [#120](https://github.com/Tracman-org/Server/issues/120) Split config/routes/settings.js into two files
+* Removed express validator and replaced with homegrown function
 * Fixed showing welcome message on every login
+* Removed naked domains
 
-###### v0.8.1/2
+###### v0.8.x
 * Hotfixed service worker bugs
-
-#### v0.8.0
 * Added check to ensure only the newest location is sent
 * Removed buggy login/-out redirects
 * [#111](https://github.com/Tracman-org/Server/issues/111) Implemented service worker

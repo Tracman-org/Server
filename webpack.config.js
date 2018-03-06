@@ -14,7 +14,7 @@ module.exports = {
     map: './static/js/map.js',
     settings: './static/js/settings.js',
     password: './static/js/password.js',
-    sw: './static/sw.js',
+    sw: './static/js/sw.js',
   },
 
   // Sourcemaps
