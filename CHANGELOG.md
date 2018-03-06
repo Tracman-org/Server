@@ -1,7 +1,7 @@
 # Tracman Server Changelog
-### v0.8.2
+### v0.9.0
 
-###### latest
+###### v0.9.0
 * Fixed showing welcome message on every login
 
 ###### v0.8.1/2
