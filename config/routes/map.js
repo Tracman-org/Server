@@ -56,20 +56,21 @@ router.get('/:slug?', async (req, res, next) => {
       throw new Error(`Possible injection attempt with slug: ${req.params.slug}`)
     } else {
       let map = await Map.findOne({slug: req.params.slug})
-    if (!map) next() // 404
-    else {
-      res.render('map', {
-        active: (req.user && req.user.maps[0].id === map.id)? 'map':'', // For header nav
-        mapData: map,
-        mapApi: env.googleMapsAPI,
-        user: req.user, // TODO: MULTIPLE: Check if this is needed
-        // Check if user can set a vehicle in this map
-        setVehicleId: (map.vehicles.indexOf(req.user.setVehicles[0])>=0)? req.user.setVehicles[0].id : '',
-        noFooter: '1',
-        noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
-        disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both
-        newmapurl: (req.query.new) ? env.url + '/map/' + req.params.slug : ''
-      })
+      if (!map) next() // 404
+      else {
+        res.render('map', {
+          active: (req.user && req.user.maps[0].id === map.id)? 'map':'', // For header nav
+          mapData: map,
+          mapApi: env.googleMapsAPI,
+          user: req.user, // TODO: MULTIPLE: Check if this is needed
+          // Check if user can set a vehicle in this map
+          setVehicleId: (map.vehicles.indexOf(req.user.setVehicles[0])>=0)? req.user.setVehicles[0].id : '',
+          noFooter: '1',
+          noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
+          disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both
+          newmapurl: (req.query.new) ? env.url + '/map/' + req.params.slug : ''
+        })
+      }
     }
   } catch (err) { mw.throwErr(err, req) }
 })
