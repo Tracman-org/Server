@@ -107,17 +107,16 @@
 	<!-- TODO: Move to own script file, maybe with https://github.com/brooklynDev/JShare -->
 	<script>
 		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
-			mapKey = "{{mapApi |safe}}",
 			noHeader = "{{noHeader |safe}}",
 			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
 			userid = "{{user._id |safe}}",
 			token = "{{user.sk32 |safe}}";
 	</script>
 
-	<!-- Webpacked bundles -->
+	<!-- Imports -->
+	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi|safe}}&callback=initMap"
+    async defer></script>
+	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js" integrity="sha256-jniDwC1PC9OmGoyPxA9VpGvgwDYyxsMqu5Q4OrF5wNY=" crossorigin="anonymous"></script>
 	<script type="application/javascript" src="/static/js/.map.bun.js"></script>
-	<!--{% if user.id == mapuser.id %}-->
-		<!--<script type="application/javascript" src="/static/js/.controls.bun.js"></script>-->
-	<!--{% endif %}-->
 
 {% endblock %}

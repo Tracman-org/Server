@@ -65,6 +65,7 @@ let ready_promise_list = []
     'script-src': ["'self'",
       "'unsafe-inline'", // TODO: Get rid of this
       'https://code.jquery.com',
+      'https://cdnjs.cloudflare.com/ajax/libs/socket.io/*',
       'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
       'https://www.google.com/recaptcha',
       'https://www.google-analytics.com',

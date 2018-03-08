@@ -1,5 +1,5 @@
 'use strict'
-/* global alert io $ loadGoogleMapsAPI mapuser userid disp noHeader mapKey navigator token */
+/* global alert io $ mapuser userid disp noHeader mapKey navigator token */
 
 
 // Variables
@@ -199,8 +199,7 @@ $(function () {
 })
 
 // Load google maps API
-loadGoogleMapsAPI({ key: mapKey })
-.then(function (googlemaps) {
+function initMap(googlemaps) {
 
   // Create map
   if (disp !== '1') {
@@ -458,6 +457,4 @@ loadGoogleMapsAPI({ key: mapKey })
   }
 
 // Error loading gmaps API
-}).catch(function (err) {
-  console.error(err.stack)
-})
+}

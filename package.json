@@ -15,8 +15,6 @@
     "express-request-limit": "^1.0.2",
     "helmet": "^3.12.0",
     "helmet-csp": "^2.7.0",
-    "jquery": "^3.2.1",
-    "load-google-maps-api": "^1.0.0",
     "minifier": "^0.8.1",
     "moment": "^2.18.1",
     "mongo-sanitize": "^1.0.0",
@@ -35,7 +33,6 @@
     "request": "^2.82.0",
     "slug": "^0.9.1",
     "socket.io": "^2.0.3",
-    "socket.io-client": "^2.0.3",
     "xss": "^0.3.4",
     "zxcvbn": "^4.4.2"
   },
