@@ -1,16 +1,10 @@
 'use strict'
 
 const router = require('express').Router()
-<<<<<<< HEAD
 const mw = require('../middleware')
 const env = require('../env/env')
-const Map = require('../models').map
-=======
-const mw = require('../middleware.js')
-const env = require('../env/env.js')
 const sanitize = require('mongo-sanitize')
-const User = require('../models.js').user
->>>>>>> develop
+const User = require('../models').user
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req, res) => {
