@@ -35,7 +35,7 @@ Then edit `config/env/local-config.js` to match your local environment.
 Run Tracman with npm:
 
 ```sh
-(npm run minify & npm run build) && npm start
+npm run minify && npm start
 ```
 
 ...or with [nodemon](https://nodemon.io/):

@@ -60,7 +60,7 @@
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo npm update && sudo npm prune",
-    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*"
+    "minify": "rm static/**/.*.min.* && minify --template .{{filename}}.min.{{ext}} --clean static/js ; minify --template .{{filename}}.min.{{ext}} --clean static/css"
   },
   "repository": "Tracman-org/Server",
   "keywords": [

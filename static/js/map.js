@@ -1,9 +1,6 @@
 'use strict'
-/* global alert mapuser userid disp noHeader mapKey navigator token */
+/* global alert io $ loadGoogleMapsAPI mapuser userid disp noHeader mapKey navigator token */
 
-import io from 'socket.io-client'
-import $ from 'jquery'
-import loadGoogleMapsAPI from 'load-google-maps-api'
 
 // Variables
 var map, marker, elevator, newLoc

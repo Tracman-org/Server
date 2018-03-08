@@ -13,9 +13,8 @@ config/env/*
 !config/env/sample.js
 !config/env/travis.js
 
-# Minified or bundled static files (can be built with `npm run minify && npm run build`)
-static/css/*.min.*
-static/**/*.bun.*
+# Minified static files
+static/**/*.min.*
 
 # Ignore docs files
 _gh_pages
