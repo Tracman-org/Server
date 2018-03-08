@@ -4,10 +4,13 @@ const router = require('express').Router()
 const mw = require('../middleware')
 const env = require('../env/env')
 const sanitize = require('mongo-sanitize')
-const User = require('../models').user
+const Map = require('../models').map
+const debug = require('debug')('tracman-routes-map')
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req, res) => {
+  //TODO: Get rid of this route and add a page with map selection
+  debug(`Redirecting user to their first map`)
   res.redirect(`/map/${req.user.maps[0].slug}`)
 })
 
@@ -55,7 +58,7 @@ router.get('/:slug?', async (req, res, next) => {
     if (req.params.slug != sanitize(req.params.slug)) {
       throw new Error(`Possible injection attempt with slug: ${req.params.slug}`)
     } else {
-      let map = await Map.findOne({slug: req.params.slug})
+      let map = await Map.findOne({slug: sanitize(req.params.slug)})
       if (!map) next() // 404
       else {
         res.render('map', {

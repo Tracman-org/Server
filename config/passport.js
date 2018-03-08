@@ -57,6 +57,7 @@ module.exports = (passport) => {
         // Successful login
         } else {
           try {
+            // Attempt rescheme
             let reschemed_user = await rescheme(user)
             reschemed_user.isNewUser = !Boolean(user.lastLogin)
             reschemed_user.lastLogin = Date.now()
