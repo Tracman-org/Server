@@ -1,12 +1,12 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="T" title="The Tracman Logo">Tracman
-###### v 0.8.2
+###### v 0.9.0
 
 node.js application to display a sharable map with user's location.
 
-[![Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
+[![Travis Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
+[![Coverage Status](https://coveralls.io/repos/github/Tracman-org/Server/badge.svg?branch=master)](https://coveralls.io/github/Tracman-org/Server?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/Tracman-org/Server.svg?columns=all)](https://waffle.io/Tracman-org/Server)
-
+[![Snyk Vulnerabilities](https://snyk.io/test/github/Tracman-org/Server/badge.svg)](https://snyk.io/test/github/Tracman-org/Servr)
 
 ## Installation
 
@@ -24,7 +24,7 @@ A good method is to simply copy the sample configuration and point `config/env/e
 
 ```sh
 cp config/env/sample.js config/env/local-config.js
-echo "module.exports = require('./local-config');" > config/env/env.js
+echo "module.exports = require('./local-config')" > config/env/env.js
 ```
 
 Then edit `config/env/local-config.js` to match your local environment.
@@ -56,13 +56,16 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-###### latest
+###### v0.9.0
+* [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
+* [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication
+* [#120](https://github.com/Tracman-org/Server/issues/120) Split config/routes/settings.js into two files
+* Removed express validator and replaced with homegrown function
 * Fixed showing welcome message on every login
+* Removed naked domains
 
-###### v0.8.1/2
+###### v0.8.x
 * Hotfixed service worker bugs
-
-#### v0.8.0
 * Added check to ensure only the newest location is sent
 * Removed buggy login/-out redirects
 * [#111](https://github.com/Tracman-org/Server/issues/111) Implemented service worker
@@ -97,7 +100,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 [view full license](LICENSE.md)
 
 Tracman: GPS tracking service in node.js
-Copyright © 2017 [Keith Irwin](https://www.keithirwin.us/)
+Copyright © 2018 [Keith Irwin](https://www.keithirwin.us/)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

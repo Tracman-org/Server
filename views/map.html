@@ -96,6 +96,7 @@
 {{super()}}
 
 	<!-- Variables from server-side -->
+	<!-- TODO: Move to own script file, maybe with https://github.com/brooklynDev/JShare -->
 	<script>
 		const mapData = JSON.parse('{{map |dump|safe}}')
 		const mapKey = "{{mapApi |safe}}"

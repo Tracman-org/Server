@@ -19,6 +19,7 @@
 		<h1>Map Settings</h1>
 
 		<form id='settings-form' role="form" method="post">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 			<div id='name' class='form-group' title="This is shown in the window title when the map is viewed. ">
 				<label for="name">Name</label>

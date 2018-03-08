@@ -4,6 +4,7 @@ const mw = require('../middleware')
 const User = require('../models').user
 const mail = require('../mail')
 const env = require('../env/env')
+const sanitize = require('mongo-sanitize')
 const zxcvbn = require('zxcvbn')
 const moment = require('moment')
 const debug = require('debug')('tracman-routes-account')
@@ -100,7 +101,7 @@ router.route('/password/:token')
     debug('/account/password/:token .all() called')
     try {
       let user = await User
-        .findOne({'auth.passToken': req.params.token})
+        .findOne({'auth.passToken': sanitize(req.params.token)})
         .where('auth.passTokenExpires').gt(Date.now())
 
       if (!user) {

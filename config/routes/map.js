@@ -1,9 +1,16 @@
 'use strict'
 
 const router = require('express').Router()
+<<<<<<< HEAD
 const mw = require('../middleware')
 const env = require('../env/env')
 const Map = require('../models').map
+=======
+const mw = require('../middleware.js')
+const env = require('../env/env.js')
+const sanitize = require('mongo-sanitize')
+const User = require('../models.js').user
+>>>>>>> develop
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, (req, res) => {
@@ -51,9 +58,11 @@ router.get('/demo', (req, res, next) => {
 // Show map
 router.get('/:slug?', async (req, res, next) => {
   try {
-    let map = await Map.findOne({slug: req.params.slug})
+    if (req.params.slug != sanitize(req.params.slug)) {
+      throw new Error(`Possible injection attempt with slug: ${req.params.slug}`)
+    } else {
+      let map = await Map.findOne({slug: req.params.slug})
     if (!map) next() // 404
-
     else {
       res.render('map', {
         active: (req.user && req.user.maps[0].id === map.id)? 'map':'', // For header nav

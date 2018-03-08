@@ -2,6 +2,8 @@
 
 // Imports
 const debug = require('debug')('tracman-sockets')
+const sanitize = require('mongo-sanitize')
+const User = require('./models.js').user
 const Vehicle = require('./models').vehicle
 
 // Check for tracking clients
@@ -82,7 +84,7 @@ module.exports = {
         } else {
           try {
             // Get loc.veh
-            let vehicle = await Vehicle.findById(loc.veh)
+            let vehicle = await Vehicle.findById(sanitize(loc.veh))
               .where('sk32').equals(loc.tok)
 
             if (!vehicle) {

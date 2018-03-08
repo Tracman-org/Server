@@ -19,6 +19,7 @@
 		<h1>Account Settings</h1>
 
 		<form id='settings-form' role="form" method="post">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 			<div id='name' class='form-group' title="This is your name.  It doesn't really matter what you put here. ">
 				<label for="name">Name</label>

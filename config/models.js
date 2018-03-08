@@ -95,14 +95,10 @@ userSchema.methods.createPassToken = function () {
 
   return new Promise( async (resolve, reject) => {
 
-    // Reuse old token, resetting clock
+    // Reuse old token
     if (user.auth.passTokenExpires >= Date.now()) {
       debug(`Reusing old password token...`)
-      user.auth.passTokenExpires = Date.now() + 3600000 // 1 hour
-      try {
-        await user.save()
-        resolve([user.auth.passToken, user.auth.passTokenExpires])
-      } catch (err) { reject(err) }
+      resolve([user.auth.passToken, user.auth.passTokenExpires])
 
     // Create new token
     } else {

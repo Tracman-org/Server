@@ -8,6 +8,7 @@ const Vehicle = require('../models').vehicle
 const crypto = require('crypto')
 const moment = require('moment')
 const slugify = require('slug')
+const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env')
 
@@ -186,7 +187,7 @@ module.exports = (app, passport) => {
               (async function checkSlug (s, cb) {
                 try {
                   debug(`Checking to see if slug ${s} is taken...`)
-                  let existing_map = await Map.findOne({slug: s})
+                  let existing_map = await Map.findOne({slug: sanitize(s)})
 
                   // Slug in use: generate a random one and retry
                   if (existing_map) {
@@ -290,7 +291,7 @@ module.exports = (app, passport) => {
 
         // Check if somebody has that email
         try {
-          let user = await User.findOne({'email': req.body.email})
+          let user = await User.findOne({'email': sanitize(req.body.email)})
 
           // No user with that email
           if (!user) {

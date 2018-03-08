@@ -1,8 +1,13 @@
 # Tracman Server Changelog
-### v0.8.2
+### v0.9.0
 
-###### latest
+###### v0.9.0
+* [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
+* [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication
+* [#120](https://github.com/Tracman-org/Server/issues/120) Split config/routes/settings.js into two files
+* Removed express validator and replaced with homegrown function
 * Fixed showing welcome message on every login
+* Removed naked domains
 
 ###### v0.8.1/2
 * Hotfixed service worker bugs

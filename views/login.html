@@ -24,6 +24,7 @@
 	
 				<h3>Login</h3>
 				<form method="post">
+					<input type="hidden" name="_csrf" value="{{csrfToken}}">
 					
 					<div id='social-login' class='flex form-group'>
 						
@@ -64,6 +65,7 @@
 				<h3>Create account</h3>
 				<p>Welcome aboard!  </p>
 				<form action="/signup" method="post">
+					<input type="hidden" name="_csrf" value="{{csrfToken}}">
 					<input type="email" name="email" placeholder="Your email" required>
 					<p>You will be sent an email confrimation with a link to create a password. </p>
 					<p>By signing up, you agree to our <a href="/terms">terms of service</a> and <a href="/privacy">privacy policy</a>. </p>

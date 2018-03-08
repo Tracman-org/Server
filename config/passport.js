@@ -7,6 +7,7 @@ const TwitterStrategy = require('passport-twitter').Strategy
 const GoogleTokenStrategy = require('passport-google-id-token')
 const FacebookTokenStrategy = require('passport-facebook-token')
 const TwitterTokenStrategy = require('passport-twitter-token')
+const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-passport')
 const env = require('./env/env')
 const mw = require('./middleware')
@@ -34,7 +35,7 @@ module.exports = (passport) => {
   }, async (req, email, password, done) => {
     debug(`Perfoming local login for ${email}`)
     try {
-      let user = await User.findOne({'email': email})
+      let user = await User.findOne({'email': sanitize(email)})
 
       // No user with that email
       if (!user) {
