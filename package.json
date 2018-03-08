@@ -9,7 +9,6 @@
     "connect-flash-plus": "^0.2.1",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
-    "css-loader": "^0.28.7",
     "csurf": "^1.9.0",
     "debug": "^2.6.9",
     "express": "^4.15.5",
@@ -37,9 +36,6 @@
     "slug": "^0.9.1",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
-    "style-loader": "^0.18.2",
-    "uglifyjs-webpack-plugin": "^0.4.6",
-    "webpack": "^3.6.0",
     "xss": "^0.3.4",
     "zxcvbn": "^4.4.2"
   },
@@ -64,9 +60,7 @@
     "start": "node server.js",
     "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
     "update": "sudo npm update && sudo npm prune",
-    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*",
-    "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "subuild": "sudo node_modules/.bin/webpack --config webpack.config.js"
+    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*"
   },
   "repository": "Tracman-org/Server",
   "keywords": [
