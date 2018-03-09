@@ -52,7 +52,7 @@
     "uglify-es": "^3.3.9"
   },
   "scripts": {
-    "test": "node_modules/mocha/bin/_mocha --exit",
+    "test": "node_modules/mocha/bin/_mocha",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --exit test/*",
     "audit": "node_modules/nsp/bin/nsp audit-package ; node_modules/nsp/bin/nsp audit-shrinkwrap",
     "lint": "standard",
