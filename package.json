@@ -57,7 +57,7 @@
     "audit": "node_modules/nsp/bin/nsp audit-package ; node_modules/nsp/bin/nsp audit-shrinkwrap",
     "lint": "standard",
     "start": "node server.js",
-    "nodemon": "nodemon server.js",
+    "nodemon": "nodemon",
     "update": "sudo npm prune && sudo npm update",
     "less": "for file in static/css/*.css; do lessc --clean-css $file static/css/.$(basename ${file%.*}).min.css; done",
     "uglify": "for file in static/js/*.js; do uglifyjs $file --output static/js/.$(basename ${file%.*}).min.js --verbose --compress --mangle 'reserved=google.maps'; done",
@@ -65,7 +65,11 @@
   },
   "nodemonConfig": {
     "ext": "html, js, json, less, css",
-    "ignore": "['package.json','static/**/*.min.*','*.md','test/*','config/env/*']"
+    "ignore": "['static/**/*.min.*','*.md','test/*','config/env/*']",
+    "events": {
+      "start": "npm run build",
+      "restart": "npm run build"
+    }
   },
   "repository": "Tracman-org/Server",
   "keywords": [

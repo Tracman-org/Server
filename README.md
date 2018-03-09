@@ -44,7 +44,7 @@ npm run build && npm start
 npm run nodemon
 ```
 
-Nodemon will automatically rebuild and restart the app when you make changes.  Check out the `nodemon.json` configuration.
+Nodemon will automatically rebuild and restart the app when you make changes. 
 
 
 ## Contributing
