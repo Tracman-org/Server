@@ -43,7 +43,7 @@ router.get('/demo', (req, res, next) => {
         units: 'standard'
       }
     },
-    mapApi: env.googleMapsAPI,
+    mapKey: env.googleMapsAPI,
     user: req.user,
     noFooter: '1',
     noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
@@ -64,9 +64,9 @@ router.get('/:slug?', async (req, res, next) => {
         res.render('map', {
           active: (req.user && req.user.maps[0].id === map.id)? 'map':'', // For header nav
           mapData: map,
-          mapApi: env.googleMapsAPI,
+          mapKey: env.googleMapsAPI,
           user: req.user, // TODO: MULTIPLE: Check if this is needed
-          // Check if user can set a vehicle in this map
+          // TODO: Check if user can set a vehicle in this map
           setVehicleId: (map.vehicles.indexOf(req.user.setVehicles[0])>=0)? req.user.setVehicles[0].id : '',
           noFooter: '1',
           noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,

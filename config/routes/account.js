@@ -165,5 +165,5 @@ router.route('/password/:token')
 
     }
   })
-  
+
 module.exports = router

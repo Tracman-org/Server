@@ -7,7 +7,7 @@ branches:
 before_script:
   - echo "module.exports = require('./travis.js')" > config/env/env.js
 script:
-  - npm run minify & npm run build
+  - npm run build
 
 # Send coverage data to Coveralls
 after_script:

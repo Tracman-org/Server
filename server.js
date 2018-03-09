@@ -65,7 +65,8 @@ let ready_promise_list = []
     'script-src': ["'self'",
       "'unsafe-inline'", // TODO: Get rid of this
       'https://code.jquery.com',
-      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/*',
+      'https://cdnjs.cloudflare.com/ajax/libs/socket.io/',
+      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/',
       'https://www.google.com/recaptcha',
       'https://www.google-analytics.com',
       'https://maps.googleapis.com',
@@ -179,7 +180,7 @@ app.post('/csp-violation', (req, res) => {
   // Catch-all for 404s
   app.use((req, res, next) => {
     if (!res.headersSent) {
-      var err = new Error(`Not found: ${req.url}`)
+      let err = new Error(`Not found: ${req.url}`)
       err.status = 404
       next(err)
     }

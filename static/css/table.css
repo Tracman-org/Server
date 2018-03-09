@@ -2,7 +2,7 @@ table {
 	width: 100%;
 }
 
-thead > tr:nth-child() {
+thead > tr {
 	background: #333333;
 }
 tr:nth-child(even) {

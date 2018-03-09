@@ -1,7 +1,7 @@
 'use strict'
 /* global $ */
 
-var validEmail, validMessage
+let validEmail, validMessage
 
 // Validate email addresses
 function validateEmail (email) {

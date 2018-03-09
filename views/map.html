@@ -106,7 +106,10 @@
 		const token = "{{user.maps[0].vehicles[0].sk32 |safe}}"
 	</script>
 
-	<!-- Webpacked bundles -->
-	<script type="application/javascript" src="/static/js/.map.bun.js"></script>
+	<!-- Imports -->
+	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapKey|safe}}&callback=initMap"
+    async defer></script>
+	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js" integrity="sha256-jniDwC1PC9OmGoyPxA9VpGvgwDYyxsMqu5Q4OrF5wNY=" crossorigin="anonymous"></script>
+	<script type="application/javascript" src="/static/js/.map.min.js"></script>
 
 {% endblock %}
