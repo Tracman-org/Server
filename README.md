@@ -35,7 +35,7 @@ Then edit `config/env/local-config.js` to match your local environment.
 Run Tracman with npm:
 
 ```sh
-npm run minify && npm start
+npm run build && npm start
 ```
 
 ...or with [nodemon](https://nodemon.io/):
@@ -44,7 +44,7 @@ npm run minify && npm start
 npm run nodemon
 ```
 
-Nodemon will automatically minify and bundle files and restart the app when you make changes.  Check out the `nodemon.json` configuration.
+Nodemon will automatically rebuild and restart the app when you make changes.  Check out the `nodemon.json` configuration.
 
 
 ## Contributing

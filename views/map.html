@@ -106,15 +106,16 @@
 	<!-- Variables from server-side -->
 	<!-- TODO: Move to own script file, maybe with https://github.com/brooklynDev/JShare -->
 	<script>
-		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
-			noHeader = "{{noHeader |safe}}",
-			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
-			userid = "{{user._id |safe}}",
-			token = "{{user.sk32 |safe}}";
+		const mapuser = JSON.parse('{{mapuser |dump|safe}}')
+		const mapKey = '{{mapKey|safe}}'
+		const noHeader = "{{noHeader |safe}}"
+		const disp = "{{disp |safe}}" // 0=map, 1=streetview, 2=both
+		const userid = "{{user._id |safe}}"
+		const token = "{{user.sk32 |safe}}"
 	</script>
 
 	<!-- Imports -->
-	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapApi|safe}}&callback=initMap"
+	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapKey|safe}}&callback=initMap"
     async defer></script>
 	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js" integrity="sha256-jniDwC1PC9OmGoyPxA9VpGvgwDYyxsMqu5Q4OrF5wNY=" crossorigin="anonymous"></script>
 	<script type="application/javascript" src="/static/js/.map.min.js"></script>

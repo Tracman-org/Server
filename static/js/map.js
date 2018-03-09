@@ -1,5 +1,5 @@
 'use strict'
-/* global alert io $ mapuser userid disp noHeader mapKey navigator token */
+/* global alert io google $ mapuser userid disp noHeader mapKey navigator token */
 
 
 // Variables
@@ -199,12 +199,12 @@ $(function () {
 })
 
 // Load google maps API
-function initMap(googlemaps) {
+function initMap() {
 
   // Create map
   if (disp !== '1') {
     // Create map and marker elements
-    map = new googlemaps.Map(mapElem, {
+    map = new google.maps.Map(mapElem, {
       center: {
         lat: mapuser.last.lat,
         lng: mapuser.last.lon
@@ -215,10 +215,10 @@ function initMap(googlemaps) {
       draggable: false,
       zoom: mapuser.settings.defaultZoom,
       streetViewControl: false,
-      zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
-      mapTypeId: (mapuser.settings.defaultMap === 'road') ? googlemaps.MapTypeId.ROADMAP : googlemaps.MapTypeId.HYBRID
+      zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
+      mapTypeId: (mapuser.settings.defaultMap === 'road') ? google.maps.MapTypeId.ROADMAP : google.maps.MapTypeId.HYBRID
     })
-    marker = new googlemaps.Marker({
+    marker = new google.maps.Marker({
       position: { lat: mapuser.last.lat, lng: mapuser.last.lon },
       title: mapuser.name,
       icon: (mapuser.settings.marker) ? '/static/img/marker/' + mapuser.settings.marker + '.png' : '/static/img/marker/red.png',
@@ -236,7 +236,7 @@ function initMap(googlemaps) {
       logoDiv.innerHTML = '<a href="https://www.tracman.org/">' +
         '<img src="https://www.tracman.org/static/img/style/logo-28.png" alt="[]">' +
         "<span class='text'>Tracman</span></a>"
-      map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv)
+      map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv)
     }
 
     // Create update time block
@@ -245,7 +245,7 @@ function initMap(googlemaps) {
     if (mapuser.last.time) {
       timeDiv.innerHTML = 'location updated ' + new Date(mapuser.last.time).toLocaleString()
     }
-    map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
 
     // Create speed block
     if (mapuser.settings.showSpeed) {
@@ -263,12 +263,12 @@ function initMap(googlemaps) {
       speedSign.appendChild(speedLabel)
       speedSign.appendChild(speedText)
       speedSign.appendChild(speedUnit)
-      map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(speedSign)
+      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign)
     }
 
     // Create altitude block
     if (mapuser.settings.showAlt) {
-      elevator = new googlemaps.ElevationService()
+      elevator = new google.maps.ElevationService()
       const altitudeSign = document.createElement('div')
       const altitudeLabel = document.createElement('div')
       const altitudeText = document.createElement('div')
@@ -288,7 +288,7 @@ function initMap(googlemaps) {
       altitudeSign.appendChild(altitudeLabel)
       altitudeSign.appendChild(altitudeText)
       altitudeSign.appendChild(altitudeUnit)
-      map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(altitudeSign)
+      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign)
     }
   }
 
@@ -301,13 +301,13 @@ function initMap(googlemaps) {
   function getAlt (loc) {
     return new Promise(function (resolve, reject) {
       // Get elevator service
-      elevator = elevator || new googlemaps.ElevationService()
+      elevator = elevator || new google.maps.ElevationService()
       // Query API
       return elevator.getElevationForLocations({
         'locations': [{ lat: loc.lat, lng: loc.lon }]
       }, function (results, status, errorMessage) {
           // Success; return altitude
-        if (status === googlemaps.ElevationStatus.OK && results[0]) {
+        if (status === google.maps.ElevationStatus.OK && results[0]) {
           console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
           resolve(results[0].elevation)
 
@@ -365,7 +365,7 @@ function initMap(googlemaps) {
       $('#timestamp').text('location updated ' + newLoc.tim)
 
       // Update marker and map center
-      googlemaps.event.trigger(map, 'resize')
+      google.maps.event.trigger(map, 'resize')
       map.setCenter({ lat: newLoc.lat, lng: newLoc.lon })
       marker.setPosition({ lat: newLoc.lat, lng: newLoc.lon })
 
@@ -393,7 +393,7 @@ function initMap(googlemaps) {
   function getStreetViewData (loc, rad, cb) {
     // Ensure that the location hasn't changed (or this is the initial setting)
     if (newLoc == null || loc.tim === newLoc.tim) {
-      if (!sv) var sv = new googlemaps.StreetViewService()
+      if (!sv) var sv = new google.maps.StreetViewService()
       sv.getPanorama({
         location: {
           lat: loc.lat,
@@ -403,11 +403,11 @@ function initMap(googlemaps) {
       }, function (data, status) {
         switch (status) {
           // Success
-          case googlemaps.StreetViewStatus.OK: {
+          case google.maps.StreetViewStatus.OK: {
             cb(data)
             break
           // No results in that radius
-          } case googlemaps.StreetViewStatus.ZERO_RESULTS: {
+          } case google.maps.StreetViewStatus.ZERO_RESULTS: {
             // Try again with a bigger radius
             getStreetViewData(loc, rad * 2, cb)
             break
