@@ -18,7 +18,7 @@ function replaceFromEndpoint (type, selector, cb) {
 
 // On page load
 $(function () {
-  var slugNotUnique, emailNotUnique
+  let slugNotUnique, emailNotUnique
 
   // Set timezone in password change link
   $('#password').attr('href', '/account/password?tz=' + new Date().getTimezoneOffset())
@@ -37,7 +37,7 @@ $(function () {
     basicCheck(function () { validateUniqueness(input) })
 
     function basicCheck (cb) {
-      var checkedCount = 0
+      let checkedCount = 0
 
       // Check slug
       if (!$('#slug-input').val()) {
@@ -74,7 +74,7 @@ $(function () {
     function validateUniqueness (input) {
       function recheckBasic () {
         if (
-          $('#email-help').is(':visible') && 
+          $('#email-help').is(':visible') &&
           $('#email-help').text().substring(0, 25) !== 'Unable to confirm unique '
         ) {
           $('#submit-group .main')
@@ -113,7 +113,7 @@ $(function () {
             // Is unique
               200: function () {
                 $('#' + input + '-help').hide()
-                if (input === 'slug') slugNotUnique = false 
+                if (input === 'slug') slugNotUnique = false
                 else if (input === 'email') emailNotUnique = false
                 recheckBasic()
               },

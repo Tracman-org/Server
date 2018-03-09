@@ -48,7 +48,7 @@ $(function () {
       $('#password-help').show()
 
       // Check first password
-      var zxcvbnResult = zxcvbn($('#p1').val())
+      let zxcvbnResult = zxcvbn($('#p1').val())
 
       // Less than an hour
       if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 3600) {

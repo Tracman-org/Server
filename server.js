@@ -179,7 +179,7 @@ app.post('/csp-violation', (req, res) => {
   // Catch-all for 404s
   app.use((req, res, next) => {
     if (!res.headersSent) {
-      var err = new Error(`Not found: ${req.url}`)
+      let err = new Error(`Not found: ${req.url}`)
       err.status = 404
       next(err)
     }

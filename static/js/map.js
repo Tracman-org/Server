@@ -3,11 +3,11 @@
 
 
 // Variables
-var map, marker, elevator, newLoc
+let map, marker, elevator, newLoc
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes in seconds
-var _idleSecondsCounter = 0
+let _idleSecondsCounter = 0
 
 // Idle timeout listeners
 function resetIdleSecondsCounter () {
@@ -76,7 +76,7 @@ $(function () {
   toggleMaps(mapuser.last)
 
   // Controls
-  var wpid, newloc
+  let wpid, newloc
 
   // Set location
   $('#set-loc').click(function () {
@@ -89,7 +89,7 @@ $(function () {
 
           // Success callback
           function (pos) {
-            var newloc = {
+            let newloc = {
               ts: Date.now(),
               tok: token,
               usr: userid,
