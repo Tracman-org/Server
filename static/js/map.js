@@ -1,9 +1,10 @@
 'use strict'
-/* global alert io google $ mapData userid setVehicleId disp noHeader mapKey navigator token */
+/* global alert io google $ mapData setVehicleId disp noHeader mapKey navigator token */
 
 
 // Variables
-let map, markers, elevator, newLoc
+let map, elevator, newLoc
+let markers = []
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
@@ -200,7 +201,7 @@ function initMap() {
       zoom: mapData.settings.defaultMap.zoom,
       streetViewControl: false,
       zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
-      mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? google.maps.MapTypeId.HYBRID : googlemaps.MapTypeId.ROADMAP
+      mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
     })
     mapData.vehicles.forEach(function(vehicle){
       markers[vehicle.id] = new google.maps.Marker({
@@ -244,7 +245,7 @@ function initMap() {
       speedLabel.id = 'spd-label'
       speedLabel.innerHTML = 'SPEED'
       speedText.id = 'spd'
-      speedText.innerHTML = (mapData.settings.units === 'standard') ? (parseFloat(mapData.last.spd) * 2.23694).toFixed() : mapData.last.spd.toFixed()
+      speedText.innerHTML = (mapData.settings.units === 'standard') ? (parseFloat(mapData.vehicles[0].last.spd) * 2.23694).toFixed() : mapData.vehicles[0].last.spd.toFixed()
       speedUnit.id = 'spd-unit'
       speedUnit.innerHTML = (mapData.settings.units === 'standard') ? 'm.p.h.' : 'k.p.h.'
       speedSign.id = 'spd-sign'
@@ -267,7 +268,7 @@ function initMap() {
       altitudeSign.id = 'alt-sign'
       altitudeText.innerHTML = ''
       altitudeLabel.innerHTML = 'ALTITUDE'
-      parseAlt(mapData.last).then(function (alt) {
+      parseAlt(mapData.vehicles[0].last).then(function (alt) {
         altitudeText.innerHTML = metersToFeet(alt)
       }).catch(function (err) {
         console.error('Could not load altitude from last known location: ', err)

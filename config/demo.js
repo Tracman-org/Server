@@ -22,13 +22,14 @@ module.exports = (io, filename='demo.txt') => {
             sendLoc(0)
           } else {
             let loc = lines[ln].split(' ')
-            //debug(`Sending demo location: ${loc[1]}, ${loc[2]}`)
+            debug(`Sending demo location: ${loc[1]}, ${loc[2]}`)
             io.to('demo').emit('get', {
               tim: new Date(),
+              veh: 'demo-veh',
               lat: loc[1],
               lon: loc[2],
               dir: loc[3],
-              spd: loc[4]
+              spd: loc[4],
             })
 
             // Repeat after delay in milliseconds
