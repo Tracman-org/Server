@@ -65,7 +65,8 @@ router.get('/:slug', async (req, res, next) => {
   debug(`Map with slug ${req.params.slug} requested`)
   try {
     if (req.params.slug != sanitize(req.params.slug)) {
-      throw new Error(`Possible injection attempt with slug: ${req.params.slug}`)
+      console.error(`Possible injection attempt with slug: ${req.params.slug}`)
+      next() // 404
     } else {
       let map = await Map.findOne({slug: sanitize(req.params.slug)})
       if (!map) next() // 404
