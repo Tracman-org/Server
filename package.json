@@ -65,8 +65,7 @@
     "ext": "html, js, json, less, css",
     "ignore": "['static/**/*.min.*','*.md','test/*','config/env/*']",
     "events": {
-      "start": "npm run build",
-      "restart": "npm run build"
+      "start": "npm run build"
     }
   },
   "repository": "Tracman-org/Server",
