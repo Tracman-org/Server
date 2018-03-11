@@ -238,8 +238,8 @@ ready_promise_list.push( new Promise( (resolve, reject) => {
     // Check for spectators for all users
     ready_promise_list.push( new Promise( async (resolve, reject) => {
       try {
-        (await User.find({})).forEach( (user) => {
-          sockets.checkForUsers(io, user.id)
+        (await Map.find({})).forEach( (map) => {
+          sockets.checkForUsers(io, map.id)
         })
         resolve()
       } catch (err) {
