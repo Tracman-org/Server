@@ -72,14 +72,15 @@ module.exports = function (old_user) {
       })
       debug(`Created new user ${new_user.id}`)
 
-      // Delete old object
-      // try {
-      //   await old_user.remove()
-      //   debug(`Deleted old user ${old_user_object.id}`)
-      // } catch (err) {
-      //   console.error(`Unable to delete old user ${old_user_id}:\n`,err.stack)
-      //   reject(err)
-      // }
+      // Delete old user
+      try {
+        var old_user_id = old_user.id
+        await old_user.remove()
+        debug(`Deleted old user ${old_user_id}`)
+      } catch (err) {
+        console.error(`Unable to delete old user ${old_user_id}:\n`,err.stack)
+        reject(err)
+      }
 
       // Save new objects
       try {

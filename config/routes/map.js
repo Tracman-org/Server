@@ -77,7 +77,7 @@ router.get('/:slug', async (req, res, next) => {
           mapKey: env.googleMapsAPI,
           user: req.user,
           // TODO: Check if user can set a vehicle in this map
-          setVehicleId: (map.vehicles.indexOf(req.user.setVehicles[0])>=0)? req.user.setVehicles[0].id : '',
+          setVehicleId: '',
           noFooter: '1',
           noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
           disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both

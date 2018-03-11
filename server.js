@@ -238,15 +238,7 @@ ready_promise_list.push( new Promise( async (resolve, reject) => {
     let all_users = await User.find({})
     all_users.forEach( (user) => {
       try {
-        rescheme(user).then((new_user) => {
-          try {
-            debug(`Removing user ${user.id}...`)
-            user.remove()
-          } catch (err) {
-            console.error(`Unable to remove user ${user.id}:\n`,err.stack)
-            reject(err)
-          }
-        })
+        rescheme(user)
       }
       catch (err) {
         console.error(`Unable to rescheme user ${user.id}:\n`,err.stack)
