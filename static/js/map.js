@@ -202,6 +202,7 @@ function initMap() {
       mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
     })
     mapData.vehicles.forEach(function(vehicle){
+      if (vehicle._id===undefined) vehicle._id=vehicle.id // Demo
       //console.log('Creating marker for',vehicle._id)
       markers[vehicle._id] = new google.maps.Marker({
         position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
