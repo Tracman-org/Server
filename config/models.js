@@ -5,45 +5,12 @@ const unique = require('mongoose-unique-validator')
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const debug = require('debug')('tracman-models')
+const Schema = mongoose.Schema
+const ObjectId = Schema.Types.ObjectId
 
-const vehicleSchema = new mongoose.Schema({
+const userSchema = new Schema({
   name: String,
-  last: {
-    time: Date,
-    lat: {type: Number, default: 0},
-    lon: {type: Number, default: 0},
-    dir: {type: Number, default: 0},
-    alt: {type: Number},
-    spd: {type: Number, default: 0}
-  },
-  sk32: {type: String, required: true},
-  marker: {type: String, default: 'red'},
-}).plugin(unique)
-
-const mapSchema = new mongoose.Schema({
-  name: {type: String},
-  slug: {type: String, required: true, /*unique: true*/}, //TODO: Make unique after rescheme
-  settings: {
-    units: {type: String, default: 'standard'},
-    defaultMap: {
-      type: {type: String, default: 'road'},
-      lat: {type: Number, default: 0},
-      lon: {type: Number, default: 0},
-      zoom: {type: Number, default: 11},
-    },
-    showScale: {type: Boolean, default: false},
-    showSpeed: {type: Boolean, default: false},
-    showTemp: {type: Boolean, default: false},
-    showAlt: {type: Boolean, default: false},
-    showStreetview: {type: Boolean, default: false},
-  },
-  lastUpdate: Date,
-  vehicles: [vehicleSchema],
-}).plugin(unique)
-
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: {type: String, required: true, /*unique: true*/}, //TODO: Make unique after rescheme
+  email: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
   newEmail: String,
   emailToken: String,
   auth: {
@@ -54,13 +21,51 @@ const userSchema = new mongoose.Schema({
     facebook: String,
     twitter: String,
   },
-  isSiteAdmin: {type: Boolean, required: true, default: false},
-  isPro: {type: Boolean, required: true, default: false},
-  created: {type: Date, required: true},
+  isSiteAdmin: { type:Boolean, required:true, default:false },
+  isPro: { type:Boolean, required:true, default:false },
+  created: { type:Date, required:true },
   lastLogin: Date,
   isNewUser: Boolean,
-  maps: [mapSchema],
-  setVehicles: [vehicleSchema],
+  sk32: { type:String, required:true },
+  setVehicle: { type:ObjectId, ref:'Vehicle' },
+  adminMaps: [{ type:ObjectId, ref:'Map' }],
+}).plugin(unique)
+
+const vehicleSchema = new Schema({
+  name: String,
+  last: {
+    time: Date,
+    lat: { type:Number, default:0 },
+    lon: { type:Number, default:0 },
+    dir: { type:Number, default:0 },
+    alt: { type:Number },
+    spd: { type:Number, default:0 },
+  },
+  marker: { type:String, default:'red' },
+  map: { type:ObjectId, ref:'Map' },
+  setByUser: { type:ObjectId, ref:'User' },
+}).plugin(unique)
+
+const mapSchema = new Schema({
+  name: String,
+  slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
+  settings: {
+    units: { type:String, default:'standard' },
+    defaultMap: {
+      type: { type:String, default:'road' },
+      lat: { type:Number, default:0 },
+      lon: { type:Number, default:0 },
+      zoom: { type:Number, default:11 },
+    },
+    showScale: { type:Boolean, default:false },
+    showSpeed: { type:Boolean, default:false },
+    showTemp: { type:Boolean, default:false },
+    showAlt: { type:Boolean, default:false },
+    showStreetview: { type:Boolean, default:false },
+  },
+  lastUpdate: Date,
+  vehicles: [{ type:ObjectId, ref:'Vehicle' }],
+  admins: [{ type:ObjectId, ref:'User' }],
 }).plugin(unique)
 
 /* User methods */
@@ -157,8 +162,13 @@ userSchema.methods.validPassword = function (password) {
   return bcrypt.compare(password, user.auth.password)
 }
 
+// Set models outside exports for populate
+let User = mongoose.model('User', userSchema)
+let Map = mongoose.model('Map', mapSchema)
+let Vehicle = mongoose.model('Vehicle', vehicleSchema)
+
 module.exports = {
-  'user': mongoose.model('User', userSchema),
-  'map': mongoose.model('Map', mapSchema),
-  'vehicle': mongoose.model('Vehicle', vehicleSchema),
+  'user': User,
+  'map': Map,
+  'vehicle': Vehicle,
 }

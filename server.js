@@ -88,7 +88,10 @@ let ready_promise_list = []
       'https://fonts.googleapis.com',
       'https://maxcdn.bootstrapcdn.com',
     ],
-    'font-src': ['https://fonts.gstatic.com'],
+    'font-src': [
+      'https://fonts.gstatic.com',
+      'https://maxcdn.bootstrapcdn.com/font-awesome/',
+    ],
     'img-src': ["'self'",
       'https://www.google-analytics.com',
       'https://maps.gstatic.com',
@@ -236,15 +239,17 @@ ready_promise_list.push(mail.verify())
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
     let all_users = await User.find({})
-    all_users.forEach( (user) => {
+    all_users.forEach( async (user) => {
       try {
-        rescheme(user)
+        let reschemed_user = await rescheme(user)
+        debug(`Finished attempted rescheme of ${reschemed_user.id}`)
       }
       catch (err) {
         console.error(`Unable to rescheme user ${user.id}:\n`,err.stack)
         reject(err)
       }
     })
+    resolve()
   } catch (err) {
     console.error(`Couldn't find all users:\n`,err.stack)
     reject(err)

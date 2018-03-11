@@ -4,7 +4,7 @@
 
 // Variables
 let map, elevator, newLoc
-let markers = []
+let markers = {}
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
@@ -46,16 +46,14 @@ function metersToFeet (meters) {
 socket
   .on('connect', function () {
     console.log('Connected!')
-
     // Can get location
     socket.emit('can-get', mapData._id)
-
     // Can set location too
     if (setVehicleId) socket.emit('can-set', setVehicleId)
   }).on('disconnect', function () {
     console.log('Disconnected!')
   }).on('error', function (err) {
-    console.error(err.stack)
+    console.error(err)
   })
 
 // On page load
@@ -204,7 +202,8 @@ function initMap() {
       mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
     })
     mapData.vehicles.forEach(function(vehicle){
-      markers[vehicle.id] = new google.maps.Marker({
+      //console.log('Creating marker for',vehicle._id)
+      markers[vehicle._id] = new google.maps.Marker({
         position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
         title: vehicle.name,
         icon: (vehicle.marker) ? '/static/img/marker/' + vehicle.marker + '.png' : '/static/img/marker/red.png',

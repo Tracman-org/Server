@@ -1,4 +1,4 @@
-'use strict'
+'use strict' /* global sendToken */
 
 const mw = require('../middleware')
 const mail = require('../mail')
@@ -60,7 +60,7 @@ module.exports = (app, passport) => {
     .post( async (req, res, next) => {
 
       // Send token and alert user
-      const sendToken = async function(user) {
+      async function sendToken(user) {
         debug(`sendToken() called for user ${user.id}`)
 
         // Create a new password token
@@ -171,14 +171,18 @@ module.exports = (app, passport) => {
           } else {
             debug(`User with email ${req.body.email} doesn't exist; creating one`)
 
-            let email = req.body.email
-
             // Create new user, map, and vehicle
             let user = new User()
             let map = new Map()
             let vehicle = new Vehicle()
             user.created = Date.now()
-            user.email = email
+            user.email = req.body.email
+            user.setVehicle = vehicle
+            user.adminMaps = [map]
+            map.vehicles = [vehicle]
+            map.admins = [user]
+            vehicle.setByUser = user
+            vehicle.map = map
 
             // Generate unique slug
             const slug = new Promise((resolve, reject) => {
@@ -187,7 +191,7 @@ module.exports = (app, passport) => {
               (async function checkSlug (s, cb) {
                 try {
                   debug(`Checking to see if slug ${s} is taken...`)
-                  let existing_map = await Map.findOne({slug: sanitize(s)})
+                  let existing_map = await Map.findOne({slug: s})
 
                   // Slug in use: generate a random one and retry
                   if (existing_map) {
@@ -199,7 +203,7 @@ module.exports = (app, passport) => {
                         reject()
                       }
                       if (buf) {
-                        checkSlug(buf.toString('hex'), cb)
+                        checkSlug(sanitize(buf.toString('hex')), cb)
                       }
                     })
 
@@ -215,16 +219,18 @@ module.exports = (app, passport) => {
                 }
 
               // Start recursive function chain using first part of email as initial slug
-              })(slugify(email.substring(0,email.indexOf('@'))), (newSlug) => {
+              })( sanitize(slugify(
+                user.email.substring( 0, user.email.indexOf('@') )
+              )), (newSlug) => {
                 debug(`Successfully created slug: ${newSlug}`)
                 map.slug = newSlug
-                resolve()
+                resolve(newSlug)
               })
             })
 
             // Generate sk32
             const sk32 = new Promise((resolve, reject) => {
-              debug('Creating sk32 for vehicle...')
+              debug('Creating sk32 for user...')
               crypto.randomBytes(32, (err, buf) => {
                 if (err) {
                   debug('Failed to create sk32!')
@@ -232,8 +238,8 @@ module.exports = (app, passport) => {
                   reject()
                 }
                 if (buf) {
-                  vehicle.sk32 = buf.toString('hex')
-                  debug(`Successfully created sk32: ${vehicle.sk32}`)
+                  user.sk32 = buf.toString('hex')
+                  debug(`Successfully created sk32: ${user.sk32}`)
                   resolve()
                 }
               })
@@ -242,8 +248,6 @@ module.exports = (app, passport) => {
             // Save user and send the token by email
             try {
               await Promise.all([slug, sk32])
-              map.vehicles.push(vehicle)
-              user.maps.push(map)
               sendToken(user)
             } catch (err) {
               debug('Failed to save user after creating slug and sk32!')
@@ -365,7 +369,7 @@ module.exports = (app, passport) => {
   // Android
   app.post('/login/app', passport.authenticate('local'), appLoginCallback)
 
-  // Token-based (android social)
+  // Token-based (android social login)
   app.get(['/login/app/google', '/auth/google/idtoken'], passport.authenticate('google-token'), appLoginCallback)
   // app.get('/login/app/facebook', passport.authenticate('facebook-token'), appLoginCallback);
   // app.get('/login/app/twitter', passport.authenticate('twitter-token'), appLoginCallback);

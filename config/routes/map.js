@@ -8,10 +8,11 @@ const Map = require('../models').map
 const debug = require('debug')('tracman-routes-map')
 
 // Redirect to real slug
-router.get('/', mw.ensureAuth, (req, res) => {
+router.get('/', mw.ensureAuth, async (req, res) => {
   //TODO: Get rid of this route and add a page with map selection
-  debug(`Redirecting user to their first map`)
-  res.redirect(`/map/${req.user.maps[0].slug}`||'/')
+  debug(`Redirecting user to the map they can set`)
+  let map = await Map.findOne({'vehicles':{$in:[req.user.setVehicle]}})
+  res.redirect(`/map/${map.slug}`||'/')
 })
 
 // Demo
@@ -69,15 +70,15 @@ router.get('/:slug', async (req, res, next) => {
       next() // 404
     } else {
       let map = await Map.findOne({slug: sanitize(req.params.slug)})
+        .populate('vehicles').exec()
       if (!map) next() // 404
       else {
         res.render('map', {
-          active: (req.user && req.user.maps[0].id === map.id)? 'map':'', // For header nav
+          active: (req.user && req.user.adminMaps[0] === map.id)? 'map':'', // For header nav
           mapData: map,
           mapKey: env.googleMapsAPI,
           user: req.user,
-          // TODO: Check if user can set a vehicle in this map
-          setVehicleId: '',
+          setVehicleId: (req.isAuthenticated())? req.user.setVehicle :'',
           noFooter: '1',
           noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
           disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both
