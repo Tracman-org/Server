@@ -15,12 +15,15 @@ const passport = require('passport')
 const flash = require('connect-flash-plus')
 const env = require('./config/env/env')
 const User = require('./config/models').user
+const Map = require('./config/models').map
 const mail = require('./config/mail')
 const demo = require('./config/demo')
 const app = express()
+const rescheme = require('./config/rescheme')
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const sockets = require('./config/sockets')
+const debug = require('debug')('tracman-server')
 
 // Promises marking a ready server
 let ready_promise_list = []
@@ -227,6 +230,34 @@ console.log(`Starting ${env.mode} server at ${__dirname}...`)
 
 // Test SMTP server
 ready_promise_list.push(mail.verify())
+
+// Rescheme database
+//TODO: Remove this after reschemed
+ready_promise_list.push( new Promise( async (resolve, reject) => {
+  try {
+    let all_users = await User.find({})
+    all_users.forEach( (user) => {
+      try {
+        rescheme(user).then((new_user) => {
+          try {
+            debug(`Removing user ${user.id}...`)
+            user.remove()
+          } catch (err) {
+            console.error(`Unable to remove user ${user.id}:\n`,err.stack)
+            reject(err)
+          }
+        })
+      }
+      catch (err) {
+        console.error(`Unable to rescheme user ${user.id}:\n`,err.stack)
+        reject(err)
+      }
+    })
+  } catch (err) {
+    console.error(`Couldn't find all users:\n`,err.stack)
+    reject(err)
+  }
+}) )
 
 // Listen
 ready_promise_list.push( new Promise( (resolve, reject) => {

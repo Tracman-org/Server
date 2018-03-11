@@ -12,7 +12,6 @@ const debug = require('debug')('tracman-passport')
 const env = require('./env/env')
 const mw = require('./middleware')
 const User = require('./models').user
-const rescheme = require('./rescheme')
 
 module.exports = (passport) => {
 
@@ -56,22 +55,10 @@ module.exports = (passport) => {
 
         // Successful login
         } else {
-          try {
-            // Attempt rescheme
-            let reschemed_user = await rescheme(user)
-            reschemed_user.isNewUser = !Boolean(user.lastLogin)
-            reschemed_user.lastLogin = Date.now()
-            try {
-              reschemed_user.save()
-              return done(null, reschemed_user)
-            } catch (err) {
-              debug(`Unable to save reschemed and logged-in user ${reschemed_user.id}!`)
-              return done(err)
-            }
-          } catch (err) {
-            debug(`Unable to rescheme user ${user.id}!`)
-            return done(err)
-          }
+          user.isNewUser = !Boolean(user.lastLogin)
+          user.lastLogin = Date.now()
+          user.save()
+          return done(null, user)
         }
 
       }

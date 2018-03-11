@@ -73,14 +73,13 @@ module.exports = function (old_user) {
       debug(`Created new user ${new_user.id}`)
 
       // Delete old object
-      let old_user_id = old_user_object.id
-      try {
-        await old_user.remove()
-        debug(`Deleted old user ${old_user_id}`)
-      } catch (err) {
-        debug(`Unable to delete old user ${old_user_id}!`)
-        reject(err)
-      }
+      // try {
+      //   await old_user.remove()
+      //   debug(`Deleted old user ${old_user_object.id}`)
+      // } catch (err) {
+      //   console.error(`Unable to delete old user ${old_user_id}:\n`,err.stack)
+      //   reject(err)
+      // }
 
       // Save new objects
       try {
@@ -92,7 +91,7 @@ module.exports = function (old_user) {
         debug(`Saved new user, map, and vehicle`)
         resolve(new_user)
       } catch (err) {
-        debug(`Unable to save new user, map, or vehicle!`)
+        console.error(`Unable to save new user, map, or vehicle:\n`,err.stack)
         reject(err)
       }
 

@@ -21,8 +21,8 @@ const vehicleSchema = new mongoose.Schema({
 }).plugin(unique)
 
 const mapSchema = new mongoose.Schema({
-  name: {type: String, unique: true},
-  slug: {type: String, required: true, unique: true},
+  name: {type: String},
+  slug: {type: String, required: true, /*unique: true*/}, //TODO: Make unique after rescheme
   settings: {
     units: {type: String, default: 'standard'},
     defaultMap: {
@@ -43,7 +43,7 @@ const mapSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema({
   name: String,
-  email: {type: String, unique: true},
+  email: {type: String, required: true, /*unique: true*/}, //TODO: Make unique after rescheme
   newEmail: String,
   emailToken: String,
   auth: {
