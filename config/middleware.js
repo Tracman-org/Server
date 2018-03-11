@@ -36,14 +36,14 @@ module.exports = {
 
 	// Ensure authentication
 	ensureAuth: (req, res, next) => {
-		debug(`ensureAuth(${req.url}, ${res.status}, ${next})`)
+		debug(`ensureAuth called at ${req.url}`)
 		if (req.isAuthenticated()) return next()
 		else res.redirect('/login')
 	},
 
 	// Ensure administrator
 	ensureAdmin: (req, res, next) => {
-		debug(`ensureAdmin(${req.url}, ${res.status}, ${next})`)
+		debug(`ensureAdmin called at ${req.url}`)
 		if (req.isAuthenticated() && req.user.isSiteAdmin) return next()
 		else {
 			let err = new Error("Unauthorized")
