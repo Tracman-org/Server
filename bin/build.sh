@@ -37,5 +37,4 @@ else
 	done
 fi
 
-echo "DONE!"
 exit 0
