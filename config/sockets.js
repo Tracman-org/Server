@@ -3,8 +3,11 @@
 // Imports
 const debug = require('debug')('tracman-sockets')
 const sanitize = require('mongo-sanitize')
-const Map = require('./models').map
-const Vehicle = require('./models').vehicle
+const models = require('./models')
+
+const User = models.user
+const Map = models.map
+const Vehicle = models.vehicle
 
 // Check for tracking clients
 function checkForViewers (io, map) {
@@ -31,14 +34,14 @@ module.exports = {
       debug(`${socket.id} connected.`)
 
       // Set a few variables
-      socket.ip = socket.client.request.headers['x-real-ip'];
-      //socket.ua = socket.client.request.headers['user-agent'];
+      socket.ip = socket.client.request.headers['x-real-ip']
+      socket.ua = socket.client.request.headers['user-agent']
 
       // Log and errors
-      //socket.on('log', (text) => {
-      //  debug(`LOG: ${text}`)
-      //})
-      //socket.on('error', (err) => { console.error(err.stack) })
+      socket.on('log', (text) => {
+        debug(`LOG: ${text}`)
+      })
+      socket.on('error', (err) => { console.error(err.stack) })
 
       // This socket can set location (app)
       socket.on('can-set', async (vehicleId) => {
@@ -68,13 +71,22 @@ module.exports = {
         if (loc.ts) loc.tim = +loc.ts
         else loc.tim = Date.now()
 
-        debug(loc)
+        // Look up vehicle if usr is supplied
+        // (for backwards-compatibility with old android versions)
+        if (loc.usr && !loc.veh) {
+          try {
+            let user = await User.findById(loc.usr)
+            loc.veh = user.setVehicle
+          } catch (err) {
+            console.error(`Unable to look up vehicle for loc.usr of ${loc.usr}:\n${err.stack}`)
+          }
+        }
 
-        // Check for user and sk32 token
+        // Check for vehicle and sk32 token
         if (!loc.veh) {
           console.error(
             new Error(
-              `Recieved an update from ${socket.ip} without a veh!`
+              `Recieved an update from ${socket.ip} without a veh or usr!`
             ).message
           )
         } else if (!loc.tok) {
@@ -85,7 +97,7 @@ module.exports = {
           )
         } else {
           try {
-            // Get loc.veh
+            // Get vehicle
             debug(`Finding vehicle with loc.veh ID of ${loc.veh} and sk32 of ${loc.tok}`)
             if (loc.veh !== sanitize(loc.veh)) {
               console.error(`Potential injection attempt with loc.veh of ${loc.veh}!`)
