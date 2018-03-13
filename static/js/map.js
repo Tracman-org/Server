@@ -25,12 +25,16 @@ window.setInterval( function CheckIdleTime () {
   if (_idleSecondsCounter >= IDLE_TIMEOUT) {
     if (socket.connected) {
       console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
+      $('#inactive-mask').show()
+      $('#inactive-message').show()
       socket.disconnect()
     }
   // Connect user if disconnected
   } else {
     if (!socket.connected) {
       console.log('Reconnecting the user because they are no longer idle.')
+      $('#inactive-mask').hide()
+      $('#inactive-message').hide()
       socket.connect()
     }
   }
@@ -371,6 +375,7 @@ function initMap() {
           console.error(err.stack)
         })
       }
+
     }
 
     // Update street view
@@ -410,6 +415,7 @@ function initMap() {
 
   // Update streetview
   function updateStreetView (loc) {
+
     // Calculate bearing between user and position of streetview image
     // https://stackoverflow.com/a/26609687/3006854
     function getBearing (userLoc, imageLoc) {
@@ -443,6 +449,7 @@ function initMap() {
         '&key=' + mapKey
       )
     })
+
   }
 
 // Error loading gmaps API

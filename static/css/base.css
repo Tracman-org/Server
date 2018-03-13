@@ -221,6 +221,7 @@ a.underline:hover:not(.btn) {
 	justify-content: space-around;
 }
 .page-mask {
+	display: none;
 	z-index: 950;
 	background: rgba(0, 0, 0, 0.5);
 	position: fixed;
