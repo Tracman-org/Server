@@ -11,9 +11,9 @@ if [ ! -d static/css ]; then
 else
 	for oldfile in static/css/*.css; do
 		newfile="static/css/.$(basename ${oldfile%.*}).min.css"
-		# Check if modified
-		if [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
-			echo "$oldfile was modified.  Compiling..."
+		# Check if compiled version doesn't exist or the uncompiled one's changed
+		if [ ! -f $newfile ] || [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
+			echo "Compiling $oldfile to $newfile..."
 			node_modules/less/bin/lessc \
 				--clean-css $oldfile $newfile
 		fi
@@ -27,9 +27,9 @@ if [ ! -d static/js ]; then
 else
 	for oldfile in static/js/*.js; do
 		newfile="static/js/.$(basename ${oldfile%.*}).min.js"
-		# Check if modified
-		if [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
-			echo "$oldfile was modified.  Minifying..."
+		# Check if minified version doesn't exist or the minified one's changed
+		if [ ! -f $newfile ] || [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
+			echo "Minifying $oldfile to $newfile..."
 			node_modules/uglify-es/bin/uglifyjs \
 				$oldfile --output $newfile \
 				--verbose --compress --mangle 'reserved=google.maps'
