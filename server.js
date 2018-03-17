@@ -166,8 +166,7 @@ app.post('/csp-violation', (req, res) => {
   app.use('/contact', require('./config/routes/contact'))
 
   // Settings
-  app.use('/user-settings', require('./config/routes/user-settings'))
-  app.use('/map-settings', require('./config/routes/map-settings'))
+  app.use('/settings', require('./config/routes/settings'))
 
   // Account settings
   app.use('/account', require('./config/routes/account'))

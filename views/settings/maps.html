@@ -1,0 +1,23 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{super()}} | Map Settings{% endblock %}
+
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
+{% endblock %}
+
+{% block main %}
+
+	<section class='container'>
+
+		<h1>Map Settings</h1>
+
+		<ul>
+			{% for map in maps %}
+				<li><a href="/settings/map/{{map._id}}">{{map.name}}</a></li>
+			{% endfor %}
+		</ul>
+
+	</section>
+
+{% endblock %}

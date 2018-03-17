@@ -1,0 +1,207 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{super()}} | Settings for {{map.name or 'Untitled map'}}{% endblock %}
+
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/settings/.common.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/settings/.map.min.css">
+{% endblock %}
+
+{% block javascript %}
+{{super()}}
+	<!--<script type="application/javascript" src="/static/js/settings/.map.min.js"></script>-->
+{% endblock %}
+
+{% block main %}
+
+	<section class='container'>
+
+		<h1>Map Settings</h1>
+
+		<form class='map-settings-form' role="form" method="post" action="/settings/map">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+			<div class='name form-group' title="Shown in the window title when viewing the map">
+				<label for="name">Name</label>
+				<input class='name-input' name="name" type="text" value="{{map.name}}" maxlength="160">
+				<p id='map-name-help-{{map._id}}' class='red help'></p>
+			</div>
+
+			<div class='slug form-group' title="The URL for the map">
+				<label for="slug-input-{{map._id}}">URL</label>
+				<div class='input-with-addon-group'>
+					<input type="text" class='left input-addon' size="13" value="tracman.org/map/" disabled readonly>
+					<input type="text" id='slug-input-{{map._id}}' class='input-with-addon left' name="slug" value="{{map.slug}}" maxlength="160" required>
+				</div>
+				<p id='slug-help-{{map._id}}' class='red help'></p>
+			</div>
+
+			<div class='units form-group' title="Standard for feet/mph, metric for meters/kph">
+				<label for="units">Units</label>
+				<select name="units">
+					<option {% if map.settings.units=='standard' %}selected {% endif %}value="standard">Standard</option>
+					<option {% if map.settings.units=='metric' %}selected {% endif %}value="metric">Metric</option>
+				</select>
+			</div>
+
+			<div class='defaultMapType form-group' title="Default image shown to map viewers, which can be changed by visitors">
+				<label for="map">Default map</label>
+				<select name="map">
+					<option {% if map.settings.defaultType=='road' %}selected {% endif %}value="road">Road</option>
+					<option {% if map.settings.defaultType=='sat' %}selected {% endif %}value="sat">Satellite</option>
+				</select>
+			</div>
+
+			<div class='defaultZoom form-group' title="The initial map zoom level, though map edges may be affected by screen size">
+				<label for="zoom">Default zoom</label>
+				<select name="defaultZoom">
+					<option {% if map.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
+					<option {% if map.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>
+					<option {% if map.settings.defaultZoom==3 %}selected {% endif %}value="3">3</option>
+					<option {% if map.settings.defaultZoom==4 %}selected {% endif %}value="4">4</option>
+					<option {% if map.settings.defaultZoom==5 %}selected {% endif %}value="5">5 Landmass</option>
+					<option {% if map.settings.defaultZoom==6 %}selected {% endif %}value="6">6</option>
+					<option {% if map.settings.defaultZoom==7 %}selected {% endif %}value="7">7</option>
+					<option {% if map.settings.defaultZoom==8 %}selected {% endif %}value="8">8</option>
+					<option {% if map.settings.defaultZoom==9 %}selected {% endif %}value="9">9</option>
+					<option {% if map.settings.defaultZoom==10 %}selected {% endif %}value="10">10 City</option>
+					<option {% if map.settings.defaultZoom==11 %}selected {% endif %}value="11">11</option>
+					<option {% if map.settings.defaultZoom==12 %}selected {% endif %}value="12">12</option>
+					<option {% if map.settings.defaultZoom==13 %}selected {% endif %}value="13">13</option>
+					<option {% if map.settings.defaultZoom==14 %}selected {% endif %}value="14">14</option>
+					<option {% if map.settings.defaultZoom==15 %}selected {% endif %}value="15">15 Streets</option>
+					<option {% if map.settings.defaultZoom==16 %}selected {% endif %}value="16">16</option>
+					<option {% if map.settings.defaultZoom==17 %}selected {% endif %}value="17">17</option>
+					<option {% if map.settings.defaultZoom==18 %}selected {% endif %}value="18">18</option>
+					<option {% if map.settings.defaultZoom==19 %}selected {% endif %}value="19">19</option>
+					<option {% if map.settings.defaultZoom==20 %}selected {% endif %}value="20">20 Buildings</option>
+				</select>
+			</div>
+
+			<!--<div class='mapCenter form-group' title="Where the map's center should be">-->
+			<!--	<label for="map">Map Center</label>-->
+			<!--	<div>-->
+			<!--		<div class='radio'>-->
+			<!--			<input type="radio" name="center" value="follow" {% if map.settings.defaultType == 'road' %}checked{% endif %}>-->
+			<!--			<label>Follow:</label>-->
+			<!--			<select name="follow">-->
+			<!--				{% for vehicle in map.vehicles %}-->
+			<!--				<option {% if map.settings.center.follow==vehicle._id %}selected {% endif %}value="{{vehicle._id}}">{{vehicle.name}}</option>-->
+			<!--				{% endfor %}-->
+			<!--			</select>-->
+			<!--		</div>-->
+			<!--		<div class='radio'>-->
+			<!--			<input type="radio" name="center" value="static" {% if map.settings.defaultType == 'sat' %}checked{% endif %}>-->
+			<!--			<label>Static: </label>-->
+			<!--			<input class='short-input' name="staticLat" type="number" value="{{map.center.staticLat}}" placeholder="Latitude">,-->
+			<!--			<input class='short-input' name="staticLon" type="number" value="{{map.center.staticLat}}" placeholder="Longitude">-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</div>-->
+
+			<div class='map-center form-group' title="Where the map's center should be">
+				<label>Map Center</label>
+				<div>
+					<div class='button-col'>
+						<input id='{{map._id}}-center-follow' type="radio" name="center" value="follow" {% if map.settings.defaultType == 'road' %}checked{% endif %}>
+						<input id='{{map._id}}-center-static' type="radio" name="center" value="static" {% if map.settings.defaultType == 'sat' %}checked{% endif %}>
+					</div>
+					<div class='label-col'>
+						<label for="{{map._id}}-center-follow">Follow:</label>
+						<label for="{{map._id}}-center-static">Static: </label>
+					</div>
+					<div class='input-col'>
+						<select name="follow">
+							{% for vehicle in map.vehicles %}
+							<option {% if map.settings.center.follow==vehicle._id %}selected {% endif %}value="{{vehicle._id}}">{{vehicle.name}}</option>
+							{% endfor %}
+						</select>
+						<div class='coords'>
+							<input class='short-input left' name="staticLat" type="number" value="{{map.center.staticLat}}" placeholder="Latitude">
+							<input class='short-input right' name="staticLon" type="number" value="{{map.center.staticLat}}" placeholder="Longitude">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class='canZoom form-group' title="Whether visitors can zoom in and out">
+				<label for="canZoom">Show scale</label>
+				<input name="canZoom" type="checkbox" {% if map.settings.canZoom %}checked{% endif %}>
+			</div>
+
+			<div class='canPan form-group' title="Whether visitors can move the map">
+				<label for="canPan">Can pan</label>
+				<input name="canPan" type="checkbox" {% if map.settings.canPan %}checked{% endif %}>
+			</div>
+
+			<div class='showScale form-group' title="Shows a scale on the map.">
+				<label for="showScale">Show scale</label>
+				<input name="showScale" type="checkbox" {% if map.settings.display.scale %}checked{% endif %}>
+			</div>
+
+			<div class='showSpeed form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
+				<label for="showSpeed">Show speed{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.speed %}checked{% else %}{% endif %}>
+			</div>
+
+			<div class='showAltitude form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
+				<label for="showAlt">Show altitude{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.alt %}checked{% else %}{% endif %}>
+			</div>
+
+			<div class='showStreet form-group' title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image at or near your current location, oriented in the direction of travel. ">
+				<label for="showStreet">Show street view{% if not user.isPro %} <span class='red'>(PRO)</span>{% endif %}</label>
+				<input name="showStreet" type="checkbox" {% if not user.isPro %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
+			</div>
+
+			<h3>Vehicles</h3>
+			<table class='vehicles-table'>
+
+				<thead><tr>
+					<th><h4>Name</h4></th>
+					<th><h4>Marker</h4></th>
+					<th><h4>Setter</h4></th>
+				</tr></thead>
+
+				<tbody>
+				{% for vehicle in map.vehicles %}
+				<tr>
+					<td>
+						<input type="text" name="vehicle-name-{{vehicle._id}}" value="{{vehicle.name}}" title="The name of a vehicle appears when you mouseover or click on a marker on the map">
+					</td>
+					<td>
+						<select name="marker-{{vehicle._id}}" title="The color of the map marker">
+							<option {% if vehicle.marker=='red' or vehicle.marker=='' %}selected {% endif %}value="red">red</option>
+							<option {% if vehicle.marker=='black' %}selected {% endif %}value="black">black</option>
+							<option {% if vehicle.marker=='green' %}selected {% endif %}value="green">green</option>
+							<option {% if vehicle.marker=='grey' %}selected {% endif %}value="grey">grey</option>
+							<option {% if vehicle.marker=='orange' %}selected {% endif %}value="orange">orange</option>
+							<option {% if vehicle.marker=='purple' %}selected {% endif %}value="purple">purple</option>
+							<option {% if vehicle.marker=='white' %}selected {% endif %}value="white">white</option>
+							<option {% if vehicle.marker=='yellow' %}selected {% endif %}value="yellow">yellow</option>
+						</select>
+					</td>
+					<td class='setter'>
+						<input type="text" name="vehicle-setter-{{vehicle._id}}" value="{{vehicle.setByUser.email}}" title="The email address of the user account that can set the vehicle's location">
+						<i class='vehicle-setter-confirmed-{{vehicle._id}} fa fa-check-circle green'></i>
+						<i class='vehicle-setter-denied-{{vehicle._id}} fa fa-times-circle red'></i>
+						<i class='vehicle-setter-checking-{{vehicle._id}} fa fa-spinner fa-spin'></i>
+					</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+
+			</table>
+
+			<div class='submit-group form-group flexbox'>
+				<input class='main btn' type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="#" class='btn' title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+{% endblock %}
