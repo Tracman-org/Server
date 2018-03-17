@@ -51,11 +51,3 @@
 #social-connect > .btn.tw:not(.connected):hover {
 	background: rgb(89,213,255);
 }
-
-/* Submit buttons */
-#submit-group {
-	justify-content: space-around;
-}
-#submit-group .main {
-	width: 50%;
-}

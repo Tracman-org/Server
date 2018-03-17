@@ -1,0 +1,7 @@
+/* Submit buttons */
+.submit-group {
+	justify-content: space-around;
+}
+.submit-group .main {
+	width: 50%;
+}
