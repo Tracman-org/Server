@@ -9,8 +9,8 @@ cd $(dirname $0)/..
 if [ ! -d static/css ]; then
 	echo "static/css directory not found!"
 else
-	for oldfile in static/css/*.css; do
-		newfile="static/css/.$(basename ${oldfile%.*}).min.css"
+	for oldfile in $(find static/css -name '*.css' -not -path '*/\.*'); do
+		newfile="$(dirname $oldfile)/.$(basename ${oldfile%.*}).min.css"
 		# Check if compiled version doesn't exist or the uncompiled one's changed
 		if [ ! -f $newfile ] || [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
 			echo "Compiling $oldfile to $newfile..."
@@ -25,8 +25,8 @@ fi
 if [ ! -d static/js ]; then
 	echo "static/css directory not found!"
 else
-	for oldfile in static/js/*.js; do
-		newfile="static/js/.$(basename ${oldfile%.*}).min.js"
+	for oldfile in $(find static/js -name '*.js' -not -path '*/\.*'); do
+		newfile="$(dirname $oldfile)/.$(basename ${oldfile%.*}).min.js"
 		# Check if minified version doesn't exist or the minified one's changed
 		if [ ! -f $newfile ] || [ "$(stat -c %Y $oldfile)" -gt "$(stat -c %Y $newfile)" ]; then
 			echo "Minifying $oldfile to $newfile..."
