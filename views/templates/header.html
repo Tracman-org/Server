@@ -16,7 +16,7 @@
 			<li><a href="/contact"{% if active=='contact' %} class='active'{% endif %}>Contact</a></li>
 		{% if user %}
 			<li><a href="/map"{% if active=='map' %} class='active'{% endif %}>Map</a></li>
-			<li><a href="settings"{% if active=='-settings' %} class='active'{% endif %}>Settings</a></li>
+			<li><a href="/settings"{% if active=='-settings' %} class='active'{% endif %}>Settings</a></li>
 		{% else %}
 			<li><a href="/map/demo"{% if active=='demo' %} class='active'{% endif %}>Demo</a></li>
 		{% endif %}
