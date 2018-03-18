@@ -1,16 +1,16 @@
 'use strict'
 
-const router = require('express').Router(),
-  zxcvbn = require('zxcvbn'),
-  mw = require('../middleware'),
-  mail = require('../mail')
+const router = require('express').Router()
+const zxcvbn = require('zxcvbn')
+const mw = require('../middleware')
+const mail = require('../mail')
 
 router
 
   .get('/mail', async (req, res, next) => {
     try {
       await mail.send({
-        to: `"Keith Irwin" <hypergeek14@gmail.com>`,
+        to: `"Keith Irwin" <keith@tracman.org>`,
         from: mail.noReply,
         subject: 'Test email',
         text: mail.text("Looks like everything's working! "),
@@ -42,15 +42,6 @@ router
     } else {
       res.sendStatus(200)
     }
-  })
-
-  .get('/settings', (req, res) => {
-    res.render('settings')
-  })
-  .post('/settings', (req, res) => {
-
-    // TODO: Test validation here?
-
   })
 
 module.exports = router
