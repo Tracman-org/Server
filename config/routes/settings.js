@@ -125,7 +125,7 @@ router.get('/user/delete', mw.ensureAuth, async (req, res) => {
 })
 
 // Maps collection
-router.route('/map')
+router.route('/maps')
   .all(mw.ensureAuth, async (req, res, next) => {
     next()
   })
@@ -146,7 +146,7 @@ router.route('/map')
   })
 
 // Map item
-router.route('/map/:id')
+router.route('/maps/:id')
   .all(mw.ensureAuth, (req, res, next) => {
     next()
   })
@@ -162,7 +162,7 @@ router.route('/map/:id')
         },
       })
     if (!found_map) next() // 404
-    else res.render('settings/map', {
+    else res.render('settings/maps', {
       active: 'settings',
       map: found_map,
     })
@@ -229,7 +229,7 @@ router.route('/map/:id')
       req.flash('success', 'Settings updated. ')
 
     } catch (err) { mw.throwErr(err, req) }
-    finally { res.redirect('/map-settings') }
+    finally { res.redirect('/settings/maps') }
   })
 
   // Delete map
@@ -241,10 +241,10 @@ router.route('/map/:id')
       try {
         await found_map.remove()
         req.flash('success', `Map deleted`)
-        res.redirect('/settings/map')
+        res.redirect('/settings/maps')
       } catch (err) {
         mw.throwErr(err, req)
-        res.redirect(`/settings/map/${req.params.id}`)
+        res.redirect(`/settings/maps/${req.params.id}`)
       }
     }
   })
