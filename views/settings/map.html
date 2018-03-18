@@ -80,27 +80,6 @@
 				</select>
 			</div>
 
-			<!--<div class='mapCenter form-group' title="Where the map's center should be">-->
-			<!--	<label for="map">Map Center</label>-->
-			<!--	<div>-->
-			<!--		<div class='radio'>-->
-			<!--			<input type="radio" name="center" value="follow" {% if map.settings.defaultType == 'road' %}checked{% endif %}>-->
-			<!--			<label>Follow:</label>-->
-			<!--			<select name="follow">-->
-			<!--				{% for vehicle in map.vehicles %}-->
-			<!--				<option {% if map.settings.center.follow==vehicle._id %}selected {% endif %}value="{{vehicle._id}}">{{vehicle.name}}</option>-->
-			<!--				{% endfor %}-->
-			<!--			</select>-->
-			<!--		</div>-->
-			<!--		<div class='radio'>-->
-			<!--			<input type="radio" name="center" value="static" {% if map.settings.defaultType == 'sat' %}checked{% endif %}>-->
-			<!--			<label>Static: </label>-->
-			<!--			<input class='short-input' name="staticLat" type="number" value="{{map.center.staticLat}}" placeholder="Latitude">,-->
-			<!--			<input class='short-input' name="staticLon" type="number" value="{{map.center.staticLat}}" placeholder="Longitude">-->
-			<!--		</div>-->
-			<!--	</div>-->
-			<!--</div>-->
-
 			<div class='map-center form-group' title="Where the map's center should be">
 				<label>Map Center</label>
 				<div>
@@ -127,7 +106,7 @@
 			</div>
 
 			<div class='canZoom form-group' title="Whether visitors can zoom in and out">
-				<label for="canZoom">Show scale</label>
+				<label for="canZoom">Can Zoom</label>
 				<input name="canZoom" type="checkbox" {% if map.settings.canZoom %}checked{% endif %}>
 			</div>
 
