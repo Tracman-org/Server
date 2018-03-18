@@ -94,6 +94,7 @@ pre {
 }
 
 a {
+	cursor: pointer;
 	color: #fbc93d;
 	text-decoration: none;
 }
