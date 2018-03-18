@@ -43,11 +43,15 @@ module.exports = function (old_user) {
           lat: old_user_object.last.lat || 0,
           lon: old_user_object.last.lon || 0,
         },
-        showScale: old_user_object.settings.showScale || false,
-        showSpeed: old_user_object.settings.showSpeed || false,
-        showTemp: old_user_object.settings.showTemp || false,
-        showAlt: old_user_object.settings.showAlt || false,
-        showStreetview: old_user_object.settings.showStreetview || false,
+        canZoom: true, 
+        canPan: false,
+        display: {
+          scale: old_user_object.settings.showScale || false,
+          speed: old_user_object.settings.showSpeed || false,
+          temp: old_user_object.settings.showTemp || false,
+          alt: old_user_object.settings.showAlt || false,
+          streetview: old_user_object.settings.showStreetview || false,
+        },
       }
       new_map.lastUpdate = old_user_object.last.time
       new_map.vehicles = [new_vehicle]
