@@ -35,11 +35,13 @@ module.exports = function (old_user) {
       new_map.slug = old_user_object.slug
       new_map.settings = {
         units: old_user_object.settings.units || 'standard',
-        defaultMap: {
-          type: old_user_object.settings.defaultMap || 'road',
+        defaultMapType: old_user_object.settings.defaultMap || 'road',
+        defaultZoom: old_user_object.settings.defaultZoom || 11,
+        center: {
+          type: 'follow',
+          follow: new_vehicle.id, // Use id to prevent RangeError
           lat: old_user_object.last.lat || 0,
           lon: old_user_object.last.lon || 0,
-          zoom: old_user_object.settings.defaultZoom || 11,
         },
         showScale: old_user_object.settings.showScale || false,
         showSpeed: old_user_object.settings.showSpeed || false,
@@ -86,17 +88,28 @@ module.exports = function (old_user) {
       }
 
       // Save new objects
+      const save_object = function(obj, name) {
+        return new Promise( async (resolve, reject) => {
+          try {
+            await obj.save()
+            resolve()
+          } catch (err) {
+            console.error(`Unable to save new ${name}:\n`,err)
+            reject(err)
+          }
+        })
+      }
+
       try {
         await Promise.all([
-          new_user.save(),
-          new_vehicle.save(),
-          new_map.save(),
+          save_object(new_user,'user'),
+          save_object(new_map,'map'),
+          save_object(new_vehicle,'vehicle'),
         ])
         debug(`Saved new user, map, and vehicle`)
         resolve(new_user)
       } catch (err) {
-        console.error(`Unable to save new user, map, or vehicle:\n`,err.stack)
-        reject(err)
+        reject() // err already handled in each promise
       }
 
     }

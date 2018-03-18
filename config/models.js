@@ -50,12 +50,14 @@ const mapSchema = new Schema({
   name: String,
   slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
   settings: {
-    units: { type:String, default:'standard' },
-    defaultMap: {
-      type: { type:String, default:'road' },
+    units: { type:String, default:'standard' }, // 'standard' or 'metric'
+    defaultMapType: { type:String, default:'road' }, // 'road' or 'sat'
+    defaultZoom: { type:Number, default:11 },
+    center: {
+      type: { type:String, default:'follow' }, // 'static' or 'follow'
+      follow: { type:ObjectId, ref:'Vehicle' },
       lat: { type:Number, default:0 },
       lon: { type:Number, default:0 },
-      zoom: { type:Number, default:11 },
     },
     showScale: { type:Boolean, default:false },
     showSpeed: { type:Boolean, default:false },
