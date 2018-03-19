@@ -3,7 +3,9 @@
 const router = require('express').Router()
 const slug = require('slug')
 const xss = require('xss')
+const sanitize = require('mongo-sanitize')
 const User = require('../models').user
+const debug = require('debug')('tracman-routes-index')
 
 module.exports = router
 
@@ -50,10 +52,10 @@ module.exports = router
     // Validate unique slug
     if (req.query.slug) {
       try {
-        let existingUser = await User.findOne({
-          slug: slug(req.query.slug)
+        let existing_map = await Map.findOne({
+          slug: sanitize(slug(req.query.slug))
         })
-        if (existingUser && existingUser.id!==req.user.id) res.sendStatus(400)
+        if (existing_map && existing_map.id!==req.user.id) res.sendStatus(400)
         else res.sendStatus(200)
       } catch (err) {
         console.error(err)
@@ -62,9 +64,11 @@ module.exports = router
 
     // Validate unique email
     } else if (req.query.email) {
+      console.log(`Testing email ${req.query.email} for uniqueness`)
       try {
-        let existingUser = User.findOne({ email: req.query.email })
-        if (existingUser && existingUser.id !== req.user.id) {
+        let existing_user = User.findOne({ email: sanitize(req.query.email) })
+        if (existing_user.id && existing_user.id !== req.user.id) {
+          console.log(`Found user ${existing_user.id} with that email`)
           res.sendStatus(400)
         } else { res.sendStatus(200) }
       } catch (err) {
@@ -72,8 +76,11 @@ module.exports = router
         res.sendStatus(500)
       }
 
-    // Create slug
-    } else if (req.query.slugify) res.send(slug(xss(req.query.slugify)))
+    // Create slug and sanitize
+    } else if (req.query.slugify) res.send(sanitize(slug(xss(slug(req.query.slugify)))))
+
+    // Sanitize for mongo
+    else if (req.query.mongo) res.send(sanitize(req.query.mongo))
 
     // Sanitize for XSS
     else if (req.query.xss) res.send(xss(req.query.xss))
