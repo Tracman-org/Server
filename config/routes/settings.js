@@ -162,7 +162,7 @@ router.route('/maps/:id')
         },
       })
     if (!found_map) next() // 404
-    else res.render('settings/maps', {
+    else res.render('settings/map', {
       active: 'settings',
       map: found_map,
     })
