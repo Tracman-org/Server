@@ -30,7 +30,7 @@ router.route('/user')
   })
 
   // TODO: Set user settings
-  // .put( (req, res) => {
+  // .post( (req, res) => {
 
   //   // Validate email
   //   const checkEmail = new Promise( async (resolve, reject) => {
@@ -169,7 +169,7 @@ router.route('/maps/:id')
   })
 
   // TODO: Set new map settings
-  .put(async (req, res, next) => {
+  .post(async (req, res, next) => {
 
     // Validate slug
     const checkSlug = new Promise( async (resolve, reject) => {
