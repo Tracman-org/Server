@@ -10,7 +10,8 @@
 
 {% block javascript %}
 {{super()}}
-	<!--<script type="application/javascript" src="/static/js/settings/.user.min.js"></script>-->
+	<script type="application/javascript" src="/static/js/settings/.common.min.js"></script>
+	<script type="application/javascript" src="/static/js/settings/.user.min.js"></script>
 {% endblock %}
 
 {% block main %}
@@ -51,12 +52,12 @@
 
 			<div id='password-delete' class='form-group'>
 				<a id='password' class='underline' href="/account/password" title="{% if user.auth.password %}Change{% else %}Set{% endif %} your password">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
-				<a id='delete' class='red underline' style="text-align:right" title="Permently delete your Tracman account">Delete account</a>
+				<a id='delete' class='red underline' href="/settings/user/delete" style="text-align:right" title="Permently delete your Tracman account">Delete account</a>
 			</div>
 
-			<div class='submit-group form-group flexbox'>
-				<input class='main btn' type="submit" value="Save" title="Save your user settings">
-				<a href="#" class='btn' title="Discard your changes">cancel</a>
+			<div id='submit-group' class='form-group flexbox'>
+				<input class='main btn' type="submit" value="Save" title="Save your settings">
+				<a href="/settings" class='btn' title="Discard your changes">cancel</a>
 			</div>
 
 		</form>
