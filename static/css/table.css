@@ -3,12 +3,12 @@ table {
 }
 
 thead > tr {
-	background: #333333;
+	background: #282828;
 }
-tr:nth-child(even) {
+tbody tr:nth-child(odd) {
 	background: #111111;
 }
-tr:nth-child(odd) {
+tbody tr:nth-child(even) {
 	background: #181818;
 }
 

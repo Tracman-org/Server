@@ -1,1 +1,1 @@
-table{width:100%}thead>tr{background:#333}tr:nth-child(even){background:#111}tr:nth-child(odd){background:#181818}td{padding:1%}
+table{width:100%}thead>tr{background:#282828}tbody tr:nth-child(odd){background:#111}tbody tr:nth-child(even){background:#181818}td{padding:1%}

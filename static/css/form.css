@@ -3,11 +3,15 @@ form {
 	max-width: 800px;
 }
 
+form ul, form table,
+.form-group {
+	margin: 8vh 0;
+}
+
 .form-group {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-	margin: 8% 0;
 }
 
 /* Sizing */
@@ -30,17 +34,17 @@ form input:not(:disabled), form textarea:not(:disabled), form .input-addon {
 	-webkit-box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 	box-shadow: inset .11vw .18vw .25vw rgba(0,0,0,.5);
 }
-form input:disabled:not(.input-addon), form textarea:disabled, 
+form input:disabled:not(.input-addon), form textarea:disabled,
 form select:disabled {
-	border: 1px solid #444;	
+	border: 1px solid #444;
 }
 form input:not(.input-addon):not(.input-with-addon):not(.short-input):not([type="radio"]):not([type="checkbox"]),
 form .input-with-addon-group {
 	min-width: 50%;
 }
-form input:active:not(.input-addon), form textarea:active, 
+form input:active:not(.input-addon), form textarea:active,
 form select:active,
-form input:focus:not(.input-addon), form textarea:focus, 
+form input:focus:not(.input-addon), form textarea:focus,
 form select:focus {
 	outline: none;
 	border: 1px solid #fbc93d;
@@ -119,7 +123,7 @@ form select > option {
 }
 
 form .radio {
-	min-width: 150px; 
+	min-width: 150px;
 	display: flex;
 	justify-content: space-between;
 }

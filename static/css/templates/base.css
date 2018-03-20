@@ -98,6 +98,9 @@ a {
 	color: #fbc93d;
 	text-decoration: none;
 }
+a[disabled] {
+	cursor: not-allowed;
+}
 main a:hover:not(.btn) {
 	color: #fbc93d;
 	text-decoration: underline;
