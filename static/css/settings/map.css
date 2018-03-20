@@ -1,39 +1,41 @@
 /* Map center */
-.map-center > div {
+#map-center > div {
 	margin-left: auto;
 	width: inherit;
 	display: flex;
 }
-.map-center > div > div > :first-child {
+#map-center > div > div > :first-child {
 	margin-bottom: 10px;
 }
-.map-center .button-col input,
-.map-center .label-col label {
+#map-center .button-col input,
+#map-center .label-col label {
 	display: block;
 	margin-right: 15px;
 }
-.map-center .button-col input {
+#map-center .button-col input {
 	margin: 10px;
 }
-.map-center .input-col select {
+#map-center .input-col select {
 	width: 100%;
 }
-.map-center .short-input {
+#map-center .short-input {
 	min-width: 100px;
 	max-width: 50%;
 }
 
 /* Vehicles table */
-.vehicles-table thead {
+#vehicles-table thead {
 	margin: 2.5vh auto;
 }
-.vehicles-table td {
+#vehicles-table thead h4 { margin:2% auto; }
+#vehicles-table td {
 	position: relative;
+	text-align: center;
 }
-.vehicles-table input {
+#vehicles-table input {
 	width: 95%;
 }
-.vehicles-table select {
+#vehicles-table select {
 	width: 80%;
 	height: 60%;
 	position: absolute;
@@ -41,8 +43,8 @@
 	left: 50%;
 	transform: translate(-50%,-50%);
 }
-.vehicles-table .setter input {
+#vehicles-table .setter input {
 	width: 88%;
 }
-.vehicles-table .setter .fa-check-circle { display:none; }
-.vehicles-table .setter .fa-times-circle { display:none; }
+#vehicles-table .setter .fa-check { display:none; }
+#vehicles-table .setter .fa-times { display:none; }

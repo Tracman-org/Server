@@ -112,7 +112,7 @@ router.route('/user')
   //   finally { res.redirect('/settings/user') }
   // })
 
-// Delete account
+// Delete account TODO: Test this
 router.get('/user/delete', mw.ensureAuth, async (req, res) => {
   try {
     await User.findByIdAndRemove(req.user)
@@ -151,6 +151,7 @@ router.route('/maps/:id')
   .get( async (req, res, next) => {
     let found_map = await Map
       .findById(sanitize(req.params.id))
+      .populate('admins')
       .populate({
         path: 'vehicles',
         populate: {
@@ -228,25 +229,40 @@ router.route('/maps/:id')
     finally { res.redirect('/settings/maps') }
   })
 
-  // Delete map
-  .delete( async (req, res, next) => {
-    let found_map = await Map
-      .findById(sanitize(req.params.id))
-    if (!found_map) next() // 404
-    else {
-      try {
-        await found_map.remove()
-        req.flash('success', `Map deleted`)
-        res.redirect('/settings/maps')
-      } catch (err) {
-        mw.throwErr(err, req)
-        res.redirect(`/settings/maps/${req.params.id}`)
-      }
+// Delete map TODO: Test this
+router.get('/maps/:id/delete', mw.ensureAuth, async (req, res, next) => {
+  let found_map = await Map
+    .findById(sanitize(req.params.id))
+  if (!found_map) next() // 404
+  else {
+    try {
+      await found_map.remove()
+      req.flash('success', `Map deleted`)
+      res.redirect('/settings/maps')
+    } catch (err) {
+      mw.throwErr(err, req)
+      res.redirect(`/settings/maps/${req.params.id}`)
     }
-  })
+  }
+})
 
 // TODO: Create new vehicle
-router.post('map/:id/new-vehicle', mw.ensureAuth, (req, res) => {
+router.put('map/:id/vehicles', mw.ensureAuth, (req, res) => {
+
+})
+
+// TODO: Delete vehicle
+router.delete('map/:map-id/vehicles/:veh-id', mw.ensureAuth, (req, res) => {
+
+})
+
+// TODO: Create new admin
+router.put('/map/:id/admins', mw.ensureAuth, (req, res) => {
+
+})
+
+// TODO: Delete admin
+router.delete('map/:map-id/admins/:admin-id', mw.ensureAuth, (req, res) => {
 
 })
 
