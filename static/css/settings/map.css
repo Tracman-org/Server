@@ -1,5 +1,6 @@
 /* Map center */
 .map-center > div {
+	margin-left: auto;
 	width: inherit;
 	display: flex;
 }
