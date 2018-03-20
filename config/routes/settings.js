@@ -20,7 +20,7 @@ router.get('/', mw.ensureAuth, async (req, res) => {
 
 // User settings
 router.route('/user')
-  .all(mw.ensureAuth) //TODO: Test this and maybe apply everywhere
+  .all(mw.ensureAuth)
 
   // Show user settings page
   .get( (req, res) => {
@@ -126,9 +126,7 @@ router.get('/user/delete', mw.ensureAuth, async (req, res) => {
 
 // Maps collection
 router.route('/maps')
-  .all(mw.ensureAuth, async (req, res, next) => {
-    next()
-  })
+  .all(mw.ensureAuth)
 
   // List of maps
   .get( async (req, res) => {
@@ -147,9 +145,7 @@ router.route('/maps')
 
 // Map item
 router.route('/maps/:id')
-  .all(mw.ensureAuth, (req, res, next) => {
-    next()
-  })
+  .all(mw.ensureAuth)
 
   // Get map settings page
   .get( async (req, res, next) => {
@@ -255,13 +251,13 @@ router.post('map/:id/new-vehicle', mw.ensureAuth, (req, res) => {
 })
 
 // Redirects for URLs that moved to /account
-router.all('/password', (req,res)=>{
+router.all('/password', (req, res) => {
   res.redirect(307, '/account/password')
 })
-router.all('/password/:token', (req,res)=>{
+router.all('/password/:token', (req, res) => {
   res.redirect(307, `/account/password/${req.params.token}`)
 })
-router.all('/email/:token', (req,res)=>{
+router.all('/email/:token', (req, res) => {
   res.redirect(307, `/account/email/${req.params.token}`)
 })
 

@@ -43,9 +43,7 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
 
 // Set password
 router.route('/password')
-  .all(mw.ensureAuth, (req, res, next) => {
-    next()
-  })
+  .all(mw.ensureAuth)
 
   // Email user a token, proceed at /password/:token
   .get( async (req, res, next) => {
