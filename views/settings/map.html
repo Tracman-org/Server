@@ -11,7 +11,8 @@
 
 {% block javascript %}
 {{super()}}
-	<!--<script type="application/javascript" src="/static/js/settings/.map.min.js"></script>-->
+	<script type="application/javascript" src="/static/js/settings/.common.min.js"></script>
+	<script type="application/javascript" src="/static/js/settings/.map.min.js"></script>
 {% endblock %}
 
 {% block main %}
@@ -23,19 +24,19 @@
 		<form class='map-settings-form' role="form" method="post" action="/settings/map">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-			<div class='name form-group' title="Shown in the window title when viewing the map">
+			<div id='name' class='form-group' title="Shown in the window title when viewing the map">
 				<label for="name-input">Name</label>
 				<input id='name-input' name="name" type="text" value="{{map.name}}" maxlength="160">
 				<p id='map-name-help-{{map._id}}' class='red help'></p>
 			</div>
 
-			<div class='slug form-group' title="The URL for the map">
+			<div id='slug' class='form-group' title="The URL for the map">
 				<label for="slug-input">URL</label>
 				<div class='input-with-addon-group'>
 					<input type="text" class='left input-addon' size="13" value="tracman.org/map/" disabled readonly>
 					<input type="text" id='slug-input' class='input-with-addon left' name="slug" value="{{map.slug}}" maxlength="160" required>
 				</div>
-				<p id='slug-help-{{map._id}}' class='red help'></p>
+				<p id='slug-help' class='red help'></p>
 			</div>
 
 			<h3>Vehicles</h3>
@@ -233,7 +234,7 @@
 			</div>
 
 			<div class='submit-group form-group flexbox'>
-				<input class='main btn' type="submit" value="Save" title="Click here to save your changes. ">
+				<input id='submit-btn' class='main btn' type="submit" value="Save" title="Click here to save your changes. ">
 				<a href="#" class='btn' title="Click here to discard your changes. ">cancel</a>
 			</div>
 

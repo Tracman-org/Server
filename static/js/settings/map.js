@@ -3,108 +3,68 @@
 
 // On page load
 $(function () {
-  let slugNotUnique
+  console.log('page loaded')
+  let original_slug = $('#slug-input').val()
 
-  function validateForm () {
-    // Perform basic check, then validate uniqueness
-    basicCheck(function () { validateUniqueSlug() })
+  // Listen for change to slug
+  $('#slug-input').change( function () {
 
-    function basicCheck (cb) {
+    // Check slug existence
+    if (!$('#slug-input').val()) {
+      $('#slug-help').show().text('A URL is required. ')
+      $('#submit-btn')
+        .prop('disabled', true)
+        .prop('title', 'You need to enter a URL above')
 
-      // Check slug
-      if (!$('#slug-input').val()) {
-        $('#slug-help').show().text('A slug is required. ')
-        $('#submit-group .main')
-          .prop('disabled', true)
-          .prop('title', 'You need to enter a slug. ')
-        if (checkedCount > 0) cb(); else checkedCount++
-      } else {
-        if (!slugNotUnique) $('#slug-help').hide()
-        if (checkedCount > 0) cb(); else checkedCount++
-      }
+    // Check that slug's changed
+    } else if ($('#slug-input').val() === original_slug) {
+      $('#slug-help').hide()
+      $('#submit-btn')
+        .prop('disabled', false)
+        .prop('title', 'Save your settings')
+    } else {
 
-    }
+      // Slugify and sanitize against mongo injection
+      replaceFromEndpoint('slugify', '#slug-input', function () {
 
-    function validateUniqueSlug () {
-
-      function recheckBasic () {
-        
-        if (
-          $('#slug-help').is(':visible') &&
-          $('#slug-help').text().substring(0, 25) !== 'Unable to confirm unique '
-        ) {
-          $('#submit-group .main')
-            .prop('disabled', true)
-            .prop('title', 'You need to supply a different slug. ')
-            
-        } else if (
-          $('#slug-help').text().substring(0, 25) === 'Unable to confirm unique '
-        ) {
-          $('#submit-group .main')
-            .prop('title', 'Unable to confirm unique slug with the server. This might not work... ')
-            
-        } else $('#submit-group .main')
-            .prop('disabled', false).prop('title', 'Click here to save your changes. ')
-            
-      }
-
-      // Should server be queried for unique values?
-      if ($('#slug-input').val()) {
-        
-         // Query server for unique slug
-          $.ajax({
-            url: '/validate?slug=' + $('#slug-input').val(),
-            type: 'GET',
-            statusCode: {
+        // Check server for uniqueness
+        $.get({
+          url: '/validate?slug=' + $('#slug-input').val(),
+          statusCode: {
 
             // Is unique
-              200: function () {
-                $('#' + input + '-help').hide()
-                if (input === 'slug') slugNotUnique = false
-                else if (input === 'email') emailNotUnique = false
-                recheckBasic()
-              },
+            200: function () {
+              $('#slug-help').hide()
+              $('#submit-btn')
+                .prop('disabled', false)
+                .prop('title', 'Save your settings')
+            },
 
             // Isn't unique
-              400: function () {
-                if (input === 'slug') slugNotUnique = true
-                else if (input === 'email') emailNotUnique = true
-                $('#' + input + '-help').show()
-                  .text('That ' + input + ' is already in use by another user. ')
-                $('#submit-group .main')
-                  .prop('disabled', true)
-                  .prop('title', 'You need to supply a different ' + input + '. ')
-              }
+            400: function () {
+              $('#slug-help').show()
+                .text('That URL is already in use by another map.')
+              $('#submit-btn')
+                .prop('disabled', true)
+                .prop('title', 'Supply a different URL above')
+            }
 
-            } })
+          }
 
-          // Server error
-          .error(function () {
-            slugNotUnique = undefined
-            $('#slug-help').show()
-              .text('Unable to confirm unique slug.  This might not work... ')
-            recheckBasic()
-          })
-          
-        }
+        // Server error
+        }).fail(function () {
+          $('#email-help').show()
+            .text('Unable to confirm unique URL.  Are you still connected to the internet?')
+          $('#submit-btn')
+            .prop('disabled', false)
+            .prop('title', 'Try to save your settings')
+        })
 
-    }
-
-  }
-
-  // Input change listeners
-  $('#slug-input').change(function () {
-    if (!$('#slug-input').val()) {
-      $('#slug-help').show().text('A slug is required. ')
-      $('#submit-group .main')
-        .prop('disabled', true)
-        .prop('title', 'You need to enter a slug. ')
-    } else {
-      $('#slug-help').hide()
-      replaceFromEndpoint('slugify', '#slug-input', function () {
-        validateForm('slug')
       })
+
     }
   })
+
+
 
 })

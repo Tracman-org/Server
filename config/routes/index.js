@@ -5,6 +5,7 @@ const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
 const User = require('../models').user
+const Map = require('../models').map
 const debug = require('debug')('tracman-routes-index')
 
 module.exports = router
@@ -49,6 +50,7 @@ module.exports = router
 
   // Endpoint to validate forms
   .get('/validate', async (req, res, next) => {
+
     // Validate unique slug
     if (req.query.slug) {
       try {
