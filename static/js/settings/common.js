@@ -15,3 +15,16 @@ function replaceFromEndpoint (type, selector, cb) {
     if (typeof cb==='function') cb()
   })
 }
+
+// On page load
+$(function () {
+  
+  // Listen for change to name (map or user)
+  $('#name-input').change(function () {
+    if ($('#name-input').val()) {
+      replaceFromEndpoint('xss', '#name-input')
+    }
+  })
+  
+})
+  
