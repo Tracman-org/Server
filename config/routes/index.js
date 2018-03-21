@@ -51,8 +51,20 @@ module.exports = router
   // Endpoint to validate forms
   .get('/validate', async (req, res, next) => {
 
+    // Validate user with email exists
+    if (req.query.user) {
+      try {
+        if ( await User.findOne({
+          email: sanitize(req.query.user)
+        }) ) res.sendStatus(200)
+        else res.sendStatus(400)
+      } catch (err) {
+        console.error(err)
+        res.sendStatus(500)
+      }
+
     // Validate unique slug
-    if (req.query.slug) {
+    } else if (req.query.slug) {
       try {
         let existing_map = await Map.findOne({
           slug: sanitize(slug(req.query.slug))
