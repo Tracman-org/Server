@@ -27,7 +27,7 @@
 
 			<div id='name' class='form-group' title="It doesn't really matter what you put here">
 				<label for="name-input">Name</label>
-				<input id='name-input' name="name" type="text" value="{{user.name}}" maxlength="160">
+				<input id='name-input' class='xss-sensitive' name="name" type="text" value="{{user.name}}" maxlength="160">
 				<p id='name-help' class='red help'></p>
 			</div>
 

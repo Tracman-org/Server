@@ -3,7 +3,6 @@
 
 // On page load
 $(function () {
-  console.log('page loaded')
   let original_slug = $('#slug-input').val()
 
   // Listen for change to slug
@@ -64,7 +63,5 @@ $(function () {
 
     }
   })
-
-
 
 })
