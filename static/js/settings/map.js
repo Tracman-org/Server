@@ -207,4 +207,9 @@ $(function () {
 
   })
 
+  // Listen to adding of vehicles
+  $('#vehicle-add').click(function() {
+    
+  })
+
 })

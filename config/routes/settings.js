@@ -230,9 +230,10 @@ router.route('/maps/:id')
   })
 
 // Delete map TODO: Test this
-router.get('/maps/:id/delete', mw.ensureAuth, async (req, res, next) => {
+router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
+  debug(`Deleting map ${req.params.map}...`)
   let found_map = await Map
-    .findById(sanitize(req.params.id))
+    .findById(sanitize(req.params.map))
   if (!found_map) next() // 404
   else {
     try {
@@ -241,13 +242,14 @@ router.get('/maps/:id/delete', mw.ensureAuth, async (req, res, next) => {
       res.redirect('/settings/maps')
     } catch (err) {
       mw.throwErr(err, req)
-      res.redirect(`/settings/maps/${req.params.id}`)
+      res.redirect(`/settings/maps/${req.params.map}`)
     }
   }
 })
 
 // TODO: Create new vehicle
 router.post('/maps/:map/vehicles', mw.ensureAuth, (req, res) => {
+  debug(`Creating new vehicle for map ${req.params.map}...`)
 
 })
 
@@ -258,12 +260,13 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, (req, res) => {
 })
 
 // TODO: Create new admin
-router.post('/map/:id/admins', mw.ensureAuth, (req, res) => {
-
+router.post('/map/:map/admins', mw.ensureAuth, (req, res) => {
+  debug(`Creating new admin for map ${req.params.map}`)
 })
 
 // TODO: Delete admin
 router.delete('map/:map/admins/:admin', mw.ensureAuth, (req, res) => {
+  debug(`Deleting admin ${req.params.admin}...`)
 
 })
 
