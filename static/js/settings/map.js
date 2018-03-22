@@ -6,9 +6,10 @@ function checkSetterEmail(setter, vehicle_id) {
   // Check all setter emails (as on page load)
   if (typeof setter==='undefined') {
     $('.vehicle-setter').each( function(i) {
-      checkSetterEmail($(this), $(this).attr('name').slice(15))
+      checkSetterEmail($(this))
     })
   } else {
+    if (typeof vehicle_id==='undefined') vehicle_id = setter.attr('data-vehicle')
 
     // Show loading icon
     $('#vehicle-setter-icon-'+vehicle_id)
@@ -61,7 +62,7 @@ function checkSetterEmail(setter, vehicle_id) {
 
 // On page load
 $(function () {
-  let original_slug = $('#slug-input').val()
+  const original_slug = $('#slug-input').val()
 
   // Check emails of all setters
   checkSetterEmail()
@@ -127,10 +128,11 @@ $(function () {
 
   // Listen to changes to vehicle setter
   $('.vehicle-setter').change( function () {
-    let vehicle_id = $(this).attr('name').slice(15)
+    const vehicle_id = $(this).attr('data-vehicle')
+    const new_value = $(this).val()
 
     // Check setter existence
-    if (!$(this).val()) {
+    if (!new_value) {
       $('#vehicle-setter-icon-'+vehicle_id)
         .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
         .addClass('red fa-times')
@@ -140,7 +142,7 @@ $(function () {
         .prop('title', 'You need to enter an email address for each vehicle setter')
 
     // Check validity of setter email
-    } else if (!validateEmail($(this).val())) {
+    } else if (!validateEmail(new_value)) {
       $('#vehicle-setter-icon-'+vehicle_id)
         .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
         .addClass('red fa-times')
@@ -157,11 +159,12 @@ $(function () {
   // Listen to deleting of vehicles
   $('.vehicle-delete').click(function () {
     const delete_button = $(this)
+    const this_row = delete_button.closest('tr')
 
     // Hide the help
     $('#vehicles-help').hide()
     // Dim the row
-    $(this).closest('tr').css({
+    this_row.css({
       'filter': 'alpha(opacity=50)',
       '-moz-opacity': '0.5',
       '-khtml-opacity': '0.5',
@@ -175,12 +178,12 @@ $(function () {
       .css('cursor','not-allowed')
 
     $.ajax({ type: 'DELETE',
-      url: window.location.pathname+'/vehicles/'+$(this).attr('id').slice(15),
+      url: window.location.pathname+'/vehicles/'+$(this).attr('data-vehicle'),
       statusCode: {
 
         // Successfully deleted
         200: function(res) {
-          delete_button.closest('tr').remove()
+          this_row.remove()
         },
 
       }
@@ -191,7 +194,7 @@ $(function () {
         .text('Failed to delete that vehicle.  Are you still conected to the internet?  ')
 
       // Undim the row
-      delete_button.closest('tr').css({
+      this_row.css({
         'filter': '',
         '-moz-opacity': '',
         '-khtml-opacity': '',
@@ -209,7 +212,7 @@ $(function () {
 
   // Listen to adding of vehicles
   $('#vehicle-add').click(function() {
-    
+
   })
 
 })
