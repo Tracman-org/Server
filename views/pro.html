@@ -10,8 +10,8 @@
 {% endblock %}
 
 {% block main %}
-<section class='dark'>
-	<div class='container'>
+<section class="dark">
+	<div class="container">
 		
 		<h1>Tracman Pro</h1>
 		<h3>A word from the developer</h3>
@@ -27,17 +27,17 @@
 		<p>Cheers, <br>
 		<a href="https://www.keithirwin.us/">Keith Irwin</a></p>
 
-		<form class='flex' action="#" method="POST">
+		<form class="flex" action="#" method="POST">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			{% if user.isPro %}
-				<div id='already-pro' class='inline-block alert alert-success'>
+				<div id="already-pro" class="inline-block alert alert-success">
 					<i class="fa fa-check-circle"></i>
-					<span class='text'>You are already pro! </span>
+					<span class="text">You are already pro! </span>
 				</div>
-				<a class='btn' href="javascript:history.go(-1)">go back</a>
+				<a class="btn" href="javascript:history.go(-1)">go back</a>
 			{% else %}
-				<input type="submit" class='btn main' value="Go Pro"></input>
-				<a class='btn' href="javascript:history.go(-1)">go home</a>
+				<input type="submit" class="btn main" value="Go Pro"></input>
+				<a class="btn" href="javascript:history.go(-1)">go home</a>
 			{% endif %}
 		</form>
 

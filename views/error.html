@@ -2,8 +2,8 @@
 {% block title %}{{super()}} | {% if code %}{{code}}{% endif %}{% if message %}: {{message}}{% else %} Error{% endif%}{% endblock %}
 
 {% block main %}
-<section class='container'>
-	{% if message %}<h2><span class='red'>❌</span>️ {{message}}</h2>{% endif %}
+<section class="container">
+	{% if message %}<h2><span class="red">❌</span>️ {{message}}</h2>{% endif %}
 	{% if stack %}<p>{{stack}}</p>{% else %}
 	{% if code == '404' %}<p>This page does not exist.  Maybe you followed a dead link here.  </p>
 	{% elif code == '401' %}<p>You aren't allowed in here.  Shoo.  </p>

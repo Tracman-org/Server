@@ -1,28 +1,28 @@
-<header class='shadow'>
+<header class="shadow">
 
 	<!-- Logo -->
-	<a href="/"><span class='logo'><img class='icon' src="/static/img/style/logo-28.png" alt="+">Tracman</span></a>
+	<a href="/"><span class="logo"><img class="icon" src="/static/img/style/logo-28.png" alt="+">Tracman</span></a>
 
 	<!-- Hamburger -->
-	<div class='hamburger hamburger--slider' aria-label="Menu" aria-controls="navigation">
-		<div class='hamburger-box'>
-			<div class='hamburger-inner'></div>
+	<div class="hamburger hamburger--slider" aria-label="Menu" aria-controls="navigation">
+		<div class="hamburger-box">
+			<div class="hamburger-inner"></div>
 		</div>
 	</div>
 
 	<!-- Navigation -->
-	<nav id='navigation'><ul>
+	<nav id="navigation"><ul>
 			{% if active!='home' %}<li><a href="/">About</a></li>{% endif %}
-			<li><a href="/contact"{% if active=='contact' %} class='active'{% endif %}>Contact</a></li>
+			<li><a href="/contact"{% if active=='contact' %} class="active"{% endif %}>Contact</a></li>
 		{% if user %}
-			<li><a href="/map"{% if active=='map' %} class='active'{% endif %}>Map</a></li>
-			<li><a href="/settings"{% if active=='-settings' %} class='active'{% endif %}>Settings</a></li>
+			<li><a href="/map"{% if active=='map' %} class="active"{% endif %}>Map</a></li>
+			<li><a href="/settings"{% if active=='-settings' %} class="active"{% endif %}>Settings</a></li>
 		{% else %}
-			<li><a href="/map/demo"{% if active=='demo' %} class='active'{% endif %}>Demo</a></li>
+			<li><a href="/map/demo"{% if active=='demo' %} class="active"{% endif %}>Demo</a></li>
 		{% endif %}
-			<li><a href="/help"{% if active=='help' %} class='active'{% endif %}>Help</a></li>
+			<li><a href="/help"{% if active=='help' %} class="active"{% endif %}>Help</a></li>
 		{% if user %}
-			{% if user.isSiteAdmin %}<li><a href="/admin"{% if active=='admin' %} class='active'{% endif %}>Admin</a></li>{% endif %}
+			{% if user.isSiteAdmin %}<li><a href="/admin"{% if active=='admin' %} class="active"{% endif %}>Admin</a></li>{% endif %}
 			<li><a href="/logout">Logout</a></li>
 		{% else %}
 			<li><a href="/login">Login / join</a></li>
@@ -33,27 +33,27 @@
 
 <!-- Flash messages -->
 <noscript>
-	<div class='alert alert-header alert-danger alert-dismissible shadow'>
+	<div class="alert alert-header alert-danger alert-dismissible shadow">
 	<strong>Uh-oh!</strong> You don't have javascript enabled!  This page won't load correctly without it.  You should really enable it, because many websites won't work properly.  Ask your grandchildren if you need help.
-	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a>
+	<a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
 </div>
 </noscript>
 {% for danger in dangers %}
-<div class='alert alert-header alert-danger alert-dismissible shadow'>
+<div class="alert alert-header alert-danger alert-dismissible shadow">
 	<strong><i class="fa fa-exclamation-circle"></i> ERROR:</strong> {{ danger | safe }}
-	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a>
+	<a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
 </div>
 {% endfor %}
 {% for warning in warnings %}
-<div class='alert alert-header alert-warning alert-dismissible shadow'>
+<div class="alert alert-header alert-warning alert-dismissible shadow">
 	<strong><i class="fa fa-exclamation-circle"></i> Hey!</strong> {{ warning | safe }}
-	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a>
+	<a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
 </div>
 {% endfor %}
 {% for success in successes %}
-<div class='alert alert-header alert-success alert-dismissible shadow'>
+<div class="alert alert-header alert-success alert-dismissible shadow">
 	<strong><i class="fa fa-check-circle"></i> Success!</strong> {{ success | safe }}
-	<a href="#" class='close' data-dismiss="alert" aria-label="close"><i class='fa fa-times'></i></a>
+	<a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
 </div>
 {% endfor %}
 

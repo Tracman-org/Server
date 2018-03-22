@@ -43,24 +43,24 @@
 {% endblock %}
 
 {% block main %}
-	<div id='inactive-mask' class='page-mask'></div>
-	<div id='inactive-message' class='popup' style="display:none">
+	<div id="inactive-mask" class="page-mask"></div>
+	<div id="inactive-message" class="popup" style="display:none">
 		<p>The map has been deactivated due to inactivity.  Move the mouse around the page to reactivate the map. </p>
 	</div>
 
 	{% if user and user.isNewUser %}
-	<div id='welcome-mask' class='page-mask' style="display:block"></div>
-	<div id='welcome' class='popup'>
+	<div id="welcome-mask" class="page-mask" style="display:block"></div>
+	<div id="welcome" class="popup">
 
-		<div class='topbar'>
+		<div class="topbar">
 			<h2>Welcome!</h2>
-			<div class='close' onclick="$('#welcome').hide();$('#welcome-mask').hide();">✖️</div>
+			<div class="close" onclick="$('#welcome').hide();$('#welcome-mask').hide();">✖️</div>
 		</div>
 
 		<p>This is your map.  It's publicly avaliable at <a href="{{newmapurl}}">{{newmapurl}}</a>.  You can change that URL and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see the <b><a href="/help">help</a></b> page.  </p>
 
-		<div class='buttons'>
-			<a class='btn main' onclick="$('#welcome').hide();$('#welcome-mask').hide();">Got it!</a>
+		<div class="buttons">
+			<a class="btn main" onclick="$('#welcome').hide();$('#welcome-mask').hide();">Got it!</a>
 		</div>
 
 	</div>
@@ -68,17 +68,17 @@
 
 	<!-- Map -->
 	{% if disp!='1' %}
-		<div id='map'></div>
+		<div id="map"></div>
 	{% endif %}
 
 	<!-- Streetview -->
 	{% if mapData.settings.showStreetview and disp!='0' %}
-		<div id='view'><img id='viewImg' alt="Streetview image"/></div>
+		<div id="view"><img id="viewImg" alt="Streetview image"/></div>
 	{% endif %}
 
 	{% if setVehicleId %}
 		<link rel="stylesheet" type="text/css" href="/static/css/.controls.min.css">
-		<div id='controls'>
+		<div id="controls">
 		{% if mapData.settings.showStreetview and disp!='0' %}
 			<style>
 				@media (orientation: portrait) {
@@ -87,9 +87,9 @@
 			</style>
 		{% endif %}
 
-			<button id='set-loc' class='btn set' title="Click here to set your location">Set</button>
-			<button id='track-loc' class='btn track' title="Click here to track your location"><i class='fa fa-crosshairs'></i>Track</button>
-			<button id='clear-loc' class='btn clear' title="Click here to clear your location">Clear</button>
+			<button id="set-loc" class="btn set" title="Click here to set your location">Set</button>
+			<button id="track-loc" class="btn track" title="Click here to track your location"><i class="fa fa-crosshairs"></i>Track</button>
+			<button id="clear-loc" class="btn clear" title="Click here to clear your location">Clear</button>
 
 		</div>
 	{% endif %}

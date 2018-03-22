@@ -16,50 +16,50 @@
 
 {% block main %}
 
-	<section class='container'>
+	<section class="container">
 		
 		<p><a href="/settings">&lt; Back to Settings</a></p>
 
 		<h1>User Settings</h1>
 
-		<form id='user-settings-form' role="form" method="post" action="/settings/user">
+		<form id="user-settings-form" role="form" method="post" action="/settings/user">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-			<div id='name' class='form-group' title="It doesn't really matter what you put here">
+			<div id="name" class="form-group" title="It doesn't really matter what you put here">
 				<label for="name-input">Name</label>
-				<input id='name-input' class='xss-sensitive' name="name" type="text" value="{{user.name}}" maxlength="160">
-				<p id='name-help' class='red help'></p>
+				<input id="name-input" class="xss-sensitive" name="name" type="text" value="{{user.name}}" maxlength="160">
+				<p id="name-help" class="red help"></p>
 			</div>
 
-			<div id='email' class='form-group' title="For account stuff only, no dumb newsletters">
+			<div id="email" class="form-group" title="For account stuff only, no dumb newsletters">
 				<label for="email-input">Email</label>
-				<input id='email-input' name="email" type="email" value="{{user.email}}" maxlength="160">
-				<p id='email-help' class='red help'></p>
+				<input id="email-input" name="email" type="email" value="{{user.email}}" maxlength="160">
+				<p id="email-help" class="red help"></p>
 			</div>
 
-			<div id='social-connect' class='form-group'>
-				<a href="/login/google" class='btn gp{% if user.auth.google %} connected{% endif %}' title="Connect your Google account so you can use it to log in quickly">
+			<div id="social-connect" class="form-group">
+				<a href="/login/google" class="btn gp{% if user.auth.google %} connected{% endif %}" title="Connect your Google account so you can use it to log in quickly">
 					<i class="fa fa-google-plus"></i>
 					{% if user.auth.google %}Disconnect{% else %}Connect{% endif %} Google
 				</a>
-				<a href="/login/facebook" class='btn fb{% if user.auth.facebook %} connected{% endif %}' title="Connect your Facebook account so you can use it to log in quickly">
+				<a href="/login/facebook" class="btn fb{% if user.auth.facebook %} connected{% endif %}" title="Connect your Facebook account so you can use it to log in quickly">
 					<i class="fa fa-facebook"></i>
 					{% if user.auth.facebook %}Disconnect{% else %}Connect{% endif %} Facebook
 				</a>
-				<a href="/login/twitter" class='btn tw{% if user.auth.twitter %} connected{% endif %}' title="Connect your Twitter account so you can use it to log in quickly">
+				<a href="/login/twitter" class="btn tw{% if user.auth.twitter %} connected{% endif %}" title="Connect your Twitter account so you can use it to log in quickly">
 					<i class="fa fa-twitter"></i>
 					{% if user.auth.twitter %}Disconnect{% else %}Connect{% endif %} Twitter
 				</a>
 			</div>
 
-			<div id='password-delete' class='form-group'>
-				<a id='password' class='underline' href="/account/password" title="{% if user.auth.password %}Change{% else %}Set{% endif %} your password">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
-				<a id='delete' class='red underline' href="/settings/user/delete" style="text-align:right" title="Permently delete your Tracman account">Delete account</a>
+			<div id="password-delete" class="form-group">
+				<a id="password" class="underline" href="/account/password" title="{% if user.auth.password %}Change{% else %}Set{% endif %} your password">{% if user.auth.password %}Change{% else %}Set{% endif %} password</a>
+				<a id="delete" class="red underline" href="/settings/user/delete" style="text-align:right" title="Permently delete your Tracman account">Delete account</a>
 			</div>
 
-			<div class='submit-group form-group flexbox'>
-				<input id='submit-btn' class='main btn' type="submit" value="Save" title="Save your settings">
-				<a href="/settings" class='btn' title="Discard your changes">cancel</a>
+			<div class="submit-group form-group flexbox">
+				<input id="submit-btn" class="main btn" type="submit" value="Save" title="Save your settings">
+				<a href="/settings" class="btn" title="Discard your changes">cancel</a>
 			</div>
 
 		</form>

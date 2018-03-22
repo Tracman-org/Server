@@ -2,13 +2,13 @@
 {% block title %}{{super()}} | Help{% endblock %}
 
 {% block main %}
-	<section class='container'>
+	<section class="container">
 		
 		<h1>Help</h1>
 			
 			<p><i>Welcome to Tracman!</i></p>
 			
-		<h2 id='website-controls'>Website map controls</h2>
+		<h2 id="website-controls">Website map controls</h2>
 			
 			<ul>
 				<li><u>Set</u> sets your location once using this device's geolocation.  On a GPS-enabled phone, the location will be set to its coordinates.  </li>
@@ -16,7 +16,7 @@
 				<li><u>Clear</u> clears your location instantly.  Anyone looking at your map will see a blank screen instead.  Use this to hide your location.  </li>
 			</ul>
 			
-		<h2 id='website-settings'>Website settings</h2>
+		<h2 id="website-settings">Website settings</h2>
 			
 			<ul>
 				<li><u>Name</u> is your name.  It appears at the title of your browsing window and when you hover over the marker on your map.  You can put whatever you want, really. </li>
@@ -30,11 +30,11 @@
 				<li><u>Show street view</u> shows a Google street view image of your location.  See <a href="#what-is-the-streetview-image">What is the street view image?</a> in the FAQ. </li>
 			</ul>
 			
-		<h2 id='android'>Android</h2>
+		<h2 id="android">Android</h2>
 			
 			<p>The android app is especially buggy, so be careful! </p>
 			
-			<h3 id='android-settings'>Settings</h3>
+			<h3 id="android-settings">Settings</h3>
 			
 				<ul>
 					<li><u>Start service on boot</u> determines whether the Tracman app will start in the background when you turn on your phone. </li>
@@ -43,11 +43,11 @@
 					<li><u>Update priority</u> determines how accurate your updates will be, and how much battery the app will use.  See the <a href="https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest#setPriority(int)">location services documentation</a> for more information.  </li>
 				</ul>
 				
-			<h3 id='android-notification'>The notification</h3>
+			<h3 id="android-notification">The notification</h3>
 			
 				<p>While tracman is running in the background, the update interval and priority are lessened while nobody's looking at the map.  This is to save battery life.  The notification will show whether its sending realtime or occasional updates.  This is an informal way of seeing if anyone is viewing your location. </p>
 			
-		<h2 id='faq'>FAQ</h2>
+		<h2 id="faq">FAQ</h2>
 			
 			<ul>
 				<li><a href="#how-do-i-share-my-location">How do I share my location?</a></li>
@@ -58,33 +58,33 @@
 				<li><a href="#why-is-there-no-ios-app">Why is there no iOS app?</a></li>
 			</ul>
 			
-			<h3 id='how-do-i-share-my-location'>How do I share my map's location?</h3>
+			<h3 id="how-do-i-share-my-location">How do I share my map's location?</h3>
 				
 				<p>You can simply share your map's url with anyone.  {% if user %}Your URL is <a href="https://www.tracman.org/map/{{user.slug}}">https://tracman.org/map/{{user.maps[0].slug}}</a>{% else %}The URL is <u>https://tracman.org/map/&gt;your-slug&lt;</u>{% endif %}. </p>
 				
-			<h3 id='how-accurate-is-the-location'>How accurate is the location?</h3>
+			<h3 id="how-accurate-is-the-location">How accurate is the location?</h3>
 				
 				<p>When using the web app, the location will be as accurate as the underlying geolocation data.  It can be pretty accurate if opened on a mobile phone browser, since the device's GPS will be used.  On a desktop, the location will be estimated based on your IP address, which can be very inaccurate.  Check out the <a href="https://www.w3.org/TR/geolocation-API/">API Specification</a> for way more information.  </p>
 				
 				<p>On android, Tracman uses <a href="https://developers.google.com/android/reference/com/google/android/gms/location/package-summary">Google Play Services location APIs</a> to set your phone's location.  This can use your phone's GPS data, or nearby WiFi and cellular towers.  Sometimes this can be pretty inaccurate.  </p>
 				
-			<h3 id='how-is-the-altitude-determined'>How is the altitude determined?</h3>
+			<h3 id="how-is-the-altitude-determined">How is the altitude determined?</h3>
 				
 				<p>The altitude is not determined using your GPS, because this is notoriously inaccurate.  Instead, the <a href="https://developers.google.com/maps/documentation/elevation">Google Maps Elevation API</a> resolves the altitude of the ground at your coordinates.  This means that if you are flying, Tracman will show the altitude of the ground beneath you.  </p>
 				
-			<h3 id='what-is-the-streetview-image'>What is the street view image?</h3>
+			<h3 id="what-is-the-streetview-image">What is the street view image?</h3>
 				
 				<p>Tracman will display a google street view image closest to your location.  If you are stationary, the image will be oriented towards you.  If you are in a building, and there is a street view image of the street outside the building, the panorama will be pointed at the building. While you are moving, the image will be oriented to your direction of travel, so if you are driving down a road, it will show the view in the direction you're driving.  This can sometimes appear like a slow-frame-rate dashcam video. </p>
 				
 				<p>The images come from <a href="https://www.google.com/streetview/">Google street view</a>.  They are <i>not</i> live images from your location.  Mostly, the photos were taken during the daytime when the weather was good.  </p>
 				
-			<h3 id='can-i-contribute-to-tracman'>Can I contribute to Tracman?</h3>
+			<h3 id="can-i-contribute-to-tracman">Can I contribute to Tracman?</h3>
 				
 				<p>Sure!  Tracman has some <a href="https://github.com/Tracman-org/">github repositories</a> you can clone.  </p>
 				
 				<p>I also accept donations to help with development and server fees. You can pay with <a href="https://cash.me/$KeithIrwin">cash</a> or <a href="bitcoin:16KY9k6qdXqDD3mWwr8hrD7ky18AqYSJDo?label=tracman">bitcoin</a>.  </p>
 				
-			<h3 id='why-is-there-no-ios-app'>Why is there no iOS app?</h3>
+			<h3 id="why-is-there-no-ios-app">Why is there no iOS app?</h3>
 			
 				<p>There are a few reasons I haven't made a version of the <a href="/android">android app</a> for iPhone/iPad/iPod: </p>
 				

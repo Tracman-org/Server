@@ -7,16 +7,16 @@
 {% endblock %}
 
 {% block main %}
-	<section class='container'>
+	<section class="container">
 			
-		<div id='users'>
+		<div id="users">
 			
-			<h1 class='left'>Users</h1>
-			<div id='stat' class='right'>
+			<h1 class="left">Users</h1>
+			<div id="stat" class="right">
 				<p><b>Total</b>: {{total}}</p>
 			</div>
 			
-			<table id='users-table'>
+			<table id="users-table">
 				
 				<thead><tr>
 					<th>Name</th>
@@ -33,16 +33,16 @@
 					<tr>
 						<td>{{usr.name}}</td>
 						<td><a href="/map/{{usr.slug}}">/{{usr.slug}}</a></td>
-						<td id='{{usr.id}}-created'></td>
-						<td id='{{usr.id}}-logged'></td>
-						<td id='{{usr.id}}-moved'></td>
-						<td id='{{usr.id}}-accounts'>
+						<td id="{{usr.id}}-created"></td>
+						<td id="{{usr.id}}-logged"></td>
+						<td id="{{usr.id}}-moved"></td>
+						<td id="{{usr.id}}-accounts">
 							{% if usr.auth.google %}<a href="https://plus.google.com/{{usr.auth.google}}/">G</a>{% endif %}
 							{% if usr.auth.facebook %}<a href="https://facebook.com/{{usr.auth.facebook}}/">F</a>{% endif %}
 							{% if usr.auth.twitter %}<a href="https://twitter.com/{{usr.auth.twitter}}/">T</a>{% endif %}
 						</td>
-						<td id='{{usr.id}}-edit'>
-							<a class='btn' href="/admin/delete/{{usr.id}}">DELETE</a>
+						<td id="{{usr.id}}-edit">
+							<a class="btn" href="/admin/delete/{{usr.id}}">DELETE</a>
 						</td>
 					</tr>
 					{% endfor %}
