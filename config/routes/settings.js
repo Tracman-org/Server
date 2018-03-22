@@ -29,7 +29,7 @@ router.route('/user')
     })
   })
 
-  // TODO: Set user settings (switch to patch when form no longer used)
+  // TODO: Set user settings
   // .post( (req, res) => {
 
   //   // Validate email
@@ -145,7 +145,7 @@ router.route('/maps')
 
 // Map item
 router.route('/maps/:id')
-  .all(mw.ensureAuth)
+  .all(mw.ensureAuth) // TODO: Check that this users can admin this map (include all endpoints)
 
   // Get map settings page
   .get( async (req, res, next) => {
@@ -165,7 +165,7 @@ router.route('/maps/:id')
     })
   })
 
-  // TODO: Set new map settings (switch to patch when form no longer used)
+  // TODO: Set new map settings
   .post(async (req, res, next) => {
 
     // Validate slug
@@ -229,19 +229,43 @@ router.route('/maps/:id')
     finally { res.redirect('/settings/maps') }
   })
 
-  // TODO: Create or delete new vehicle or admin
-  .patch( (req, res) => {
-    if (req.body.vehicle) {
-      
-    } else if (req.body.admin) {
-      
-    } else res.sendStatus(400)
-  })
+// Delete map TODO: Test this
+router.get('/maps/:id/delete', mw.ensureAuth, async (req, res, next) => {
+  let found_map = await Map
+    .findById(sanitize(req.params.id))
+  if (!found_map) next() // 404
+  else {
+    try {
+      await found_map.remove()
+      req.flash('success', `Map deleted`)
+      res.redirect('/settings/maps')
+    } catch (err) {
+      mw.throwErr(err, req)
+      res.redirect(`/settings/maps/${req.params.id}`)
+    }
+  }
+})
 
-  // TODO: Delete map
-  .delete( (req, res, next) => {
+// TODO: Create new vehicle
+router.post('/maps/:map/vehicles', mw.ensureAuth, (req, res) => {
 
-  })
+})
+
+// TODO: Delete vehicle
+router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, (req, res) => {
+  debug(`Deleting vehicle ${req.params.veh}...`)
+  res.sendStatus(200)
+})
+
+// TODO: Create new admin
+router.post('/map/:id/admins', mw.ensureAuth, (req, res) => {
+
+})
+
+// TODO: Delete admin
+router.delete('map/:map/admins/:admin', mw.ensureAuth, (req, res) => {
+
+})
 
 // Redirects for URLs that moved to /account
 router.all('/password', (req, res) => {

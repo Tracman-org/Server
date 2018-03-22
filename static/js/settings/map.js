@@ -1,17 +1,17 @@
 'use strict'
 /* global $ validateEmail replaceFromEndpoint */
 
-function checkSetterEmail(setter, setter_id) {
+function checkSetterEmail(setter, vehicle_id) {
 
   // Check all setter emails (as on page load)
   if (typeof setter==='undefined') {
     $('.vehicle-setter').each( function(i) {
-      checkSetterEmail($(this))
+      checkSetterEmail($(this), $(this).attr('name').slice(15))
     })
   } else {
 
     // Show loading icon
-    $('#vehicle-setter-icon-'+setter_id)
+    $('#vehicle-setter-icon-'+vehicle_id)
       .removeClass('green fa-check red fa-times fa-exclamation')
       .addClass('fa-spinner fa-spin')
       .attr('title', 'Checking if a user has this email address')
@@ -23,7 +23,7 @@ function checkSetterEmail(setter, setter_id) {
 
         // Exists
         200: function () {
-          $('#vehicle-setter-icon-'+setter_id)
+          $('#vehicle-setter-icon-'+vehicle_id)
             .removeClass('red fa-times fa-exclamation fa-spinner fa-spin')
             .addClass('green fa-check')
             .attr('title', 'This email is associated with an existing user')
@@ -34,7 +34,7 @@ function checkSetterEmail(setter, setter_id) {
 
         // Doesn't exist
         404: function () {
-          $('#vehicle-setter-icon-'+setter_id)
+          $('#vehicle-setter-icon-'+vehicle_id)
             .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
             .addClass('red fa-times')
             .attr('title', 'No Tracman user has this email')
@@ -47,7 +47,7 @@ function checkSetterEmail(setter, setter_id) {
 
     // Server error
     }).fail(function () {
-      $('#vehicle-setter-icon-'+setter_id)
+      $('#vehicle-setter-icon-'+vehicle_id)
         .removeClass('green fa-check fa-times fa-spinner fa-spin')
         .addClass('red fa-exclamation')
         .attr('title', 'Could not check if this email is associated with a Tracman user. Are you still connected to the internet?')
@@ -127,13 +127,11 @@ $(function () {
 
   // Listen to changes to vehicle setter
   $('.vehicle-setter').change( function () {
-    let setter_id = $(this).attr('name').slice(15)
-
-    $('#vehicle-setter-checking-'+setter_id).show()
+    let vehicle_id = $(this).attr('name').slice(15)
 
     // Check setter existence
     if (!$(this).val()) {
-      $('#vehicle-setter-icon-'+setter_id)
+      $('#vehicle-setter-icon-'+vehicle_id)
         .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
         .addClass('red fa-times')
         .attr('title', 'An email is required!')
@@ -143,7 +141,7 @@ $(function () {
 
     // Check validity of setter email
     } else if (!validateEmail($(this).val())) {
-      $('#vehicle-setter-icon-'+setter_id)
+      $('#vehicle-setter-icon-'+vehicle_id)
         .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
         .addClass('red fa-times')
         .attr('title', 'That isn\'t a valid email address')
@@ -152,22 +150,61 @@ $(function () {
         .prop('title', 'All vehicle setters must have valid email addresses')
 
     // Check setter email
-    } else checkSetterEmail($(this), setter_id)
+    } else checkSetterEmail($(this), vehicle_id)
 
   })
 
   // Listen to deleting of vehicles
   $('.vehicle-delete').click(function () {
+    const delete_button = $(this)
+
+    // Hide the help
+    $('#vehicles-help').hide()
+    // Dim the row
+    $(this).closest('tr').css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+    // Replace delete button with loading icon
+    delete_button
+      .addClass('fa-spinner fa-spin')
+      .css('color','#FFF')
+      .removeClass('red fa-times-circle')
+      .css('cursor','not-allowed')
+
     $.ajax({ type: 'DELETE',
-      url: $(this).attr('href'),
+      url: window.location.pathname+'/vehicles/'+$(this).attr('id').slice(15),
       statusCode: {
 
+        // Successfully deleted
+        200: function(res) {
+          delete_button.closest('tr').remove()
+        },
 
       }
-      success: function(res) {
-        // Do something with the response
-      }
+    }).fail( function() {
+
+      // Show help
+      $('#vehicles-help').show()
+        .text('Failed to delete that vehicle.  Are you still conected to the internet?  ')
+
+      // Undim the row
+      delete_button.closest('tr').css({
+        'filter': '',
+        '-moz-opacity': '',
+        '-khtml-opacity': '',
+        'opacity': '',
+      })
+      // Replace loading icon with delete button
+      delete_button
+        .addClass('red fa-times-circle')
+        .removeClass('fa-spinner fa-spin')
+        .css('cursor','pointer')
+
     })
+
   })
 
 })

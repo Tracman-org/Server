@@ -46,3 +46,7 @@
 #vehicles-table .setter input {
 	width: 88%;
 }
+#vehicles-help {
+	margin-top: -6vh;
+	margin-bottom: 2vh;
+}

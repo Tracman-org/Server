@@ -74,9 +74,7 @@
 						</select>
 					</td>
 					<td>
-						<a href="/settings/maps/{{map._id}}/vehicles/{{vehicle._id}}/delete">
-							<i id='vehicle-delete-{{vehicle._id}}' class='vehicle-delete fa fa-times-circle red'></i>
-						</a>
+						<a><i id='vehicle-delete-{{vehicle._id}}' class='vehicle-delete fa fa-times-circle red'></i></a>
 					</td>
 				</tr>
 				{% endfor %}
@@ -109,6 +107,7 @@
 				</tbody>
 
 			</table>
+			<p id='vehicles-help' class='red help'></p>
 
 			<h3>Administrators</h3>
 			<ul>
