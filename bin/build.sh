@@ -9,6 +9,16 @@ cd $(dirname $0)/..
 if [ ! -d static/css ]; then
 	echo "static/css directory not found!"
 else
+	# Removed minified files that no longer exist
+	for minfile in $(find static/css -name '.*.min.css'); do
+		int=$(dirname $minfile)/${minfile##*/.}
+		srcfile=${int%.min.*}.css
+		if [ ! -f $srcfile ]; then
+			echo "Removing $minfile because $srcfile no longer exists..."
+			rm $minfile
+		fi
+	done
+	# Minify new and updated files
 	for oldfile in $(find static/css -name '*.css' -not -path '*/\.*'); do
 		newfile="$(dirname $oldfile)/.$(basename ${oldfile%.*}).min.css"
 		# Check if compiled version doesn't exist or the uncompiled one's changed
@@ -25,6 +35,16 @@ fi
 if [ ! -d static/js ]; then
 	echo "static/css directory not found!"
 else
+	# Removed minified files that no longer exist
+	for minfile in $(find static/js -name '.*.min.js'); do
+		int=$(dirname $minfile)/${minfile##*/.}
+		srcfile=${int%.min.*}.js
+		if [ ! -f $srcfile ]; then
+			echo "Removing $minfile because $srcfile no longer exists..."
+			rm $minfile
+		fi
+	done
+	# Minify new and updated files
 	for oldfile in $(find static/js -name '*.js' -not -path '*/\.*'); do
 		newfile="$(dirname $oldfile)/.$(basename ${oldfile%.*}).min.js"
 		# Check if minified version doesn't exist or the minified one's changed
