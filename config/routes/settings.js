@@ -250,7 +250,13 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
 // TODO: Create new vehicle
 router.post('/maps/:map/vehicles', mw.ensureAuth, (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
-
+  res.statusCode = 201
+  res.json({
+    id: 'fakeid',
+    name: req.body.name,
+    setter: req.body.setter,
+    marker: req.body.marker,
+  })
 })
 
 // TODO: Delete vehicle

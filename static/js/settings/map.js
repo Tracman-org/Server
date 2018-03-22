@@ -127,7 +127,7 @@ $(function () {
   })
 
   // Listen to changes to vehicle setter
-  $('.vehicle-setter').change( function () {
+  $('table').on('change', '.vehicle-setter', function () {
     const vehicle_id = $(this).attr('data-vehicle')
     const new_value = $(this).val()
 
@@ -157,7 +157,7 @@ $(function () {
   })
 
   // Listen to deleting of vehicles
-  $('.vehicle-delete').click(function () {
+  $('table').on('click', '.vehicle-delete', function () {
     const delete_button = $(this)
     const this_row = delete_button.closest('tr')
 
@@ -177,6 +177,7 @@ $(function () {
       .removeClass('red fa-times-circle')
       .css('cursor','not-allowed')
 
+    // Send request
     $.ajax({ type: 'DELETE',
       url: window.location.pathname+'/vehicles/'+$(this).attr('data-vehicle'),
       statusCode: {
@@ -211,7 +212,113 @@ $(function () {
   })
 
   // Listen to adding of vehicles
-  $('#vehicle-add').click(function() {
+  $('#vehicle-new').click( function() {
+    const add_button =$(this)
+    const new_row = $(this).closest('tr')
+
+    // Hide the help
+    $('#vehicles-help').hide()
+
+    // Dim the new row
+    new_row.css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+
+    // Replace add button with loading icon
+    add_button
+      .addClass('fa-spinner fa-spin')
+      .css('color','#FFF')
+      .removeClass('green fa-plus-circle')
+      .css('cursor','not-allowed')
+
+    // Send request
+    $.post({
+      url: window.location.pathname+'/vehicles/',
+      data: {
+        name: $('#vehicle-name-new').val(),
+        setter: $('#vehicle-setter-new').val(),
+        marker: $('#vehicle-marker-new').val(),
+      },
+      statusCode: {
+
+        // Successfully added
+        201: function(res) {
+
+          // Add row
+          new_row.before('<tr>\
+            <td>\
+              <input class="xss-sensitive" type="text" name="vehicle-name-'+res.id+'" value="'+res.name+'" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">\
+				    </td>\
+  					<td class="setter">\
+  						<input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicle-setter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
+  						<i id="vehicle-setter-icon-'+res.id+'" class="fa fa-spinner fa-spin"></i>\
+  					</td>\
+  					<td>\
+  						<select name="marker-'+res.id+'" title="The color of the map marker">\
+  							<option '+((res.marker==='red')?'selected ':'')+'value="red">red</option>\
+  							<option '+((res.marker==='black')?'selected ':'')+'value="black">black</option>\
+  							<option '+((res.marker==='green')?'selected ':'')+'value="green">green</option>\
+  							<option '+((res.marker==='grey')?'selected ':'')+'value="grey">grey</option>\
+  							<option '+((res.marker==='orange')?'selected ':'')+'value="orange">orange</option>\
+  							<option '+((res.marker==='purple')?'selected ':'')+'value="purple">purple</option>\
+  							<option '+((res.marker==='white')?'selected ':'')+'value="white">white</option>\
+  							<option '+((res.marker==='yellow')?'selected ':'')+'value="yellow">yellow</option>\
+  						</select>\
+  					</td>\
+  					<td>\
+  						<a><i data-vehicle="'+res.id+'" class="vehicle-delete fa fa-times-circle red"></i></a>\
+  					</td>\
+				  </tr>')
+
+				  // Check setter
+				  checkSetterEmail($('.vehicle-setter[data-vehicle="'+res.id+'"]'))
+
+		      // Undim the new row
+          new_row.css({
+            'filter': '',
+            '-moz-opacity': '',
+            '-khtml-opacity': '',
+            'opacity': '',
+          })
+
+          // Replace loading icon with add button
+          add_button
+            .addClass('green fa-plus-circle')
+            .removeClass('fa-spinner fa-spin')
+            .css('cursor','pointer')
+
+          // Clear new row inputs
+          $('#vehicle-name-new').val('')
+          $('#vehicle-setter-new').val('')
+          $("#vehicle-marker-new").val('red')
+
+        },
+
+      }
+    }).fail( function() {
+
+      // Show help
+      $('#vehicles-help').show()
+        .text('Failed to add vehicle.  Are you still conected to the internet?  ')
+
+      // Undim the new row
+      new_row.css({
+        'filter': '',
+        '-moz-opacity': '',
+        '-khtml-opacity': '',
+        'opacity': '',
+      })
+
+      // Replace loading icon with delete button
+      add_button
+        .addClass('green fa-plus-circle')
+        .removeClass('fa-spinner fa-spin')
+        .css('cursor','pointer')
+
+    })
 
   })
 
