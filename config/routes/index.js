@@ -57,7 +57,7 @@ module.exports = router
         if ( await User.findOne({
           email: sanitize(req.query.user)
         }) ) res.sendStatus(200)
-        else res.sendStatus(400)
+        else res.sendStatus(404)
       } catch (err) {
         console.error(err)
         res.sendStatus(500)
@@ -69,8 +69,8 @@ module.exports = router
         let existing_map = await Map.findOne({
           slug: sanitize(slug(req.query.slug))
         })
-        if (existing_map && existing_map.id!==req.user.id) res.sendStatus(400)
-        else res.sendStatus(200)
+        if (existing_map && existing_map.id!==req.user.id) res.sendStatus(409)
+        else res.sendStatus(204)
       } catch (err) {
         console.error(err)
         res.sendStatus(500)
@@ -83,8 +83,8 @@ module.exports = router
         let existing_user = User.findOne({ email: sanitize(req.query.email) })
         if (existing_user.id && existing_user.id !== req.user.id) {
           console.log(`Found user ${existing_user.id} with that email`)
-          res.sendStatus(400)
-        } else { res.sendStatus(200) }
+          res.sendStatus(409)
+        } else { res.sendStatus(204) }
       } catch (err) {
         console.error(err)
         res.sendStatus(500)

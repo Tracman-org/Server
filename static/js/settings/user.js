@@ -51,15 +51,15 @@ $(function () {
           statusCode: {
 
             // Is unique
-            200: function () {
+            204: function () {
               $('#email-help').hide()
               $('#submit-btn')
                 .prop('disabled', false)
                 .prop('title', 'Save your settings')
             },
 
-            // Isn't unique
-            400: function () {
+            // Is taken
+            409: function () {
               $('#email-help').show()
                 .text('That email is already in use by another account. ')
               $('#submit-btn')

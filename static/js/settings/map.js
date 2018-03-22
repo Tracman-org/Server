@@ -1,7 +1,7 @@
 'use strict'
 /* global $ validateEmail replaceFromEndpoint */
 
-function checkSetterEmail(setter) {
+function checkSetterEmail(setter, setter_id) {
 
   // Check all setter emails (as on page load)
   if (typeof setter==='undefined') {
@@ -9,7 +9,6 @@ function checkSetterEmail(setter) {
       checkSetterEmail($(this))
     })
   } else {
-    let setter_id = setter.attr('name').slice(15)
 
     // Show loading icon
     $('#vehicle-setter-icon-'+setter_id)
@@ -34,7 +33,7 @@ function checkSetterEmail(setter) {
         },
 
         // Doesn't exist
-        400: function () {
+        404: function () {
           $('#vehicle-setter-icon-'+setter_id)
             .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
             .addClass('red fa-times')
@@ -94,15 +93,15 @@ $(function () {
           statusCode: {
 
             // Is unique
-            200: function () {
+            204: function () {
               $('#slug-help').hide()
               $('#submit-btn')
                 .prop('disabled', false)
                 .prop('title', 'Save your settings')
             },
 
-            // Isn't unique
-            400: function () {
+            // Is taken
+            409: function () {
               $('#slug-help').show()
                 .text('That URL is already in use by another map.')
               $('#submit-btn')
@@ -153,8 +152,22 @@ $(function () {
         .prop('title', 'All vehicle setters must have valid email addresses')
 
     // Check setter email
-    } else checkSetterEmail($(this))
+    } else checkSetterEmail($(this), setter_id)
 
+  })
+
+  // Listen to deleting of vehicles
+  $('.vehicle-delete').click(function () {
+    $.ajax({ type: 'DELETE',
+      url: $(this).attr('href'),
+      statusCode: {
+
+
+      }
+      success: function(res) {
+        // Do something with the response
+      }
+    })
   })
 
 })

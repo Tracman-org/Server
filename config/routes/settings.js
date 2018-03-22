@@ -29,7 +29,7 @@ router.route('/user')
     })
   })
 
-  // TODO: Set user settings
+  // TODO: Set user settings (switch to patch when form no longer used)
   // .post( (req, res) => {
 
   //   // Validate email
@@ -165,7 +165,7 @@ router.route('/maps/:id')
     })
   })
 
-  // TODO: Set new map settings
+  // TODO: Set new map settings (switch to patch when form no longer used)
   .post(async (req, res, next) => {
 
     // Validate slug
@@ -229,42 +229,19 @@ router.route('/maps/:id')
     finally { res.redirect('/settings/maps') }
   })
 
-// Delete map TODO: Test this
-router.get('/maps/:id/delete', mw.ensureAuth, async (req, res, next) => {
-  let found_map = await Map
-    .findById(sanitize(req.params.id))
-  if (!found_map) next() // 404
-  else {
-    try {
-      await found_map.remove()
-      req.flash('success', `Map deleted`)
-      res.redirect('/settings/maps')
-    } catch (err) {
-      mw.throwErr(err, req)
-      res.redirect(`/settings/maps/${req.params.id}`)
-    }
-  }
-})
+  // TODO: Create or delete new vehicle or admin
+  .patch( (req, res) => {
+    if (req.body.vehicle) {
+      
+    } else if (req.body.admin) {
+      
+    } else res.sendStatus(400)
+  })
 
-// TODO: Create new vehicle
-router.put('map/:id/vehicles', mw.ensureAuth, (req, res) => {
+  // TODO: Delete map
+  .delete( (req, res, next) => {
 
-})
-
-// TODO: Delete vehicle
-router.delete('map/:map-id/vehicles/:veh-id', mw.ensureAuth, (req, res) => {
-
-})
-
-// TODO: Create new admin
-router.put('/map/:id/admins', mw.ensureAuth, (req, res) => {
-
-})
-
-// TODO: Delete admin
-router.delete('map/:map-id/admins/:admin-id', mw.ensureAuth, (req, res) => {
-
-})
+  })
 
 // Redirects for URLs that moved to /account
 router.all('/password', (req, res) => {
