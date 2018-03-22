@@ -12,9 +12,10 @@ function checkSetterEmail(setter) {
     let setter_id = setter.attr('name').slice(15)
 
     // Show loading icon
-    $('#vehicle-setter-denied-'+setter_id).hide()
-    $('#vehicle-setter-confirmed-'+setter_id).hide()
-    $('#vehicle-setter-checking-'+setter_id).show()
+    $('#vehicle-setter-icon-'+setter_id)
+      .removeClass('green fa-check red fa-times fa-exclamation')
+      .addClass('fa-spinner fa-spin')
+      .attr('title', 'Checking if a user has this email address')
 
     // Check server for a user with that email
     $.get({
@@ -23,9 +24,10 @@ function checkSetterEmail(setter) {
 
         // Exists
         200: function () {
-          $('#vehicle-setter-checking-'+setter_id).hide()
-          $('#vehicle-setter-denied-'+setter_id).hide()
-          $('#vehicle-setter-confirmed-'+setter_id).show()
+          $('#vehicle-setter-icon-'+setter_id)
+            .removeClass('red fa-times fa-exclamation fa-spinner fa-spin')
+            .addClass('green fa-check')
+            .attr('title', 'This email is associated with an existing user')
           $('#submit-btn')
             .prop('disabled', false)
             .prop('title', 'Save your settings')
@@ -33,9 +35,10 @@ function checkSetterEmail(setter) {
 
         // Doesn't exist
         400: function () {
-          $('#vehicle-setter-checking-'+setter_id).hide()
-          $('#vehicle-setter-confirmed-'+setter_id).hide()
-          $('#vehicle-setter-denied-'+setter_id).show()
+          $('#vehicle-setter-icon-'+setter_id)
+            .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
+            .addClass('red fa-times')
+            .attr('title', 'No Tracman user has this email')
           $('#submit-btn')
             .prop('disabled', true)
             .prop('title', 'All vehicle setters must represent real users above')
@@ -45,9 +48,10 @@ function checkSetterEmail(setter) {
 
     // Server error
     }).fail(function () {
-      $('#vehicle-setter-checking-'+setter_id).hide()
-      $('#vehicle-setter-confirmed-'+setter_id).hide()
-      $('#vehicle-setter-denied-'+setter_id).show()
+      $('#vehicle-setter-icon-'+setter_id)
+        .removeClass('green fa-check fa-times fa-spinner fa-spin')
+        .addClass('red fa-exclamation')
+        .attr('title', 'Could not check if this email is associated with a Tracman user. Are you still connected to the internet?')
       $('#submit-btn')
         .prop('disabled', false)
         .prop('title', 'Try to save your settings')
@@ -130,18 +134,20 @@ $(function () {
 
     // Check setter existence
     if (!$(this).val()) {
-      $('#vehicle-setter-checking-'+setter_id).hide()
-      $('#vehicle-setter-confirmed-'+setter_id).hide()
-      $('#vehicle-setter-denied-'+setter_id).show()
+      $('#vehicle-setter-icon-'+setter_id)
+        .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
+        .addClass('red fa-times')
+        .attr('title', 'An email is required!')
       $('#submit-btn')
         .prop('disabled', true)
         .prop('title', 'You need to enter an email address for each vehicle setter')
 
     // Check validity of setter email
     } else if (!validateEmail($(this).val())) {
-      $('#vehicle-setter-checking-'+setter_id).hide()
-      $('#vehicle-setter-confirmed-'+setter_id).hide()
-      $('#vehicle-setter-denied-'+setter_id).show()
+      $('#vehicle-setter-icon-'+setter_id)
+        .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
+        .addClass('red fa-times')
+        .attr('title', 'That isn\'t a valid email address')
       $('#submit-btn')
         .prop('disabled', true)
         .prop('title', 'All vehicle setters must have valid email addresses')
