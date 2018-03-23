@@ -31,9 +31,6 @@ function checkSetterEmail(setter, vehicle_id) {
             .removeClass('red fa-times fa-exclamation fa-spinner fa-spin')
             .addClass('green fa-check')
             .attr('title', 'This email is associated with an existing user')
-          $('#submit-btn')
-            .prop('disabled', false)
-            .attr('title', 'Save your settings')
         },
 
         // Doesn't exist
@@ -42,9 +39,6 @@ function checkSetterEmail(setter, vehicle_id) {
             .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
             .addClass('red fa-times')
             .attr('title', 'No Tracman user has this email')
-          $('#submit-btn')
-            .prop('disabled', true)
-            .attr('title', 'All vehicle setters must represent real users above')
         }
 
       }
@@ -55,9 +49,6 @@ function checkSetterEmail(setter, vehicle_id) {
         .removeClass('green fa-check fa-times fa-spinner fa-spin')
         .addClass('red fa-exclamation')
         .attr('title', 'Could not check if this email is associated with a Tracman user. Are you still connected to the internet?')
-      $('#submit-btn')
-        .prop('disabled', false)
-        .attr('title', 'Try to save your settings')
     })
 
   }
@@ -84,14 +75,14 @@ $(function () {
     // Check slug existence
     if (!$('#slug-input').val()) {
       $('#slug-help').show().text('A URL is required. ')
-      $('#submit-btn')
+      $('#basics .submit.btn')
         .prop('disabled', true)
         .attr('title', 'You need to enter a URL above')
 
     // Check that slug's changed
     } else if ($('#slug-input').val() === original_slug) {
       $('#slug-help').hide()
-      $('#submit-btn')
+      $('#basics .submit.btn')
         .prop('disabled', false)
         .attr('title', 'Save your settings')
     } else {
@@ -107,7 +98,7 @@ $(function () {
             // Is unique
             204: function () {
               $('#slug-help').hide()
-              $('#submit-btn')
+              $('#basics .submit.btn')
                 .prop('disabled', false)
                 .attr('title', 'Save your settings')
             },
@@ -116,7 +107,7 @@ $(function () {
             409: function () {
               $('#slug-help').show()
                 .text('That URL is already in use by another map.')
-              $('#submit-btn')
+              $('#basics .submit.btn')
                 .prop('disabled', true)
                 .attr('title', 'Supply a different URL above')
             }
@@ -127,7 +118,7 @@ $(function () {
         }).fail(function () {
           $('#email-help').show()
             .text('Unable to confirm unique URL.  Are you still connected to the internet?')
-          $('#submit-btn')
+          $('#basics .submit.btn')
             .prop('disabled', false)
             .attr('title', 'Try to save your settings')
         })
@@ -159,10 +150,6 @@ $(function () {
         if (vehicle_id==='new') $('#vehicle-new')
           .css('cursor', 'not-allowed')
           .attr('title', 'A setter email is required')
-        // Disable submit button
-        else $('#submit-btn')
-          .prop('disabled', true)
-          .attr('title', 'You need to enter an email address for each vehicle setter')
       }
 
     // Check validity of setter email
@@ -176,10 +163,6 @@ $(function () {
       if (vehicle_id==='new') $('#vehicle-new')
         .css('cursor', 'not-allowed')
         .attr('title', 'That email address isn\'t valid')
-      // Disable submit button
-      else $('#submit-btn')
-        .prop('disabled', true)
-        .attr('title', 'All vehicle setters must have valid email addresses')
 
     } else {
       // Check setter email
@@ -188,10 +171,6 @@ $(function () {
       if (vehicle_id==='new') $('#vehicle-new')
         .css('cursor', 'pointer')
         .attr('title', 'Click to add a new vehicle')
-      // Enable submit button
-      else $('#submit-btn')
-        .prop('disabled', false)
-        .attr('title', 'Save your settings')
     }
 
   })
@@ -251,12 +230,11 @@ $(function () {
 
   })
 
-  // Listen to changes to new vehicle
-
   // Listen to adding of vehicles
   $('#vehicle-new').click( function() {
     const add_button = $(this)
     const new_row = $(this).closest('tr')
+    const icon_classes = ($('#vehicle-setter-icon-new').attr('class'))
 
     // Hide the help
     $('#vehicles-help').hide()
@@ -296,7 +274,7 @@ $(function () {
 				    </td>\
   					<td class="setter">\
   						<input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicle-setter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
-  						<i id="vehicle-setter-icon-'+res.id+'" class="fa fa-spinner fa-spin"></i>\
+  						<i id="vehicle-setter-icon-'+res.id+'" class="'+icon_classes+'"></i>\
   					</td>\
   					<td>\
   						<select name="marker-'+res.id+'" title="The color of the map marker">\

@@ -38,7 +38,7 @@ form input:disabled:not(.input-addon), form textarea:disabled,
 form select:disabled {
 	border: 1px solid #444;
 }
-form input:not(.input-addon):not(.input-with-addon):not(.short-input):not([type="radio"]):not([type="checkbox"]),
+form input:not(.input-addon):not(.input-with-addon):not([type="radio"]):not([type="checkbox"]),
 form .input-with-addon-group {
 	min-width: 50%;
 }

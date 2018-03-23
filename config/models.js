@@ -43,7 +43,8 @@ const vehicleSchema = new Schema({
   },
   marker: { type:String, default:'red' },
   map: { type:ObjectId, ref:'Map' },
-  setByUser: { type:ObjectId, ref:'User' },
+  setterEmail: String, // Email of setter in case user doesn't exist yet
+  setter: { type:ObjectId, ref:'User' },
 }).plugin(unique)
 
 const mapSchema = new Schema({

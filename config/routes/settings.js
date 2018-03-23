@@ -155,7 +155,7 @@ router.route('/maps/:id')
       .populate({
         path: 'vehicles',
         populate: {
-          path: 'setByUser',
+          path: 'setter',
         },
       })
     if (!found_map) next() // 404

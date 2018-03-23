@@ -27,7 +27,7 @@ module.exports = function (old_user) {
       new_vehicle.last = old_user_object.last
       new_vehicle.marker = old_user_object.marker || 'red'
       new_vehicle.map = new_map
-      new_vehicle.setByUser = new_user
+      new_vehicle.setter = new_user
       debug(`Set properties for new vehicle ${new_vehicle.id}`)
 
       // Create new map object

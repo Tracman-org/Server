@@ -4,23 +4,24 @@
 	width: inherit;
 	display: flex;
 }
-#map-center > div > div > :first-child {
-	margin-bottom: 10px;
+#map-center .col {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
-#map-center .button-col input,
-#map-center .label-col label {
+#map-center .button.col input,
+#map-center .label.col label {
 	display: block;
 	margin-right: 15px;
 }
-#map-center .button-col input {
+#map-center .button.col input {
 	margin: 10px;
 }
-#map-center .input-col select {
+#map-center .input.col select {
 	width: 100%;
 }
-#map-center .short-input {
-	min-width: 100px;
-	max-width: 50%;
+#map-center .coords > input {
+	min-width: 95px;
 }
 
 /* Vehicles table */
