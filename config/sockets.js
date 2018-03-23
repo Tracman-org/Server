@@ -102,7 +102,7 @@ module.exports = {
             if (loc.veh !== sanitize(loc.veh)) {
               console.error(`Potential injection attempt with loc.veh of ${loc.veh}!`)
             } else {
-              let vehicle = await Vehicle.findById(loc.veh).populate('setByUser')
+              let vehicle = await Vehicle.findById(loc.veh).populate('setter')
 
               if (!vehicle) {
                 console.error(
@@ -110,10 +110,10 @@ module.exports = {
                     `Recieved an update from ${socket.ip} for ${loc.veh}, but no such vehicle was found in the db!`
                   ).message
                 )
-              } else if (vehicle.setByUser.sk32 !== loc.tok) {
+              } else if (vehicle.setter.sk32 !== loc.tok) {
                 console.error(
                   new Error(
-                    `Recieved an update from ${socket.ip} for ${loc.veh} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setByUser} has an sk32 of ${vehicle.setByUser.sk32}!`
+                    `Recieved an update from ${socket.ip} for ${loc.veh} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setter} has an sk32 of ${vehicle.setbyuser.sk32}!`
                   ).message
                 )
               } else {

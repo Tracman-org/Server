@@ -181,7 +181,7 @@ module.exports = (app, passport) => {
             user.adminMaps = [map]
             map.vehicles = [vehicle]
             map.admins = [user]
-            vehicle.setByUser = user
+            vehicle.setter = user
             vehicle.map = map
 
             // Generate unique slug
