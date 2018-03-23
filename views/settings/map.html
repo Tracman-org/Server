@@ -3,6 +3,7 @@
 
 {% block head %}
 {{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.tabs.min.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/settings/.common.min.css">
@@ -11,19 +12,29 @@
 
 {% block javascript %}
 {{super()}}
+	<script type="application/javascript" src="/static/js/.tabs.min.js"></script>
 	<script type="application/javascript" src="/static/js/settings/.common.min.js"></script>
 	<script type="application/javascript" src="/static/js/settings/.map.min.js"></script>
 {% endblock %}
 
 {% block main %}
+<div class="container">
 
-	<section class="container">
+	<p><a href="/settings/maps">&lt; Back to all maps</a></p>
 
-		<p><a href="/settings/maps">&lt; Back to all maps</a></p>
+	<h1>{{map.name or 'Map'}} Settings</h1>
 
-		<h1>Map Settings</h1>
+	<ul class="etabs">
+		<li class="tab btn"><a href="#basics">Basics</a></li>
+		<li class="tab btn"><a href="#display">Display</a></li>
+		<li class="tab btn"><a href="#vehicles">Vehicles</a></li>
+		<li class="tab btn"><a href="#admins">Admins</a></li>
+	</ul>
 
-		<form class="map-settings-form" role="form" method="post" action="/settings/map">
+	<section id="basics">
+		<h2>Basics</h2>
+
+		<form role="form" method="post" action="/settings/map">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 			<div id="name" class="form-group" title="Shown in the window title when viewing the map">
@@ -41,7 +52,21 @@
 				<p id="slug-help" class="red help"></p>
 			</div>
 
-			<h3>Vehicles</h3>
+			<div class="submit-group form-group flexbox">
+				<input id="submit-btn" class="main btn" type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+	<section id="vehicles">
+
+		<h2>Vehicles</h2>
+
+		<form>
+
 			<table id="vehicles-table">
 
 				<thead><tr>
@@ -107,7 +132,21 @@
 			</table>
 			<p id="vehicles-help" class="red help"></p>
 
-			<h3>Administrators</h3>
+			<div class="submit-group form-group flexbox">
+				<input id="submit-btn" class="main btn" type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+	<section id="admins">
+
+		<h2>Administrators</h2>
+
+		<form>
+
 			<ul>
 				<li>
 					{{user.name}} &mdash; {{user.email}} (<i>you</i>)
@@ -125,7 +164,20 @@
 				</li>
 			</ul>
 
-			<h3>Display</h3>
+			<div class="submit-group form-group flexbox">
+				<input id="submit-btn" class="main btn" type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+	<section id="display">
+
+		<h2>Display</h2>
+
+		<form>
 
 			<div id="units" class="form-group" title="Standard for feet/mph, metric for meters/kph">
 				<label for="units-select">Units</label>
@@ -237,4 +289,5 @@
 
 	</section>
 
+</div>
 {% endblock %}

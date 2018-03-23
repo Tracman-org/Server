@@ -6,10 +6,13 @@ function checkSetterEmail(setter, vehicle_id) {
   // Check all setter emails (as on page load)
   if (typeof setter==='undefined') {
     $('.vehicle-setter').each( function(i) {
-      checkSetterEmail($(this))
+      if ($(this).attr('data-vehicle')) { // Ignore new
+        checkSetterEmail($(this), $(this).attr('data-vehicle'))
+      }
     })
+
+  // Check single setter
   } else {
-    if (typeof vehicle_id==='undefined') vehicle_id = setter.attr('data-vehicle')
 
     // Show loading icon
     $('#vehicle-setter-icon-'+vehicle_id)
@@ -62,6 +65,14 @@ function checkSetterEmail(setter, vehicle_id) {
 
 // On page load
 $(function () {
+
+  // Set up tabs
+  $('.container').easytabs()
+  // Listen to click on entire tab, not just link
+  $('.tab').click( function() {
+    $('.container').easytabs('select', $(this).children('a').attr('href'))
+  })
+
   const original_slug = $('#slug-input').val()
 
   // Check emails of all setters
@@ -128,24 +139,31 @@ $(function () {
 
   // Listen to changes to vehicle setter
   $('table').on('change', '.vehicle-setter', function () {
-    const vehicle_id = $(this).attr('data-vehicle')||'new'
+    let vehicle_id = $(this).attr('data-vehicle')
+    if (typeof vehicle_id==='undefined') vehicle_id = 'new'
     const new_value = $(this).val()
 
     // Check setter existence
     if (!new_value) {
-      // Change setter icon
-      $('#vehicle-setter-icon-'+vehicle_id)
-        .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
-        .addClass('red fa-times')
-        .attr('title', 'An email is required!')
-      // Disable new button
-      if (vehicle_id==='new') $('#vehicle-new')
-        .css('cursor', 'not-allowed')
-        .attr('title', 'A setter email is required')
-      // Disable submit button
-      else $('#submit-btn')
-        .prop('disabled', true)
-        .attr('title', 'You need to enter an email address for each vehicle setter')
+
+      // If new, hide icon
+      if (vehicle_id==='new') $('#vehicle-setter-icon-'+vehicle_id).hide()
+
+      else {
+        // Change setter icon
+        $('#vehicle-setter-icon-'+vehicle_id)
+          .removeClass('green fa-check fa-exclamation fa-spinner fa-spin')
+          .addClass('red fa-times')
+          .attr('title', 'An email is required!')
+        // Disable new button
+        if (vehicle_id==='new') $('#vehicle-new')
+          .css('cursor', 'not-allowed')
+          .attr('title', 'A setter email is required')
+        // Disable submit button
+        else $('#submit-btn')
+          .prop('disabled', true)
+          .attr('title', 'You need to enter an email address for each vehicle setter')
+      }
 
     // Check validity of setter email
     } else if (!validateEmail(new_value)) {
