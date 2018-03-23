@@ -1,0 +1,50 @@
+.container {
+	padding-top: 10vh;
+	padding-bottom: 5vh;
+}
+
+/* Margins for tabbar, which can't have a
+ * margin because it's position:absolute */
+.container > h1 {
+	margin-bottom: 7%;
+}
+section > h2:first-child {
+	margin-top: 5%;
+}
+
+.etabs {
+	padding: 0;
+	position: absolute;
+	left: 0;
+	border-bottom: 1px #666 solid;
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+	list-style-type: none;
+}
+.etabs .tab {
+	background: #181818;
+	background: rgba(255,255,255,.05);
+	font-weight: 300;
+	border-radius: 1.5vw 1.5vw 0 0;
+	width: 20vh;
+	min-width: 100px;
+	text-align: center;
+	margin: auto;
+	padding: 1.5vh 0;
+}
+.etabs .tab a:hover {
+	text-decoration: none;
+}
+.etabs .tab.active {
+	cursor: default;
+	pointer-events: none;
+	background: #222;
+	background: rgba(255,255,255,.1);
+}
+.etabs .tab.active a {
+	color: #FFF;
+	font-weight: 600;
+	cursor: default;
+	pointer-events: none;
+}
