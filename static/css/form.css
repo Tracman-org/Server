@@ -42,8 +42,6 @@ form input:not(.input-addon):not(.input-with-addon):not([type="radio"]):not([typ
 form .input-with-addon-group {
 	min-width: 50%;
 }
-form input:active:not(.input-addon), form textarea:active,
-form select:active,
 form input:focus:not(.input-addon), form textarea:focus,
 form select:focus {
 	outline: none;
@@ -132,7 +130,6 @@ form input[type="checkbox"], form input[type="radio"] {
 	width: auto;
 	margin: 8px;
 }
-form input[type="checkbox"]:active, form input[type="radio"]:active,
 form input[type="checkbox"]:focus, form input[type="radio"]:focus {
 	outline: 1px solid #fbc93d;
 }
