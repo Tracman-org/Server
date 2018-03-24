@@ -180,6 +180,25 @@ $(function () {
   dimCenterInputs()
   $('#map-center .button.col input').change(dimCenterInputs)
 
+  // Complain about static map center latitude that's out of range
+  $('#center-static-coords input[name="staticLat"]').change( function() {
+    const val = parseFloat($(this).val())
+    if (val>90) $('#map-center-lat-help').show()
+      .text('Latitudes are always less than 90.')
+    else if (val<-90) $('#map-center-lat-help').show()
+      .text('Latitudes are always greater than -90.')
+    else $('#map-center-lat-help').hide()
+  })
+  // Complain about static map center longitude that's out of range
+  $('#center-static-coords input[name="staticLon"]').change( function() {
+    const val = parseFloat($(this).val())
+    if (val>180) $('#map-center-lon-help').show()
+      .text('Longitudes are always less than 180.')
+    else if (val<-180) $('#map-center-lon-help').show()
+      .text('Longitudes are always greater than -180.')
+    else $('#map-center-lon-help').hide()
+  })
+
   // Check emails of all vehcicle setters
   checkSetterEmail()
 
