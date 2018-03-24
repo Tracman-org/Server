@@ -237,12 +237,12 @@
 						<label for="center-static-radio">Static:</label>
 					</div>
 					<div class="input col">
-						<select name="follow">
+						<select id="center-follow-vehicle" name="follow">
 							{% for vehicle in map.vehicles %}
 							<option {% if map.settings.center.follow==vehicle._id %}selected {% endif %}value="{{vehicle._id}}">{{vehicle.name}}</option>
 							{% endfor %}
 						</select>
-						<div class="coords flex">
+						<div id="center-static-coords" class="flex">
 							<input name="staticLat" type="number" value="{{map.center.staticLat}}" placeholder="Latitude" max="90" min="-90">
 							<input name="staticLon" type="number" value="{{map.center.staticLat}}" placeholder="Longitude" max="180" min="-180">
 						</div>

@@ -54,6 +54,57 @@ function checkSetterEmail(setter, vehicle_id) {
   }
 }
 
+function dimCenterInputs() {
+
+  // Follow
+  if ($('#center-follow-radio').is(':checked')) {
+
+    // Activate followed vehicle
+    $('#center-follow-vehicle')
+    .css({
+      'filter': '',
+      '-moz-opacity': '',
+      '-khtml-opacity': '',
+      'opacity': '',
+    })
+    .prop('disabled', false)
+
+    // Deactivate static coordinantes
+    $('#center-static-coords input')
+    .css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+    .prop('disabled', true)
+
+  // Static
+  } else if ($('#center-static-radio').is(':checked')) {
+
+    // Deactivate followed vehicle
+    $('#center-follow-vehicle')
+    .css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+    .prop('disabled', true)
+
+    // Activate static coordinantes
+    $('#center-static-coords input')
+    .css({
+      'filter': '',
+      '-moz-opacity': '',
+      '-khtml-opacity': '',
+      'opacity': '',
+    })
+    .prop('disabled', false)
+
+  }
+}
+
 // On page load
 $(function () {
 
@@ -65,9 +116,6 @@ $(function () {
   })
 
   const original_slug = $('#slug-input').val()
-
-  // Check emails of all setters
-  checkSetterEmail()
 
   // Listen for change to slug
   $('#slug-input').change( function () {
@@ -127,6 +175,13 @@ $(function () {
 
     }
   })
+
+  // Dim inactive map center inputs
+  dimCenterInputs()
+  $('#map-center .button.col input').change(dimCenterInputs)
+
+  // Check emails of all vehcicle setters
+  checkSetterEmail()
 
   // Listen to changes to vehicle setter
   $('table').on('change', '.vehicle-setter', function () {

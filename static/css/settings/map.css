@@ -20,7 +20,7 @@
 #map-center .input.col select {
 	width: 100%;
 }
-#map-center .coords > input {
+#map-center #center-static-coords > input {
 	min-width: 95px;
 }
 
