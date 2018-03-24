@@ -65,118 +65,6 @@
 
 	</section>
 
-	<section id="vehicles">
-
-		<h2>Vehicles</h2>
-
-		<form>
-
-			<table id="vehicles-table">
-
-				<thead><tr>
-					<th><h4>Name</h4></th>
-					<th><h4>Setter</h4></th>
-					<th><h4>Marker</h4></th>
-					<th><h4></h4></th>
-				</tr></thead>
-
-				<tbody>
-				{% for vehicle in map.vehicles %}
-				<tr>
-					<td>
-						<input class="xss-sensitive" type="text" name="vehicle-name-{{vehicle._id}}" value="{{vehicle.name}}" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">
-					</td>
-					<td class="setter">
-						<input type="text" class="vehicle-setter left" data-vehicle="{{vehicle._id}}" name="vehicle-setter-{{vehicle._id}}" value="{{vehicle.setter.email or vehicle.setterEmail}}" placeholder="Enter an email" title="The email address of the user account that can set the vehicle's location">
-						<i id="vehicle-setter-icon-{{vehicle._id}}" class="fa fa-spinner fa-spin"></i>
-					</td>
-					<td>
-						<select name="marker-{{vehicle._id}}" title="The color of the map marker">
-							<option {% if vehicle.marker=='red' or vehicle.marker=='' %}selected {% endif %}value="red">red</option>
-							<option {% if vehicle.marker=='black' %}selected {% endif %}value="black">black</option>
-							<option {% if vehicle.marker=='green' %}selected {% endif %}value="green">green</option>
-							<option {% if vehicle.marker=='grey' %}selected {% endif %}value="grey">grey</option>
-							<option {% if vehicle.marker=='orange' %}selected {% endif %}value="orange">orange</option>
-							<option {% if vehicle.marker=='purple' %}selected {% endif %}value="purple">purple</option>
-							<option {% if vehicle.marker=='white' %}selected {% endif %}value="white">white</option>
-							<option {% if vehicle.marker=='yellow' %}selected {% endif %}value="yellow">yellow</option>
-						</select>
-					</td>
-					<td>
-						<a><i data-vehicle="{{vehicle._id}}" class="vehicle-delete fa fa-times-circle red"></i></a>
-					</td>
-				</tr>
-				{% endfor %}
-				<tr>
-					<td>
-						<input type="text" id="vehicle-name-new" title="The name of a vehicle appears when you mouseover or click on a marker on the map" placeholder="New vehicle name (optional)">
-					</td>
-					<td id="setter-new" class="setter">
-						<input type="text" class="vehicle-setter left" id="vehicle-setter-new" title="The email address of the user account that can set the vehicle's location" placeholder="New vehicle setter email">
-						<i id="vehicle-setter-icon-new" class="fa"></i>
-					</td>
-					<td>
-						<select id="vehicle-marker-new" title="The color of the map marker">
-							<option selected value="red">red</option>
-							<option value="black">black</option>
-							<option value="green">green</option>
-							<option value="grey">grey</option>
-							<option value="orange">orange</option>
-							<option value="purple">purple</option>
-							<option value="white">white</option>
-							<option value="yellow">yellow</option>
-						</select>
-					</td>
-					<td>
-						<a><i id="vehicle-new" class="fa fa-plus-circle green" title="A setter email is required"></i></a>
-					</td>
-				</tr>
-				</tbody>
-
-			</table>
-			<p id="vehicles-help" class="red help"></p>
-
-			<div class="submit-group form-group flexbox">
-				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
-			</div>
-
-		</form>
-
-	</section>
-
-	<section id="admins">
-
-		<h2>Administrators</h2>
-
-		<form>
-
-			<ul>
-				<li>
-					{{user.name}} &mdash; {{user.email}} (<i>you</i>)
-				</li>
-			{% for admin in map.admins %}
-			{# if admin.id !== user.id #}
-				<li>
-					{{admin.name}} &mdash; {{admin.email}} <a href="/settings/maps/{{map._id}}/admins/{{admin._id}}/delete"><i id="admin-delete-{{vehicle._id}}" class="fa fa-times-circle red" title="Remove {{admin.name}} from admins"></i></a>
-				</li>
-			{# endif #}
-			{% endfor %}
-				<li>
-					<input id="new-admin-input" type="text" name="new-admin" placeholder="New admin email" title="Enter the email of an admin you want to add" style="display:inline-block;padding:0">
-					<a href="/settings/maps/{{map._id}}/admins/new" disabled><i id="admin-delete-{{vehicle._id}}" class="fa fa-plus-circle green" title="Type an email address in the box, then click here"></i></a>
-				</li>
-			</ul>
-
-			<div class="submit-group form-group flexbox">
-				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
-			</div>
-
-		</form>
-
-	</section>
-
 	<section id="display">
 
 		<h2>Display</h2>
@@ -281,6 +169,118 @@
 				<label for="show-streetview-input">Show street view{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
 				<input id="show-streetview-input" name="show-streetview" type="checkbox" {% if not user.isPro %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
 			</div>
+
+			<div class="submit-group form-group flexbox">
+				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+	<section id="vehicles">
+
+		<h2>Vehicles</h2>
+
+		<form>
+
+			<table id="vehicles-table">
+
+				<thead><tr>
+					<th><h4>Name</h4></th>
+					<th><h4>Setter</h4></th>
+					<th><h4>Marker</h4></th>
+					<th><h4></h4></th>
+				</tr></thead>
+
+				<tbody>
+				{% for vehicle in map.vehicles %}
+				<tr>
+					<td>
+						<input class="xss-sensitive" type="text" name="vehicle-name-{{vehicle._id}}" value="{{vehicle.name}}" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">
+					</td>
+					<td class="setter">
+						<input type="text" class="vehicle-setter left" data-vehicle="{{vehicle._id}}" name="vehicle-setter-{{vehicle._id}}" value="{{vehicle.setter.email or vehicle.setterEmail}}" placeholder="Enter an email" title="The email address of the user account that can set the vehicle's location">
+						<i id="vehicle-setter-icon-{{vehicle._id}}" class="fa fa-spinner fa-spin"></i>
+					</td>
+					<td>
+						<select name="marker-{{vehicle._id}}" title="The color of the map marker">
+							<option {% if vehicle.marker=='red' or vehicle.marker=='' %}selected {% endif %}value="red">red</option>
+							<option {% if vehicle.marker=='black' %}selected {% endif %}value="black">black</option>
+							<option {% if vehicle.marker=='green' %}selected {% endif %}value="green">green</option>
+							<option {% if vehicle.marker=='grey' %}selected {% endif %}value="grey">grey</option>
+							<option {% if vehicle.marker=='orange' %}selected {% endif %}value="orange">orange</option>
+							<option {% if vehicle.marker=='purple' %}selected {% endif %}value="purple">purple</option>
+							<option {% if vehicle.marker=='white' %}selected {% endif %}value="white">white</option>
+							<option {% if vehicle.marker=='yellow' %}selected {% endif %}value="yellow">yellow</option>
+						</select>
+					</td>
+					<td>
+						<a><i data-vehicle="{{vehicle._id}}" class="vehicle-delete fa fa-times-circle red"></i></a>
+					</td>
+				</tr>
+				{% endfor %}
+				<tr>
+					<td>
+						<input type="text" id="vehicle-name-new" title="The name of a vehicle appears when you mouseover or click on a marker on the map" placeholder="New vehicle name (optional)">
+					</td>
+					<td id="setter-new" class="setter">
+						<input type="text" class="vehicle-setter left" id="vehicle-setter-new" title="The email address of the user account that can set the vehicle's location" placeholder="New vehicle setter email">
+						<i id="vehicle-setter-icon-new" class="fa"></i>
+					</td>
+					<td>
+						<select id="vehicle-marker-new" title="The color of the map marker">
+							<option selected value="red">red</option>
+							<option value="black">black</option>
+							<option value="green">green</option>
+							<option value="grey">grey</option>
+							<option value="orange">orange</option>
+							<option value="purple">purple</option>
+							<option value="white">white</option>
+							<option value="yellow">yellow</option>
+						</select>
+					</td>
+					<td>
+						<a><i id="vehicle-new" class="fa fa-plus-circle green" title="A setter email is required"></i></a>
+					</td>
+				</tr>
+				</tbody>
+
+			</table>
+			<p id="vehicles-help" class="red help"></p>
+
+			<div class="submit-group form-group flexbox">
+				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
+				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+			</div>
+
+		</form>
+
+	</section>
+
+	<section id="admins">
+
+		<h2>Administrators</h2>
+
+		<form>
+
+			<ul>
+				<li>
+					{{user.name}} &mdash; {{user.email}} (<i>you</i>)
+				</li>
+			{% for admin in map.admins %}
+			{# if admin.id !== user.id #}
+				<li>
+					{{admin.name}} &mdash; {{admin.email}} <a href="/settings/maps/{{map._id}}/admins/{{admin._id}}/delete"><i id="admin-delete-{{vehicle._id}}" class="fa fa-times-circle red" title="Remove {{admin.name}} from admins"></i></a>
+				</li>
+			{# endif #}
+			{% endfor %}
+				<li>
+					<input id="new-admin-input" type="text" name="new-admin" placeholder="New admin email" title="Enter the email of an admin you want to add" style="display:inline-block;padding:0">
+					<a href="/settings/maps/{{map._id}}/admins/new" disabled><i id="admin-delete-{{vehicle._id}}" class="fa fa-plus-circle green" title="Type an email address in the box, then click here"></i></a>
+				</li>
+			</ul>
 
 			<div class="submit-group form-group flexbox">
 				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
