@@ -67,7 +67,7 @@ let ready_promise_list = []
       'https://code.jquery.com',
       'https://cdnjs.cloudflare.com/ajax/libs/socket.io/',
       'https://cdnjs.cloudflare.com/ajax/libs/moment.js/',
-      'https://www.google.com/recaptcha',
+      'https://www.google.com/recaptcha/',
       'https://www.google-analytics.com',
       'https://maps.googleapis.com',
       'https://coin-hive.com',
