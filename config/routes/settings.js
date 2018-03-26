@@ -149,15 +149,17 @@ router.route('/maps/:id')
 
   // Get map settings page
   .get( async (req, res, next) => {
-    let found_map = await Map
+
+    // Find and populate associated map
+    const found_map = await Map
       .findById(sanitize(req.params.id))
-      .populate('admins')
       .populate({
         path: 'vehicles',
         populate: {
           path: 'setter',
         },
       })
+
     if (!found_map) next() // 404
     else res.render('settings/map', {
       active: 'settings',
@@ -266,14 +268,19 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, (req, res) => {
 })
 
 // TODO: Create new admin
-router.post('/map/:map/admins', mw.ensureAuth, (req, res) => {
+router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
   debug(`Creating new admin for map ${req.params.map}`)
+  res.statusCode = 201
+  res.json({
+    email: req.body.email,
+  })
 })
 
 // TODO: Delete admin
-router.delete('map/:map/admins/:admin', mw.ensureAuth, (req, res) => {
+router.delete('/maps/:map/admins/:admin', mw.ensureAuth, (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
-
+  // Don't forget that req.params.admin is an email, not an id
+  res.sendStatus(200)
 })
 
 // Redirects for URLs that moved to /account

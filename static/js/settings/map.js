@@ -108,6 +108,8 @@ function dimCenterInputs() {
 // On page load
 $(function () {
 
+  const original_slug = $('#slug-input').val()
+
   // Set up tabs
   $('.container').easytabs()
   // Listen to click on entire tab, not just link
@@ -115,7 +117,8 @@ $(function () {
     $('.container').easytabs('select', $(this).children('a').attr('href'))
   })
 
-  const original_slug = $('#slug-input').val()
+  // Check emails of all vehcicle setters
+  checkSetterEmail()
 
   // Listen for change to slug
   $('#slug-input').change( function () {
@@ -199,11 +202,8 @@ $(function () {
     else $('#map-center-lon-help').hide()
   })
 
-  // Check emails of all vehcicle setters
-  checkSetterEmail()
-
   // Listen to changes to vehicle setter
-  $('table').on('change', '.vehicle-setter', function () {
+  $('#vehicles-table').on('change', '.vehicle-setter', function () {
     let vehicle_id = $(this).attr('data-vehicle')
     if (typeof vehicle_id==='undefined') vehicle_id = 'new'
     const new_value = $(this).val()
@@ -249,8 +249,120 @@ $(function () {
 
   })
 
+  // Listen to adding of vehicles
+  $('#vehicle-new').click( function() {
+    const add_button = $(this)
+    const new_row = $(this).closest('tr')
+    const icon_classes = ($('#vehicle-setter-icon-new').attr('class'))
+
+    // Hide the help
+    $('#vehicles-help').hide()
+
+    // Dim the new row
+    new_row.css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+
+    // Replace add button with loading icon
+    add_button
+      .addClass('fa-spinner fa-spin')
+      .css('color','#FFF')
+      .removeClass('green fa-plus-circle')
+      .css('cursor','not-allowed')
+
+    // Send request
+    $.post({
+      url: window.location.pathname+'/vehicles/',
+      data: {
+        name: $('#vehicle-name-new').val(),
+        setter: $('#vehicle-setter-new').val(),
+        marker: $('#vehicle-marker-new').val(),
+      },
+      statusCode: {
+
+        // Successfully added
+        201: function(res) {
+
+          // Add row
+          new_row.before('<tr>\
+            <td>\
+              <input class="xss-sensitive" type="text" name="vehicle-name-'+res.id+'" value="'+res.name+'" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">\
+            </td>\
+            <td class="setter">\
+              <input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicle-setter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
+              <i id="vehicle-setter-icon-'+res.id+'" class="'+icon_classes+'"></i>\
+            </td>\
+            <td>\
+              <select name="marker-'+res.id+'" title="The color of the map marker">\
+                <option '+((res.marker==='red')?'selected ':'')+'value="red">red</option>\
+                <option '+((res.marker==='black')?'selected ':'')+'value="black">black</option>\
+                <option '+((res.marker==='green')?'selected ':'')+'value="green">green</option>\
+                <option '+((res.marker==='grey')?'selected ':'')+'value="grey">grey</option>\
+                <option '+((res.marker==='orange')?'selected ':'')+'value="orange">orange</option>\
+                <option '+((res.marker==='purple')?'selected ':'')+'value="purple">purple</option>\
+                <option '+((res.marker==='white')?'selected ':'')+'value="white">white</option>\
+                <option '+((res.marker==='yellow')?'selected ':'')+'value="yellow">yellow</option>\
+              </select>\
+            </td>\
+            <td>\
+              <a><i data-vehicle="'+res.id+'" class="vehicle-delete fa fa-times-circle red"></i></a>\
+            </td>\
+          </tr>')
+
+          // Check setter
+          checkSetterEmail($('.vehicle-setter[data-vehicle="'+res.id+'"]'))
+
+          // Undim the new row
+          new_row.css({
+            'filter': '',
+            '-moz-opacity': '',
+            '-khtml-opacity': '',
+            'opacity': '',
+          })
+
+          // Replace loading icon with add button
+          add_button
+            .addClass('green fa-plus-circle')
+            .removeClass('fa-spinner fa-spin')
+            .css('cursor','pointer')
+
+          // Clear new row inputs
+          $('#vehicle-name-new').val('')
+          $('#vehicle-setter-new').val('')
+          $("#vehicle-marker-new").val('red')
+
+        },
+
+      }
+    }).fail( function() {
+
+      // Show help
+      $('#vehicles-help').show()
+        .text('Failed to add vehicle.  Are you still conected to the internet?  ')
+
+      // Undim the new row
+      new_row.css({
+        'filter': '',
+        '-moz-opacity': '',
+        '-khtml-opacity': '',
+        'opacity': '',
+      })
+
+      // Replace loading icon with delete button
+      add_button
+        .addClass('green fa-plus-circle')
+        .removeClass('fa-spinner fa-spin')
+        .css('cursor','pointer')
+
+    })
+
+  })
+
   // Listen to deleting of vehicles
-  $('table').on('click', '.vehicle-delete', function () {
+  $('#vehicles-table').on('click', '.vehicle-delete', function () {
     const delete_button = $(this)
     const this_row = delete_button.closest('tr')
 
@@ -304,17 +416,17 @@ $(function () {
 
   })
 
-  // Listen to adding of vehicles
-  $('#vehicle-new').click( function() {
+  // Listen to adding of admins
+  $('#admin-new').click( function() {
     const add_button = $(this)
-    const new_row = $(this).closest('tr')
-    const icon_classes = ($('#vehicle-setter-icon-new').attr('class'))
+    const new_value = $('#admin-new-email').val()
+    const new_line = $(this).closest('li')
 
     // Hide the help
-    $('#vehicles-help').hide()
+    $('#admins-help').hide()
 
     // Dim the new row
-    new_row.css({
+    new_line.css({
       'filter': 'alpha(opacity=50)',
       '-moz-opacity': '0.5',
       '-khtml-opacity': '0.5',
@@ -328,87 +440,162 @@ $(function () {
       .removeClass('green fa-plus-circle')
       .css('cursor','not-allowed')
 
-    // Send request
-    $.post({
-      url: window.location.pathname+'/vehicles/',
-      data: {
-        name: $('#vehicle-name-new').val(),
-        setter: $('#vehicle-setter-new').val(),
-        marker: $('#vehicle-marker-new').val(),
-      },
-      statusCode: {
+    // Empty input; show help
+    if (!new_value) {
+      $('#admins-help').show()
+        .text('Type an email address in the box, then click here to add it')
 
-        // Successfully added
-        201: function(res) {
-
-          // Add row
-          new_row.before('<tr>\
-            <td>\
-              <input class="xss-sensitive" type="text" name="vehicle-name-'+res.id+'" value="'+res.name+'" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">\
-				    </td>\
-  					<td class="setter">\
-  						<input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicle-setter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
-  						<i id="vehicle-setter-icon-'+res.id+'" class="'+icon_classes+'"></i>\
-  					</td>\
-  					<td>\
-  						<select name="marker-'+res.id+'" title="The color of the map marker">\
-  							<option '+((res.marker==='red')?'selected ':'')+'value="red">red</option>\
-  							<option '+((res.marker==='black')?'selected ':'')+'value="black">black</option>\
-  							<option '+((res.marker==='green')?'selected ':'')+'value="green">green</option>\
-  							<option '+((res.marker==='grey')?'selected ':'')+'value="grey">grey</option>\
-  							<option '+((res.marker==='orange')?'selected ':'')+'value="orange">orange</option>\
-  							<option '+((res.marker==='purple')?'selected ':'')+'value="purple">purple</option>\
-  							<option '+((res.marker==='white')?'selected ':'')+'value="white">white</option>\
-  							<option '+((res.marker==='yellow')?'selected ':'')+'value="yellow">yellow</option>\
-  						</select>\
-  					</td>\
-  					<td>\
-  						<a><i data-vehicle="'+res.id+'" class="vehicle-delete fa fa-times-circle red"></i></a>\
-  					</td>\
-				  </tr>')
-
-				  // Check setter
-				  checkSetterEmail($('.vehicle-setter[data-vehicle="'+res.id+'"]'))
-
-		      // Undim the new row
-          new_row.css({
-            'filter': '',
-            '-moz-opacity': '',
-            '-khtml-opacity': '',
-            'opacity': '',
-          })
-
-          // Replace loading icon with add button
-          add_button
-            .addClass('green fa-plus-circle')
-            .removeClass('fa-spinner fa-spin')
-            .css('cursor','pointer')
-
-          // Clear new row inputs
-          $('#vehicle-name-new').val('')
-          $('#vehicle-setter-new').val('')
-          $("#vehicle-marker-new").val('red')
-
-        },
-
-      }
-    }).fail( function() {
-
-      // Show help
-      $('#vehicles-help').show()
-        .text('Failed to add vehicle.  Are you still conected to the internet?  ')
-
-      // Undim the new row
-      new_row.css({
+      // Undim the new line
+      new_line.css({
         'filter': '',
         '-moz-opacity': '',
         '-khtml-opacity': '',
         'opacity': '',
       })
 
-      // Replace loading icon with delete button
+      // Replace loading icon with add button
       add_button
         .addClass('green fa-plus-circle')
+        .removeClass('fa-spinner fa-spin')
+        .css('cursor','pointer')
+
+    // Inbalid email
+    } else if (!validateEmail(new_value)) {
+
+      // Show help
+      $('#admins-help').show()
+        .text('That email address isn\'t valid')
+
+      // Undim the new line
+      new_line.css({
+        'filter': '',
+        '-moz-opacity': '',
+        '-khtml-opacity': '',
+        'opacity': '',
+      })
+
+      // Replace loading icon with add button
+      add_button
+        .addClass('green fa-plus-circle')
+        .removeClass('fa-spinner fa-spin')
+        .css('cursor','pointer')
+
+    // Valid input
+    } else {
+
+      // Send request
+      $.post({
+        url: window.location.pathname+'/admins/',
+        data: {
+          email: $('#admin-new-email').val(),
+        },
+        statusCode: {
+
+          // Successfully added
+          201: function(res) {
+
+            // Add line
+            new_line.before('<li>\
+              '+res.email+' <a><i data-admin="'+res.email+'" class="admin-delete fa fa-times-circle red" title="Remove '+res.email+' from admins"></i></a>\
+            </li>')
+
+            // Undim the new line
+            new_line.css({
+              'filter': '',
+              '-moz-opacity': '',
+              '-khtml-opacity': '',
+              'opacity': '',
+            })
+
+            // Replace loading icon with add button
+            add_button
+              .addClass('green fa-plus-circle')
+              .removeClass('fa-spinner fa-spin')
+              .css('cursor','pointer')
+
+            // Clear new input and give focus
+            $('#admin-new-email').val('').focus()
+
+          },
+
+        }
+      }).fail( function() {
+
+        // Show help
+        $('#vehicles-help').show()
+          .text('Failed to add admin.  Are you still conected to the internet?  ')
+
+        // Undim the new row
+        new_line.css({
+          'filter': '',
+          '-moz-opacity': '',
+          '-khtml-opacity': '',
+          'opacity': '',
+        })
+
+        // Replace loading icon with delete button
+        add_button
+          .addClass('green fa-plus-circle')
+          .removeClass('fa-spinner fa-spin')
+          .css('cursor','pointer')
+
+        // Return focus to input
+        $('#admin-new-email').focus()
+
+      })
+
+    }
+
+  })
+
+  // Listen to deleting of admins
+  $('#admins-list').on('click', '.admin-delete', function () {
+    const delete_button = $(this)
+    const this_line = delete_button.closest('li')
+
+    // Hide the help
+    $('#admins-help').hide()
+    // Dim the line
+    this_line.css({
+      'filter': 'alpha(opacity=50)',
+      '-moz-opacity': '0.5',
+      '-khtml-opacity': '0.5',
+      'opacity': '0.5',
+    })
+    // Replace delete button with loading icon
+    delete_button
+      .addClass('fa-spinner fa-spin')
+      .css('color','#FFF')
+      .removeClass('red fa-times-circle')
+      .css('cursor','not-allowed')
+
+    // Send request
+    $.ajax({ type: 'DELETE',
+      url: window.location.pathname+'/admins/'+$(this).attr('data-admin'),
+      statusCode: {
+
+        // Successfully deleted
+        200: function(res) {
+          this_line.remove()
+        },
+
+      }
+    }).fail( function() {
+
+      // Show help
+      $('#admins-help').show()
+        .text('Failed to delete that admin.  Are you still conected to the internet?  ')
+
+      // Undim the row
+      this_line.css({
+        'filter': '',
+        '-moz-opacity': '',
+        '-khtml-opacity': '',
+        'opacity': '',
+      })
+      // Replace loading icon with delete button
+      delete_button
+        .addClass('red fa-times-circle')
         .removeClass('fa-spinner fa-spin')
         .css('cursor','pointer')
 

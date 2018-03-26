@@ -263,31 +263,25 @@
 
 		<h2>Administrators</h2>
 
-		<form>
+		<form><ul id="admins-list">
+			<li>
+				{{user.email}} (<i>you</i>)
+			</li>
 
-			<ul>
-				<li>
-					{{user.name}} &mdash; {{user.email}} (<i>you</i>)
-				</li>
-			{% for admin in map.admins %}
-			{# if admin.id !== user.id #}
-				<li>
-					{{admin.name}} &mdash; {{admin.email}} <a href="/settings/maps/{{map._id}}/admins/{{admin._id}}/delete"><i id="admin-delete-{{vehicle._id}}" class="fa fa-times-circle red" title="Remove {{admin.name}} from admins"></i></a>
-				</li>
-			{# endif #}
-			{% endfor %}
-				<li>
-					<input id="new-admin-input" type="text" name="new-admin" placeholder="New admin email" title="Enter the email of an admin you want to add" style="display:inline-block;padding:0">
-					<a href="/settings/maps/{{map._id}}/admins/new" disabled><i id="admin-delete-{{vehicle._id}}" class="fa fa-plus-circle green" title="Type an email address in the box, then click here"></i></a>
-				</li>
-			</ul>
+		{% for admin in map.admins %}
+		{% if admin !== user.email %}
+			<li>
+				{{admin.email}} <a><i data-admin="{{admin}}" class="admin-delete fa fa-times-circle red" title="Remove {{admin}} from admins"></i></a>
+			</li>
+		{% endif %}
+		{% endfor %}
+			<li>
+				<input id="admin-new-email" type="text" placeholder="New admin email" title="Enter the email of an admin you want to add" style="display:inline-block;padding:0">
+				<a><i id="admin-new" class="fa fa-plus-circle green" title="Click to add a new admin"></i></a>
+			</li>
+		</ul></form>
 
-			<div class="submit-group form-group flexbox">
-				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
-			</div>
-
-		</form>
+		<p id="admins-help" class="red help"></p>
 
 	</section>
 

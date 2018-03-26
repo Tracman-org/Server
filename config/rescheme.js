@@ -43,7 +43,7 @@ module.exports = function (old_user) {
           lat: old_user_object.last.lat || 0,
           lon: old_user_object.last.lon || 0,
         },
-        canZoom: true, 
+        canZoom: true,
         canPan: false,
         display: {
           scale: old_user_object.settings.showScale || false,
@@ -55,7 +55,7 @@ module.exports = function (old_user) {
       }
       new_map.lastUpdate = old_user_object.last.time
       new_map.vehicles = [new_vehicle]
-      new_map.admins = [new_user]
+      new_map.admins = [old_user.email]
       debug(`Set properties for new map ${new_map.id}`)
 
       // Create new user object

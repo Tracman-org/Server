@@ -72,7 +72,7 @@ const mapSchema = new Schema({
   },
   lastUpdate: Date,
   vehicles: [{ type:ObjectId, ref:'Vehicle' }],
-  admins: [{ type:ObjectId, ref:'User' }],
+  admins: [String], // Array of authorized emails
 }).plugin(unique)
 
 /* User methods */
@@ -82,7 +82,7 @@ const mapSchema = new Schema({
 // Create email confirmation token
 userSchema.methods.createEmailToken = function () {
   debug(`user.createEmailToken() called for ${user.id}`)
-  let user = this
+  const user = this
 
   return new Promise((resolve, reject) => {
     crypto.randomBytes(16, async (err, buf) => {
@@ -102,7 +102,7 @@ userSchema.methods.createEmailToken = function () {
 
 // Create password reset token
 userSchema.methods.createPassToken = function () {
-  let user = this
+  const user = this
   debug(`user.createPassToken() called for ${user.id}`)
 
   return new Promise( async (resolve, reject) => {
@@ -164,15 +164,15 @@ userSchema.methods.generateHashedPassword = function (password) {
 
 // Check for valid password
 userSchema.methods.validPassword = function (password) {
-  let user = this
+  const user = this
   debug(`user.validPassword() called for ${user.id}`)
   return bcrypt.compare(password, user.auth.password)
 }
 
 // Set models outside exports for populate
-let User = mongoose.model('User', userSchema)
-let Map = mongoose.model('Map', mapSchema)
-let Vehicle = mongoose.model('Vehicle', vehicleSchema)
+const User = mongoose.model('User', userSchema)
+const Map = mongoose.model('Map', mapSchema)
+const Vehicle = mongoose.model('Vehicle', vehicleSchema)
 
 module.exports = {
   'user': User,
