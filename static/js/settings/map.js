@@ -2,7 +2,7 @@
 /* global $ validateEmail replaceFromEndpoint */
 
 function checkSetterEmail(setter, vehicle_id) {
-  console.log('checkSetterEmail('+setter+', '+vehicle_id+')')
+  //console.log('checkSetterEmail('+setter+', '+vehicle_id+')')
 
   // Check all setter emails (as on page load)
   if (typeof setter==='undefined') {
@@ -252,7 +252,7 @@ $(function () {
 
   // Add vehicle
   function addVehicle() {
-    console.log('addVehicle() called')
+    //console.log('addVehicle() called')
     const $vehicle_add_button = $('#vehicle-new')
     const $new_vehicle_row = $vehicle_add_button.closest('tr')
     const icon_classes = $('#vehicle-setter-icon-new').attr('class')
@@ -327,7 +327,7 @@ $(function () {
     } else {
 
       // Send request
-      console.log('sending request to',window.location.pathname+'/vehicles/new/')
+      //console.log('sending request to',window.location.pathname+'/vehicles/new/')
       $.post({
         url: window.location.pathname+'/vehicles/new/',
         data: {
@@ -339,7 +339,7 @@ $(function () {
 
           // Successfully added
           201: function(res) {
-            console.log('successfully added with res of:',res)
+            //console.log('successfully added with res of:',res)
 
             // Add row
             $new_vehicle_row.before('<tr>\
@@ -422,10 +422,10 @@ $(function () {
   $('#vehicle-new').click(addVehicle)
   // Intercept add vehicle form submission
   $('#vehicles form').submit( function(e) {
-    console.log('vehicle submit intercepted')
+    //console.log('vehicle submit intercepted')
     // Add vehicle if new vehicle input has focus
     if ($('.new-vehicle-input').is(':focus')) {
-      console.log('new vehicle has focus')
+      //console.log('new vehicle has focus')
       e.preventDefault()
       addVehicle()
     }
@@ -488,7 +488,7 @@ $(function () {
 
   // Add admin
   function addAdmin() {
-    console.log('addAdmin() called')
+    //console.log('addAdmin() called')
     const $admin_add_button = $('#admin-new')
     const $new_admin_line = $admin_add_button.closest('li')
     const new_value = $('#admin-new-email').val()
