@@ -143,12 +143,8 @@ router.route('/maps')
 
   })
 
-// Map item
-router.route('/maps/:id')
-  .all(mw.ensureAuth) // TODO: Check that this users can admin this map (include all endpoints)
-
-  // Get map settings page
-  .get( async (req, res, next) => {
+// Get map settings
+router.get('/maps/:id', mw.ensureAuth, async (req, res, next) => {
 
     // Find and populate associated map
     const found_map = await Map
@@ -167,69 +163,79 @@ router.route('/maps/:id')
     })
   })
 
-  // TODO: Set new map settings
-  .post(async (req, res, next) => {
+// Set basic map settings
+router.post('/maps/:id/basic', async (req, res, next) => {
 
-    // Validate slug
-    const checkSlug = new Promise( async (resolve, reject) => {
-      // Check existence
-      if (req.body.slug === '') {
-        req.flash('warning', `You must supply a slug.  `)
+  // Validate slug
+  const checkSlug = new Promise( async (resolve, reject) => {
+    // Check existence
+    if (req.body.slug === '') {
+      req.flash('warning', `You must supply a slug.  `)
+      resolve()
+
+    // Check if unchanged
+    } else if (req.user.maps[0].slug === slug(xss(req.body.slug))) resolve()
+
+    // Check uniqueness
+    else {
+      try {
+        let existingUser = await User.findOne({ slug: req.body.slug })
+
+        // Not unique!
+        if (existingUser && existingUser.id !== req.user.id) {
+          req.flash( 'warning',
+          `That slug, <u>${req.body.slug}</u>, is already in use by another map! `
+          )
+
+        // It's unique
+        } else req.user.maps[0].slug = slug(xss(req.body.slug))
+
         resolve()
-
-      // Check if unchanged
-      } else if (req.user.maps[0].slug === slug(xss(req.body.slug))) resolve()
-
-      // Check uniqueness
-      else {
-        try {
-          let existingUser = await User.findOne({ slug: req.body.slug })
-
-          // Not unique!
-          if (existingUser && existingUser.id !== req.user.id) {
-            req.flash( 'warning',
-            `That slug, <u>${req.body.slug}</u>, is already in use by another map! `
-            )
-
-          // It's unique
-          } else req.user.maps[0].slug = slug(xss(req.body.slug))
-
-          resolve()
-        } catch (err) { reject() }
-      }
-    })
-
-    // Set settings when done
-    try {
-      await checkSlug
-      debug('Setting map settings... ')
-
-      // Set values
-      req.user.maps[0].settings = {
-        // TODO: Rescheme this
-        units: req.body.units,
-        defaultMap: {
-          type: req.body.defaultMapType,
-          zoom: req.body.defaultZoom,
-          lat: req.body.defaultLat,
-          lon: req.body.defaultLon,
-        },
-        showScale: !!(req.body.showScale),
-        showSpeed: !!(req.body.showSpeed),
-        showAlt: !!(req.body.showAlt),
-        showStreetview: !!(req.body.showStreet),
-        marker: req.body.marker
-      }
-
-      // Save user and send response
-      debug(`Saving new settings for map ${req.user.maps[0].name}...`)
-      await req.user.save()
-      debug(`DONE!  Redirecting...`)
-      req.flash('success', 'Settings updated. ')
-
-    } catch (err) { mw.throwErr(err, req) }
-    finally { res.redirect('/settings/maps') }
+      } catch (err) { reject() }
+    }
   })
+
+  // Set settings when done
+  try {
+    await checkSlug
+    debug('Setting map settings... ')
+
+    // Set values
+    req.user.maps[0].settings = {
+      // TODO: Rescheme this
+      units: req.body.units,
+      defaultMap: {
+        type: req.body.defaultMapType,
+        zoom: req.body.defaultZoom,
+        lat: req.body.defaultLat,
+        lon: req.body.defaultLon,
+      },
+      showScale: !!(req.body.showScale),
+      showSpeed: !!(req.body.showSpeed),
+      showAlt: !!(req.body.showAlt),
+      showStreetview: !!(req.body.showStreet),
+      marker: req.body.marker
+    }
+
+    // Save user and send response
+    debug(`Saving new settings for map ${req.user.maps[0].name}...`)
+    await req.user.save()
+    debug(`DONE!  Redirecting...`)
+    req.flash('success', 'Settings updated. ')
+
+  } catch (err) { mw.throwErr(err, req) }
+  finally { res.redirect('/settings/maps') }
+})
+
+// Set display settings
+router.post('/maps/:map/display',async (req, res, next) => {
+
+})
+
+// Set vehicle settings
+router.post('/maps/:map/vehicles', async (req, res, next) => {
+
+})
 
 // Delete map TODO: Test this
 router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
@@ -250,7 +256,7 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
 })
 
 // TODO: Create new vehicle
-router.post('/maps/:map/vehicles', mw.ensureAuth, (req, res) => {
+router.post('/maps/:map/vehicles/new', mw.ensureAuth, (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
   res.statusCode = 201
   res.json({
