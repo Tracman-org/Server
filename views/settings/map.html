@@ -36,6 +36,7 @@
 
 		<form role="form" method="post" action="/settings/maps/{{map._id}}/basics">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
+			<input type="hidden" name="mapId" value="{{map._id}}">
 
 			<div id="name" class="form-group" title="Shown in the window title when viewing the map">
 				<label for="name-input">Name</label>
