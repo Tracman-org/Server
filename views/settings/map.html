@@ -82,7 +82,7 @@
 
 			<div id="default-map-type" class="form-group" title="Default image shown to map viewers, which can be changed by visitors">
 				<label for="map-type-select">Default map</label>
-				<select id="map-type-select" name="map-type">
+				<select id="map-type-select" name="mapType">
 					<option {% if map.settings.defaultType=='road' %}selected {% endif %}value="road">Road</option>
 					<option {% if map.settings.defaultType=='sat' %}selected {% endif %}value="sat">Satellite</option>
 				</select>
@@ -90,7 +90,7 @@
 
 			<div id="default-zoom" class="form-group" title="The initial map zoom level, though map edges may be affected by screen size">
 				<label for="zoom-select">Default zoom</label>
-				<select id="default-zoom-select" name="default-zoom">
+				<select id="default-zoom-select" name="defaultZoom">
 					<option {% if map.settings.defaultZoom==1 %}selected {% endif %}value="1">1 World</option>
 					<option {% if map.settings.defaultZoom==2 %}selected {% endif %}value="2">2</option>
 					<option {% if map.settings.defaultZoom==3 %}selected {% endif %}value="3">3</option>
@@ -132,8 +132,8 @@
 							{% endfor %}
 						</select>
 						<div id="center-static-coords" class="flex">
-							<input name="staticLat" type="number" value="{{map.center.staticLat}}" placeholder="Latitude" max="90" min="-90">
-							<input name="staticLon" type="number" value="{{map.center.staticLat}}" placeholder="Longitude" max="180" min="-180">
+							<input name="staticLat" type="number" value="{{map.center.lat}}" placeholder="Latitude" max="90" min="-90">
+							<input name="staticLon" type="number" value="{{map.center.lon}}" placeholder="Longitude" max="180" min="-180">
 						</div>
 					</div>
 				</div>
@@ -143,32 +143,32 @@
 
 			<div id="can-zoom" class="form-group" title="Whether visitors can zoom in and out">
 				<label for="can-zoom-input">Can zoom</label>
-				<input id="can-zoom-input" name="can-zoom" type="checkbox" {% if map.settings.canZoom %}checked{% endif %}>
+				<input id="can-zoom-input" name="canZoom" type="checkbox" {% if map.settings.canZoom %}checked{% endif %}>
 			</div>
 
 			<div id="can-pan" class="form-group" title="Whether visitors can move the map">
 				<label for="can-pan-input">Can pan</label>
-				<input id="can-pan-input" name="can-pan" type="checkbox" {% if map.settings.canPan %}checked{% endif %}>
+				<input id="can-pan-input" name="canPan" type="checkbox" {% if map.settings.canPan %}checked{% endif %}>
 			</div>
 
 			<div id="show-scale" class="form-group" title="Shows a scale on the map.">
 				<label for="show-scale">Show scale</label>
-				<input id="show-scale-input" name="show-scale" type="checkbox" {% if map.settings.display.scale %}checked{% endif %}>
+				<input id="show-scale-input" name="showScale" type="checkbox" {% if map.settings.display.scale %}checked{% endif %}>
 			</div>
 
 			<div id="show-speed" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
 				<label for="show-speed-input">Show speed{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-speed-input" name="show-speed" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.speed %}checked{% else %}{% endif %}>
+				<input id="show-speed-input" name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.speed %}checked{% else %}{% endif %}>
 			</div>
 
 			<div id="show-altitude" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
 				<label for="show-alt-input">Show altitude{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-alt-input" name="show-alt" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.alt %}checked{% else %}{% endif %}>
+				<input id="show-alt-input" name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.alt %}checked{% else %}{% endif %}>
 			</div>
 
 			<div id="show-streetview" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image at or near your current location, oriented in the direction of travel. ">
 				<label for="show-streetview-input">Show street view{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-streetview-input" name="show-streetview" type="checkbox" {% if not user.isPro %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
+				<input id="show-streetview-input" name="showStreetview" type="checkbox" {% if not user.isPro %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
 			</div>
 
 			<div class="submit-group form-group flexbox">

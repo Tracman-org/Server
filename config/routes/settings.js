@@ -194,22 +194,22 @@ router.post('/maps/:map/basics', async (req, res, next) => {
         // Check existence
         if (req.body.slug === '')
           throw new Error('You must supply a slug.  ')
-  
+
         // Check uniqueness
         else {
           const valid_slug = slug(xss(req.body.slug))
           const existing_map = await Map.findOne({ slug: valid_slug })
-  
+
           // Not unique!
           if (existing_map && existing_map.id !== req.params.map)
             throw new Error('That slug is already in use by another map! ')
-  
+
           // It's unique
           else resolve(valid_slug)
         }
-        
+
       } catch (err) { reject(err) }
-      
+
     })
 
     // Set settings
@@ -217,21 +217,55 @@ router.post('/maps/:map/basics', async (req, res, next) => {
     map.slug = await checked_slug
     map.name = xss(req.body.name)
 
-    // Save user and send response
+    // Save map and send response
     debug(`Saving new settings for map ${map.name}...`)
     await map.save()
 
     // Success
     debug(`DONE!  Redirecting...`)
-    req.flash('success', 'Settings updated. ')
+    req.flash('success', 'Basic map settings updated. ')
 
   } catch (err) { mw.throwErr(err, req) }
+
   finally { res.redirect(`/settings/maps/${req.params.map}#basics`) }
 
 })
 
 // Set display settings
 router.post('/maps/:map/display',async (req, res, next) => {
+  try {
+
+    // Get map
+    const map = await Map.findById(sanitize(req.params.map))
+    if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
+
+    // Set settings
+    debug(`Setting map ${req.params.map} display settings... `)
+    map.settings.units = req.body.units
+    map.settings.defaultMapType = req.body.mapType
+    map.settings.defaultZoom = req.body.defaultZoom
+    map.settings.center.type = req.body.center
+    map.settings.center.follow = req.body.follow
+    map.settings.center.lat = req.body.staticLat
+    map.settings.center.lon = req.body.staticLon
+    map.settings.canZoom = (req.body.canZoom=='on')
+    map.settings.canPan = (req.body.canPan==='on')
+    map.settings.display.scale = (req.body.showScale==='on')
+    map.settings.display.speed = (req.body.showSpeed==='on')
+    map.settings.display.alt = (req.body.showAlt==='on')
+    map.settings.display.streetview = (req.body.showStreetview==='on')
+
+    // Save map and send response
+    debug(`Saving new settings for map ${map.name}...`)
+    await map.save()
+
+    // Success
+    debug(`DONE!  Redirecting...`)
+    req.flash('success', 'Map display settings updated. ')
+
+  } catch (err) { mw.throwErr(err, req) }
+
+  finally { res.redirect(`/settings/maps/${req.params.map}#display`) }
 
 })
 
