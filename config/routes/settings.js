@@ -9,6 +9,7 @@ const env = require('../env/env')
 const debug = require('debug')('tracman-routes-settings')
 const User = require('../models').user
 const Map = require('../models').map
+const Vehicle = require('../models').vehicle
 const router = require('express').Router()
 
 // Settings index
@@ -143,8 +144,12 @@ router.route('/maps')
 
   })
 
-// Get map settings
-router.get('/maps/:map', mw.ensureAuth, async (req, res, next) => {
+// Map settings
+router.route('/maps/:map')
+  .all(mw.ensureAuth)
+
+  // Get map settings page
+  .get(async (req, res, next) => {
 
     // Find and populate associated map
     const found_map = await Map
@@ -164,114 +169,156 @@ router.get('/maps/:map', mw.ensureAuth, async (req, res, next) => {
     })
 
   })
-// Redirect faulty POSTs
-router.get('/maps/:map/basics', (req, res) => {
-  res.redirect(`/settings/maps/${req.params.map}#basics`)
-})
-router.get('/maps/:map/display', (req, res) => {
-  res.redirect(`/settings/maps/${req.params.map}#display`)
-})
-router.get('/maps/:map/vehicles', (req, res) => {
-  res.redirect(`/settings/maps/${req.params.map}#vehicles`)
-})
-router.get('/maps/:map/admins', (req, res) => {
-  res.redirect(`/settings/maps/${req.params.map}#admins`)
-})
 
-// Set basic map settings
-router.post('/maps/:map/basics', async (req, res, next) => {
-  try {
+  // Set map settings
+  .post(async (req, res, next) => {
+    switch (req.body.type) {
 
-    // Get map
-    const map = await Map.findById(sanitize(req.params.map))
-    if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
+      // Set basic settings
+      case 'basics':
+        try {
 
-    // Validate slug
-    const checked_slug = new Promise( async (resolve, reject) => {
-      debug(`Checking slug ${req.body.slug}... `)
-      try {
+          // Get map
+          const map = await Map.findById(sanitize(req.params.map))
+          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
 
-        // Check existence
-        if (req.body.slug === '')
-          throw new Error('You must supply a slug.  ')
+          // Validate slug
+          const checked_slug = new Promise( async (resolve, reject) => {
+            debug(`Checking slug ${req.body.slug}... `)
+            try {
 
-        // Check uniqueness
-        else {
-          const valid_slug = slug(xss(req.body.slug))
-          const existing_map = await Map.findOne({ slug: valid_slug })
+              // Check existence
+              if (req.body.slug === '')
+                throw new Error('You must supply a slug.  ')
 
-          // Not unique!
-          if (existing_map && existing_map.id !== req.params.map)
-            throw new Error('That slug is already in use by another map! ')
+              // Check uniqueness
+              else {
+                const valid_slug = slug(xss(req.body.slug))
+                const existing_map = await Map.findOne({ slug: valid_slug })
 
-          // It's unique
-          else resolve(valid_slug)
-        }
+                // Not unique!
+                if (existing_map && existing_map.id !== req.params.map)
+                  throw new Error('That slug is already in use by another map! ')
 
-      } catch (err) { reject(err) }
+                // It's unique
+                else resolve(valid_slug)
+              }
 
-    })
+            } catch (err) { reject(err) }
 
-    // Set settings
-    debug(`Setting map name to ${xss(req.body.name)} and slug to ${await checked_slug}... `)
-    map.slug = await checked_slug
-    map.name = xss(req.body.name)
+          })
 
-    // Save map and send response
-    debug(`Saving new settings for map ${map.name}...`)
-    await map.save()
+          // Set settings
+          debug(`Setting map name to ${xss(req.body.name)} and slug to ${await checked_slug}... `)
+          map.slug = await checked_slug
+          map.name = xss(req.body.name)
 
-    // Success
-    debug(`DONE!  Redirecting...`)
-    req.flash('success', 'Basic map settings updated. ')
+          // Save map and send response
+          debug(`Saving new settings for map ${map.name}...`)
+          await map.save()
 
-  } catch (err) { mw.throwErr(err, req) }
+          // Success
+          debug(`Done saving basic settings for map ${map.id}.  Redirecting...`)
+          req.flash('success', 'Basic map settings updated. ')
 
-  finally { res.redirect(`/settings/maps/${req.params.map}#basics`) }
+        } catch (err) { mw.throwErr(err, req) }
 
-})
+        finally { res.redirect(`/settings/maps/${req.params.map}#basics`) }
+        break
 
-// Set display settings
-router.post('/maps/:map/display',async (req, res, next) => {
-  try {
+      // Set display settings
+      case 'display':
+        try {
 
-    // Get map
-    const map = await Map.findById(sanitize(req.params.map))
-    if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
+          // Get map
+          const map = await Map.findById(sanitize(req.params.map))
+          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
 
-    // Set settings
-    debug(`Setting map ${req.params.map} display settings... `)
-    map.settings.units = req.body.units
-    map.settings.defaultMapType = req.body.mapType
-    map.settings.defaultZoom = req.body.defaultZoom
-    map.settings.center.type = req.body.center
-    map.settings.center.follow = req.body.follow
-    map.settings.center.lat = req.body.staticLat
-    map.settings.center.lon = req.body.staticLon
-    map.settings.canZoom = (req.body.canZoom=='on')
-    map.settings.canPan = (req.body.canPan==='on')
-    map.settings.display.scale = (req.body.showScale==='on')
-    map.settings.display.speed = (req.body.showSpeed==='on')
-    map.settings.display.alt = (req.body.showAlt==='on')
-    map.settings.display.streetview = (req.body.showStreetview==='on')
+          // Set settings
+          debug(`Setting map ${req.params.map} display settings... `)
+          map.settings.units = req.body.units
+          map.settings.defaultMapType = req.body.mapType
+          map.settings.defaultZoom = req.body.defaultZoom
+          map.settings.center.type = req.body.center
+          map.settings.center.follow = req.body.follow
+          map.settings.center.lat = req.body.staticLat
+          map.settings.center.lon = req.body.staticLon
+          map.settings.canZoom = (req.body.canZoom=='on')
+          map.settings.canPan = (req.body.canPan==='on')
+          map.settings.display.scale = (req.body.showScale==='on')
+          map.settings.display.speed = (req.body.showSpeed==='on')
+          map.settings.display.alt = (req.body.showAlt==='on')
+          map.settings.display.streetview = (req.body.showStreetview==='on')
 
-    // Save map and send response
-    debug(`Saving new settings for map ${map.name}...`)
-    await map.save()
+          // Save map and send response
+          debug(`Saving new settings for map ${map.name}...`)
+          await map.save()
 
-    // Success
-    debug(`DONE!  Redirecting...`)
-    req.flash('success', 'Map display settings updated. ')
+          // Success
+          debug(`Done updating display settings for map ${map.id}.  Redirecting...`)
+          req.flash('success', 'Map display settings updated. ')
 
-  } catch (err) { mw.throwErr(err, req) }
+        } catch (err) { mw.throwErr(err, req) }
 
-  finally { res.redirect(`/settings/maps/${req.params.map}#display`) }
+        finally { res.redirect(`/settings/maps/${req.params.map}#display`) }
+        break
 
-})
+      // Set vehicle setttings
+      case 'vehicles':
+        try {
 
-// Set vehicle settings
-router.post('/maps/:map/vehicles', async (req, res, next) => {
+          // Get map
+          const map = await Map.findById(sanitize(req.params.map))
+          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
 
+          // Organize request body
+          debug(`Organizing request body data... `)
+          let update_request = {}
+          for (const prop in req.body) {
+            if (prop!=='_csrf'&&prop!=='type') { // Ignore CSRF token and form type
+              // New vehicle
+              if (!update_request[prop.slice(-24)])
+                update_request[sanitize(prop.slice(-24))] = {}
+              // New vehicle property
+              update_request[prop.slice(-24)][prop.slice(0,-25)] = req.body[prop]
+            }
+          }
+          debug(`Organized request body data: ${update_request}`)
+
+          // Get all vehicles that need updating
+          debug(`Getting vehicles that need updating... `)
+          const vehicles = await Vehicle.find({ '_id': {
+            $in: Object.keys(update_request)
+          } })
+          debug(`${vehicles.length} vehicles found that need updating.`)
+
+          // Update each vehicle
+          vehicles.forEach( async (vehicle) => {
+            debug(`Updating vehicle ${vehicle.id}...`)
+            vehicle.name = update_request[vehicle.id].vehicleName
+            vehicle.setterEmail = update_request[vehicle.id].vehicleSetter
+            vehicle.marker = update_request[vehicle.id].vehicleMarker
+            vehicle.setter = await User.findOne({
+              'email': sanitize(update_request[vehicle.id].vehicleSetter)
+            })
+            vehicle.save()
+            debug(`Vehicle ${vehicle.id} updated.`)
+          })
+
+          // Success
+          debug(`Done updating vehicles for map ${map.id}.  Redirecting...`)
+          req.flash('success', 'Map vehicle settings updated. ')
+
+        } catch (err) { mw.throwErr(err, req) }
+
+        finally { res.redirect(`/settings/maps/${req.params.map}#vehicles`) }
+        break
+
+      default:
+        next() // 404
+        break
+
+    }
 })
 
 // Delete map TODO: Test this
