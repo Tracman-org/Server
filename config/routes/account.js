@@ -31,7 +31,7 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
 
     } catch (err) {
       mw.throwErr(err, req)
-      res.redirect('/settings')
+      res.redirect('/settings/user')
     }
 
   // Invalid token

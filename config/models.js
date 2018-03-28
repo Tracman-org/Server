@@ -80,7 +80,7 @@ const mapSchema = new Schema({
 
 // Create email confirmation token
 userSchema.methods.createEmailToken = function () {
-  debug(`user.createEmailToken() called for ${user.id}`)
+  debug(`user.createEmailToken() called for ${this.id}`)
   const user = this
 
   return new Promise((resolve, reject) => {

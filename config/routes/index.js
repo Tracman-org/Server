@@ -78,7 +78,7 @@ module.exports = router
 
     // Validate unique email
     } else if (req.query.email) {
-      console.log(`Testing email ${req.query.email} for uniqueness`)
+      debug(`Testing email ${req.query.email} for uniqueness`)
       try {
         let existing_user = User.findOne({ email: sanitize(req.query.email) })
         if (existing_user.id && existing_user.id !== req.user.id) {

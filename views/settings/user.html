@@ -22,7 +22,7 @@
 
 		<h1>User Settings</h1>
 
-		<form id="user-settings-form" role="form" method="post" action="/settings/user">
+		<form role="form" method="post">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 
 			<div id="name" class="form-group" title="It doesn't really matter what you put here">
@@ -30,10 +30,19 @@
 				<input id="name-input" class="xss-sensitive" name="name" type="text" value="{{user.name}}" maxlength="160">
 				<p id="name-help" class="red help"></p>
 			</div>
-
+			
 			<div id="email" class="form-group" title="For account stuff only, no dumb newsletters">
+			{% if user.newEmail and user.newEmail != user.email %}
+				<label for="email-input-confirmed">Current email</label>
+				<input id="email-input-confirmed" type="email" value="{{user.email}}" maxlength="160" style="cursor:not-allowed" title="Use the box below to change your email" disabled>
+			</div>
+			<div id="email-unconfirmed" class="form-group" title="This email will become active as soon as you confirm it by clicking the link in its inbox">
+				<label for="email-input">Unconfirmed email</label>
+				<input id="email-input" name="email" type="email" value="{{user.newEmail}}" maxlength="160" title="You can change this address or resubmit it to recieve a new confirmation link">
+			{% else %}
 				<label for="email-input">Email</label>
 				<input id="email-input" name="email" type="email" value="{{user.email}}" maxlength="160">
+			{% endif %}
 				<p id="email-help" class="red help"></p>
 			</div>
 

@@ -31,78 +31,75 @@ router.route('/user')
   })
 
   // TODO: Set user settings
-  .post( (req, res) => {
-
-    // Validate email
-    const checkedEmail = new Promise( async (resolve, reject) => {
-      
-      // Sanitize for mongo
-      req.body.email = sanitize(req.body.email)
-
-      // Check if changed
-      if (req.user.email === req.body.email) resolve(req.body.email)
-      
-      else if (!mw.validateEmail(req.body.email)) {
-        req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `)
-        reject()
-
-      // Check uniqueness
-      } else {
-        
-        try {
-          let existing_user = await User.findOne({ email: req.body.email })
-
-          // Not unique!
-          if (existing_user && existing_user.id !== req.user.id) {
-            req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `)
-            reject()
-
-          // It's unique
-          } else {
-            debug('Email is unique')
-            req.user.newEmail = req.body.email
-
-            // Create token
-            debug(`Creating email token...`)
-            let token = await req.user.createEmailToken()
-
-            // Send token to user by email
-            debug(`Mailing new email token to ${req.body.email}...`)
-            await mail.send({
-              to: `"${req.user.name}" <${req.body.email}>`,
-              from: mail.noReply,
-              subject: 'Confirm your new email address for Tracman',
-              text: mail.text(
-                `A request has been made to change your Tracman email address.  \
-                If you did not initiate this request, please disregard it.  \n\n\
-                To confirm your email, follow this link:\n${env.url}/account/email/${token}. `
-              ),
-              html: mail.html(
-                `<p>A request has been made to change your Tracman email address.  \
-                If you did not initiate this request, please disregard it.  </p>\
-                <p>To confirm your email, follow this link:\
-                <br><a href="${env.url}/account/email/${token}">\
-                ${env.url}/account/email/${token}</a>. </p>`
-              )
-            })
-
-            req.flash('warning',
-              `An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `
-            )
-            resolve()
-          }
-        } catch (err) { reject() }
-      }
-    })
-
-    // Set settings when done
+  .post(async (req, res) => {
+    debug('Setting user settings... ')
     try {
-      await checkEmail
-      debug('Setting user settings... ')
-
+      
       // Set values
       req.user.name = xss(req.body.name)
+      req.user.newEmail = await new Promise( async (resolve, reject) => {
+        
+        // Sanitize for mongo
+        req.body.email = sanitize(req.body.email)
 
+        // Check if changed
+        if (req.user.email === req.body.email) resolve(req.body.email)
+        
+        else if (!mw.validateEmail(req.body.email)) {
+          req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `)
+          reject()
+
+        // Check uniqueness
+        } else {
+          
+          try {
+            let existing_user = await User.findOne({ 'email': req.body.email })
+
+            // Not unique!
+            if (existing_user && existing_user.id !== req.user.id) {
+              debug(`User ${existing_user.id} already has that email!`)
+              req.flash('warning', `That email, <u>${req.body.email}</u>, is already in use by another user! `)
+              reject()
+
+            // It's unique
+            } else {
+
+              // Create token
+              debug(`Creating email token...`)
+              let token = await req.user.createEmailToken()
+
+              // Send token to user by email
+              debug(`Mailing new email token to ${req.body.email}...`)
+              await mail.send({
+                to: `"${req.user.name}" <${req.body.email}>`,
+                from: mail.noReply,
+                subject: 'Confirm your new email address for Tracman',
+                text: mail.text(
+                  `A request has been made to change your Tracman email address.  \
+                  If you did not initiate this request, please disregard it.  \n\n\
+                  To confirm your email, follow this link:\n${env.url}/account/email/${token}. `
+                ),
+                html: mail.html(
+                  `<p>A request has been made to change your Tracman email address.  \
+                  If you did not initiate this request, please disregard it.  </p>\
+                  <p>To confirm your email, follow this link:\
+                  <br><a href="${env.url}/account/email/${token}">\
+                  ${env.url}/account/email/${token}</a>. </p>`
+                )
+              })
+
+              req.flash('warning',
+                `An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `
+              )
+              
+              // Resolve, so it canbe set outside this promise
+              resolve(req.body.email)
+              
+            }
+          } catch (err) { reject(err) }
+        }
+      })
+      
       // Save user and send response
       debug(`Saving new settings for user ${req.user.name}...`)
       await req.user.save()
@@ -111,6 +108,7 @@ router.route('/user')
 
     } catch (err) { mw.throwErr(err, req) }
     finally { res.redirect('/settings/user') }
+    
   })
 
 // Delete account TODO: Test this
