@@ -344,14 +344,14 @@ $(function () {
             // Add row
             $new_vehicle_row.before('<tr>\
               <td>\
-                <input class="xss-sensitive" type="text" name="vehicle-name-'+res.id+'" value="'+res.name+'" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">\
+                <input class="xss-sensitive" type="text" name="vehicleName-'+res.id+'" value="'+res.name+'" placeholder="Vehicle names are optional" title="The name of a vehicle appears when you mouseover or click on a marker on the map">\
               </td>\
               <td class="setter">\
-                <input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicle-setter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
+                <input type="text" class="vehicle-setter left" data-vehicle="'+res.id+'" name="vehicleSetter-'+res.id+'" value="'+res.setter+'" placeholder="Enter an email" title="The email address of the user account that can set the vehicle\'s location">\
                 <i id="vehicle-setter-icon-'+res.id+'" class="'+icon_classes+'"></i>\
               </td>\
               <td>\
-                <select name="marker-'+res.id+'" title="The color of the map marker">\
+                <select name="vehicleMarker-'+res.id+'" title="The color of the map marker">\
                   <option '+((res.marker==='red')?'selected ':'')+'value="red">red</option>\
                   <option '+((res.marker==='black')?'selected ':'')+'value="black">black</option>\
                   <option '+((res.marker==='green')?'selected ':'')+'value="green">green</option>\

@@ -65,7 +65,6 @@ const mapSchema = new Schema({
     display: {
       scale: { type:Boolean, default:false },
       speed: { type:Boolean, default:false },
-      temp: { type:Boolean, default:false },
       alt: { type:Boolean, default:false },
       streetview: { type:Boolean, default:false },
     },

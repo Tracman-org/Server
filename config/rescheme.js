@@ -48,7 +48,6 @@ module.exports = function (old_user) {
         display: {
           scale: old_user_object.settings.showScale || false,
           speed: old_user_object.settings.showSpeed || false,
-          temp: old_user_object.settings.showTemp || false,
           alt: old_user_object.settings.showAlt || false,
           streetview: old_user_object.settings.showStreetview || false,
         },

@@ -34,7 +34,6 @@ router.get('/demo', (req, res, next) => {
         showScale: true,
         showSpeed: true,
         showAlt: false,
-        showTemp: false,
         showStreetview: true,
       },
       lastUpdate: new Date(),
