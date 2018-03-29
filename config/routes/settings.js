@@ -374,21 +374,16 @@ router.route('/maps/:map')
     }
 })
 
-// Delete map TODO: Test this
+// Delete map
 router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
   debug(`Deleting map ${req.params.map}...`)
-  let found_map = await Map
-    .findById(sanitize(req.params.map))
-  if (!found_map) next() // 404
-  else {
-    try {
-      await found_map.remove()
-      req.flash('success', `Map deleted`)
-      res.redirect('/settings/maps')
-    } catch (err) {
-      mw.throwErr(err, req)
-      res.redirect(`/settings/maps/${req.params.map}`)
-    }
+  try {
+    await Map.findByIdAndRemove(req.params.map)
+    req.flash('success', `Map deleted`)
+    res.redirect('/settings/maps')
+  } catch (err) {
+    mw.throwErr(err, req)
+    res.redirect(`/settings/maps/${req.params.map}`)
   }
 })
 

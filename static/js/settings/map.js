@@ -111,6 +111,15 @@ $(function () {
 
   const original_slug = $('#slug-input').val()
 
+  // Delete map
+  $('#delete').click(function () {
+    if (
+      confirm('Are you sure you want to delete your this map and all associated vehicles?  This CANNOT be undone! ')
+    ) {
+      window.location.href = $('#delete').attr('href')
+    }
+  })
+
   // Set up tabs
   $('.container').easytabs()
   // Listen to click on entire tab, not just link

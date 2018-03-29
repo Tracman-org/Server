@@ -73,7 +73,6 @@ module.exports = function (old_user) {
       new_user.lastLogin = old_user_object.lastLogin || 0
       new_user.isNewUser = old_user_object.isNewUser || true
       new_user.sk32 = old_user_object.sk32
-      new_user.setVehicle = new_vehicle
 
       // Delete old user
       try {

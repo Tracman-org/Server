@@ -27,7 +27,6 @@ const userSchema = new Schema({
   lastLogin: Date,
   isNewUser: Boolean,
   sk32: { type:String, required:true },
-  setVehicle: { type:ObjectId, ref:'Vehicle' },
 }).plugin(unique)
 
 const vehicleSchema = new Schema({
@@ -74,6 +73,12 @@ const mapSchema = new Schema({
   vehicles: [{ type:ObjectId, ref:'Vehicle' }],
   admins: [String], // Array of authorized emails
 }).plugin(unique)
+
+/* Middleware */
+// Delete vehicles when a map is deleted
+mapSchema.post('remove', (map) => {
+  Vehicle.remove({_id: { $in: map.vehicles }})
+})
 
 /* User methods */
 // Do not replace with arrow functions!

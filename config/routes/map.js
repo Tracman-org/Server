@@ -11,8 +11,8 @@ const debug = require('debug')('tracman-routes-map')
 router.get('/', mw.ensureAuth, async (req, res) => {
   //TODO: Get rid of this route and add a page with map selection
   debug(`Redirecting user to the map they can set`)
-  let map = await Map.findOne({'vehicles':{$in:[req.user.setVehicle]}})
-  res.redirect(`/map/${map.slug}`||'/')
+  let map = await Map.findOne({'vehicles':req.user.id})
+  res.redirect((map)?`/map/${map.slug}`:'/')
 })
 
 // Demo

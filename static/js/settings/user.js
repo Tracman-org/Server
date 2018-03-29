@@ -11,8 +11,7 @@ $(function () {
     if (
       confirm('Are you sure you want to delete your account?  This CANNOT be undone! ')
     ) {
-      console.log($('#delete').attr('href'))
-      //window.location.href = $('#delete').attr('href')
+      window.location.href = $('#delete').attr('href')
     }
   })
 
