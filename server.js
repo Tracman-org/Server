@@ -220,12 +220,11 @@ app.post('/csp-violation', (req, res) => {
 
 // CSRF Protection (keep after routes)
 app.use(csurf({
-    cookie: true,
-  }))
+  cookie: true,
+}))
 
-/* Sockets */ {
-  sockets.init(io)
-}
+/* Sockets */
+sockets.init(io)
 
 /* RUNTIME */
 console.log(`Starting ${env.mode} server at ${__dirname}...`)
