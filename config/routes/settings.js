@@ -387,38 +387,103 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
   }
 })
 
-// TODO: Create new vehicle
+// Create new vehicle
 router.post('/maps/:map/vehicles/new', mw.ensureAuth, (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
-  res.statusCode = 201
-  res.json({
-    id: 'fakeid',
-    name: req.body.name,
-    setter: req.body.setter,
-    marker: req.body.marker,
-  })
+  
+  // Create document
+  new_vehicle = new Vehicle()
+  // Check that email is valid
+  if (!mw.validateEmail(req.body.email)) {
+    req.flash('danger', `That email, <u>${req.body.email}</u> is invalid!`)
+    res.sendStatus(404)
+  } else {
+    new_vehicle.setterEmail = sanitize(req.body.email)
+    new_vehicle.created = Date.now()
+    new_vehicle.name = xss(req.body.name)
+    // Only set marker if it's whitelisted
+    if (mw.markers.includes(req.body.marker))
+      new_vehicle.marker = req.body.marker
+    else new_vehicle_marker = 'red'
+    new_vehicle.setter = User.findOne({ 'email': sanitize(req.body.email) })
+  
+    // Respond
+    res.statusCode = 201
+    res.json({
+      id: new_vehicle.id,
+      name: new_vehicle.name,
+      setter: new_vehicle.setterEmail,
+      marker: new_vehicle.marker,
+    })
+    
+  }
 })
 
-// TODO: Delete vehicle
-router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, (req, res) => {
+// Delete vehicle
+router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
   debug(`Deleting vehicle ${req.params.veh}...`)
-  res.sendStatus(200)
+  try {
+    await Vehicle.findByIdAndRemove(sanitize(req.params.veh))
+    res.sendStatus(200)
+  } catch (err) {
+    res.sendStatus(400)
+  }
 })
 
-// TODO: Create new admin
+// Create new admin
 router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
   debug(`Creating new admin for map ${req.params.map}`)
-  res.statusCode = 201
-  res.json({
-    email: req.body.email,
-  })
+  try {
+    
+    // Validate email
+    if (!mw.validateEmail(req.body.email))
+      throw new Error(`The email for a new admin, ${req.body.email} is invalid!`)
+    else {
+      
+      // Add admin email to map
+      Map.findByIdAndUpdate(
+        sanitize(req.params.map),
+        {$push: {
+          admins: req.body.email,
+        } },
+      )
+      
+      // Respond
+      res.statusCode = 201
+      res.json({
+        email: req.body.email,
+      })
+      
+    }
+    
+  } catch (err) {
+    res.sendStatus(500)
+  }
+
 })
 
-// TODO: Delete admin
+// Delete admin
 router.delete('/maps/:map/admins/:admin', mw.ensureAuth, (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
-  // Don't forget that req.params.admin is an email, not an id
-  res.sendStatus(200)
+  try {
+      
+    // Remove admin email to map
+    Map.findByIdAndUpdate(
+      sanitize(req.params.map),
+      {$pull: {
+        admins: req.body.email,
+      } },
+    )
+    
+    // Respond
+    res.statusCode = 201
+    res.json({
+      email: req.body.email,
+    })
+    
+  } catch (err) {
+    res.sendStatus(500)
+  }
 })
 
 // Redirects for URLs that moved to /account

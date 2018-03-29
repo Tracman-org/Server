@@ -5,6 +5,18 @@ const debug = require('debug')('tracman-middleware')
 
 module.exports = {
 
+	// Array of markers
+	markers: [
+		'black',
+		'green',
+		'grey',
+		'orange',
+		'purple',
+		'red',
+		'white',
+		'yellow',
+	],
+
 	// Throw error
 	throwErr: (err, req=null) => {
 		debug(`throwErr(${err.message},${req?req.url:'null'})`)
