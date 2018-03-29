@@ -4,6 +4,7 @@
 {% block head %}
 {{super()}}
 	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
 {% endblock %}
 
 {% block main %}
@@ -14,11 +15,17 @@
 		
 		<p><a href="/settings">&lt; Back to all settings</a></p>
 
+		<form role="form" method="post">
+		<input type="hidden" name="_csrf" value="{{csrfToken}}">
 		<ul>
-			{% for map in maps %}
-				<li><a href="/settings/maps/{{map._id}}">{{map.name}}</a></li>
-			{% endfor %}
-		</ul>
+		{% for map in maps %}
+			<li><a href="/settings/maps/{{map._id}}">{{map.name}}</a></li>
+		{% endfor %}
+			<li>
+				<input id="new-map-input" name="name" type="text" maxlength="160" placeholder="New map name (optional)">
+				<a href="#" onclick="$('form').submit()" title="Click to add a new map"><i class="green fa fa-plus-circle"></i></a>
+			</li>
+		</ul></form>
 
 	</section>
 

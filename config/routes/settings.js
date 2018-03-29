@@ -3,6 +3,7 @@
 const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
+const slugify = require('slug')
 const mw = require('../middleware')
 const mail = require('../mail')
 const env = require('../env/env')
@@ -132,14 +133,66 @@ router.route('/maps')
     res.render('settings/maps', {
       active: 'settings',
       maps: await Map.find({
-        _id: {$in:req.user.adminMaps},
+        admins: req.user.email,
       }),
     })
   })
 
-  // TODO: Create new map
-  .post((req, res) => {
+  // Create new map
+  .post(async (req, res) => {
+    debug(`Creating new map...`)
+    
+    try {
+      let new_map = new Map()
+      new_map.name = xss(req.body.name)
+      new_map.admins = [req.user.email]
+      new_map.created = Date.now()
+      
+      // Generate unique slug
+      new_map.slug = await new Promise((resolve, reject) => {
+        debug(`Creating new slug for map...`);
 
+        (async function checkSlug (s, cb) {
+          try {
+            debug(`Checking to see if slug ${s} is taken...`)
+            let existing_map = await Map.findOne({slug: s})
+
+            // Slug in use: generate a random one and retry
+            if (existing_map) {
+              debug(`Slug ${s} is taken; generating another...`)
+              crypto.randomBytes(6, (err, buf) => {
+                if (err) {
+                  debug('Failed to create random bytes for slug!')
+                  mw.throwErr(err, req)
+                  reject()
+                }
+                if (buf) {
+                  checkSlug(sanitize(buf.toString('hex')), cb)
+                }
+              })
+
+            // Unique slug: proceed
+            } else {
+              debug(`Slug ${s} is unique`)
+              cb(s)
+            }
+          } catch (err) {
+            debug('Failed to create slug!')
+            mw.throwErr(err, req)
+            reject(err)
+          }
+
+        // Start recursive function chain using first part of email as initial slug
+        })(sanitize(slugify(new_map.name)), resolve)
+      })
+      
+      await new_map.save()
+      
+      debug(`Successfully created new map ${new_map.id}`)
+      req.flash('success', `Created new map <i>${new_map.name}</i>`)
+    } catch (err) { mw.throwErr(err) }
+    finally { res.redirect(`/settings/maps`) }
+    
   })
 
 // Map settings

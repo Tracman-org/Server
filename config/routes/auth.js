@@ -184,50 +184,6 @@ module.exports = (app, passport) => {
             vehicle.setter = user
             vehicle.map = map
 
-            // Generate unique slug
-            const slug = new Promise((resolve, reject) => {
-              debug(`Creating new slug for map...`);
-
-              (async function checkSlug (s, cb) {
-                try {
-                  debug(`Checking to see if slug ${s} is taken...`)
-                  let existing_map = await Map.findOne({slug: s})
-
-                  // Slug in use: generate a random one and retry
-                  if (existing_map) {
-                    debug(`Slug ${s} is taken; generating another...`)
-                    crypto.randomBytes(6, (err, buf) => {
-                      if (err) {
-                        debug('Failed to create random bytes for slug!')
-                        mw.throwErr(err, req)
-                        reject()
-                      }
-                      if (buf) {
-                        checkSlug(sanitize(buf.toString('hex')), cb)
-                      }
-                    })
-
-                  // Unique slug: proceed
-                  } else {
-                    debug(`Slug ${s} is unique`)
-                    cb(s)
-                  }
-                } catch (err) {
-                  debug('Failed to create slug!')
-                  mw.throwErr(err, req)
-                  reject()
-                }
-
-              // Start recursive function chain using first part of email as initial slug
-              })( sanitize(slugify(
-                user.email.substring( 0, user.email.indexOf('@') )
-              )), (newSlug) => {
-                debug(`Successfully created slug: ${newSlug}`)
-                map.slug = newSlug
-                resolve(newSlug)
-              })
-            })
-
             // Generate sk32
             const sk32 = new Promise((resolve, reject) => {
               debug('Creating sk32 for user...')
@@ -247,7 +203,7 @@ module.exports = (app, passport) => {
 
             // Save user and send the token by email
             try {
-              await Promise.all([slug, sk32])
+              await sk32
               sendToken(user)
             } catch (err) {
               debug('Failed to save user after creating slug and sk32!')

@@ -16,16 +16,27 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
   // Check token
   if (req.user.emailToken === req.params.token) {
     try {
+      const old_email = req.user.email
+      
       // Set new email
       req.user.email = req.user.newEmail
 
       // Delete token and newEmail
       req.user.emailToken = undefined
       req.user.newEmail = undefined
-
+      
+      // Modify maps this user is admining
+      await Map.find({
+        admins: old_email,
+      }).forEach( (map) => {
+        map.admins
+          .splice(map.admins.indexOf(old_email), 1)
+          .push(req.user.newEmail)
+          .save()
+      })
+      
+      // Save new user and report success
       await req.user.save()
-
-      // Report success
       req.flash('success', `Your email has been set to <u>${req.user.email}</u>. `)
       res.redirect('/settings')
 

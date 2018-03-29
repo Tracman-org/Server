@@ -23,16 +23,16 @@ const userSchema = new Schema({
   },
   isSiteAdmin: { type:Boolean, required:true, default:false },
   isPro: { type:Boolean, required:true, default:false },
-  created: { type:Date, required:true },
+  created: Date,
   lastLogin: Date,
   isNewUser: Boolean,
   sk32: { type:String, required:true },
   setVehicle: { type:ObjectId, ref:'Vehicle' },
-  adminMaps: [{ type:ObjectId, ref:'Map' }],
 }).plugin(unique)
 
 const vehicleSchema = new Schema({
   name: String,
+  created: Date,
   last: {
     time: Date,
     lat: { type:Number, default:0 },
@@ -49,6 +49,8 @@ const vehicleSchema = new Schema({
 
 const mapSchema = new Schema({
   name: String,
+  created: Date,
+  lastUpdate: Date,
   slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
   settings: {
     units: { type:String, default:'standard' }, // 'standard' or 'metric'
@@ -69,7 +71,6 @@ const mapSchema = new Schema({
       streetview: { type:Boolean, default:false },
     },
   },
-  lastUpdate: Date,
   vehicles: [{ type:ObjectId, ref:'Vehicle' }],
   admins: [String], // Array of authorized emails
 }).plugin(unique)

@@ -20,7 +20,6 @@ module.exports = function (old_user) {
       let new_vehicle = new Vehicle()
       let new_user = new User()
       let new_map = new Map()
-      debug(`Created new mongoose objects`)
 
       // Create new vehicle object
       new_vehicle.name = old_user_object.name
@@ -28,7 +27,6 @@ module.exports = function (old_user) {
       new_vehicle.marker = old_user_object.marker || 'red'
       new_vehicle.map = new_map
       new_vehicle.setter = new_user
-      debug(`Set properties for new vehicle ${new_vehicle.id}`)
 
       // Create new map object
       new_map.name = old_user_object.name
@@ -55,7 +53,6 @@ module.exports = function (old_user) {
       new_map.lastUpdate = old_user_object.last.time
       new_map.vehicles = [new_vehicle]
       new_map.admins = [old_user.email]
-      debug(`Set properties for new map ${new_map.id}`)
 
       // Create new user object
       new_user.name = old_user_object.name
@@ -76,9 +73,7 @@ module.exports = function (old_user) {
       new_user.lastLogin = old_user_object.lastLogin || 0
       new_user.isNewUser = old_user_object.isNewUser || true
       new_user.sk32 = old_user_object.sk32
-      new_user.adminMaps = [new_map]
       new_user.setVehicle = new_vehicle
-      debug(`Set properties for new user ${new_user.id}`)
 
       // Delete old user
       try {
