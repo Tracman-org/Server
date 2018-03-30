@@ -8,6 +8,9 @@ const debug = require('debug')('tracman-models')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 
+
+/* Schemas */
+
 const userSchema = new Schema({
   name: String,
   email: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
@@ -73,13 +76,21 @@ const mapSchema = new Schema({
   admins: [String], // Array of authorized emails
 }).plugin(unique)
 
-/* Middleware */
+
+/* Middleware Hooks */
+
 // Delete vehicles when a map is deleted
 mapSchema.post('remove', (map) => {
-  Vehicle.remove({_id: { $in: map.vehicles }})
+  Vehicle.remove({'_id': { $in: map.vehicles }})
 })
 
-/* User methods */
+// Delete maps for which user is sole admin
+// when they delete their account
+userSchema.post('remove', (user) => {
+  Map.remove({'admins': [user]})
+})
+
+/* User Methods */
 // Do not replace with arrow functions!
 // https://stackoverflow.com/a/37875212
 
@@ -172,6 +183,9 @@ userSchema.methods.validPassword = function (password) {
   debug(`user.validPassword() called for ${user.id}`)
   return bcrypt.compare(password, user.auth.password)
 }
+
+
+/* Exports */
 
 // Set models outside exports for populate
 const User = mongoose.model('User', userSchema)

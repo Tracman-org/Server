@@ -9,7 +9,7 @@ $(function () {
   // Delete account
   $('#delete').click(function () {
     if (
-      confirm('Are you sure you want to delete your account?  This CANNOT be undone! ')
+      confirm('Are you sure you want to delete your account?  It will also delete any maps for which you are the sole administrator.  This CANNOT be undone! ')
     ) {
       window.location.href = $('#delete').attr('href')
     }
