@@ -400,6 +400,10 @@ $(function () {
 
           },
 
+          400: function(res) {
+            alertDanger(res.responseJSON.danger)
+          }
+
         }
       }).fail( function() {
 

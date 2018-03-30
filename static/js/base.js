@@ -1,6 +1,16 @@
 'use strict';
 /* global ga CoinHive navigator */
 
+// Throw new danger alert
+function alertDanger(text) {
+  $('noscript').after('\
+    <div class="alert alert-header alert-danger alert-dismissible shadow">\
+      <strong><i class="fa fa-exclamation-circle"></i> ERROR:</strong> '+text+'\
+      <a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>\
+    </div>\
+  ')
+}
+
 // Google analytics
 (function (t, r, a, c, m, o, n) {
   t['GoogleAnalyticsObject'] = m; t[m] = t[m] || function () {

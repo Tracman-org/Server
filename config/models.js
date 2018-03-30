@@ -41,10 +41,9 @@ const vehicleSchema = new Schema({
     spd: { type:Number, default:0 },
   },
   marker: { type:String, default:'red' },
-  map: { type:ObjectId, ref:'Map' },
   setterEmail: String, // Email of setter in case user doesn't exist yet
   setter: { type:ObjectId, ref:'User' },
-}).plugin(unique)
+})
 
 const mapSchema = new Schema({
   name: String,

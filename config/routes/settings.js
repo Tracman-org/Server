@@ -197,7 +197,7 @@ router.route('/maps')
 
 // Map settings
 router.route('/maps/:map')
-  .all(mw.ensureAuth)
+  .all(mw.ensureAuth) //TODO: Ensure user can modify req.params.map
 
   // Get map settings page
   .get(async (req, res, next) => {
@@ -388,34 +388,62 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
 })
 
 // Create new vehicle
-router.post('/maps/:map/vehicles/new', mw.ensureAuth, (req, res) => {
+router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
+  try {
   
-  // Create document
-  new_vehicle = new Vehicle()
-  // Check that email is valid
-  if (!mw.validateEmail(req.body.email)) {
-    req.flash('danger', `That email, <u>${req.body.email}</u> is invalid!`)
-    res.sendStatus(404)
-  } else {
-    new_vehicle.setterEmail = sanitize(req.body.email)
-    new_vehicle.created = Date.now()
-    new_vehicle.name = xss(req.body.name)
-    // Only set marker if it's whitelisted
-    if (mw.markers.includes(req.body.marker))
-      new_vehicle.marker = req.body.marker
-    else new_vehicle_marker = 'red'
-    new_vehicle.setter = User.findOne({ 'email': sanitize(req.body.email) })
-  
-    // Respond
-    res.statusCode = 201
-    res.json({
-      id: new_vehicle.id,
-      name: new_vehicle.name,
-      setter: new_vehicle.setterEmail,
-      marker: new_vehicle.marker,
-    })
     
+    // Check that email is valid
+    if (!mw.validateEmail(req.body.setter)) {
+      res.statusCode = 400
+      res.json({
+        'danger': `That email, <u>${req.body.setter}</u> is invalid!`,
+      })
+    } else {
+      
+      // Create vehicle
+      let new_vehicle = new Vehicle()
+      new_vehicle.setterEmail = sanitize(req.body.setter)
+      new_vehicle.created = Date.now()
+      new_vehicle.name = xss(req.body.name)
+      // Only set marker if it's whitelisted
+      new_vehicle.marker = 
+        (mw.markers.includes(req.body.marker))?
+        req.body.marker : 'red'
+      new_vehicle.setter = await User.findOne({
+        'email': sanitize(req.body.setter)
+      })
+      
+      // Don't send response until ready
+      await Promise.all([
+      
+        // Save new vehicle
+        new_vehicle.save(),
+      
+        // Add vehicle to map
+        Map.findByIdAndUpdate(
+          sanitize(req.params.map),
+          { $push: {
+            vehicles: new_vehicle,
+          } },
+        ),
+        
+      ])
+    
+      // Respond
+      res.statusCode = 201
+      res.json({
+        id: new_vehicle.id,
+        name: new_vehicle.name,
+        setter: new_vehicle.setterEmail,
+        marker: new_vehicle.marker,
+      })
+      
+    }
+    
+  } catch (err) {
+    console.error(err)
+    res.sendStatus(500)
   }
 })
 
@@ -426,6 +454,7 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
     await Vehicle.findByIdAndRemove(sanitize(req.params.veh))
     res.sendStatus(200)
   } catch (err) {
+    console.error(err)
     res.sendStatus(400)
   }
 })
@@ -457,6 +486,7 @@ router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
     }
     
   } catch (err) {
+    console.error(err)
     res.sendStatus(500)
   }
 
@@ -467,10 +497,10 @@ router.delete('/maps/:map/admins/:admin', mw.ensureAuth, (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
   try {
       
-    // Remove admin email to map
+    // Remove admin email from map
     Map.findByIdAndUpdate(
       sanitize(req.params.map),
-      {$pull: {
+      { $pull: {
         admins: req.body.email,
       } },
     )
