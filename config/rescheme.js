@@ -23,6 +23,7 @@ module.exports = function (old_user) {
 
       // Create new vehicle object
       new_vehicle.name = old_user_object.name
+      new_vehicle.created = old_user_object.created || 0
       new_vehicle.last = old_user_object.last
       new_vehicle.marker = old_user_object.marker || 'red'
       new_vehicle.setter = new_user
@@ -30,6 +31,7 @@ module.exports = function (old_user) {
       // Create new map object
       new_map.name = old_user_object.name
       new_map.slug = old_user_object.slug
+      new_map.created = old_user_object.created || 0
       new_map.settings = {
         units: old_user_object.settings.units || 'standard',
         defaultMapType: old_user_object.settings.defaultMap || 'road',

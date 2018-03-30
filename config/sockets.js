@@ -75,8 +75,7 @@ module.exports = {
         // (for backwards-compatibility with old android versions)
         if (loc.usr && !loc.veh) {
           try {
-            let user = await User.findById(loc.usr)
-            loc.veh = user.setVehicle
+            loc.veh = await Vehicle.findOne({'setter':loc.usr})
           } catch (err) {
             console.error(`Unable to look up vehicle for loc.usr of ${loc.usr}:\n${err.stack}`)
           }

@@ -7,7 +7,6 @@ const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const crypto = require('crypto')
 const moment = require('moment')
-const slugify = require('slug')
 const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env')
@@ -60,24 +59,24 @@ module.exports = (app, passport) => {
     .post( async (req, res, next) => {
 
       // Send token and alert user
-      async function sendToken(user) {
+      function sendToken(user) {
         debug(`sendToken() called for user ${user.id}`)
-
-        // Create a new password token
-        try {
-          let [token, expires] = await user.createPassToken()
-          debug(`Created password token for user ${user.id} successfully`)
-
-          // Figure out expiration time string
-          debug(`Determining expiration time string for ${expires}...`)
-          let expiration_time_string = (req.query.tz)
-            ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
-            : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
-
-          // Email the instructions to continue
-          debug(`Emailing new user ${user.id} at ${user.email} instructions to create a password...`)
+        return new Promise( async (resolve, reject) => {
           try {
-            await mail.send({
+
+            // Create a new password token
+            let [token, expires] = await user.createPassToken()
+            debug(`Created password token for user ${user.id} successfully`)
+
+            // Figure out expiration time string
+            debug(`Determining expiration time string for ${expires}...`)
+            let expiration_time_string = (req.query.tz)
+              ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
+              : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
+
+            // Email the instructions to continue
+            debug(`Emailing new user ${user.id} at ${user.email} instructions to create a password...`)
+            resolve( await mail.send({
               from: mail.noReply,
               to: `<${user.email}>`,
               subject: 'Complete your Tracman registration',
@@ -93,131 +92,117 @@ module.exports = (app, passport) => {
                 ${env.url}/account/password/${token}</a></p>\
                 <p>This link will expire at ${expiration_time_string}. </p>`
               )
+            }) )
+
+          } catch (err) { reject(err) }
+        })
+      }
+
+      try {
+
+        // Invalid email
+        if (!mw.validateEmail(req.body.email))
+          throw Error('Invalid email')
+
+        // Valid email
+        else {
+
+          // Check if somebody already has that email
+          debug(`Searching for user with email ${req.body.email}...`)
+          let existing_user = await User.findOne({'email': req.body.email})
+
+          // User already exists
+          if (existing_user && existing_user.auth.password)
+            throw Error('User exists')
+
+          // User exists but hasn't created a password yet
+          else if (existing_user) {
+            debug(`User ${existing_user.id} has email ${req.body.email} but doesn't have a password`)
+
+            // Send another token
+            await sendToken(existing_user)
+            req.flash('warning', `A user with the email <u>${req.body.email}</u> has already been created, but hasn't set a password yet.  Another password creation link is being sent; check your inbox and spam folder.`)
+
+          // Create user
+          } else {
+            debug(`User with email ${req.body.email} doesn't exist; creating one`)
+
+            // Create new documents
+            var user = new User()
+            var map = new Map()
+            var vehicle = new Vehicle()
+
+            // Set map properties and save
+            map.created = Date.now()
+            map.vehicles = [vehicle]
+            map.admins = [user]
+            map.save()
+
+            // Set vehicle properties and save
+            vehicle.created = Date.now()
+            vehicle.setter = user
+            vehicle.map = map
+            vehicle.save()
+
+            // Set user properties and save
+            user.created = Date.now()
+            user.email = req.body.email
+            user.sk32 = await new Promise((resolve, reject) => {
+              debug('Creating sk32 for user...')
+              crypto.randomBytes(32, (err, buf) => {
+                if (err) throw err
+                if (!buf)
+                  throw new Error('Faild to create sk32 buf')
+                else resolve(buf.toString('hex'))
+              })
             })
+            await user.save()
+
+            // Send the token by email
+            await sendToken(user)
+
+            // Send response
             debug(`Successfully emailed new user ${user.id} instructions to continue`)
             req.flash('success',
               `An email has been sent to <u>${user.email}</u>. Check your \
               inbox and follow the link to complete your registration. (Your \
               registration link will expire in one hour). `
             )
-            res.redirect('/login')
-          } catch (err) { switch (err.responseCode) {
 
-            // Mailbox doesn't exist
-            case 550: {
-              debug(`Failed to email new user ${user.id} instructions to create a password because the mailbox for ${user.email} wasn't found. `)
-
-              // Remove user
-              user.remove().catch( (err) => {
-                console.error(`Failed to remove new user ${user.id}, with a nonexistant email of ${user.email}:\n`,err.stack)
-              })
-
-              // Redirect back
-              req.flash('danger', `Mailbox for <u>${user.email}</u> not found.  Did you enter that correctly?`)
-              res.redirect('/login#signup')
-
-              break
-
-            // Other error
-            } default: {
-              debug(`Failed to email new user ${user.id} instructions to create a password!`)
-              mw.throwErr(err, req)
-              res.redirect('/login#signup')
-            }
-
-          } }
-        } catch (err) {
-          debug(`Error creating password token for user ${user.id}!`)
-          mw.throwErr(err, req)
-          res.redirect('/login#signup')
-        }
-
-      }
-
-      // Invalid email
-      if (!mw.validateEmail(req.body.email)) {
-        debug(`Email ${req.body.email} was found invalid!`)
-        req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
-        res.redirect('/login#signup')
-        next()
-
-      // Valid email
-      } else {
-        debug(`Email ${req.body.email} was found valid.`)
-
-        // Check if somebody already has that email
-        try {
-          debug(`Searching for user with email ${req.body.email}...`)
-          let existing_user = await User.findOne({'email': req.body.email})
-
-          // User already exists
-          if (existing_user && existing_user.auth.password) {
-            debug(`User ${existing_user.id} has email ${req.body.email} and has a password`)
-            req.flash('warning',
-              `A user with that email already exists!  If you forgot your password, \
-              you can <a href="/login/forgot?email=${req.body.email}">reset it here</a>.`
-            )
-            res.redirect('/login#login')
-            next()
-
-          // User exists but hasn't created a password yet
-          } else if (existing_user) {
-            debug(`User ${existing_user.id} has email ${req.body.email} but doesn't have a password`)
-
-            // Send another token
-            sendToken(existing_user)
-
-          // Create user
-          } else {
-            debug(`User with email ${req.body.email} doesn't exist; creating one`)
-
-            // Create new user, map, and vehicle
-            let user = new User()
-            let map = new Map()
-            let vehicle = new Vehicle()
-            user.created = Date.now()
-            user.email = req.body.email
-            user.setVehicle = vehicle
-            user.adminMaps = [map]
-            map.vehicles = [vehicle]
-            map.admins = [user]
-            vehicle.setter = user
-            vehicle.map = map
-
-            // Generate sk32
-            const sk32 = new Promise((resolve, reject) => {
-              debug('Creating sk32 for user...')
-              crypto.randomBytes(32, (err, buf) => {
-                if (err) {
-                  debug('Failed to create sk32!')
-                  mw.throwErr(err, req)
-                  reject()
-                }
-                if (buf) {
-                  user.sk32 = buf.toString('hex')
-                  debug(`Successfully created sk32: ${user.sk32}`)
-                  resolve()
-                }
-              })
-            })
-
-            // Save user and send the token by email
-            try {
-              await sk32
-              sendToken(user)
-            } catch (err) {
-              debug('Failed to save user after creating slug and sk32!')
-              mw.throwErr(err, req)
-              res.redirect('/login#signup')
-            }
           }
-        } catch (err) {
-          debug(`Failed to check if somebody already has the email ${req.body.email}`)
-          mw.throwErr(err, req)
-          res.redirect('/login#signup')
+
         }
 
-      }
+      } catch (err) {
+
+        // Display error to visitor
+        switch (err.message) {
+
+          case 'Invalid email':
+            req.flash('danger', `The email you entered, <u>${req.body.email}</u> is invalid.`)
+            break
+
+          case 'User exists':
+            req.flash('danger',`A user with that email (<u>${req.body.email}</u>) already exists.`)
+            break
+
+          case '550: Mailbox not found':
+            req.flash('danger', `Couldn't find a mailbox at <u>${req.body.email}</u>.  Are you sure you typed that correctly?`)
+            break
+
+          default: mw.throwErr(err, req)
+        }
+
+        // Delete any documents and objects that were created
+        try {
+          user.remove()
+          map.remove()
+          vehicle.remove()
+        } catch (err) { console.error(err) }
+
+
+      } finally { res.redirect('/login') }
+
     })
 
   // Forgot password

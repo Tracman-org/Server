@@ -13,20 +13,23 @@ const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const router = require('express').Router()
 
+// Check admin auth and add map to res.locals
 async function getMap(req, res, next) {
-  // Pass map on to future routes
-  res.locals.map = await Map.findById(sanitize(req.params.map))
-  // No such map
-  if (!res.locals.map) {
-    req.flash('danger', `That map does not exist!`)
-    res.redirect('/settings/maps')
-  // User not authorized to edit this map
-  } else if (!res.locals.map.admins.includes(req.user.email)) {
-    req.flash('danger', `You are not authorized to edit this map!`)
-    res.status = 403
-    res.redirect('/settings/maps')
-  // All clear, continue
-  } else next()
+  try {
+    // Pass map on to future routes
+    res.locals.map = await Map.findById(sanitize(req.params.map))
+    // No such map
+    if (!res.locals.map) {
+      req.flash('danger', `That map does not exist!`)
+      res.redirect('/settings/maps')
+    // User not authorized to edit this map
+    } else if (!res.locals.map.admins.includes(req.user.email)) {
+      let auth_err = new Error(`Forbidden`)
+      auth_err.status = 403
+      throw auth_err
+    // All clear, continue
+    } else next()
+  } catch(err) { next(err) }
 }
 
 // Settings index
@@ -51,24 +54,24 @@ router.route('/user')
   .post(async (req, res) => {
     debug('Setting user settings... ')
     try {
-      
+
       // Set values
       req.user.name = xss(req.body.name)
       req.user.newEmail = await new Promise( async (resolve, reject) => {
-        
+
         // Sanitize for mongo
         req.body.email = sanitize(req.body.email)
 
         // Check if changed
         if (req.user.email === req.body.email) resolve(req.body.email)
-        
+
         else if (!mw.validateEmail(req.body.email)) {
           req.flash('warning', `<u>${req.body.email}</u> is not a valid email address.  `)
           reject()
 
         // Check uniqueness
         } else {
-          
+
           try {
             let existing_user = await User.findOne({ 'email': req.body.email })
 
@@ -108,15 +111,15 @@ router.route('/user')
               req.flash('warning',
                 `An email has been sent to <u>${req.body.email}</u>.  Check your inbox to confirm your new email address. `
               )
-              
+
               // Resolve, so it canbe set outside this promise
               resolve(req.body.email)
-              
+
             }
           } catch (err) { reject(err) }
         }
       })
-      
+
       // Save user and send response
       debug(`Saving new settings for user ${req.user.name}...`)
       await req.user.save()
@@ -125,7 +128,7 @@ router.route('/user')
 
     } catch (err) { mw.throwErr(err, req) }
     finally { res.redirect('/settings/user') }
-    
+
   })
 
 // Delete account
@@ -158,13 +161,13 @@ router.route('/maps')
   // Create new map
   .post(async (req, res) => {
     debug(`Creating new map...`)
-    
+
     try {
       let new_map = new Map()
       new_map.name = xss(req.body.name)
       new_map.admins = [req.user.email]
       new_map.created = Date.now()
-      
+
       // Generate unique slug
       new_map.slug = await new Promise((resolve, reject) => {
         debug(`Creating new slug for map...`);
@@ -202,14 +205,14 @@ router.route('/maps')
         // Start recursive function chain using first part of email as initial slug
         })(sanitize(slugify(new_map.name)), resolve)
       })
-      
+
       await new_map.save()
-      
+
       debug(`Successfully created new map ${new_map.id}`)
       req.flash('success', `Created new map <i>${new_map.name}</i>`)
     } catch (err) { mw.throwErr(err) }
     finally { res.redirect(`/settings/maps`) }
-    
+
   })
 
 // Map settings
@@ -399,51 +402,51 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, getMap, async (req, res) =
 
     // Check that email is valid
     if (!mw.validateEmail(req.body.setter)) {
-      res.statusCode = 400
+      res.status = 400
       res.json({
         'danger': `That email, <u>${req.body.setter}</u> is invalid!`,
       })
     } else {
-      
+
       // Create vehicle
       let new_vehicle = new Vehicle()
       new_vehicle.setterEmail = sanitize(req.body.setter)
       new_vehicle.created = Date.now()
       new_vehicle.name = xss(req.body.name)
       // Only set marker if it's whitelisted
-      new_vehicle.marker = 
+      new_vehicle.marker =
         (mw.markers.includes(req.body.marker))?
         req.body.marker : 'red'
       new_vehicle.setter = await User.findOne({
         'email': sanitize(req.body.setter)
       })
-      
+
       // Don't send response until ready
       await Promise.all([
-      
+
         // Save new vehicle
         new_vehicle.save(),
-      
+
         // Add vehicle to map
         res.locals.map.update({
           $push: {
             vehicles: new_vehicle,
           }
         }),
-        
+
       ])
-    
+
       // Respond
-      res.statusCode = 201
+      res.status = 201
       res.json({
         id: new_vehicle.id,
         name: new_vehicle.name,
         setter: new_vehicle.setterEmail,
         marker: new_vehicle.marker,
       })
-      
+
     }
-    
+
   } catch (err) {
     console.error(err)
     res.sendStatus(500)
@@ -455,17 +458,17 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, getMap, async (req, res
   debug(`Deleting vehicle ${req.params.veh}...`)
   try {
     await Promise.all([
-    
+
       // Delete vehicle
       Vehicle.findByIdAndRemove(sanitize(req.params.veh)),
-      
+
       // Add vehicle to map
       res.locals.map.update({
         $pull: {
           vehicles: sanitize(req.params.veh),
         }
       }),
-      
+
     ])
     res.sendStatus(200)
   } catch (err) {
@@ -478,27 +481,27 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, getMap, async (req, res
 router.post('/maps/:map/admins', mw.ensureAuth, getMap, (req, res) => {
   debug(`Creating new admin for map ${req.params.map}`)
   try {
-    
+
     // Validate email
     if (!mw.validateEmail(req.body.email))
       throw new Error(`The email for a new admin, ${req.body.email} is invalid!`)
     else {
-      
+
       // Add admin email to map
       res.locals.map.update({
         $push: {
           admins: req.body.email,
         }
       })
-      
+
       // Respond
-      res.statusCode = 201
+      res.status = 201
       res.json({
         email: req.body.email,
       })
-      
+
     }
-    
+
   } catch (err) {
     console.error(err)
     res.sendStatus(500)
@@ -510,20 +513,20 @@ router.post('/maps/:map/admins', mw.ensureAuth, getMap, (req, res) => {
 router.delete('/maps/:map/admins/:admin', mw.ensureAuth, getMap, (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
   try {
-      
+
     // Remove admin email from map
     res.locals.map.update({
       $pull: {
         admins: req.body.email,
       }
     })
-    
+
     // Respond
-    res.statusCode = 201
+    res.status = 201
     res.json({
       email: req.body.email,
     })
-    
+
   } catch (err) {
     res.sendStatus(500)
   }

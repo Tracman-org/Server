@@ -99,7 +99,8 @@ router.route('/password')
     } catch (err) {
       mw.throwErr(err, req)
     } finally {
-      res.redirect((req.user) ? '/settings' : '/login')
+      req.logout()
+      res.redirect('/login')
     }
   })
 

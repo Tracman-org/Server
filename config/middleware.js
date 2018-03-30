@@ -1,6 +1,7 @@
 'use strict'
 
 const env = require('./env/env')
+const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-middleware')
 
 module.exports = {
@@ -42,27 +43,22 @@ module.exports = {
 	// Validate an email address
 	validateEmail: (email) => {
 		debug(`validateEmail(${email})`)
-		const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		return re.test(email)
+		if (email !== sanitize(email))
+			return false
+		else {
+			const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+			return re.test(email)
+		}
 	},
 
 	// Ensure authentication
 	ensureAuth: (req, res, next) => {
 		debug(`ensureAuth called at ${req.url}`)
 		if (req.isAuthenticated()) return next()
-		else res.redirect('/login')
-	},
-
-	// Ensure administrator
-	ensureAdmin: (req, res, next) => {
-		debug(`ensureAdmin called at ${req.url}`)
-		if (req.isAuthenticated() && req.user.isSiteAdmin) return next()
 		else {
-			let err = new Error("Unauthorized")
-			err.status = 401
-			next(err)
+			res.status = 401
+			res.render('login')
 		}
-		//TODO: test this by logging in as !isSiteAdmin and go to /admin
-	}
+	},
 
 }

@@ -194,7 +194,7 @@ app.post('/csp-violation', (req, res) => {
   // Production handlers
   if (env.mode !== 'development') {
     app.use((err, req, res, next) => {
-      if (err.status !== 404 && err.status !== 401) console.error(err.stack)
+      if (err.status >= 500) console.error(err.stack)
       if (res.headersSent) return next(err)
       res.status(err.status || 500)
       res.render('error', {
