@@ -391,8 +391,7 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
 router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
   try {
-  
-    
+
     // Check that email is valid
     if (!mw.validateEmail(req.body.setter)) {
       res.statusCode = 400
@@ -451,11 +450,24 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
 router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
   debug(`Deleting vehicle ${req.params.veh}...`)
   try {
-    await Vehicle.findByIdAndRemove(sanitize(req.params.veh))
+    await Promise.all([
+    
+      // Delete vehicle
+      Vehicle.findByIdAndRemove(sanitize(req.params.veh)),
+      
+      // Add vehicle to map
+      Map.findByIdAndUpdate(
+        sanitize(req.params.map),
+        { $pull: {
+          vehicles: sanitize(req.params.veh),
+        } },
+      ),
+      
+    ])
     res.sendStatus(200)
   } catch (err) {
     console.error(err)
-    res.sendStatus(400)
+    res.sendStatus(500)
   }
 })
 

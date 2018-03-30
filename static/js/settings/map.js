@@ -441,6 +441,8 @@ $(function () {
       //console.log('new vehicle has focus')
       e.preventDefault()
       addVehicle()
+    } else if ($('#vehicle-name-new').val()!==''||$('#vehicle-setter-new').val()!=='') {
+      addVehicle()
     }
   })
 
