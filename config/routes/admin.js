@@ -9,7 +9,7 @@ function ensureAdmin (req, res, next) {
 	debug(`ensureAdmin called at ${req.url}`)
 	if (req.user.isSiteAdmin) return next()
 	else {
-		let err = new Error("Forbidden")
+		let err = Error("Forbidden")
 		err.status = 403
 		next(err)
 	}

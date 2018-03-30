@@ -24,7 +24,7 @@ async function getMap(req, res, next) {
       res.redirect('/settings/maps')
     // User not authorized to edit this map
     } else if (!res.locals.map.admins.includes(req.user.email)) {
-      let auth_err = new Error(`Forbidden`)
+      let auth_err = Error(`Forbidden`)
       auth_err.status = 403
       throw auth_err
     // All clear, continue
@@ -484,7 +484,7 @@ router.post('/maps/:map/admins', mw.ensureAuth, getMap, (req, res) => {
 
     // Validate email
     if (!mw.validateEmail(req.body.email))
-      throw new Error(`The email for a new admin, ${req.body.email} is invalid!`)
+      throw Error(`The email for a new admin, ${req.body.email} is invalid!`)
     else {
 
       // Add admin email to map

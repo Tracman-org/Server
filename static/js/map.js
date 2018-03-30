@@ -407,7 +407,7 @@ function initMap() {
             break
           // Error
           } default:
-            console.error(new Error('Street view not available: ' + status).message)
+            console.error(Error('Street view not available: ' + status).message)
         }
       })
     }

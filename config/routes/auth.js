@@ -29,7 +29,7 @@ module.exports = (app, passport) => {
     debug('appLoginCallback called.')
     if (req.user) res.send(req.user)
     else {
-      let err = new Error('Unauthorized')
+      let err = Error('Unauthorized')
       err.status = 401
       next(err)
     }
@@ -152,7 +152,7 @@ module.exports = (app, passport) => {
               crypto.randomBytes(32, (err, buf) => {
                 if (err) throw err
                 if (!buf)
-                  throw new Error('Faild to create sk32 buf')
+                  throw Error('Faild to create sk32 buf')
                 else resolve(buf.toString('hex'))
               })
             })

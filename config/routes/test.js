@@ -32,7 +32,7 @@ router
     if ( // Less than ten days
       zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000
     ) {
-      let err = new Error(
+      let err = Error(
         `That password could be cracked in \
         ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  \
         Come up with a more complex password that would take at least 10 days to crack. `

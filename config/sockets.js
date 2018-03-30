@@ -84,13 +84,13 @@ module.exports = {
         // Check for vehicle and sk32 token
         if (!loc.veh) {
           console.error(
-            new Error(
+            Error(
               `Recieved an update from ${socket.ip} without a veh or usr!`
             ).message
           )
         } else if (!loc.tok) {
           console.error(
-            new Error(
+            Error(
               `Recieved an update from ${socket.ip} for usr ${loc.veh} without a token!`
             ).message
           )
@@ -105,13 +105,13 @@ module.exports = {
 
               if (!vehicle) {
                 console.error(
-                  new Error(
+                  Error(
                     `Recieved an update from ${socket.ip} for ${loc.veh}, but no such vehicle was found in the db!`
                   ).message
                 )
               } else if (vehicle.setter.sk32 !== loc.tok) {
                 console.error(
-                  new Error(
+                  Error(
                     `Recieved an update from ${socket.ip} for ${loc.veh} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setter} has an sk32 of ${vehicle.setbyuser.sk32}!`
                   ).message
                 )
