@@ -13,6 +13,22 @@ const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const router = require('express').Router()
 
+async function getMap(req, res, next) {
+  // Pass map on to future routes
+  res.locals.map = await Map.findById(sanitize(req.params.map))
+  // No such map
+  if (!res.locals.map) {
+    req.flash('danger', `That map does not exist!`)
+    res.redirect('/settings/maps')
+  // User not authorized to edit this map
+  } else if (!res.locals.map.admins.includes(req.user.email)) {
+    req.flash('danger', `You are not authorized to edit this map!`)
+    res.status = 403
+    res.redirect('/settings/maps')
+  // All clear, continue
+  } else next()
+}
+
 // Settings index
 router.get('/', mw.ensureAuth, async (req, res) => {
   res.render('settings/index', {
@@ -197,7 +213,7 @@ router.route('/maps')
 
 // Map settings
 router.route('/maps/:map')
-  .all(mw.ensureAuth) //TODO: Ensure user can modify req.params.map
+  .all(mw.ensureAuth, getMap)
 
   // Get map settings page
   .get(async (req, res, next) => {
@@ -229,10 +245,6 @@ router.route('/maps/:map')
       case 'basics':
         try {
 
-          // Get map
-          const map = await Map.findById(sanitize(req.params.map))
-          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
-
           // Validate slug
           const checked_slug = new Promise( async (resolve, reject) => {
             debug(`Checking slug ${req.body.slug}... `)
@@ -263,15 +275,15 @@ router.route('/maps/:map')
 
           // Set settings
           debug(`Setting map name to ${xss(req.body.name)} and slug to ${await checked_slug}... `)
-          map.slug = await checked_slug
-          map.name = xss(req.body.name)
+          res.locals.map.slug = await checked_slug
+          res.locals.map.name = xss(req.body.name)
 
           // Save map and send response
-          debug(`Saving new settings for map ${map.name}...`)
-          await map.save()
+          debug(`Saving new settings for map ${res.locals.map.name}...`)
+          await res.locals.map.save()
 
           // Success
-          debug(`Done saving basic settings for map ${map.id}.  Redirecting...`)
+          debug(`Done saving basic settings for map ${res.locals.map.id}.  Redirecting...`)
           req.flash('success', 'Basic map settings updated. ')
 
         } catch (err) { mw.throwErr(err, req) }
@@ -283,32 +295,28 @@ router.route('/maps/:map')
       case 'display':
         try {
 
-          // Get map
-          const map = await Map.findById(sanitize(req.params.map))
-          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
-
           // Set settings
           debug(`Setting map ${req.params.map} display settings... `)
-          map.settings.units = req.body.units
-          map.settings.defaultMapType = req.body.mapType
-          map.settings.defaultZoom = req.body.defaultZoom
-          map.settings.center.type = req.body.center
-          map.settings.center.follow = req.body.follow
-          map.settings.center.lat = req.body.staticLat
-          map.settings.center.lon = req.body.staticLon
-          map.settings.canZoom = (req.body.canZoom=='on')
-          map.settings.canPan = (req.body.canPan==='on')
-          map.settings.display.scale = (req.body.showScale==='on')
-          map.settings.display.speed = (req.body.showSpeed==='on')
-          map.settings.display.alt = (req.body.showAlt==='on')
-          map.settings.display.streetview = (req.body.showStreetview==='on')
+          res.locals.map.settings.units = req.body.units
+          res.locals.map.settings.defaultMapType = req.body.mapType
+          res.locals.map.settings.defaultZoom = req.body.defaultZoom
+          res.locals.map.settings.center.type = req.body.center
+          res.locals.map.settings.center.follow = req.body.follow
+          res.locals.map.settings.center.lat = req.body.staticLat
+          res.locals.map.settings.center.lon = req.body.staticLon
+          res.locals.map.settings.canZoom = (req.body.canZoom=='on')
+          res.locals.map.settings.canPan = (req.body.canPan==='on')
+          res.locals.map.settings.display.scale = (req.body.showScale==='on')
+          res.locals.map.settings.display.speed = (req.body.showSpeed==='on')
+          res.locals.map.settings.display.alt = (req.body.showAlt==='on')
+          res.locals.map.settings.display.streetview = (req.body.showStreetview==='on')
 
           // Save map and send response
-          debug(`Saving new settings for map ${map.name}...`)
-          await map.save()
+          debug(`Saving new settings for map ${res.locals.map.name}...`)
+          await res.locals.map.save()
 
           // Success
-          debug(`Done updating display settings for map ${map.id}.  Redirecting...`)
+          debug(`Done updating display settings for map ${res.locals.map.id}.  Redirecting...`)
           req.flash('success', 'Map display settings updated. ')
 
         } catch (err) { mw.throwErr(err, req) }
@@ -319,10 +327,6 @@ router.route('/maps/:map')
       // Set vehicle setttings
       case 'vehicles':
         try {
-
-          // Get map
-          const map = await Map.findById(sanitize(req.params.map))
-          if (!map) throw new Error(`Could not find map with ID ${req.params.map}!`)
 
           // Organize request body
           debug(`Organizing request body data... `)
@@ -359,7 +363,7 @@ router.route('/maps/:map')
           })
 
           // Success
-          debug(`Done updating vehicles for map ${map.id}.  Redirecting...`)
+          debug(`Done updating vehicles for map ${res.locals.map.id}.  Redirecting...`)
           req.flash('success', 'Map vehicle settings updated. ')
 
         } catch (err) { mw.throwErr(err, req) }
@@ -375,10 +379,10 @@ router.route('/maps/:map')
 })
 
 // Delete map
-router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
+router.get('/maps/:map/delete', mw.ensureAuth, getMap, async (req, res, next) => {
   debug(`Deleting map ${req.params.map}...`)
   try {
-    await Map.findByIdAndRemove(req.params.map)
+    await res.locals.map.remove()
     req.flash('success', `Map deleted`)
     res.redirect('/settings/maps')
   } catch (err) {
@@ -388,7 +392,7 @@ router.get('/maps/:map/delete', mw.ensureAuth, async (req, res, next) => {
 })
 
 // Create new vehicle
-router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
+router.post('/maps/:map/vehicles/new', mw.ensureAuth, getMap, async (req, res) => {
   debug(`Creating new vehicle for map ${req.params.map}...`)
   try {
 
@@ -420,12 +424,11 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
         new_vehicle.save(),
       
         // Add vehicle to map
-        Map.findByIdAndUpdate(
-          sanitize(req.params.map),
-          { $push: {
+        res.locals.map.update({
+          $push: {
             vehicles: new_vehicle,
-          } },
-        ),
+          }
+        }),
         
       ])
     
@@ -447,7 +450,7 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, async (req, res) => {
 })
 
 // Delete vehicle
-router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
+router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, getMap, async (req, res) => {
   debug(`Deleting vehicle ${req.params.veh}...`)
   try {
     await Promise.all([
@@ -456,12 +459,11 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
       Vehicle.findByIdAndRemove(sanitize(req.params.veh)),
       
       // Add vehicle to map
-      Map.findByIdAndUpdate(
-        sanitize(req.params.map),
-        { $pull: {
+      res.locals.map.update({
+        $pull: {
           vehicles: sanitize(req.params.veh),
-        } },
-      ),
+        }
+      }),
       
     ])
     res.sendStatus(200)
@@ -472,7 +474,7 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, async (req, res) => {
 })
 
 // Create new admin
-router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
+router.post('/maps/:map/admins', mw.ensureAuth, getMap, (req, res) => {
   debug(`Creating new admin for map ${req.params.map}`)
   try {
     
@@ -482,12 +484,11 @@ router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
     else {
       
       // Add admin email to map
-      Map.findByIdAndUpdate(
-        sanitize(req.params.map),
-        {$push: {
+      res.locals.map.update({
+        $push: {
           admins: req.body.email,
-        } },
-      )
+        }
+      })
       
       // Respond
       res.statusCode = 201
@@ -505,17 +506,16 @@ router.post('/maps/:map/admins', mw.ensureAuth, (req, res) => {
 })
 
 // Delete admin
-router.delete('/maps/:map/admins/:admin', mw.ensureAuth, (req, res) => {
+router.delete('/maps/:map/admins/:admin', mw.ensureAuth, getMap, (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
   try {
       
     // Remove admin email from map
-    Map.findByIdAndUpdate(
-      sanitize(req.params.map),
-      { $pull: {
+    res.locals.map.update({
+      $pull: {
         admins: req.body.email,
-      } },
-    )
+      }
+    })
     
     // Respond
     res.statusCode = 201
