@@ -249,8 +249,10 @@ router.route('/maps/:map')
       case 'basics':
         try {
 
-          // Validate slug
-          const checked_slug = new Promise( async (resolve, reject) => {
+          // Set settings
+          debug(`Setting map name and slug... `)
+          res.locals.map.name = xss(req.body.name)
+          res.locals.map.slug = await new Promise( async (resolve, reject) => {
             debug(`Checking slug ${req.body.slug}... `)
             try {
 
@@ -276,11 +278,6 @@ router.route('/maps/:map')
             } catch (err) { reject(err) }
 
           })
-
-          // Set settings
-          debug(`Setting map name to ${xss(req.body.name)} and slug to ${await checked_slug}... `)
-          res.locals.map.slug = await checked_slug
-          res.locals.map.name = xss(req.body.name)
 
           // Save map and send response
           debug(`Saving new settings for map ${res.locals.map.name}...`)
