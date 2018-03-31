@@ -1,7 +1,5 @@
 'use strict'
-/* global $ */
-
-const zxcvbn = require('zxcvbn')
+/* global $ zxcvbn */
 
 function checkMatch () {
   $('#submit')
