@@ -170,7 +170,7 @@ userSchema.methods.generateHashedPassword = function (password) {
         try {
           await this.save()
           resolve()
-        } catch (err) { reject() }
+        } catch (err) { reject(err) }
       })
     })
 
@@ -179,9 +179,8 @@ userSchema.methods.generateHashedPassword = function (password) {
 
 // Check for valid password
 userSchema.methods.validPassword = function (password) {
-  const user = this
-  debug(`user.validPassword() called for ${user.id}`)
-  return bcrypt.compare(password, user.auth.password)
+  debug(`user.validPassword() called for ${this.id}`)
+  return bcrypt.compare(password, this.auth.password)
 }
 
 

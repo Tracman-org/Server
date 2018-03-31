@@ -6,8 +6,11 @@ const User = require('../models').user
 const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const crypto = require('crypto')
+const util = require('util')
+const setTimeoutPromise = util.promisify(setTimeout)
 const moment = require('moment')
 const sanitize = require('mongo-sanitize')
+const slugify = require('slug')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env')
 
@@ -67,6 +70,11 @@ module.exports = (app, passport) => {
             // Create a new password token
             let [token, expires] = await user.createPassToken()
             debug(`Created password token for user ${user.id} successfully`)
+
+            // Delete user if token expires without password being set
+            setTimeoutPromise(1000*60*60).then( () => {
+              user.remove()
+            }).catch(console.error)
 
             // Figure out expiration time string
             debug(`Determining expiration time string for ${expires}...`)
@@ -136,13 +144,46 @@ module.exports = (app, passport) => {
             map.created = Date.now()
             map.vehicles = [vehicle]
             map.admins = [user]
-            map.save()
+            map.slug = await new Promise( (resolve, reject) => {
+              debug(`Creating new slug for map...`)
+
+              // Recursive IIFE to find unused slug
+              ;( async function checkSlug (s) {
+                try {
+                  // Sanitize and slugify
+                  s = slugify(sanitize(s))
+                  debug(`Checking to see if slug ${s} is taken...`)
+
+                  // Slug in use
+                  if (await Map.findOne({slug: s})) {
+                    debug(`Slug ${s} is taken; generating another...`)
+                    // Generate a new slug
+                    crypto.randomBytes(6, (err, buf) => {
+                      if (err) return reject(err)
+                      if (!buf)
+                        return reject('crypto.randomBytes failed to generate buf!')
+                      else
+                        // Recurse by checking the newly generated slug
+                        checkSlug(buf.toString('hex'))
+                    })
+
+                  // Unique slug: proceed
+                  } else {
+                    debug(`Slug ${s} is unique`)
+                    resolve(s)
+                  }
+
+                } catch (err) { reject(err) }
+
+              // Initial slug argument to IIFE is the first part of the email
+              })( req.body.email.substring(0, req.body.email.indexOf('@')) )
+
+            })
 
             // Set vehicle properties and save
             vehicle.created = Date.now()
             vehicle.setter = user
             vehicle.map = map
-            vehicle.save()
 
             // Set user properties and save
             user.created = Date.now()
@@ -156,17 +197,19 @@ module.exports = (app, passport) => {
                 else resolve(buf.toString('hex'))
               })
             })
-            await user.save()
 
-            // Send the token by email
-            await sendToken(user)
+            // Send token and save docs
+            await Promise.all([
+              sendToken(user),
+              user.save(),
+              vehicle.save(),
+              map.save(),
+            ])
 
             // Send response
             debug(`Successfully emailed new user ${user.id} instructions to continue`)
             req.flash('success',
-              `An email has been sent to <u>${user.email}</u>. Check your \
-              inbox and follow the link to complete your registration. (Your \
-              registration link will expire in one hour). `
+              `An email has been sent to <u>${user.email}</u>. Check your inbox and follow the link to complete your registration. (Your registration link will expire in one hour). `
             )
 
           }
@@ -176,29 +219,24 @@ module.exports = (app, passport) => {
       } catch (err) {
 
         // Display error to visitor
-        switch (err.message) {
-
-          case 'Invalid email':
-            req.flash('danger', `The email you entered, <u>${req.body.email}</u> is invalid.`)
-            break
-
-          case 'User exists':
-            req.flash('danger',`A user with that email (<u>${req.body.email}</u>) already exists.`)
-            break
-
-          case '550: Mailbox not found':
-            req.flash('danger', `Couldn't find a mailbox at <u>${req.body.email}</u>.  Are you sure you typed that correctly?`)
-            break
-
-          default: mw.throwErr(err, req)
-        }
+        if (err.message==='Invalid email')
+          req.flash('danger', `The email you entered, <u>${req.body.email}</u> is invalid.`)
+        else if (err.message==='User exists')
+          req.flash('danger',`A user with that email (<u>${req.body.email}</u>) already exists.`)
+        else if (err.message.slice(0, 15)==='Can\'t send mail')
+          req.flash('danger', `Couldn't send mail to <u>${req.body.email}</u>.  Are you sure you typed that correctly?`)
+        else mw.throwErr(err, req)
 
         // Delete any documents and objects that were created
-        try {
-          user.remove()
-          map.remove()
-          vehicle.remove()
-        } catch (err) { console.error(err) }
+        try { await Promise.all([
+          user.remove(),
+          map.remove(),
+          vehicle.remove(),
+        ]) } catch (err) {
+          // Ignore attempts to remove objects that don't exist
+          if (!err.message===`Cannot read property 'remove' of undefined`)
+            console.error(err)
+        }
 
 
       } finally { res.redirect('/login') }
@@ -222,86 +260,79 @@ module.exports = (app, passport) => {
 
     // Submitted forgot password form
     .post( async (req, res, next) => {
+      try {
 
-      // Invalid email
-      if (!mw.validateEmail(req.body.email)) {
-        debug(`Email ${req.body.email} was found invalid!`)
-        req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
-        res.redirect('/login/forgot')
-        next()
+        // Invalid email
+        if (!mw.validateEmail(req.body.email))
+          throw Error('Invalid email')
 
-      // Valid email
-      } else {
-        debug(`Email ${req.body.email} was found valid.`)
+        // Valid email
+        else {
+          debug(`Email ${req.body.email} is valid.`)
 
-        // Check if somebody has that email
-        try {
-          let user = await User.findOne({'email': sanitize(req.body.email)})
+          // Check if somebody has that email
+          const user = await User.findOne({'email': sanitize(req.body.email)})
 
           // No user with that email
-          if (!user) {
+          if (!user)
             debug(`No user found with email ${req.body.email}; ignoring password request.`)
-            // Don't let on that no such user exists, to prevent dictionary attacks
-            req.flash('success',
-              `If an account exists with the email <u>${req.body.email}</u>, \
-              an email has been sent there with a password reset link. `
-            )
-            res.redirect('/login')
 
           // User with that email does exist
-          } else {
+          else {
             debug(`User ${user.id} found with that email.  Creating reset token...`)
 
             // Create reset token
-            try {
-              let [token, expires] = await user.createPassToken()
+            let [token, expires] = await user.createPassToken()
 
-              // Figure out expiration time string
-              debug(`Determining expiration time string for ${expires}...`)
-              let expiration_time_string = (req.query.tz)
-                ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
-                : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
+            // Figure out expiration time string
+            debug(`Determining expiration time string for ${expires}...`)
+            let expiration_time_string = (req.query.tz)
+              ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
+              : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
 
-              // Email reset link
-              try {
-                await mail.send({
-                  from: mail.noReply,
-                  to: mail.to(user),
-                  subject: 'Reset your Tracman password',
-                  text: mail.text(
-                    `Hi, \n\nDid you request to reset your Tracman password?  \
-                    If so, follow this link to do so:\
-                    \n${env.url}/account/password/${token}\n\n\
-                    This link will expire at ${expiration_time_string}.  \n\n\
-                    If you didn't initiate this request, just ignore this email. \n\n`
-                  ),
-                  html: mail.html(
-                    `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
-                    If so, follow this link to do so:<br>\
-                    <a href="${env.url}/account/password/${token}">\
-                    ${env.url}/account/password/${token}</a>.  \
-                    This link will expire at ${expiration_time_string}.  </p>\
-                    <p>If you didn't initiate this request, just ignore this email. </p>`
-                  )
-                })
-                req.flash(
-                  'success',
-                  `If an account exists with the email <u>${req.body.email}</u>, \
-                  an email has been sent there with a password reset link.\
-                  (Your reset link will expire in one hour.)`)
-                res.redirect('/login')
-              } catch (err) {
-                debug(`Failed to send reset link to ${user.email}`)
-                mw.throwErr(err, req)
-                res.redirect('/login')
-              }
-            } catch (err) { return next(err) }
+            // Email reset link
+            await mail.send({
+              from: mail.noReply,
+              to: mail.to(user),
+              subject: 'Reset your Tracman password',
+              text: mail.text(
+                `Hi, \n\nDid you request to reset your Tracman password?  \
+                If so, follow this link to do so:\
+                \n${env.url}/account/password/${token}\n\n\
+                This link will expire at ${expiration_time_string}.  \n\n\
+                If you didn't initiate this request, just ignore this email. \n\n`
+              ),
+              html: mail.html(
+                `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
+                If so, follow this link to do so:<br>\
+                <a href="${env.url}/account/password/${token}">\
+                ${env.url}/account/password/${token}</a>.  \
+                This link will expire at ${expiration_time_string}.  </p>\
+                <p>If you didn't initiate this request, just ignore this email. </p>`
+              )
+            })
+
           }
-        } catch (err) {
-          debug(`Failed to check for if somebody has that email (in reset request)!`)
-          mw.throwErr(err, req)
-          res.redirect('/login/forgot')
+
+          // Respond
+          req.flash(
+            'success',
+            `If an account exists with the email <u>${req.body.email}</u>, \
+            an email has been sent there with a password reset link.\
+            (Your reset link will expire in one hour.)`)
+          res.redirect('/login')
+
         }
+
+      } catch (err) {
+
+        // Display error to visitor
+        if (err.message==='Invalid email')
+          req.flash('warning', `The email you entered, ${req.body.email} isn't valid.  Try again. `)
+        else mw.throwError(err, req)
+
+        // Respond
+        res.redirect(`/login/forgot?email=${req.body.email}`)
 
       }
 

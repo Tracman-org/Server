@@ -57,7 +57,7 @@ module.exports = {
 		if (req.isAuthenticated()) return next()
 		else {
 			res.status = 401
-			res.render('login')
+			res.redirect('/login')
 		}
 	},
 
