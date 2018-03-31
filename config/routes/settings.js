@@ -134,10 +134,9 @@ router.route('/user')
 // Delete account
 router.get('/user/delete', mw.ensureAuth, async (req, res) => {
   try {
-    req.logout()
-    await User.findByIdAndRemove(req.user)
+    req.user.remove()
     req.flash('success', 'Your account has been deleted. ')
-    res.redirect('/logout')
+    res.redirect('/')
   } catch (err) {
     mw.throwErr(err, req)
     res.redirect('/settings/user')

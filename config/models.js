@@ -80,14 +80,32 @@ const mapSchema = new Schema({
 /* Middleware Hooks */
 
 // Delete vehicles when a map is deleted
-mapSchema.post('remove', (map) => {
-  Vehicle.remove({'_id': { $in: map.vehicles }})
+mapSchema.post('remove', async (map) => {
+  debug(`Map post remove hook called for ${map.id}`)
+  const map_vehicles = await Vehicle.find({
+    '_id': { $in: map.vehicles }
+  })
+  map_vehicles.forEach( (vehicle) => {
+    debug(`Removing vehicle ${vehicle.id} because it depends on a deleted map.`)
+    vehicle.remove()
+  })
 })
 
 // Delete maps for which user is sole admin
 // when they delete their account
-userSchema.post('remove', (user) => {
-  Map.remove({'admins': [user]})
+// TODO: Check if other admin emails actually have accounts first
+userSchema.post('remove', async (user) => {
+  debug(`User post remove hook called for ${user.id}`)
+  try {
+    // Don't replace with findAndRemove to ensure map hooks fire
+    const user_maps = await Map.find({
+      'admins': [user.email]
+    })
+    user_maps.forEach( (map) => {
+      debug(`Removing map ${map.id} because it depends on a deleted user.`)
+      map.remove()
+    })
+  } catch (err) { console.error(err.message) }
 })
 
 /* User Methods */
