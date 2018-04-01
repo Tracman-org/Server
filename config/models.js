@@ -28,7 +28,7 @@ const userSchema = new Schema({
   isPro: { type:Boolean, required:true, default:false },
   created: Date,
   lastLogin: Date,
-  isNewUser: Boolean,
+  isNewUser: { type:Boolean, default:true },
   sk32: { type:String, required:true },
 }).plugin(unique)
 
@@ -82,13 +82,14 @@ const mapSchema = new Schema({
 // Delete vehicles when a map is deleted
 mapSchema.post('remove', async (map) => {
   debug(`Map post remove hook called for ${map.id}`)
-  const map_vehicles = await Vehicle.find({
-    '_id': { $in: map.vehicles }
-  })
-  map_vehicles.forEach( (vehicle) => {
-    debug(`Removing vehicle ${vehicle.id} because it depends on a deleted map.`)
-    vehicle.remove()
-  })
+  try {
+    ( await Vehicle.find({
+      '_id': { $in: map.vehicles }
+    }) ).forEach( (vehicle) => {
+      debug(`Removing vehicle ${vehicle.id} because it depends on a deleted map.`)
+      vehicle.remove()
+    })
+  } catch (err) { console.error(err.message) }
 })
 
 // Delete maps for which user is sole admin
@@ -98,10 +99,9 @@ userSchema.post('remove', async (user) => {
   debug(`User post remove hook called for ${user.id}`)
   try {
     // Don't replace with findAndRemove to ensure map hooks fire
-    const user_maps = await Map.find({
+    ( await Map.find({
       'admins': [user.email]
-    })
-    user_maps.forEach( (map) => {
+    }) ).forEach( (map) => {
       debug(`Removing map ${map.id} because it depends on a deleted user.`)
       map.remove()
     })

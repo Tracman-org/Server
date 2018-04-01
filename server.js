@@ -251,17 +251,21 @@ ready_promise_list.push( new Promise( async (resolve, reject) => {
 // Delete users who never created a password
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
-    // Users with no passwords
-    const abandoned_users = await User.find({
+    
+    // Get users with no passwords
+    (await User.find({
       'auth.password': {$exists:false},
     })
+    
     // Check that their token expired too
-    .where('auth.passTokenExpires').lt(Date.now())
+    //.where('auth.passTokenExpires').lt(Date.now())
+
     // Delete them one-by-one to ensure hooks fire
-    abandoned_users.forEach( (user) => {
+    ).forEach( (user) => {
       debug(`Deleting abandoned account ${user.id}...`)
       user.remove()
     })
+
     resolve()
   } catch (err) {
     console.error(err.message)

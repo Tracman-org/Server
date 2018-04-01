@@ -69,7 +69,7 @@ module.exports = (app, passport) => {
 
             // Create a new password token
             let [token, expires] = await user.createPassToken()
-            debug(`Created password token for user ${user.id} successfully`)
+            debug(`Created password token for user ${user.id}`)
 
             // Delete user if token expires without password being set
             setTimeoutPromise(1000*60*60).then( () => {
@@ -144,7 +144,7 @@ module.exports = (app, passport) => {
             // Set map properties and save
             map.created = Date.now()
             map.vehicles = [vehicle]
-            map.admins = [user]
+            map.admins = [req.body.email]
             map.slug = await new Promise( (resolve, reject) => {
               debug(`Creating new slug for map...`)
 
