@@ -1,5 +1,5 @@
 'use strict'
-/* global $ validateEmail replaceFromEndpoint */
+/* global $ validateEmail replaceFromEndpoint alertDanger */
 
 function checkSetterEmail(setter, vehicle_id) {
   //console.log('checkSetterEmail('+setter+', '+vehicle_id+')')
@@ -402,7 +402,7 @@ $(function () {
 
           400: function(res) {
             alertDanger(res.responseJSON.danger)
-          }
+          },
 
         }
       }).fail( function() {
@@ -517,7 +517,7 @@ $(function () {
       '-moz-opacity': '0.5',
       '-khtml-opacity': '0.5',
       'opacity': '0.5',
-    })
+    }).prop('disabled', true)
 
     // Replace add button with loading icon
     $admin_add_button
@@ -579,6 +579,7 @@ $(function () {
 
           // Successfully added
           201: function(res) {
+            //console.log('admin',res.email,'added')
 
             // Add line
             $new_admin_line.before('<li>\
@@ -591,7 +592,7 @@ $(function () {
               '-moz-opacity': '',
               '-khtml-opacity': '',
               'opacity': '',
-            })
+            }).prop('disabled', false)
 
             // Replace loading icon with add button
             $admin_add_button
@@ -604,8 +605,13 @@ $(function () {
 
           },
 
+          400: function(res) {
+            alertDanger(res.responseJSON.danger)
+          },
+
         }
       }).fail( function() {
+        //console.log('Failed to add admin')
 
         // Show help
         $('#vehicles-help').show()
@@ -617,7 +623,7 @@ $(function () {
           '-moz-opacity': '',
           '-khtml-opacity': '',
           'opacity': '',
-        })
+        }).prop('disabled', false)
 
         // Replace loading icon with delete button
         $admin_add_button

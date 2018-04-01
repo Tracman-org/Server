@@ -276,7 +276,7 @@
 		{% for admin in map.admins %}
 		{% if admin !== user.email %}
 			<li>
-				{{admin.email}} <a><i data-admin="{{admin}}" class="admin-delete fa fa-times-circle red" title="Remove {{admin}} from admins"></i></a>
+				{{admin}} <a><i data-admin="{{admin}}" class="admin-delete fa fa-times-circle red" title="Remove {{admin}} from admins"></i></a>
 			</li>
 		{% endif %}
 		{% endfor %}

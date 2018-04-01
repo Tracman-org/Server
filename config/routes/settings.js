@@ -14,6 +14,7 @@ const Vehicle = require('../models').vehicle
 const router = require('express').Router()
 
 // Check admin auth and add map to res.locals
+/* global getMap */
 async function getMap(req, res, next) {
   try {
     // Pass map on to future routes
@@ -433,8 +434,7 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, getMap, async (req, res) =
       ])
 
       // Respond
-      res.status = 201
-      res.json({
+      res.status(201).json({
         id: new_vehicle.id,
         name: new_vehicle.name,
         setter: new_vehicle.setterEmail,
@@ -458,10 +458,10 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, getMap, async (req, res
       // Delete vehicle
       Vehicle.findByIdAndRemove(sanitize(req.params.veh)),
 
-      // Add vehicle to map
+      // Remove vehicle from map
       res.locals.map.update({
         $pull: {
-          vehicles: sanitize(req.params.veh),
+          'vehicles': sanitize(req.params.veh),
         }
       }),
 
@@ -474,56 +474,56 @@ router.delete('/maps/:map/vehicles/:veh', mw.ensureAuth, getMap, async (req, res
 })
 
 // Create new admin
-router.post('/maps/:map/admins', mw.ensureAuth, getMap, (req, res) => {
+router.post('/maps/:map/admins', mw.ensureAuth, getMap, async (req, res) => {
   debug(`Creating new admin for map ${req.params.map}`)
   try {
 
     // Validate email
-    if (!mw.validateEmail(req.body.email))
-      throw Error(`The email for a new admin, ${req.body.email} is invalid!`)
-    else {
+    if (!mw.validateEmail(req.body.email)) {
+      res.status = 400
+      res.json({
+        'danger': `That email, <u>${req.body.email}</u> is invalid!`,
+      })
+    } else {
 
       // Add admin email to map
-      res.locals.map.update({
+      await res.locals.map.update({
         $push: {
-          admins: req.body.email,
+          'admins': req.body.email,
         }
       })
 
       // Respond
-      res.status = 201
-      res.json({
+      res.status(201).json({
         email: req.body.email,
       })
 
     }
 
   } catch (err) {
-    console.error(err)
+    console.error(err.message)
     res.sendStatus(500)
   }
 
 })
 
 // Delete admin
-router.delete('/maps/:map/admins/:admin', mw.ensureAuth, getMap, (req, res) => {
+router.delete('/maps/:map/admins/:admin', mw.ensureAuth, getMap, async (req, res) => {
   debug(`Deleting admin ${req.params.admin}...`)
   try {
 
     // Remove admin email from map
-    res.locals.map.update({
+    await res.locals.map.update({
       $pull: {
-        admins: req.body.email,
+        'admins': sanitize(req.params.admin),
       }
     })
 
     // Respond
-    res.status = 201
-    res.json({
-      email: req.body.email,
-    })
+    res.sendStatus(200)
 
   } catch (err) {
+    console.error(err.message)
     res.sendStatus(500)
   }
 })
