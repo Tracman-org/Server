@@ -236,61 +236,73 @@ ready_promise_list.push(mail.verify())
 //TODO: Remove this after reschemed
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
-    let all_users = await User.find({})
+    const all_users = await User.find({})
     all_users.forEach( async (user) => {
-      try {
-        let reschemed_user = await rescheme(user)
-        debug(`Finished attempted rescheme of ${reschemed_user.id}`)
-      }
-      catch (err) {
-        console.error(`Unable to rescheme user ${user.id}:\n`,err.stack)
-        reject(err)
-      }
+      await rescheme(user)
+      debug(`Finished attempted rescheme of ${user.id}`)
     })
     resolve()
   } catch (err) {
-    console.error(`Couldn't find all users:\n`,err.stack)
+    console.error(err.message)
     reject(err)
   }
 }) )
 
+// Delete users who never created a password
+ready_promise_list.push( new Promise( async (resolve, reject) => {
+  try {
+    // Users with no passwords
+    const abandoned_users = await User.find({
+      'auth.password': {$exists:false},
+    })
+    // Check that their token expired too
+    .where('auth.passTokenExpires').lt(Date.now())
+    // Delete them one-by-one to ensure hooks fire
+    abandoned_users.forEach( (user) => {
+      debug(`Deleting abandoned account ${user.id}...`)
+      user.remove()
+    })
+    resolve()
+  } catch (err) {
+    console.error(err.message)
+    reject(err)
+  }
+}) )
+
+// Check for spectators for all users
+ready_promise_list.push( new Promise( async (resolve, reject) => {
+  try {
+    (await Map.find({})).forEach( (map) => {
+      sockets.checkForUsers(io, map.id)
+    })
+    resolve()
+  } catch (err) {
+    console.error(err.message)
+    reject(err)
+  }
+}) )
+
+// Start transmitting demo
+ready_promise_list.push( demo(io) )
+
 // Listen
 ready_promise_list.push( new Promise( (resolve, reject) => {
-  http.listen(env.port, async () => {
-
+  http.listen(env.port, () => {
     console.log(`  Express listening on ${env.url}`)
     resolve()
-
-    // Check for spectators for all users
-    ready_promise_list.push( new Promise( async (resolve, reject) => {
-      try {
-        (await Map.find({})).forEach( (map) => {
-          sockets.checkForUsers(io, map.id)
-        })
-        resolve()
-      } catch (err) {
-        console.error(err.stack)
-        reject(err)
-      }
-    }) )
-
-    // Start transmitting demo
-    ready_promise_list.push( demo(io) )
-
-    // Mark everything when working correctly
-    try {
-      await Promise.all(ready_promise_list.map(
-        // Also wait for rejected promises
-        // https://stackoverflow.com/a/36115549/3006854
-        p => p.catch(e => e)
-      ))
-      console.log('Tracman server is running properly.\n')
-    } catch (err) {
-      console.error(err.message)
-      console.log(`Tracman server is NOT running properly!\n`)
-    }
-
   })
 }) )
+
+// Mark everything when working correctly
+Promise.all(ready_promise_list.map(
+  // Also wait for rejected promises
+  // https://stackoverflow.com/a/36115549/3006854
+  p => p.catch(e => e)
+)).then( () => {
+  console.log('Tracman server is running properly.\n')
+}).catch( (err) => {
+  console.error(err.message)
+  console.log(`Tracman server is NOT running properly!\n`)
+})
 
 module.exports = app
