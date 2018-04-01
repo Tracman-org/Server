@@ -342,16 +342,11 @@ router.route('/maps/:map')
             }
           }
           debug(`Organized request body data: ${update_request}`)
-
-          // Get all vehicles that need updating
-          debug(`Getting vehicles that need updating... `)
-          const vehicles = await Vehicle.find({ '_id': {
-            $in: Object.keys(update_request)
-          } })
-          debug(`${vehicles.length} vehicles found that need updating.`)
-
+          
           // Update each vehicle
-          vehicles.forEach( async (vehicle) => {
+          ;( await Vehicle.find({ '_id': {
+            $in: Object.keys(update_request)
+          } }) ).forEach( async (vehicle) => {
             debug(`Updating vehicle ${vehicle.id}...`)
             vehicle.name = update_request[vehicle.id].vehicleName
             vehicle.setterEmail = update_request[vehicle.id].vehicleSetter

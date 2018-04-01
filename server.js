@@ -236,8 +236,7 @@ ready_promise_list.push(mail.verify())
 //TODO: Remove this after reschemed
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
-    const all_users = await User.find({})
-    all_users.forEach( async (user) => {
+    ( await User.find({}) ).forEach( async (user) => {
       await rescheme(user)
       debug(`Finished attempted rescheme of ${user.id}`)
     })

@@ -33,8 +33,7 @@ router.get('/delete/:usrid', mw.ensureAuth, ensureAdmin, async (req, res, next) 
 
   try {
     // Don't replace with findByIdAndRemove to ensure hooks fire
-    const user = await User.findById(req.params.usrid)
-    await user.remove()
+    await (await User.findById(req.params.usrid)).remove()
     req.flash('success', `<i>${req.params.usrid}</i> deleted.`)
     res.redirect('/admin')
   } catch (err) {

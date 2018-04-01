@@ -86,7 +86,7 @@ module.exports = function (old_user) {
       }
 
       // Save new objects
-      const save_object = function(obj, name) {
+      const saveObject = function(obj, name) {
         return new Promise( async (resolve, reject) => {
           try {
             await obj.save()
@@ -100,9 +100,9 @@ module.exports = function (old_user) {
 
       try {
         await Promise.all([
-          save_object(new_user,'user'),
-          save_object(new_map,'map'),
-          save_object(new_vehicle,'vehicle'),
+          saveObject(new_user,'user'),
+          saveObject(new_map,'map'),
+          saveObject(new_vehicle,'vehicle'),
         ])
         debug(`Saved new user, map, and vehicle`)
         resolve(new_user)

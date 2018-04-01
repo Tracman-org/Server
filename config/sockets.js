@@ -3,10 +3,9 @@
 // Imports
 const debug = require('debug')('tracman-sockets')
 const sanitize = require('mongo-sanitize')
-const models = require('./models')
+const Map = require('./models').map
+const Vehicle = require('./models').vehicle
 
-const Map = models.map
-const Vehicle = models.vehicle
 
 // Check for tracking clients
 function checkForViewers (io, map) {

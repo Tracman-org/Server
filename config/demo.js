@@ -14,14 +14,12 @@ module.exports = (io, filename='demo.txt') => {
         console.error(err.message)
         reject()
       } else {
-
-        const lines = String(data).split('\n');
-
+        
         (function sendLoc (ln) {
           if (ln > 20754) {
             sendLoc(0)
           } else {
-            const loc = lines[ln].split(' ')
+            const loc = String(data).split('\n')[ln].split(' ')
             //debug(`Sending demo location: ${loc[1]}, ${loc[2]}`)
             io.to('demo').emit('get', {
               tim: new Date(),
