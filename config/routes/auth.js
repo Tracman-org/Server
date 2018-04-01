@@ -73,6 +73,7 @@ module.exports = (app, passport) => {
 
             // Delete user if token expires without password being set
             setTimeoutPromise(1000*60*60).then( () => {
+              debug(`Deleting abandoned account ${user.id}...`)
               user.remove()
             }).catch(console.error)
 
