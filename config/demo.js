@@ -3,7 +3,7 @@
 // Imports
 const fs = require('fs')
 const path = require('path')
-const debug = require('debug')('tracman-demo')
+//const debug = require('debug')('tracman-demo')
 
 module.exports = (io, filename='demo.txt') => {
   return new Promise( (resolve, reject) => {
@@ -21,7 +21,7 @@ module.exports = (io, filename='demo.txt') => {
           if (ln > 20754) {
             sendLoc(0)
           } else {
-            let loc = lines[ln].split(' ')
+            const loc = lines[ln].split(' ')
             //debug(`Sending demo location: ${loc[1]}, ${loc[2]}`)
             io.to('demo').emit('get', {
               tim: new Date(),

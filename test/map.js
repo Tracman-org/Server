@@ -10,8 +10,8 @@ chai.use(
 describe('Mapping', () => {
 
   it('Displays demo map', async () => {
-    let res = await request.get('/map/demo')
-    chai.expect(res).to.have.status(200).to.be.html
+    chai.expect(await request.get('/map/demo'))
+      .to.have.status(200).to.be.html
   })
 
   // TODO: it('Shows own map', async () => {

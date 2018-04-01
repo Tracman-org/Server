@@ -17,9 +17,9 @@ module.exports = function (old_user) {
       debug(`Rescheming user ${old_user.id}...`)
 
       // Create new objects
-      let new_vehicle = new Vehicle()
-      let new_user = new User()
-      let new_map = new Map()
+      const new_vehicle = new Vehicle()
+      const new_user = new User()
+      const new_map = new Map()
 
       // Create new vehicle object
       new_vehicle.name = old_user_object.name
@@ -76,8 +76,8 @@ module.exports = function (old_user) {
       new_user.sk32 = old_user_object.sk32
 
       // Delete old user
+      const old_user_id = old_user.id
       try {
-        var old_user_id = old_user.id
         await old_user.remove()
         debug(`Deleted old user ${old_user_id}`)
       } catch (err) {

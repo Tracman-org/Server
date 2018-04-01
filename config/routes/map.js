@@ -11,7 +11,7 @@ const debug = require('debug')('tracman-routes-map')
 router.get('/', mw.ensureAuth, async (req, res) => {
   //TODO: Get rid of this route and add a page with map selection
   debug(`Redirecting user to the map they can set`)
-  let map = await Map.findOne({'vehicles':req.user.id})
+  const map = await Map.findOne({'vehicles':req.user.id})
   res.redirect((map)?`/map/${map.slug}`:'/')
 })
 
@@ -68,7 +68,8 @@ router.get('/:slug', async (req, res, next) => {
       console.error(`Possible injection attempt with slug: ${req.params.slug}`)
       next() // 404
     } else {
-      let map = await Map.findOne({slug: sanitize(req.params.slug)})
+      const map = await Map
+        .findOne({slug: sanitize(req.params.slug)})
         .populate('vehicles').exec()
       if (!map) next() // 404
       else {

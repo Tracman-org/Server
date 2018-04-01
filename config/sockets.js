@@ -5,7 +5,6 @@ const debug = require('debug')('tracman-sockets')
 const sanitize = require('mongo-sanitize')
 const models = require('./models')
 
-const User = models.user
 const Map = models.map
 const Vehicle = models.vehicle
 
@@ -46,7 +45,7 @@ module.exports = {
       // This socket can set location (app)
       socket.on('can-set', async (vehicleId) => {
         debug(`${socket.id} can set updates for ${vehicleId}.`)
-        let map = await Map.findOne({'vehicles':{$in:[vehicleId]}})
+        const map = await Map.findOne({'vehicles':{$in:[vehicleId]}})
         socket.join(map.id, () => {
           debug(`${socket.id} joined ${map.id}`)
         })
@@ -101,7 +100,7 @@ module.exports = {
             if (loc.veh !== sanitize(loc.veh)) {
               console.error(`Potential injection attempt with loc.veh of ${loc.veh}!`)
             } else {
-              let vehicle = await Vehicle.findById(loc.veh).populate('setter')
+              const vehicle = await Vehicle.findById(loc.veh).populate('setter')
 
               if (!vehicle) {
                 console.error(
@@ -123,7 +122,7 @@ module.exports = {
 
                   // Find associated map
                   debug(`Finding map associated with vehicle ${vehicle.id}`)
-                  let map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
+                  const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
                   debug(`Found map ${map.id}`)
 
                   // Broadcast location

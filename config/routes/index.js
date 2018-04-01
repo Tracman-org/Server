@@ -66,7 +66,7 @@ module.exports = router
     // Validate unique slug
     } else if (req.query.slug) {
       try {
-        let existing_map = await Map.findOne({
+        const existing_map = await Map.findOne({
           slug: sanitize(slug(req.query.slug))
         })
         if (existing_map && existing_map.id!==req.user.id) res.sendStatus(409)
@@ -80,7 +80,7 @@ module.exports = router
     } else if (req.query.email) {
       debug(`Testing email ${req.query.email} for uniqueness`)
       try {
-        let existing_user = User.findOne({ email: sanitize(req.query.email) })
+        const existing_user = User.findOne({ email: sanitize(req.query.email) })
         if (existing_user.id && existing_user.id !== req.user.id) {
           console.log(`Found user ${existing_user.id} with that email`)
           res.sendStatus(409)

@@ -34,7 +34,7 @@ module.exports = (passport) => {
   }, async (req, email, password, done) => {
     debug(`Perfoming local login for ${email}`)
     try {
-      let user = await User.findOne({'email': sanitize(email)})
+      const user = await User.findOne({'email': sanitize(email)})
 
       // No user with that email
       if (!user) {
@@ -45,11 +45,8 @@ module.exports = (passport) => {
       } else {
         debug(`User exists. Checking password...`)
 
-        // Check password
-        let correct_password = await user.validPassword(password)
-
         // Password incorrect
-        if (!correct_password) {
+        if (!await user.validPassword(password)) {
           debug(`Incorrect password`)
           return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
@@ -69,55 +66,32 @@ module.exports = (passport) => {
   ))
 
   // Social login
+  /* global socialLogin */
   async function socialLogin(req, service, profileId, done) {
     debug(`socialLogin() called for ${service} account ${profileId}`)
-    let query = {}
+    const query = {}
     query['auth.' + service] = profileId
 
     // Intent to log in
     if (!req.user) {
       debug(`Searching for user with query ${query}...`)
       try {
-        let user = await User.findOne(query)
+        const user = await User.findOne(query)
 
         // Can't find user
         if (!user) {
-
-          // Check for old googleID field
-          if (service === 'google') {
-            try {
-              let user = await User.findOne({ 'googleID': parseInt(profileId, 10) })
-
-              // User exists with old schema
-              if (user) {
-                req.session.flashType = 'success'
-                req.session.flashMessage = 'You have been logged in. '
-                return done(null, user)
-
-              // No such user
-              } else {
-                debug(`User with ${service} account of ${profileId} not found.`)
-                req.flash('warning', `There's no user for that ${service} account. `)
-                return done()
-              }
-            } catch (err) {
-              debug(`Failed to search for user with old googleID of ${profileId}. `)
-              mw.throwErr(err, req)
-              return done(err)
-            }
-
-          // No googleID either
-          } else {
-            debug(`Couldn't find ${service} user with profileID ${profileId}.`)
-            req.flash('warning', `There's no user for that ${service} account. `)
-            return done()
-          }
+          debug(`Couldn't find ${service} user with profileID ${profileId}.`)
+          req.flash('warning', `There's no user for that ${service} account. `)
+          return done()
 
         // Successfull social login
         } else {
           debug(`Found user: ${user.id}; logging in...`)
           req.session.flashType = 'success'
           req.session.flashMessage = 'You have been logged in.'
+          user.isNewUser = !Boolean(user.lastLogin)
+          user.lastLogin = Date.now()
+          user.save()
           return done(null, user)
         }
       } catch (err) {
@@ -133,7 +107,7 @@ module.exports = (passport) => {
       // Check for unique profileId
       debug(`Checking for unique account with query ${query}...`)
       try {
-        let existing_user = await User.findOne(query)
+        const existing_user = await User.findOne(query)
 
         // Social account already in use
         if (existing_user) {

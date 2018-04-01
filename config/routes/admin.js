@@ -9,7 +9,7 @@ function ensureAdmin (req, res, next) {
 	debug(`ensureAdmin called at ${req.url}`)
 	if (req.user.isSiteAdmin) return next()
 	else {
-		let err = Error("Forbidden")
+		const err = Error("Forbidden")
 		err.status = 403
 		next(err)
 	}
@@ -18,7 +18,7 @@ function ensureAdmin (req, res, next) {
 
 router.get('/', mw.ensureAuth, ensureAdmin, async (req, res) => {
   try {
-    let found = await User.find({}).sort({lastLogin: -1})
+    const found = await User.find({}).sort({lastLogin: -1})
     res.render('admin', {
       active: 'admin',
       noFooter: '1',

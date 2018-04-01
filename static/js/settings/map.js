@@ -1,6 +1,9 @@
 'use strict'
 /* global $ validateEmail replaceFromEndpoint alertDanger */
 
+const $vehicle_add_button = $('#vehicle-new')
+const $new_vehicle_row = $vehicle_add_button.closest('tr')
+
 function checkSetterEmail(setter, vehicle_id) {
   //console.log('checkSetterEmail('+setter+', '+vehicle_id+')')
 
@@ -214,7 +217,7 @@ $(function () {
 
   // Listen to changes to vehicle setter
   $('#vehicles-table').on('change', '.vehicle-setter', function () {
-    let vehicle_id = $(this).attr('data-vehicle')
+    const vehicle_id = $(this).attr('data-vehicle')
     if (typeof vehicle_id==='undefined') vehicle_id = 'new'
     const new_value = $(this).val()
 
@@ -262,8 +265,6 @@ $(function () {
   // Add vehicle
   function addVehicle() {
     //console.log('addVehicle() called')
-    const $vehicle_add_button = $('#vehicle-new')
-    const $new_vehicle_row = $vehicle_add_button.closest('tr')
     const icon_classes = $('#vehicle-setter-icon-new').attr('class')
     const new_setter = $('#vehicle-setter-new').val()
 

@@ -43,16 +43,14 @@ module.exports = router
         res.redirect('/contact')
       }
       if (response.statusCode !== 200) {
-        let err = Error('Bad response from reCaptcha service')
-        mw.throwErr(err, req)
+        mw.throwErr(Error('Bad response from reCaptcha service'), req)
         res.redirect('/contact')
 
       // No errors
       } else {
         // Captcha failed
         if (!JSON.parse(body).success) {
-          let err = Error('Failed reCaptcha')
-          mw.throwErr(err, req)
+          mw.throwErr(Error('Failed reCaptcha'), req)
           res.redirect('/contact')
 
         // Captcha succeeded

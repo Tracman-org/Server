@@ -24,7 +24,7 @@ describe('Authentication', () => {
     // Make sure test user doesn't exist
     before( async () => {
       try {
-        let user = await User.findOne({'email':TEST_EMAIL})
+        const user = await User.findOne({'email':TEST_EMAIL})
         if (!user) return
         else user.remove()
       } catch (err) { console.error(err) }
@@ -106,19 +106,17 @@ describe('Authentication', () => {
     it('Sets a strong password', async () => {
 
       // Perform request
-      let res = await request
+      const res = await request
         .post(`/account/password/${passwordless_user.auth.passToken}`)
         .type('form').send({ 'password':TEST_PASSWORD })
 
       // Expect redirect
       chai.expect(res).to.redirectTo('/login')
 
-      // Retrieve user with password saved
-      let passworded_user = await User.findOne({'email':TEST_EMAIL} )
-
       // Assert password was set
       chai.assert.isString(
-        passworded_user.auth.password, 'Failed to correctly save password'
+        (await User.findOne({'email':TEST_EMAIL} ))
+        .auth.password, 'Failed to correctly save password'
       )
 
       return res
@@ -151,8 +149,8 @@ describe('Authentication', () => {
         })
 
         it('Loads forgot password page', async () => {
-          let res = await request.get('/login/forgot')
-          chai.expect(res).to.be.html.and.have.status(200)
+          chai.expect(await request.get('/login/forgot'))
+            .to.be.html.and.have.status(200)
         })
 
         // TODO: Test already-logged-in forgot password requests
@@ -169,9 +167,9 @@ describe('Authentication', () => {
           ).to.redirectTo('/login')
 
           // Assert password token was set
-          let requesting_user = await User.findOne({'email':TEST_EMAIL} )
-          chai.expect(requesting_user.auth.passToken)
-            .to.be.a('string').and.to.have.lengthOf(32)
+          chai.expect(
+            (await User.findOne({'email':TEST_EMAIL} )).auth.passToken
+          ).to.be.a('string').and.to.have.lengthOf(32)
 
         })
 
@@ -181,20 +179,20 @@ describe('Authentication', () => {
         after( () => {
 
           it('Logs in with password', async () => {
-            let res = await request.post('/login')
-              .type('form').send({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD
-              })
-            chai.expect(res).to.redirectTo('/map')
+            chai.expect(
+              await request.post('/login')
+                .type('form').send({
+                  email: TEST_EMAIL,
+                  password: TEST_PASSWORD
+                })
+            ).to.redirectTo('/map')
 
             // Then do tests requiring login
             after( () => {
               describe('Logged in', () => {
 
                 it('Logs out', async () => {
-                  let res = request.get('/logout')
-                  chai.expect(res).to.redirectTo('/')
+                  chai.expect(await request.get('/logout')).to.redirectTo('/')
                 })
 
                 // it('Changes email address', async () => {

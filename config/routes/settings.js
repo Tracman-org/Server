@@ -1,5 +1,6 @@
 'use strict'
 
+const crypto = require('crypto')
 const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
@@ -25,7 +26,7 @@ async function getMap(req, res, next) {
       res.redirect('/settings/maps')
     // User not authorized to edit this map
     } else if (!res.locals.map.admins.includes(req.user.email)) {
-      let auth_err = Error(`Forbidden`)
+      const auth_err = Error(`Forbidden`)
       auth_err.status = 403
       throw auth_err
     // All clear, continue
@@ -74,7 +75,7 @@ router.route('/user')
         } else {
 
           try {
-            let existing_user = await User.findOne({ 'email': req.body.email })
+            const existing_user = await User.findOne({ 'email': req.body.email })
 
             // Not unique!
             if (existing_user && existing_user.id !== req.user.id) {
@@ -87,7 +88,7 @@ router.route('/user')
 
               // Create token
               debug(`Creating email token...`)
-              let token = await req.user.createEmailToken()
+              const token = await req.user.createEmailToken()
 
               // Send token to user by email
               debug(`Mailing new email token to ${req.body.email}...`)
@@ -163,7 +164,7 @@ router.route('/maps')
     debug(`Creating new map...`)
 
     try {
-      let new_map = new Map()
+      const new_map = new Map()
       new_map.name = xss(req.body.name)
       new_map.admins = [req.user.email]
       new_map.created = Date.now()
@@ -175,10 +176,9 @@ router.route('/maps')
         (async function checkSlug (s, cb) {
           try {
             debug(`Checking to see if slug ${s} is taken...`)
-            let existing_map = await Map.findOne({slug: s})
 
             // Slug in use: generate a random one and retry
-            if (existing_map) {
+            if (await Map.findOne({slug:s})) {
               debug(`Slug ${s} is taken; generating another...`)
               crypto.randomBytes(6, (err, buf) => {
                 if (err) {
@@ -331,7 +331,7 @@ router.route('/maps/:map')
 
           // Organize request body
           debug(`Organizing request body data... `)
-          let update_request = {}
+          const update_request = {}
           for (const prop in req.body) {
             if (prop!=='_csrf'&&prop!=='type') { // Ignore CSRF token and form type
               // New vehicle
@@ -406,7 +406,7 @@ router.post('/maps/:map/vehicles/new', mw.ensureAuth, getMap, async (req, res) =
     } else {
 
       // Create vehicle
-      let new_vehicle = new Vehicle()
+      const new_vehicle = new Vehicle()
       new_vehicle.setterEmail = sanitize(req.body.setter)
       new_vehicle.created = Date.now()
       new_vehicle.name = xss(req.body.name)

@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer')
 const env = require('./env/env')
 const debug = require('debug')('tracman-mail')
 
-let transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   host: env.mailserver,
   port: env.mailport,
   secure: false,

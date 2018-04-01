@@ -17,14 +17,14 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
   if (req.user.emailToken === req.params.token) {
     try {
       const old_email = req.user.email
-      
+
       // Set new email
       req.user.email = req.user.newEmail
 
       // Delete token and newEmail
       req.user.emailToken = undefined
       req.user.newEmail = undefined
-      
+
       // Modify maps this user is admining
       await Map.find({
         admins: old_email,
@@ -34,7 +34,7 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
           .push(req.user.newEmail)
           .save()
       })
-      
+
       // Save new user and report success
       await req.user.save()
       req.flash('success', `Your email has been set to <u>${req.user.email}</u>. `)
@@ -60,9 +60,9 @@ router.route('/password')
   .get( async (req, res, next) => {
     // Create token for password change
     try {
-      let [token, expires] = await req.user.createPassToken()
+      const [token, expires] = await req.user.createPassToken()
       // Figure out expiration time
-      let expirationTimeString = (req.query.tz)
+      const expirationTimeString = (req.query.tz)
         ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
         : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
 
@@ -110,7 +110,7 @@ router.route('/password/:token')
   .all( async (req, res, next) => {
     debug('/account/password/:token .all() called')
     try {
-      let user = await User
+      const user = await User
         .findOne({'auth.passToken': sanitize(req.params.token)})
         .where('auth.passTokenExpires').gt(Date.now())
 
@@ -142,7 +142,7 @@ router.route('/password/:token')
     debug('/account/password/:token .post() called')
 
     // Validate password strength
-    let zxcvbnResult = zxcvbn(req.body.password)
+    const zxcvbnResult = zxcvbn(req.body.password)
     if (zxcvbnResult.crack_times_seconds.online_no_throttling_10_per_second < 864000) { // Less than ten days
       req.flash( 'danger',
 				`That password could be cracked in ${zxcvbnResult.crack_times_display.online_no_throttling_10_per_second}!  Come up with a more complex password that would take at least 10 days to crack. `

@@ -32,7 +32,7 @@ module.exports = (app, passport) => {
     debug('appLoginCallback called.')
     if (req.user) res.send(req.user)
     else {
-      let err = Error('Unauthorized')
+      const err = Error('Unauthorized')
       err.status = 401
       next(err)
     }
@@ -68,7 +68,7 @@ module.exports = (app, passport) => {
           try {
 
             // Create a new password token
-            let [token, expires] = await user.createPassToken()
+            const [token, expires] = await user.createPassToken()
             debug(`Created password token for user ${user.id}`)
 
             // Delete user if token expires without password being set
@@ -79,7 +79,7 @@ module.exports = (app, passport) => {
 
             // Figure out expiration time string
             debug(`Determining expiration time string for ${expires}...`)
-            let expiration_time_string = (req.query.tz)
+            const expiration_time_string = (req.query.tz)
               ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
               : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
 
@@ -118,7 +118,7 @@ module.exports = (app, passport) => {
 
           // Check if somebody already has that email
           debug(`Searching for user with email ${req.body.email}...`)
-          let existing_user = await User.findOne({'email': req.body.email})
+          const existing_user = await User.findOne({'email': req.body.email})
 
           // User already exists
           if (existing_user && existing_user.auth.password)
@@ -229,11 +229,15 @@ module.exports = (app, passport) => {
         else mw.throwErr(err, req)
 
         // Delete any documents and objects that were created
-        try { await Promise.all([
-          user.remove(),
-          map.remove(),
-          vehicle.remove(),
-        ]) } catch (err) {
+        try {
+          await Promise.all( [
+            user.remove(),
+            map.remove(),
+            vehicle.remove(),
+          // Also wait for rejected promises
+          // https://stackoverflow.com/a/36115549/3006854
+          ].map(p => p.catch(e => e)) )
+        } catch (err) {
           // Ignore attempts to remove objects that don't exist
           if (!err.message===`Cannot read property 'remove' of undefined`)
             console.error(err)
@@ -283,11 +287,11 @@ module.exports = (app, passport) => {
             debug(`User ${user.id} found with that email.  Creating reset token...`)
 
             // Create reset token
-            let [token, expires] = await user.createPassToken()
+            const [token, expires] = await user.createPassToken()
 
             // Figure out expiration time string
             debug(`Determining expiration time string for ${expires}...`)
-            let expiration_time_string = (req.query.tz)
+            const expiration_time_string = (req.query.tz)
               ? moment(expires).utcOffset(req.query.tz).toDate().toLocaleTimeString(req.acceptsLanguages[0])
               : moment(expires).toDate().toLocaleTimeString(req.acceptsLanguages[0]) + ' UTC'
 
@@ -349,27 +353,26 @@ module.exports = (app, passport) => {
 
   // Social
   app.get('/login/:service', async (req, res, next) => {
-    let service = req.params.service
-    let sendParams = (service === 'google') ? {scope: ['https://www.googleapis.com/auth/userinfo.profile']} : null
+    const sendParams = (req.params.service === 'google') ? {scope: ['https://www.googleapis.com/auth/userinfo.profile']} : null
 
     // Social login
     if (!req.user) {
-      debug(`Attempting to login with ${service} with params: ${JSON.stringify(sendParams)}...`)
-      passport.authenticate(service, sendParams)(req, res, next)
+      debug(`Attempting to login with ${req.params.service} with params: ${JSON.stringify(sendParams)}...`)
+      passport.authenticate(req.params.service, sendParams)(req, res, next)
 
     // Connect social account
-    } else if (!req.user.auth[service]) {
-      debug(`Attempting to connect ${service} account...`)
-      passport.authorize(service, sendParams)(req, res, next)
+    } else if (!req.user.auth[req.params.service]) {
+      debug(`Attempting to connect ${req.params.service} account...`)
+      passport.authorize(req.params.service, sendParams)(req, res, next)
 
     // Disconnect social account
     } else {
-      debug(`Attempting to disconnect ${service} account...`)
+      debug(`Attempting to disconnect ${req.params.service} account...`)
 
       // Make sure the user has a password before they disconnect their google login account
       // This is because login used to only be through google, and some people might not have
       // set passwords yet...
-      if (!req.user.auth.password && service === 'google') {
+      if (!req.user.auth.password && req.params.service === 'google') {
         req.flash(
           'warning',
           `Hey, you need to <a href="/account/password">set a password</a> \
@@ -379,12 +382,12 @@ module.exports = (app, passport) => {
         res.redirect('/settings')
       } else {
         try {
-          req.user.auth[service] = undefined
+          req.user.auth[req.params.service] = undefined
           await req.user.save()
-          req.flash('success', `${mw.capitalize(service)} account disconnected. `)
+          req.flash('success', `${mw.capitalize(req.params.service)} account disconnected. `)
           res.redirect('/settings')
         } catch (err) {
-          debug(`Failed to save user after disconnecting ${service} account!`)
+          debug(`Failed to save user after disconnecting ${req.params.service} account!`)
           mw.throwErr(err, req)
           res.redirect('/settings')
         }

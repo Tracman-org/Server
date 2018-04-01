@@ -4,7 +4,7 @@
 
 // On page load
 $(function () {
-  let original_email = $('#email-input').val()
+  const original_email = $('#email-input').val()
 
   // Delete account
   $('#delete').click(function () {

@@ -26,7 +26,7 @@ const sockets = require('./config/sockets')
 const debug = require('debug')('tracman-server')
 
 // Promises marking a ready server
-let ready_promise_list = []
+const ready_promise_list = []
 
 /* Database */ {
   // Setup with native ES6 promises
@@ -185,7 +185,7 @@ app.post('/csp-violation', (req, res) => {
   // Catch-all for 404s
   app.use((req, res, next) => {
     if (!res.headersSent) {
-      let err = Error(`Not found: ${req.url}`)
+      const err = Error(`Not found: ${req.url}`)
       err.status = 404
       next(err)
     }
@@ -251,14 +251,14 @@ ready_promise_list.push( new Promise( async (resolve, reject) => {
 // Delete users who never created a password
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
-    
+
     // Get users with no passwords
     (await User.find({
       'auth.password': {$exists:false},
     })
-    
+
     // Check that their token expired too
-    //.where('auth.passTokenExpires').lt(Date.now())
+    .where('auth.passTokenExpires').lt(Date.now())
 
     // Delete them one-by-one to ensure hooks fire
     ).forEach( (user) => {

@@ -4,7 +4,7 @@
 
 // Variables
 let map, elevator, newLoc
-let markers = {}
+const markers = {}
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
@@ -77,7 +77,7 @@ $(function () {
 
           // Success callback
           function (pos) {
-            let newloc = {
+            const newloc = {
               ts: Date.now(),
               tok: token,
               veh: setVehicleId,
