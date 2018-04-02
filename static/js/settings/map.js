@@ -546,7 +546,7 @@ $(function () {
         .removeClass('fa-spinner fa-spin')
         .css('cursor','pointer')
 
-    // Inbalid email
+    // Invalid email
     } else if (!validateEmail(new_value)) {
 
       // Show help

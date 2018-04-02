@@ -343,7 +343,7 @@ router.route('/maps/:map')
             }
           }
           debug(`Organized request body data: ${update_request}`)
-          
+
           // Update each vehicle
           ;( await Vehicle.find({ '_id': {
             $in: Object.keys(update_request)
@@ -484,7 +484,7 @@ router.post('/maps/:map/admins', mw.ensureAuth, getMap, async (req, res) => {
 
       // Add admin email to map
       await res.locals.map.update({
-        $push: {
+        $addToSet: {
           'admins': req.body.email,
         }
       })
