@@ -248,29 +248,30 @@ ready_promise_list.push( new Promise( async (resolve, reject) => {
 }) )
 
 // Delete users who never created a password
-ready_promise_list.push( new Promise( async (resolve, reject) => {
-  try {
+// TODO: Uncomment after rescheme
+// ready_promise_list.push( new Promise( async (resolve, reject) => {
+//   try {
 
-    // Get users with no passwords
-    (await User.find({
-      'auth.password': {$exists:false},
-    })
+//     // Get users with no passwords
+//     (await User.find({
+//       'auth.password': {$exists:false},
+//     })
 
-    // Check that their token expired too
-    .where('auth.passTokenExpires').lt(Date.now())
+//     // Check that their token expired too
+//     .where('auth.passTokenExpires').lt(Date.now())
 
-    // Delete them one-by-one to ensure hooks fire
-    ).forEach( (user) => {
-      debug(`Deleting abandoned account ${user.id}...`)
-      user.remove()
-    })
+//     // Delete them one-by-one to ensure hooks fire
+//     ).forEach( (user) => {
+//       debug(`Deleting abandoned account ${user.id}...`)
+//       user.remove()
+//     })
 
-    resolve()
-  } catch (err) {
-    console.error(err.message)
-    reject(err)
-  }
-}) )
+//     resolve()
+//   } catch (err) {
+//     console.error(err.message)
+//     reject(err)
+//   }
+// }) )
 
 // Check for spectators for all users
 ready_promise_list.push( new Promise( async (resolve, reject) => {

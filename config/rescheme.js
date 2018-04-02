@@ -33,6 +33,7 @@ module.exports = function (old_user) {
       new_map.slug = old_user_object.slug
       new_map.created = old_user_object.created || 0
       new_map.settings = {
+        visibility: 'public',
         units: old_user_object.settings.units || 'standard',
         defaultMapType: old_user_object.settings.defaultMap || 'road',
         defaultZoom: old_user_object.settings.defaultZoom || 11,

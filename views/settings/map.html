@@ -74,6 +74,14 @@
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
 			<input type="hidden" name="type" value="display">
 
+			<div id="visibility" class="form-group" title="Private maps can only be viewed by admins">
+				<label for="visibility-select">Units</label>
+				<select id="visibility-select" name="visibility">
+					<option {% if map.settings.visibility=='public' %}selected {% endif %}value="public">Public</option>
+					<option {% if map.settings.visibility=='metric' %}selected {% endif %}value="private">Private</option>
+				</select>
+			</div>
+
 			<div id="units" class="form-group" title="Standard for feet/mph, metric for meters/kph">
 				<label for="units-select">Units</label>
 				<select id="units-select" name="units">

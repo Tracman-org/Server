@@ -54,6 +54,7 @@ const mapSchema = new Schema({
   lastUpdate: Date,
   slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
   settings: {
+    visibility: { type:String, default:'public' }, // 'public' or 'private'
     units: { type:String, default:'standard' }, // 'standard' or 'metric'
     defaultMapType: { type:String, default:'road' }, // 'road' or 'sat'
     defaultZoom: { type:Number, default:11 },

@@ -298,6 +298,7 @@ router.route('/maps/:map')
 
           // Set settings
           debug(`Setting map ${req.params.map} display settings... `)
+          res.locals.map.settings.visibility = req.body.visibility
           res.locals.map.settings.units = req.body.units
           res.locals.map.settings.defaultMapType = req.body.mapType
           res.locals.map.settings.defaultZoom = req.body.defaultZoom

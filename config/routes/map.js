@@ -72,7 +72,7 @@ router.get('/:slug', async (req, res, next) => {
         .findOne({slug: sanitize(req.params.slug)})
         .populate('vehicles').exec()
       if (!map) next() // 404
-      else {
+      else if ( map.settings.visibility!=='private' || map.admins.includes(req.user.email) )
         res.render('map', {
           active: (req.user && req.user.adminMaps[0] === map.id)? 'map':'', // For header nav
           mapData: map,
@@ -84,6 +84,9 @@ router.get('/:slug', async (req, res, next) => {
           disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both
           newmapurl: (req.query.new) ? env.url + '/map/' + req.params.slug : ''
         })
+      else {
+        res.status(403)
+        next()
       }
     }
   } catch (err) { mw.throwErr(err, req) }
