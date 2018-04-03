@@ -5,14 +5,27 @@ const mw = require('../middleware')
 const env = require('../env/env')
 const sanitize = require('mongo-sanitize')
 const Map = require('../models').map
+const Vehicle = require('../models').vehicle
 const debug = require('debug')('tracman-routes-map')
 
 // Redirect to real slug
 router.get('/', mw.ensureAuth, async (req, res) => {
-  //TODO: Get rid of this route and add a page with map selection
-  debug(`Redirecting user to the map they can set`)
-  const map = await Map.findOne({'vehicles':req.user.id})
-  res.redirect((map)?`/map/${map.slug}`:'/')
+  debug(`Finding a map to redirect to...`)
+  const vehicle = await Vehicle.findOne({'setter':req.user.id})
+  if (!vehicle) {
+    debug(`User sets for no vehicles.  Redirecting to settings/maps...`)
+    res.redirect('/settings/maps')
+  } else {
+    debug(`Found vehicle ${vehicle.id}; searching for associated map...`)
+    const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
+    if (!map) {
+      console.error(`Couldn't find map for vehicle ${vehicle.id}!`)
+      res.redirect('/')
+    } else {
+      debug(`Found map ${map.id}; redirecting to /map/${map.slug}...`)
+      res.redirect(`/map/${map.slug}`)
+    }
+  }
 })
 
 // Demo
@@ -70,11 +83,12 @@ router.get('/:slug', async (req, res, next) => {
     } else {
       const map = await Map
         .findOne({slug: sanitize(req.params.slug)})
-        .populate('vehicles').exec()
+        .populate('vehicles')
       if (!map) next() // 404
       else if ( map.settings.visibility!=='private' || map.admins.includes(req.user.email) )
         res.render('map', {
-          active: (req.user && req.user.adminMaps[0] === map.id)? 'map':'', // For header nav
+          // Header 'map' active if this user can set this map
+          active: ((map.vehicles.map(a => a.setter.toString())).includes(req.user.id))?'map':'',
           mapData: map,
           mapKey: env.googleMapsAPI,
           user: req.user,
