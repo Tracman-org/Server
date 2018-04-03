@@ -45,10 +45,12 @@ module.exports = {
       socket.on('can-set', async (vehicleId) => {
         debug(`${socket.id} can set updates for ${vehicleId}.`)
         const map = await Map.findOne({'vehicles':{$in:[vehicleId]}})
-        socket.join(map.id, () => {
-          debug(`${socket.id} joined ${map.id}`)
-        })
-        checkForViewers(io, map.id)
+        if (map) {
+          socket.join(map.id, () => {
+            debug(`${socket.id} joined ${map.id}`)
+          })
+          checkForViewers(io, map.id)
+        }
       })
 
       // This socket can receive location (map)
