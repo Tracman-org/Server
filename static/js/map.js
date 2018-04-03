@@ -1,14 +1,22 @@
 'use strict'
-/* global alert io google $ mapData setVehicleId disp noHeader mapKey navigator token */
+/* global alert io google $ mapData userid disp noHeader mapKey navigator token */
 
 
 // Variables
-let map, elevator, newLoc
+let map, elevator, newLoc, setVehicleId
 const markers = {}
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
 let _idleSecondsCounter = 0
+
+// Get vehicle to set, if any
+for (var i=0; i<mapData.vehicles.length; i++) {
+  if (mapData.vehicles[i].setter===userid) {
+    setVehicleId = mapData.vehicles[i].setter
+    break
+  }
+}
 
 // Idle timeout listeners
 function resetIdleSecondsCounter () {

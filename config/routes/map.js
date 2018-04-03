@@ -92,8 +92,6 @@ router.get('/:slug', async (req, res, next) => {
           mapData: map,
           mapKey: env.googleMapsAPI,
           user: req.user,
-          setVehicleId: (req.isAuthenticated())? req.user.setVehicle :'',
-          noFooter: '1',
           noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
           disp: (req.query.disp) ? req.query.disp.match(/\d/)[0] : 2, // 0=map, 1=streetview, 2=both
           newmapurl: (req.query.new) ? env.url + '/map/' + req.params.slug : ''
