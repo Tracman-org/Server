@@ -28,6 +28,11 @@ const debug = require('debug')('tracman-server')
 // Promises marking a ready server
 const ready_promise_list = []
 
+// Show stacktrace for unhandled promise rejections
+// https://github.com/nodejs/node/issues/9523#issuecomment-259303079
+if (env.mode !== 'production')
+  process.on('unhandledRejection', (err) => console.error(err));
+
 /* Database */ {
   // Setup with native ES6 promises
   mongoose.Promise = global.Promise
