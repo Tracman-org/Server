@@ -19,47 +19,49 @@ for (var i=0; i<mapData.vehicles.length; i++) {
 }
 
 // Idle timeout listeners
-function resetIdleSecondsCounter () {
+function resetIdleCounter () {
   _idleSecondsCounter = 0
+  // Hide mask
+  if (!socket.connected) {
+    $('#inactive-mask').hide()
+    $('#inactive-message').hide()
+  }
 }
-document.onclick = resetIdleSecondsCounter
-document.onmousemove = resetIdleSecondsCounter
-document.onkeypress = resetIdleSecondsCounter
+document.onclick = resetIdleCounter
+document.onmousemove = resetIdleCounter
+document.onkeypress = resetIdleCounter
 
 // Disconnect socket.io if user is idle for longer than IDLE_TIMEOUT seconds
 window.setInterval( function CheckIdleTime () {
   _idleSecondsCounter++
   // Disconnect idle user if still connected
   if (_idleSecondsCounter >= IDLE_TIMEOUT && socket.connected) {
-    //console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
+    console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
     $('#inactive-mask').show()
     $('#inactive-message').show()
     socket.disconnect()
-  // Connect user if disconnected
-  } else {
-    //console.log('Reconnecting the user because they are no longer idle.')
-    $('#inactive-mask').hide()
-    $('#inactive-message').hide()
+  // Reconnect if disconnected
+  } else if (_idleSecondsCounter <= IDLE_TIMEOUT && !socket.connected)
+    console.log('Reconnecting...')
     socket.connect()
-  }
 }, 1000)
 
 // Convert to feet if needed
 function convertMeters (meters) {
-  //console.log('convertMeters('+meters+')')
+  console.log('convertMeters('+meters+')')
   return (mapData.settings.units === 'standard') ? (meters * 3.28084).toFixed() : meters.toFixed()
 }
 
 // socket.io stuff
 socket
   .on('connect', function () {
-    //console.log('Connected!')
+    console.log('Connected!')
     // Can get location
     socket.emit('can-get', mapData._id)
     // Can set location too
     if (setVehicleId) socket.emit('can-set', setVehicleId)
   })//.on('disconnect', function () {
-    //console.log('Disconnected!')
+    console.log('Disconnected!')
   //}).on('error', function (err) {
     //console.error(err)
   //})
@@ -91,7 +93,7 @@ $(function () {
               spd: (pos.coords.speed || 0)
             }
             socket.emit('set', newloc)
-            //console.log('Set location:', newloc.lat + ', ' + newloc.lon)
+            console.log('Set location:', newloc.lat + ', ' + newloc.lon)
           },
 
           // Error callback
@@ -137,7 +139,7 @@ $(function () {
                   spd: (pos.coords.speed || 0)
                 }
                 socket.emit('set', newloc)
-                //console.log('Set location:', newloc.lat + ', ' + newloc.lon)
+                console.log('Set location:', newloc.lat + ', ' + newloc.lon)
               },
 
               // Error callback
@@ -183,7 +185,7 @@ $(function () {
         lon: 0,
         spd: 0
       })
-      //console.log('Cleared location')
+      console.log('Cleared location')
     }
   })
 
@@ -196,7 +198,7 @@ function initMap() {
   if (disp !== '1') {
     // Create map and marker elements
     mapData.vehicles.forEach( function(vehicle) {
-      //console.log('Creating marker for',vehicle._id)
+      console.log('Creating marker for',vehicle._id)
       markers[vehicle._id] = new google.maps.Marker({
         position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
         title: vehicle.name,
@@ -312,7 +314,7 @@ function initMap() {
       }, function (results, status, errorMessage) {
           // Success; return altitude
         if (status === google.maps.ElevationStatus.OK && results[0]) {
-          //console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
+          console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
           resolve(results[0].elevation)
 
         // Unable to get any altitude
@@ -323,7 +325,7 @@ function initMap() {
 
   // Parse altitude
   function parseAlt (loc) {
-    //console.log('parseAlt('+loc+'})')
+    console.log('parseAlt('+loc+'})')
 
     return new Promise(function (resolve, reject) {
       // Check if altitude was provided
@@ -366,7 +368,7 @@ function initMap() {
 
     // Update map
     if (disp !== '1') {
-      //console.log('Updating map...')
+      console.log('Updating map...')
 
       // Update time
       $('#timestamp').text('location updated ' + parsed_loc.tim)
