@@ -3,9 +3,9 @@
 
 
 // Variables
-let map, elevator, newLoc, setVehicleId
+let map, elevator, parsed_loc, setVehicleId
 const markers = {}
-const mapElem = document.getElementById('map')
+const map_element = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
 let _idleSecondsCounter = 0
@@ -30,43 +30,39 @@ document.onkeypress = resetIdleSecondsCounter
 window.setInterval( function CheckIdleTime () {
   _idleSecondsCounter++
   // Disconnect idle user if still connected
-  if (_idleSecondsCounter >= IDLE_TIMEOUT) {
-    if (socket.connected) {
-      console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
-      $('#inactive-mask').show()
-      $('#inactive-message').show()
-      socket.disconnect()
-    }
+  if (_idleSecondsCounter >= IDLE_TIMEOUT && socket.connected) {
+    //console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
+    $('#inactive-mask').show()
+    $('#inactive-message').show()
+    socket.disconnect()
   // Connect user if disconnected
   } else {
-    if (!socket.connected) {
-      console.log('Reconnecting the user because they are no longer idle.')
-      $('#inactive-mask').hide()
-      $('#inactive-message').hide()
-      socket.connect()
-    }
+    //console.log('Reconnecting the user because they are no longer idle.')
+    $('#inactive-mask').hide()
+    $('#inactive-message').hide()
+    socket.connect()
   }
 }, 1000)
 
 // Convert to feet if needed
-function metersToFeet (meters) {
-  //console.log('metersToFeet('+meters+')')
+function convertMeters (meters) {
+  //console.log('convertMeters('+meters+')')
   return (mapData.settings.units === 'standard') ? (meters * 3.28084).toFixed() : meters.toFixed()
 }
 
 // socket.io stuff
 socket
   .on('connect', function () {
-    console.log('Connected!')
+    //console.log('Connected!')
     // Can get location
     socket.emit('can-get', mapData._id)
     // Can set location too
     if (setVehicleId) socket.emit('can-set', setVehicleId)
-  }).on('disconnect', function () {
-    console.log('Disconnected!')
-  }).on('error', function (err) {
-    console.error(err)
-  })
+  })//.on('disconnect', function () {
+    //console.log('Disconnected!')
+  //}).on('error', function (err) {
+    //console.error(err)
+  //})
 
 // On page load
 $(function () {
@@ -95,13 +91,13 @@ $(function () {
               spd: (pos.coords.speed || 0)
             }
             socket.emit('set', newloc)
-            console.log('Set location:', newloc.lat + ', ' + newloc.lon)
+            //console.log('Set location:', newloc.lat + ', ' + newloc.lon)
           },
 
           // Error callback
           function (err) {
             alert('Unable to set location.')
-            console.error(err.stack)
+            //console.error(err.message)
           },
 
           // Options
@@ -141,13 +137,13 @@ $(function () {
                   spd: (pos.coords.speed || 0)
                 }
                 socket.emit('set', newloc)
-                console.log('Set location:', newloc.lat + ', ' + newloc.lon)
+                //console.log('Set location:', newloc.lat + ', ' + newloc.lon)
               },
 
               // Error callback
               function (err) {
                 alert('Unable to track location.')
-                console.error(err.stack)
+                //console.error(err.message)
               },
 
               // Options
@@ -187,7 +183,7 @@ $(function () {
         lon: 0,
         spd: 0
       })
-      console.log('Cleared location')
+      //console.log('Cleared location')
     }
   })
 
@@ -199,34 +195,39 @@ function initMap() {
   // Create map
   if (disp !== '1') {
     // Create map and marker elements
-    map = new google.maps.Map(mapElem, {
-      center: {
-        lat: (mapData.vehicles.length>1)? mapData.settings.defaultMap.lat : mapData.vehicles[0].last.lat,
-        lng: (mapData.vehicles.length>1)? mapData.settings.defaultMap.lon : mapData.vehicles[0].last.lon
-      },
-      panControl: false,
-      scrollwheel: (mapData.vehicles.length===1)? true: false,
-      scaleControl: !!(mapData.settings.showScale),
-      draggable: false,
-      zoom: mapData.settings.defaultMap.zoom,
-      streetViewControl: false,
-      zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
-      mapTypeId: (mapData.settings.defaultMap.type === 'sat') ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
-    })
-    mapData.vehicles.forEach(function(vehicle){
-      if (vehicle._id===undefined) vehicle._id=vehicle.id // Demo
+    mapData.vehicles.forEach( function(vehicle) {
       //console.log('Creating marker for',vehicle._id)
       markers[vehicle._id] = new google.maps.Marker({
         position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
         title: vehicle.name,
-        icon: (vehicle.marker) ? '/static/img/marker/' + vehicle.marker + '.png' : '/static/img/marker/red.png',
+        icon: '/static/img/marker/' + (vehicle.marker)?
+          vehicle.marker + '.png' : 'red.png',
         map: map,
         draggable: false
       })
+    } )
+    map = new google.maps.Map(map_element, {
+      center: (mapData.settings.center.type==='static')? {
+        lat:  mapData.settings.center.lat,
+        lng: mapData.settings.center.lon,
+      } : markers[mapData.settings.center.follow].getPosition(),
+      panControl: !!(mapData.settings.canPan) || false,
+      scrollwheel: !!(mapData.settings.canZoom) || false,
+      scaleControl: !!(mapData.settings.showScale),
+      draggable: false,
+      zoom: mapData.settings.defaultZoom||11,
+      streetViewControl: false,
+      zoomControl: !!(mapData.settings.canZoom),
+      zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
+      mapTypeId: (mapData.settings.defaultMapType==='sat')?
+        google.maps.MapTypeId.HYBRID :
+        google.maps.MapTypeId.ROADMAP
     })
-    if (Object.keys(markers).length === 1) {
+
+    // Move center if following
+    if (!!(mapData.settings.canZoom)) {
       map.addListener('zoom_changed', function () {
-        map.setCenter(markers[Object.keys(markers)[0]].getPosition())
+        map.setCenter(markers[mapData.settings.center.follow].getPosition())
       })
     }
 
@@ -249,7 +250,7 @@ function initMap() {
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
 
     // Create speed block
-    if (mapData.settings.showSpeed && mapData.vehicles.length===1) {
+    if (mapData.settings.showSpeed) {
       const speedSign = document.createElement('div')
       const speedLabel = document.createElement('div')
       const speedText = document.createElement('div')
@@ -257,7 +258,9 @@ function initMap() {
       speedLabel.id = 'spd-label'
       speedLabel.innerHTML = 'SPEED'
       speedText.id = 'spd'
-      speedText.innerHTML = (mapData.settings.units === 'standard') ? (parseFloat(mapData.vehicles[0].last.spd) * 2.23694).toFixed() : mapData.vehicles[0].last.spd.toFixed()
+      //speedText.innerHTML = (mapData.settings.units === 'standard')?
+        //(parseFloat(mapData.vehicles[0].last.spd) * 2.23694).toFixed() :
+        //mapData.vehicles[0].last.spd.toFixed()
       speedUnit.id = 'spd-unit'
       speedUnit.innerHTML = (mapData.settings.units === 'standard') ? 'm.p.h.' : 'k.p.h.'
       speedSign.id = 'spd-sign'
@@ -268,7 +271,7 @@ function initMap() {
     }
 
     // Create altitude block
-    if (mapData.settings.showAlt && mapData.vehicles.length===1) {
+    if (mapData.settings.showAlt) {
       elevator = new google.maps.ElevationService()
       const altitudeSign = document.createElement('div')
       const altitudeLabel = document.createElement('div')
@@ -278,27 +281,27 @@ function initMap() {
       altitudeText.id = 'alt'
       altitudeUnit.id = 'alt-unit'
       altitudeSign.id = 'alt-sign'
-      altitudeText.innerHTML = ''
       altitudeLabel.innerHTML = 'ALTITUDE'
-      parseAlt(mapData.vehicles[0].last).then(function (alt) {
-        altitudeText.innerHTML = metersToFeet(alt)
-      }).catch(function (err) {
-        console.error('Could not load altitude from last known location: ', err)
-      })
+      //altitudeText.innerHTML = ''
+      //parseAlt(mapData.vehicles[0].last).then(function (alt) {
+        //altitudeText.innerHTML = convertMeters(alt)
+      //}).catch(function (err) {
+        //console.error('Could not load altitude from last known location: ', err)
+      //})
       altitudeUnit.innerHTML = (mapData.settings.units === 'standard') ? 'feet' : 'meters'
       altitudeSign.appendChild(altitudeLabel)
       altitudeSign.appendChild(altitudeText)
       altitudeSign.appendChild(altitudeUnit)
       map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign)
     }
+
   }
 
   // Create streetview
-  if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length===1) {
+  if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length===1)
     updateStreetView(parseLoc(mapData.vehicles[0].last), 10)
-  }
 
-  // Get altitude from Google API
+  // Get altitudes from Google API
   function getAlt (loc) {
     return new Promise(function (resolve, reject) {
       // Get elevator service
@@ -309,7 +312,7 @@ function initMap() {
       }, function (results, status, errorMessage) {
           // Success; return altitude
         if (status === google.maps.ElevationStatus.OK && results[0]) {
-          console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
+          //console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
           resolve(results[0].elevation)
 
         // Unable to get any altitude
@@ -342,13 +345,16 @@ function initMap() {
 
   // Parse location
   function parseLoc (loc) {
-    loc.spd = (mapData.settings.units === 'standard') ? parseFloat(loc.spd) * 2.23694 : parseFloat(loc.spd)
-    loc.dir = parseFloat(loc.dir)
-    loc.lat = parseFloat(loc.lat)
-    loc.lon = parseFloat(loc.lon)
-    //loc.alt = parseAlt(loc) // TODO: Check if this is needed
-    loc.tim = new Date(loc.tim).toLocaleString()
-    return loc
+    return {
+      spd: (mapData.settings.units === 'standard')?
+        parseFloat(loc.spd) * 2.23694:
+        parseFloat(loc.spd),
+      dir: parseFloat(loc.dir),
+      lat: parseFloat(loc.lat),
+      lon: parseFloat(loc.lon),
+      //alt: parseAlt(loc), // TODO: Check if this is needed
+      tim: new Date(loc.tim).toLocaleString(),
+    }
   }
 
   // Got location
@@ -356,28 +362,40 @@ function initMap() {
     console.log('Got location:', loc.lat + ', ' + loc.lon+' for '+loc.veh)
 
     // Parse location
-    newLoc = parseLoc(loc)
+    parsed_loc = parseLoc(loc)
 
     // Update map
     if (disp !== '1') {
       //console.log('Updating map...')
 
       // Update time
-      $('#timestamp').text('location updated ' + newLoc.tim)
+      $('#timestamp').text('location updated ' + parsed_loc.tim)
 
-      // Update marker and recenter map
-      google.maps.event.trigger(map, 'resize')
-      markers[loc.veh].setPosition({ lat: newLoc.lat, lng: newLoc.lon })
-      if (mapData.vehicles.length === 1) map.setCenter({ lat: newLoc.lat, lng: newLoc.lon })
+      // Update marker
+      google.maps.event.trigger(map, 'resize') //TODO: What's this for?
+      markers[loc.veh].setPosition({
+        lat: parsed_loc.lat,
+        lng: parsed_loc.lon,
+      })
+
+      // Set map center
+      if (mapData.settings.center.type!=='static' && loc.veh===mapData.settings.center.follow)
+        map.setCenter({
+          lat: parsed_loc.lat,
+          lng: parsed_loc.lon,
+        })
 
       // Update speed
-      if (mapData.settings.showSpeed && mapData.vehicles.length === 1) $('#spd').text(newLoc.spd.toFixed())
+      // TODO: Fix this
+      if (mapData.settings.showSpeed && mapData.vehicles.length === 1)
+        $('#spd').text(parsed_loc.spd.toFixed())
 
       // Update altitude
+      // TODO: Fix this
       if (mapData.settings.showAlt && mapData.vehicles.length === 1) {
         // console.log('updating altitude...');
         parseAlt(loc).then(function (alt) {
-          $('#alt').text(metersToFeet(alt))
+          $('#alt').text(convertMeters(alt))
         }).catch(function (err) {
           $('#alt').text('????')
           console.error(err.stack)
@@ -387,14 +405,15 @@ function initMap() {
     }
 
     // Update street view
-    if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length === 1) updateStreetView(newLoc, 10)
+    if (disp !== '0' && mapData.settings.showStreetview && mapData.vehicles.length === 1)
+      updateStreetView(parsed_loc, 10)
 
   })
 
   // Get street view imagery
   function getStreetViewData (loc, rad, cb) {
     // Ensure that the location hasn't changed (or this is the initial setting)
-    if (newLoc == null || loc.tim === newLoc.tim) {
+    if (parsed_loc == null || loc.tim === parsed_loc.tim) {
       if (!sv) var sv = new google.maps.StreetViewService()
       sv.getPanorama({
         location: {

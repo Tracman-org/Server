@@ -34,7 +34,8 @@ router.get('/demo', (req, res, next) => {
   res.render('map', {
     active: 'demo',
     mapData: {
-      _id: 'demo',
+      id: 'demo',
+      // _id: 'demo',
       name: 'Demo',
       settings: {
         units: 'standard',
