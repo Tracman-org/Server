@@ -3,18 +3,26 @@
 
 
 // Variables
-let map, elevator, parsed_loc, setVehicleId
+let map, elevator, parsed_loc, setVehicleId, initial_followed_center
 const markers = {}
 const map_element = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes
 let _idleSecondsCounter = 0
 
-// Get vehicle to set, if any
+// Iterate through vehicles
 for (var i=0; i<mapData.vehicles.length; i++) {
+  // Find vehicle to set
   if (mapData.vehicles[i].setter===userid) {
     setVehicleId = mapData.vehicles[i].setter
-    break
+    console.log('Determined set vehicle as',setVehicleId)
+  }
+  if (mapData.vehicles[i]._id===mapData.settings.center.follow) {
+    initial_followed_center = {
+      lat: parseFloat(mapData.vehicles[i].last.lat) || 0,
+      lng: parseFloat(mapData.vehicles[i].last.lon) || 0,
+    }
+    console.log('Set initial followed center to',initial_followed_center)
   }
 }
 
@@ -197,27 +205,16 @@ function initMap() {
   // Create map
   if (disp !== '1') {
     // Create map and marker elements
-    mapData.vehicles.forEach( function(vehicle) {
-      console.log('Creating marker for',vehicle._id)
-      markers[vehicle._id] = new google.maps.Marker({
-        position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
-        title: vehicle.name,
-        icon: '/static/img/marker/' + (vehicle.marker)?
-          vehicle.marker + '.png' : 'red.png',
-        map: map,
-        draggable: false
-      })
-    } )
     map = new google.maps.Map(map_element, {
       center: (mapData.settings.center.type==='static')? {
         lat:  mapData.settings.center.lat,
         lng: mapData.settings.center.lon,
-      } : markers[mapData.settings.center.follow].getPosition(),
+      } : initial_followed_center,
       panControl: !!(mapData.settings.canPan) || false,
       scrollwheel: !!(mapData.settings.canZoom) || false,
       scaleControl: !!(mapData.settings.showScale),
       draggable: false,
-      zoom: mapData.settings.defaultZoom||11,
+      zoom: mapData.settings.defaultZoom || 11,
       streetViewControl: false,
       zoomControl: !!(mapData.settings.canZoom),
       zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
@@ -225,6 +222,18 @@ function initMap() {
         google.maps.MapTypeId.HYBRID :
         google.maps.MapTypeId.ROADMAP
     })
+    mapData.vehicles.forEach( function(vehicle) {
+      console.log('Creating marker for',vehicle._id)
+      markers[vehicle._id] = new google.maps.Marker({
+        position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
+        title: vehicle.name,
+        icon: (vehicle.marker)?
+          '/static/img/marker/' + vehicle.marker + '.png':
+          '/static/img/marker/red.png',
+        map: map,
+        draggable: false
+      })
+    } )
 
     // Move center if following
     if (!!(mapData.settings.canZoom)) {
