@@ -44,7 +44,9 @@ module.exports = (app, passport) => {
       // Already logged in
       if (req.isAuthenticated()) loginCallback(req, res)
       // Show login page
-      else res.render('login')
+      else res.render('login', {
+        active: 'login',
+      })
     })
     .post(passport.authenticate('local', loginOutcome), loginCallback)
   app.get('/logout', (req, res) => {
