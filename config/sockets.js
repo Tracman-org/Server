@@ -30,7 +30,7 @@ module.exports = {
   init: (io) => {
     io.on('connection', (socket) => {
       debug(`${socket.id} connected.`)
-
+      
       // Set a few variables
       socket.ip = socket.client.request.headers['x-real-ip']
       socket.ua = socket.client.request.headers['user-agent']
@@ -168,9 +168,11 @@ module.exports = {
         // Check if client was receiving updates
         if (socket.gets) {
           debug(`${socket.id} left ${socket.gets}`)
+          // See if that was the last client
           checkForViewers(io, socket.gets)
         }
       })
+
     })
   }
 

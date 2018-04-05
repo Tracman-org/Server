@@ -76,7 +76,7 @@
 		<div id="view"><img id="viewImg" alt="Streetview image"/></div>
 	{% endif %}
 
-	{% if setVehicleId %}
+	{% if active.length %}
 		<link rel="stylesheet" type="text/css" href="/static/css/.controls.min.css">
 		<div id="controls">
 		{% if mapData.settings.showStreetview and disp!='0' %}
