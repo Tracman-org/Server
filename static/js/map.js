@@ -1,9 +1,9 @@
 'use strict'
-/* global alert io google $ mapData userid disp noHeader mapKey navigator token */
+/* global alert io google $ mapData userid disp noHeader mapKey */
 
 
 // Variables
-let map, elevator, parsed_loc, setVehicleId, initial_followed_center
+let map, elevator, parsed_loc, setVehicleId, initial_followed_center, selected_vehicle
 const markers = {}
 const map_element = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
@@ -80,7 +80,8 @@ function initMap() {
 
   // Create map
   if (disp !== '1') {
-    // Create map and marker elements
+
+    // Create map
     map = new google.maps.Map(map_element, {
       center: (mapData.settings.center.type==='static')? {
         lat:  mapData.settings.center.lat,
@@ -98,7 +99,11 @@ function initMap() {
         google.maps.MapTypeId.HYBRID :
         google.maps.MapTypeId.ROADMAP
     })
+
+    // Iterate through vehicles
     mapData.vehicles.forEach( function(vehicle) {
+
+      // Create marker
       console.log('Creating marker for',vehicle._id)
       markers[vehicle._id] = new google.maps.Marker({
         position: { lat: vehicle.last.lat, lng: vehicle.last.lon },
@@ -109,6 +114,28 @@ function initMap() {
         map: map,
         draggable: false
       })
+
+      // Listen to clicking on vehicle
+      markers[vehicle._id].addListener('click', function(){
+        selected_vehicle = vehicle._id
+
+        // Show and set speed sign
+        if (mapData.settings.showSpeed) {
+          $('#spd').text(this.speed)
+          $('spd-sign').show()
+        }
+
+        // Show and set altitude sign
+        if (mapData.settings.showAlt) {
+          $('#alt').text(this.altitude)
+          $('#alt-sign').show()
+        }
+
+        // Center map on that vehicle if panning is enabled
+        if (!!(mapData.settings.canPan)) map.setCenter(this.getPosition())
+
+      })
+
     } )
 
     // Move center if following
@@ -145,9 +172,12 @@ function initMap() {
       speedLabel.id = 'spd-label'
       speedLabel.innerHTML = 'SPEED'
       speedText.id = 'spd'
-      //speedText.innerHTML = (mapData.settings.units === 'standard')?
-        //(parseFloat(mapData.vehicles[0].last.spd) * 2.23694).toFixed() :
-        //mapData.vehicles[0].last.spd.toFixed()
+      // Initially hide speed sign if multiple vehicles
+      if (mapData.vehicles.length!==1) speedSign.style.display = 'none'
+      // Show last speed if single vehicle
+      else speedText.innerHTML = (mapData.settings.units === 'standard')?
+        (parseFloat(mapData.vehicles[0].last.spd) * 2.23694).toFixed() :
+        mapData.vehicles[0].last.spd.toFixed()
       speedUnit.id = 'spd-unit'
       speedUnit.innerHTML = (mapData.settings.units === 'standard') ? 'm.p.h.' : 'k.p.h.'
       speedSign.id = 'spd-sign'
@@ -169,12 +199,15 @@ function initMap() {
       altitudeUnit.id = 'alt-unit'
       altitudeSign.id = 'alt-sign'
       altitudeLabel.innerHTML = 'ALTITUDE'
-      //altitudeText.innerHTML = ''
-      //parseAlt(mapData.vehicles[0].last).then(function (alt) {
-        //altitudeText.innerHTML = convertMeters(alt)
-      //}).catch(function (err) {
-        //console.error('Could not load altitude from last known location: ', err)
-      //})
+      // Initially hide altitude sign if multiple vehicles
+      if (mapData.vehicles.length!==1) altitudeSign.style.display = 'hide'
+      // Show last altitude if single vehicle
+      else parseAlt(mapData.vehicles[0].last).then(function (alt) {
+        altitudeText.innerHTML = convertMeters(alt)
+      }).catch(function (err) {
+        console.error('Could not load altitude from last known location: ', err)
+        altitudeText.innerHTML = '????'
+      })
       altitudeUnit.innerHTML = (mapData.settings.units === 'standard') ? 'feet' : 'meters'
       altitudeSign.appendChild(altitudeLabel)
       altitudeSign.appendChild(altitudeText)
@@ -259,33 +292,43 @@ function initMap() {
       $('#timestamp').text('location updated ' + parsed_loc.tim)
 
       // Update marker
-      google.maps.event.trigger(map, 'resize') //TODO: What's this for?
+      google.maps.event.trigger(map, 'resize') //TODO: Figure out what this line does
       markers[loc.veh].setPosition({
         lat: parsed_loc.lat,
         lng: parsed_loc.lon,
       })
 
       // Set map center
-      if (mapData.settings.center.type!=='static' && loc.veh===mapData.settings.center.follow)
+      if (mapData.settings.center.type!=='static')
+      if ( (selected_vehicle && loc.veh===selected_vehicle) ||
+        (!selected_vehicle && loc.veh===mapData.settings.center.follow) )
         map.setCenter({
           lat: parsed_loc.lat,
           lng: parsed_loc.lon,
         })
 
       // Update speed
-      // TODO: Fix this
-      if (mapData.settings.showSpeed && mapData.vehicles.length === 1)
-        $('#spd').text(parsed_loc.spd.toFixed())
+      if (mapData.settings.showSpeed) {
+        markers[loc.veh].speed = parsed_loc.spd.toFixed()
+        if (mapData.vehicles.length===1 || selected_vehicle===loc.veh)
+          $('#spd').text(parsed_loc.spd.toFixed())
+      }
 
       // Update altitude
-      // TODO: Fix this
-      if (mapData.settings.showAlt && mapData.vehicles.length === 1) {
-        // console.log('updating altitude...');
-        parseAlt(loc).then(function (alt) {
-          $('#alt').text(convertMeters(alt))
+      if (mapData.settings.showAlt) {
+        parseAlt(loc)
+        .then(convertMeters)
+        .then(function (alt) {
+          // Set marker altitude
+          markers[loc.veh].altitude = alt
+          // Set sign
+          if (mapData.vehicles.length===1 || selected_vehicle===loc.veh)
+            $('#alt').text(alt)
         }).catch(function (err) {
-          $('#alt').text('????')
-          console.error(err.stack)
+          markers[loc.veh].altitude = undefined
+          if (mapData.vehicles.length===1 || selected_vehicle===loc.veh)
+            $('#alt').text('????')
+          console.error(err.message)
         })
       }
 
@@ -366,5 +409,4 @@ function initMap() {
 
   }
 
-// Error loading gmaps API
 }
