@@ -115,5 +115,8 @@
     async defer></script>
 	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js" integrity="sha256-jniDwC1PC9OmGoyPxA9VpGvgwDYyxsMqu5Q4OrF5wNY=" crossorigin="anonymous"></script>
 	<script type="application/javascript" src="/static/js/map.js"></script>
+	{% if active.length %}
+	<script type="application/javascript" src="/static/js/controls.js"></script>
+	{% endif %}
 
 {% endblock %}
