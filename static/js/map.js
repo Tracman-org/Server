@@ -80,6 +80,7 @@ function initMap() {
 
   // Create map
   if (disp !== '1') {
+    console.log('canPan:',!!(mapData.settings.canPan))
 
     // Create map
     map = new google.maps.Map(map_element, {
@@ -87,8 +88,8 @@ function initMap() {
         lat:  mapData.settings.center.lat,
         lng: mapData.settings.center.lon,
       } : initial_followed_center,
-      panControl: !!(mapData.settings.canPan) || false,
-      scrollwheel: !!(mapData.settings.canZoom) || false,
+      panControl: !!(mapData.settings.canPan),
+      scrollwheel: !!(mapData.settings.canZoom),
       scaleControl: !!(mapData.settings.showScale),
       draggable: false,
       zoom: mapData.settings.defaultZoom || 11,
@@ -286,7 +287,7 @@ function initMap() {
 
     // Update map
     if (disp !== '1') {
-      console.log('Updating map...')
+      console.log('Setting vehicle',loc.veh,'to',loc.lat+',',loc.lon+'...')
 
       // Update time
       $('#timestamp').text('location updated ' + parsed_loc.tim)

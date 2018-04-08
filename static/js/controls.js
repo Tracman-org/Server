@@ -1,4 +1,4 @@
-/* global navigator $ socket token */
+/* global navigator $ socket userid token */
 
 // On page load
 $(function () {
@@ -10,7 +10,7 @@ $(function () {
   $('#set-loc').click(function () {
 
     // Check if logged in and enabled
-    if (!setVehicleId.length) alert('You are not logged in! '); else {
+    if (!userid.length) alert('You are not logged in! '); else {
       if (!navigator.geolocation) alert('Geolocation not enabled. '); else {
 
         navigator.geolocation.getCurrentPosition(
@@ -20,7 +20,7 @@ $(function () {
             const newloc = {
               ts: Date.now(),
               tok: token,
-              veh: setVehicleId,
+              usr: userid,
               alt: pos.coords.altitude,
               lat: pos.coords.latitude,
               lon: pos.coords.longitude,

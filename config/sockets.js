@@ -30,7 +30,7 @@ module.exports = {
   init: (io) => {
     io.on('connection', (socket) => {
       debug(`${socket.id} connected.`)
-      
+
       // Set a few variables
       socket.ip = socket.client.request.headers['x-real-ip']
       socket.ua = socket.client.request.headers['user-agent']
@@ -65,96 +65,92 @@ module.exports = {
 
       // Set location
       socket.on('set', async (loc) => {
-        debug(`${socket.id} set location for ${loc.veh} to: ${loc.lat},${loc.lon}`)
+        debug(`${socket.id} set location for user ${loc.usr} to: ${loc.lat},${loc.lon}`)
 
         // Get android timestamp or use server timestamp
         if (loc.ts) loc.tim = +loc.ts
         else loc.tim = Date.now()
 
-        // Look up vehicle if usr is supplied
-        // (for backwards-compatibility with old android versions)
-        if (loc.usr && !loc.veh) {
-          try {
-            loc.veh = await Vehicle.findOne({'setter':loc.usr})
-          } catch (err) {
-            console.error(`Unable to look up vehicle for loc.usr of ${loc.usr}:\n${err.stack}`)
-          }
-        }
-
-        // Check for vehicle and sk32 token
-        if (!loc.veh) {
+        // Check for user and sk32 token
+        if (!loc.usr) {
           console.error(
             Error(
-              `Recieved an update from ${socket.ip} without a veh or usr!`
+              `Recieved an update from ${socket.ip} without a usr!`
             ).message
           )
         } else if (!loc.tok) {
           console.error(
             Error(
-              `Recieved an update from ${socket.ip} for usr ${loc.veh} without a token!`
+              `Recieved an update from ${socket.ip} for usr ${loc.usr} without a token!`
             ).message
           )
         } else {
           try {
             // Get vehicle
-            debug(`Finding vehicle with loc.veh ID of ${loc.veh} and sk32 of ${loc.tok}`)
-            if (loc.veh !== sanitize(loc.veh)) {
-              console.error(`Potential injection attempt with loc.veh of ${loc.veh}!`)
+            debug(`Finding vehicles with loc.usr of ${loc.usr} and sk32 of ${loc.tok}`)
+            if (loc.usr !== sanitize(loc.usr)) {
+              console.error(`Potential injection attempt with loc.usr of ${loc.usr}!`)
             } else {
-              const vehicle = await Vehicle.findById(loc.veh).populate('setter')
-
-              if (!vehicle) {
+              const vehicles = await Vehicle.find({'setter':loc.usr}).populate('setter')
+              // No vehicles found
+              if (!vehicles.length) {
                 console.error(
                   Error(
-                    `Recieved an update from ${socket.ip} for ${loc.veh}, but no such vehicle was found in the db!`
-                  ).message
-                )
-              } else if (vehicle.setter.sk32 !== loc.tok) {
-                console.error(
-                  Error(
-                    `Recieved an update from ${socket.ip} for ${loc.veh} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setter} has an sk32 of ${vehicle.setbyuser.sk32}!`
+                    `Recieved an update from ${socket.ip} for user ${loc.usr}, but they don't seem to be a setter!`
                   ).message
                 )
               } else {
+                vehicles.forEach( async (vehicle) => {
+                  if (vehicle.setter.sk32 !== loc.tok) {
+                    console.error(
+                      Error(
+                        `Recieved an update from ${socket.ip} for vehicle ${vehicle.id} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setter} has an sk32 of ${vehicle.setbyuser.sk32}!`
+                      ).message
+                    )
+                  } else {
+                    loc.veh = vehicle.id
 
-                // Check that loc is newer than lastLoc
-                debug(`Confirming that loc.tim of ${loc.tim} is newer than last of ${(vehicle.last.time)? vehicle.last.time.getTime(): vehicle.last.time}...`)
-                if (!vehicle.last.time || loc.tim > vehicle.last.time.getTime()) {
+                    // Check that loc is newer than lastLoc
+                    debug(`Confirming that loc.tim of ${loc.tim} is newer than last of ${(vehicle.last.time)? vehicle.last.time.getTime(): vehicle.last.time}...`)
+                    if (!vehicle.last.time || loc.tim > vehicle.last.time.getTime()) {
 
-                  // Find associated map
-                  debug(`Finding map associated with vehicle ${vehicle.id}`)
-                  const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
-                  debug(`Found map ${map.id}`)
+                      // Find associated map
+                      debug(`Finding map associated with vehicle ${vehicle.id}`)
+                      const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
+                      debug(`Found map ${map.id}`)
 
-                  // Broadcast location
-                  debug(`Broadcasting ${loc.lat}, ${loc.lon} to ${map.id} for ${loc.veh}`)
-                  io.to(map.id).emit('get', loc)
+                      // Broadcast location
+                      debug(`Broadcasting ${loc.lat}, ${loc.lon} to map ${map.id} for vehicle ${vehicle.id}`)
+                      io.to(map.id).emit('get', loc)
 
-                  // Save new location in db
-                  try {
-                    vehicle.last = {
-                      lat: parseFloat(loc.lat),
-                      lon: parseFloat(loc.lon),
-                      dir: parseFloat(loc.dir || 0),
-                      spd: parseFloat(loc.spd || 0),
-                      alt: (loc.alt)? parseFloat(loc.alt): undefined,
-                      time: loc.tim,
+                      // Save new location in db
+                      try {
+                        vehicle.last = {
+                          lat: parseFloat(loc.lat),
+                          lon: parseFloat(loc.lon),
+                          dir: parseFloat(loc.dir || 0),
+                          spd: parseFloat(loc.spd || 0),
+                          alt: (loc.alt)? parseFloat(loc.alt): undefined,
+                          time: loc.tim,
+                        }
+                        await vehicle.save()
+                        debug(`Saved new loc for ${vehicle.id}.`)
+                      } catch (err) {
+                        console.error(`Failed to save new location for vehicle ${vehicle.id} in db:\n${err.stack}`)
+                      }
+                      try {
+                        map.lastUpdate = loc.tim
+                        await map.save()
+                        debug(`Saved new lastUpdate for ${map.id}.`)
+                      } catch (err) {
+                        console.error(`Failed to save new lastUpdate for map ${map.id} in db:\n${err.stack}`)
+                      }
+
                     }
-                    await vehicle.save()
-                    debug(`Saved new loc for ${vehicle.id}.`)
-                  } catch (err) {
-                    console.error(`Failed to save new location for vehicle ${vehicle.id} in db:\n${err.stack}`)
-                  }
-                  try {
-                    map.lastUpdate = loc.tim
-                    await map.save()
-                    debug(`Saved new lastUpdate for ${map.id}.`)
-                  } catch (err) {
-                    console.error(`Failed to save new lastUpdate for map ${map.id} in db:\n${err.stack}`)
+
                   }
 
-                }
-
+                } )
               }
             }
           } catch (err) { console.error(err.stack) }
