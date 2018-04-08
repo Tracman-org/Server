@@ -1,5 +1,5 @@
 'use strict'
-/* global alert io google $ mapData userid disp noHeader mapKey */
+/* global alert io google $ mapData userid token disp noHeader mapKey */
 
 
 // Variables
@@ -68,7 +68,7 @@ socket
     // Can get location
     socket.emit('can-get', mapData._id)
     // Can set location too
-    if (setVehicleId) socket.emit('can-set', setVehicleId)
+    if (setVehicleId) socket.emit('can-set', userid, token)
   })//.on('disconnect', function () {
     console.log('Disconnected!')
   //}).on('error', function (err) {
@@ -294,10 +294,11 @@ function initMap() {
 
       // Update marker
       google.maps.event.trigger(map, 'resize') //TODO: Figure out what this line does
-      markers[loc.veh].setPosition({
-        lat: parsed_loc.lat,
-        lng: parsed_loc.lon,
-      })
+      if (markers[loc.veh])
+        markers[loc.veh].setPosition({
+          lat: parsed_loc.lat,
+          lng: parsed_loc.lon,
+        })
 
       // Set map center
       if (mapData.settings.center.type!=='static')

@@ -3,6 +3,7 @@
 // Imports
 const debug = require('debug')('tracman-sockets')
 const sanitize = require('mongo-sanitize')
+const User = require('./models').user
 const Map = require('./models').map
 const Vehicle = require('./models').vehicle
 
@@ -29,144 +30,125 @@ module.exports = {
 
   init: (io) => {
     io.on('connection', (socket) => {
-      debug(`${socket.id} connected.`)
 
       // Set a few variables
       socket.ip = socket.client.request.headers['x-real-ip']
       socket.ua = socket.client.request.headers['user-agent']
+      debug(`${socket.ua} connected from ${socket.ip} as ${socket.id}`)
 
       // Log and errors
-      socket.on('log', (text) => {
-        debug(`LOG: ${text}`)
-      })
-      socket.on('error', (err) => { console.error(err.stack) })
+      //socket.on('log', (text) => {
+        //debug(`LOG: ${text}`)
+      //})
+      //socket.on('error', (err) => { console.error(err) })
 
-      // This socket can set location (app)
-      socket.on('can-set', async (vehicleId) => {
-        debug(`${socket.id} can set updates for ${vehicleId}.`)
-        const map = await Map.findOne({'vehicles':{$in:[vehicleId]}})
-        if (map) {
-          socket.join(map.id, () => {
-            debug(`${socket.id} joined ${map.id}`)
-          })
-          checkForViewers(io, map.id)
+      // This socket can set location (setter)
+      socket.on('can-set', async (user_id, token) => {
+        if (user_id!==sanitize(user_id))
+          console.error(Error(`Possible injection attempt with user_id of ${user_id}`).message)
+        else if (token!==sanitize(token))
+          console.error(Error(`Possible injection attempt with token of ${token}`).message)
+        else if (!token)
+          console.error(Error(`User ${user_id} wants to set location, but didn't send a token!`).message)
+        else {
+          try {
+            const user = await User.findById(user_id).where('sk32',token)
+            if (!user)
+              console.error(Error(`Could not find a user with ID of ${user_id} and sk32 of ${token}!`).message)
+            else {
+              debug(`${socket.id} can set updates for user ${user.id}.`)
+              const vehicles = await Vehicle.find({'setter':user_id})
+              debug(`User sets location of ${vehicles.length} vehicles.`)
+              if (vehicles.length) {
+                socket.sets = []
+                vehicles.forEach( async (vehicle) => {
+                  const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
+                  if (!map)
+                    console.error(Error(`Can't find map for vehicle ${vehicle.id}!`).message)
+                  else {
+                    socket.sets.push([map.id,vehicle.id])
+                    socket.join(map.id, () => {
+                      debug(`${socket.id} joined ${map.id}`)
+                    })
+                    checkForViewers(io, map.id)
+                  }
+                } )
+              }
+            }
+          } catch (err) { console.error(err.message) }
         }
       })
 
       // This socket can receive location (map)
-      socket.on('can-get', (mapId) => {
-        socket.gets = mapId
-        debug(`${socket.id} can get updates for ${mapId}.`)
-        socket.join(mapId, () => {
-          debug(`${socket.id} joined ${mapId}`)
-          socket.to(mapId).emit('activate', 'true')
+      socket.on('can-get', (map_id) => {
+        socket.gets = map_id
+        debug(`${socket.id} can get updates for ${map_id}.`)
+        socket.join(map_id, () => {
+          debug(`${socket.id} joined ${map_id}`)
+          socket.to(map_id).emit('activate', 'true')
         })
       })
 
       // Set location
       socket.on('set', async (loc) => {
-        debug(`${socket.id} set location for user ${loc.usr} to: ${loc.lat},${loc.lon}`)
+        debug(`${socket.id} is setting location for ${socket.sets.length} maps to: ${loc.lat}, ${loc.lon}`)
 
         // Get android timestamp or use server timestamp
         if (loc.ts) loc.tim = +loc.ts
         else loc.tim = Date.now()
 
-        // Check for user and sk32 token
-        if (!loc.usr) {
-          console.error(
-            Error(
-              `Recieved an update from ${socket.ip} without a usr!`
-            ).message
-          )
-        } else if (!loc.tok) {
-          console.error(
-            Error(
-              `Recieved an update from ${socket.ip} for usr ${loc.usr} without a token!`
-            ).message
-          )
-        } else {
-          try {
-            // Get vehicle
-            debug(`Finding vehicles with loc.usr of ${loc.usr} and sk32 of ${loc.tok}`)
-            if (loc.usr !== sanitize(loc.usr)) {
-              console.error(`Potential injection attempt with loc.usr of ${loc.usr}!`)
-            } else {
-              const vehicles = await Vehicle.find({'setter':loc.usr}).populate('setter')
-              // No vehicles found
-              if (!vehicles.length) {
-                console.error(
-                  Error(
-                    `Recieved an update from ${socket.ip} for user ${loc.usr}, but they don't seem to be a setter!`
-                  ).message
-                )
-              } else {
-                vehicles.forEach( async (vehicle) => {
-                  if (vehicle.setter.sk32 !== loc.tok) {
-                    console.error(
-                      Error(
-                        `Recieved an update from ${socket.ip} for vehicle ${vehicle.id} with a tok of ${loc.tok}, but the vehicle's user, ${vehicle.setter} has an sk32 of ${vehicle.setbyuser.sk32}!`
-                      ).message
-                    )
-                  } else {
-                    loc.veh = vehicle.id
+        // Send location to each map
+        socket.sets.forEach( (map_array) => {
+          debug(`Sending location to map ${map_array[0]} for vehicle ${map_array[1]}...`)
+          loc.veh = map_array[1]
+          io.to(map_array[0]).emit('get', loc)
+          // Save new location to sockets object (to save to DB on disconnect)
+          socket.last = {
+            lat: parseFloat(loc.lat),
+            lon: parseFloat(loc.lon),
+            dir: parseFloat(loc.dir || 0),
+            spd: parseFloat(loc.spd || 0),
+            alt: (loc.alt)? parseFloat(loc.alt): undefined,
+            time: loc.tim,
+          }
+        })
 
-                    // Check that loc is newer than lastLoc
-                    debug(`Confirming that loc.tim of ${loc.tim} is newer than last of ${(vehicle.last.time)? vehicle.last.time.getTime(): vehicle.last.time}...`)
-                    if (!vehicle.last.time || loc.tim > vehicle.last.time.getTime()) {
-
-                      // Find associated map
-                      debug(`Finding map associated with vehicle ${vehicle.id}`)
-                      const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
-                      debug(`Found map ${map.id}`)
-
-                      // Broadcast location
-                      debug(`Broadcasting ${loc.lat}, ${loc.lon} to map ${map.id} for vehicle ${vehicle.id}`)
-                      io.to(map.id).emit('get', loc)
-
-                      // Save new location in db
-                      try {
-                        vehicle.last = {
-                          lat: parseFloat(loc.lat),
-                          lon: parseFloat(loc.lon),
-                          dir: parseFloat(loc.dir || 0),
-                          spd: parseFloat(loc.spd || 0),
-                          alt: (loc.alt)? parseFloat(loc.alt): undefined,
-                          time: loc.tim,
-                        }
-                        await vehicle.save()
-                        debug(`Saved new loc for ${vehicle.id}.`)
-                      } catch (err) {
-                        console.error(`Failed to save new location for vehicle ${vehicle.id} in db:\n${err.stack}`)
-                      }
-                      try {
-                        map.lastUpdate = loc.tim
-                        await map.save()
-                        debug(`Saved new lastUpdate for ${map.id}.`)
-                      } catch (err) {
-                        console.error(`Failed to save new lastUpdate for map ${map.id} in db:\n${err.stack}`)
-                      }
-
-                    }
-
-                  }
-
-                } )
-              }
-            }
-          } catch (err) { console.error(err.stack) }
-        }
       })
 
       // Shutdown (check for remaining clients)
       socket.on('disconnect', (reason) => {
-        debug(`${socket.id} disconnected because of a ${reason}.`)
+        debug(`${socket.id} disconnected because of a ${reason}`)
 
         // Check if client was receiving updates
         if (socket.gets) {
-          debug(`${socket.id} left ${socket.gets}`)
+          debug(`${socket.id} no longer gets ${socket.gets}`)
           // See if that was the last client
           checkForViewers(io, socket.gets)
         }
+
+        // Check if client was setting updates
+        if (socket.sets && socket.sets.length) {
+          debug(`${socket.id} no longer sets for ${socket.sets.length} maps`)
+          socket.sets.forEach( (map_array) => {
+
+            // Set vehicle last
+            try {
+              debug(`Setting vehicle last for ${map_array[1]}...`)
+              Vehicle.findByIdAndUpdate(map_array[1], {'last': socket.last})
+            } catch (err) { console.error(err.message) }
+
+            // Set map last if this socket's is more recent
+            try {
+              const map = Map.findById(map_array[0])
+              if (socket.last.time>map.lastUpdate) {
+                debug(`Setting map last for ${map.id}...`)
+                map.update({'lastUpdate': socket.last})
+              }
+            } catch (err) { console.error(err.message) }
+
+          } )
+        }
+
       })
 
     })

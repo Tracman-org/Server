@@ -20,7 +20,6 @@ $(function () {
             const newloc = {
               ts: Date.now(),
               tok: token,
-              usr: userid,
               alt: pos.coords.altitude,
               lat: pos.coords.latitude,
               lon: pos.coords.longitude,
@@ -31,10 +30,7 @@ $(function () {
           },
 
           // Error callback
-          function (err) {
-            alert('Unable to set location.')
-            //console.error(err.message)
-          },
+          function (err){ alert('Unable to set location:',err.message) },
 
           // Options
           { enableHighAccuracy: true }
@@ -48,7 +44,7 @@ $(function () {
   $('#track-loc').click(function () {
 
     // Check if logged in and enabled
-    if (!setVehicleId.length) alert('You are not logged in! '); else {
+    if (!userid.length) alert('You are not logged in! '); else {
       if (!navigator.geolocation) alert('Geolocation not enabled. '); else {
 
         // Start tracking
@@ -66,7 +62,6 @@ $(function () {
                 newloc = {
                   ts: Date.now(),
                   tok: token,
-                  veh: setVehicleId,
                   lat: pos.coords.latitude,
                   lon: pos.coords.longitude,
                   alt: pos.coords.altitude,
@@ -78,8 +73,11 @@ $(function () {
 
               // Error callback
               function (err) {
-                alert('Unable to track location.')
-                //console.error(err.message)
+                alert('Unable to track location:',err.message)
+                // Stop tracking
+                $('#track-loc').html('<i class="fa fa-crosshairs"></i>Track').prop('title', 'Click here to track your location. ')
+                navigator.geolocation.clearWatch(wpid)
+                wpid = undefined
               },
 
               // Options
@@ -101,7 +99,7 @@ $(function () {
 
   // Clear location
   $('#clear-loc').click(function () {
-    if (!setVehicleId.length) alert('You are not logged in! '); else {
+    if (!userid.length) alert('You are not logged in! '); else {
 
       // Stop tracking
       if (wpid) {
@@ -114,7 +112,6 @@ $(function () {
       socket.emit('set', {
         ts: Date.now(),
         tok: token,
-        veh: setVehicleId,
         lat: 0,
         lon: 0,
         spd: 0
