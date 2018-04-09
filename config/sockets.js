@@ -44,6 +44,7 @@ module.exports = {
 
       // This socket can set location (setter)
       socket.on('can-set', async (user_id, token) => {
+        debug(`Got can-set...`)
         if (user_id!==sanitize(user_id))
           console.error(Error(`Possible injection attempt with user_id of ${user_id}`).message)
         else if (token!==sanitize(token))
@@ -52,6 +53,7 @@ module.exports = {
           console.error(Error(`User ${user_id} wants to set location, but didn't send a token!`).message)
         else {
           try {
+            debug(`Finding user with id ${user_id} and token ${token}`)
             const user = await User.findById(user_id).where('sk32',token)
             if (!user)
               console.error(Error(`Could not find a user with ID of ${user_id} and sk32 of ${token}!`).message)
@@ -66,7 +68,10 @@ module.exports = {
                   if (!map)
                     console.error(Error(`Can't find map for vehicle ${vehicle.id}!`).message)
                   else {
-                    socket.sets.push([map.id,vehicle.id])
+                    socket.sets.push({
+                      'map': map.id,
+                      'veh': vehicle.id,
+                    })
                     socket.join(map.id, () => {
                       debug(`${socket.id} joined ${map.id}`)
                     })
@@ -98,24 +103,24 @@ module.exports = {
         else loc.tim = Date.now()
 
         // Send location to each map
-        socket.sets.forEach( (map_array) => {
-          debug(`Sending location to map ${map_array[0]} for vehicle ${map_array[1]}...`)
-          loc.veh = map_array[1]
-          io.to(map_array[0]).emit('get', loc)
+        socket.sets.forEach( (sets) => {
+          debug(`Sending location to map ${sets.map} for vehicle ${sets.veh}...`)
+          loc.veh = sets.veh
+          io.to(sets.map).emit('get', loc)
           // Save new location to sockets object (to save to DB on disconnect)
           socket.last = {
-            lat: parseFloat(loc.lat),
-            lon: parseFloat(loc.lon),
-            dir: parseFloat(loc.dir || 0),
-            spd: parseFloat(loc.spd || 0),
-            alt: (loc.alt)? parseFloat(loc.alt): undefined,
-            time: loc.tim,
+            lat: parseFloat(loc.lat || 0),
+            lon: parseFloat(loc.lon || 0),
+            dir: parseFloat(loc.dir) || null,
+            spd: parseFloat(loc.spd) || null,
+            alt: (loc.alt)? parseFloat(loc.alt): null,
+            time: loc.tim || 0,
           }
         })
 
       })
 
-      // Shutdown (check for remaining clients)
+      // Disconnect
       socket.on('disconnect', (reason) => {
         debug(`${socket.id} disconnected because of a ${reason}`)
 
@@ -126,25 +131,25 @@ module.exports = {
           checkForViewers(io, socket.gets)
         }
 
-        // Check if client was setting updates
-        if (socket.sets && socket.sets.length) {
+        // Save last known location to database
+        if (socket.sets && socket.sets.length && socket.last) {
           debug(`${socket.id} no longer sets for ${socket.sets.length} maps`)
-          socket.sets.forEach( (map_array) => {
+          socket.sets.forEach( async (sets) => {
 
             // Set vehicle last
             try {
-              debug(`Setting vehicle last for ${map_array[1]}...`)
-              Vehicle.findByIdAndUpdate(map_array[1], {'last': socket.last})
-            } catch (err) { console.error(err.message) }
+              debug(`Setting vehicle last for ${sets.veh} to ${socket.last}...`)
+              await Vehicle.findByIdAndUpdate(sets.veh, {'last': socket.last})
+            } catch (err) { console.error(err) }
 
             // Set map last if this socket's is more recent
             try {
-              const map = Map.findById(map_array[0])
-              if (socket.last.time>map.lastUpdate) {
+              const map = await Map.findById(sets.map)
+              if (map && socket.last && socket.last.time>map.lastUpdate) {
                 debug(`Setting map last for ${map.id}...`)
-                map.update({'lastUpdate': socket.last})
+                map.update({'lastUpdate': socket.last.time})
               }
-            } catch (err) { console.error(err.message) }
+            } catch (err) { console.error(err) }
 
           } )
         }
