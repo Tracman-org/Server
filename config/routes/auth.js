@@ -30,8 +30,11 @@ module.exports = (app, passport) => {
   }
   const appLoginCallback = (req, res, next) => {
     debug('appLoginCallback called.')
-    if (req.user) res.send(req.user)
-    else {
+    if (req.user) {
+      debug(`App login succeeded`)
+      res.send(req.user)
+    } else {
+      debug(`App login failed`)
       const err = Error('Unauthorized')
       err.status = 401
       next(err)
