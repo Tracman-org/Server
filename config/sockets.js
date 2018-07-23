@@ -49,6 +49,8 @@ module.exports = {
           console.error(Error(`Possible injection attempt with user_id of ${user_id}`).message)
         else if (token!==sanitize(token))
           console.error(Error(`Possible injection attempt with token of ${token}`).message)
+        else if (!user_id)
+          console.error(Error(`Received can-set without user_id`))
         else if (!token)
           console.error(Error(`User ${user_id} wants to set location, but didn't send a token!`).message)
         else {
@@ -62,6 +64,7 @@ module.exports = {
               const vehicles = await Vehicle.find({'setter':user_id})
               debug(`User sets location of ${vehicles.length} vehicles.`)
               if (vehicles.length) {
+                user.vehicles = vehicles
                 socket.sets = []
                 vehicles.forEach( async (vehicle) => {
                   const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
