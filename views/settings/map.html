@@ -75,7 +75,7 @@
 			<input type="hidden" name="type" value="display">
 
 			<div id="visibility" class="form-group" title="Private maps can only be viewed by admins">
-				<label for="visibility-select">Units</label>
+				<label for="visibility-select">Visibility</label>
 				<select id="visibility-select" name="visibility">
 					<option {% if map.settings.visibility=='public' %}selected {% endif %}value="public">Public</option>
 					<option {% if map.settings.visibility=='metric' %}selected {% endif %}value="private">Private</option>
