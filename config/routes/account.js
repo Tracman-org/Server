@@ -13,6 +13,7 @@ const router = require('express').Router()
 
 // Confirm email address
 router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
+  debug(`GET /email/:token=${req.params.token}`)
   // Check token
   if (req.user.emailToken === req.params.token) {
     try {
@@ -58,6 +59,7 @@ router.route('/password')
 
   // Email user a token, proceed at /password/:token
   .get( async (req, res, next) => {
+    debug(`GET /password`)
     // Create token for password change
     try {
       const [token, expires] = await req.user.createPassToken()
@@ -108,7 +110,7 @@ router.route('/password/:token')
 
   // Check token
   .all( async (req, res, next) => {
-    debug('/account/password/:token .all() called')
+    debug(`ALL /account/password/:token=${req.params.token}`)
     try {
       const user = await User
         .findOne({'auth.passToken': sanitize(req.params.token)})
@@ -119,7 +121,7 @@ router.route('/password/:token')
         req.flash('danger', 'Password reset token is invalid or has expired. ')
         res.redirect((req.isAuthenticated) ? '/settings' : '/login')
       } else {
-        debug('setting passwordUser')
+        debug(`Password reset token is valid and unexpired.  Saving this still-logged-out user as res.locals.passwordUser...`)
         res.locals.passwordUser = user
         next()
       }
@@ -133,13 +135,13 @@ router.route('/password/:token')
 
   // Show password change form
   .get((req, res) => {
-    debug('/account/password/:token .get() called')
+    debug(`GET /account/password/:token=${req.params.token}`)
     res.render('password')
   })
 
   // Set new password
   .post( async (req, res, next) => {
-    debug('/account/password/:token .post() called')
+    debug(`POST /account/password/:token=${req.params.token}`)
 
     // Validate password strength
     const zxcvbnResult = zxcvbn(req.body.password)
@@ -156,19 +158,19 @@ router.route('/password/:token')
 
         // User changed password
         if (req.user) {
-          debug('User saved password')
+          debug(`${res.locals.passwordUser.email} set new password`)
           req.flash('success', 'Your password has been changed. ')
           res.redirect('/settings')
 
         // New user created password
         } else {
-          debug('New user created password')
+          debug(`New user created: ${res.locals.passwordUser.email}`)
           req.flash('success', 'Password set.  You can use it to log in now. ')
           res.redirect('/login')
         }
 
       } catch (err) {
-        debug('Error creating hashed password and saving to db')
+        debug('Error creating hashed password for ${res.locals.passwordUser.email} and saving to db')
         mw.throwErr(err, req)
         res.redirect(`/account/password/${req.params.token}`)
       }
