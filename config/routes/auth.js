@@ -240,8 +240,8 @@ module.exports = (app, passport) => {
         try {
           await Promise.all( [
             user.remove(),
-            map.remove(),
-            vehicle.remove(),
+            // map.remove(),
+            // vehicle.remove(),
           // Also wait for rejected promises
           // https://stackoverflow.com/a/36115549/3006854
           ].map(p => p.catch(e => e)) )
