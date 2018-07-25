@@ -35,7 +35,7 @@ describe('Authentication', () => {
       // Confirm redirect
       chai.expect( await request.post('/signup')
         .type('form').send({ 'email':FAKE_EMAIL })
-      ).to.redirectTo('/login#signup')
+      ).to.redirectTo('/login')
 
       /* Ensure user was deleted after email failed to send
        * Users with bad emails are removed asynchronously and may happen after
