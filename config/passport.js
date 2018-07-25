@@ -38,20 +38,26 @@ module.exports = (passport) => {
 
       // No user with that email
       if (!user) {
-        debug(`No user with that email`)
+        debug(`No user with the email ${sanitize(email)}`)
         return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
       // User exists
       } else {
-        debug(`User exists. Checking password...`)
+        debug(`${user.email} exists. Checking password...`)
+
+        // Password not set yet
+        if (!user.auth.password) {
+          debug(`${user.email} exists but hasn't created a password.`)
+          return done(null, false, req.flash('warning', `You haven't verified your email yet.  Check your inbox, or, if you lost the email, use the 'Create account' form to send another.  `))
 
         // Password incorrect
-        if (!await user.validPassword(password)) {
-          debug(`Incorrect password`)
+        } else if (!await user.validPassword(password)) {
+          debug(`${user.email} entered an incorrect password`)
           return done(null, false, req.flash('warning', 'Incorrect email or password.'))
 
         // Successful login
         } else {
+          debug(`${user.email} entered ccorrect password.  Logging in...`)
           user.isNewUser = !Boolean(user.lastLogin)
           user.lastLogin = Date.now()
           user.save()
