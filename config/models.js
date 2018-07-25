@@ -49,7 +49,7 @@ const vehicleSchema = new Schema({
 })
 
 const mapSchema = new Schema({
-  name: String,
+  name: { type:String, required:true },
   created: Date,
   lastUpdate: Date,
   slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
