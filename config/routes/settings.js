@@ -164,11 +164,11 @@ router.route('/maps')
     debug(`Creating new map...`)
 
     try {
-      
+
       // Create map
       const new_map = new Map()
       new_map.created = Date.now()
-      
+
       // Make current user only admin
       new_map.admins = [req.user.email]
 
@@ -193,9 +193,8 @@ router.route('/maps')
                   mw.throwErr(err, req)
                   reject()
                 }
-                if (buf) {
+                if (buf)
                   checkSlug(sanitize(s+buf.toString('hex')), cb)
-                }
               })
 
             // Unique slug: proceed
@@ -218,7 +217,7 @@ router.route('/maps')
       debug(`Successfully created new map ${new_map.id}`)
       req.flash('success', `Created new map <i>${new_map.name}</i>`)
       res.redirect(`/settings/maps/${new_map.id}`)
-      
+
     } catch (err) {
       mw.throwErr(err)
       res.redirect(`/settings/maps`)
