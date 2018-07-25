@@ -143,56 +143,59 @@ module.exports = (app, passport) => {
 
             // Create new documents
             var user = new User()
-            var map = new Map()
-            var vehicle = new Vehicle()
+            //var map = new Map()
+            // var vehicle = new Vehicle()
 
             // Set map properties and save
-            map.created = Date.now()
-            map.vehicles = [vehicle]
-            map.admins = [req.body.email]
-            map.slug = await new Promise( (resolve, reject) => {
-              debug(`Creating new slug for map...`)
+            //map.created = Date.now()
+            //map.vehicles = [vehicle]
+            //map.admins = [req.body.email]
+            //map.name = `${user.name} map`
+
+            // map.slug = await new Promise( (resolve, reject) => {
+              // debug(`Creating new slug for map...`)
 
               // Recursive IIFE to find unused slug
-              ;( async function checkSlug (s) {
-                try {
-                  // Sanitize and slugify
-                  s = slugify(sanitize(s))
-                  debug(`Checking to see if slug ${s} is taken...`)
+              // ;( async function checkSlug (s) {
+              //   try {
+              //     // Sanitize and slugify
+              //     s = slugify(sanitize(s))
+              //     debug(`Checking to see if slug ${s} is taken...`)
 
-                  // Slug in use
-                  if (await Map.findOne({slug: s})) {
-                    debug(`Slug ${s} is taken; generating another...`)
-                    // Generate a new slug
-                    crypto.randomBytes(6, (err, buf) => {
-                      if (err) return reject(err)
-                      if (!buf)
-                        return reject('crypto.randomBytes failed to generate buf!')
-                      else
-                        // Recurse by checking the newly generated slug
-                        checkSlug(buf.toString('hex'))
-                    })
+              //     // Slug in use
+              //     if (await Map.findOne({slug: s})) {
+              //       debug(`Slug ${s} is taken; generating another digit...`)
+              //       // Add a random digit
+              //       crypto.randomBytes(1, (err, buf) => {
+              //         if (err) return reject(err)
+              //         if (!buf)
+              //           return reject('crypto.randomBytes failed to generate buf!')
+              //         else
+              //           // Recurse by checking the newly generated slug
+              //           checkSlug(s+buf.toString('hex'))
+              //       })
 
-                  // Unique slug: proceed
-                  } else {
-                    debug(`Slug ${s} is unique`)
-                    resolve(s)
-                  }
+              //     // Unique slug: proceed
+              //     } else {
+              //       debug(`Slug ${s} is unique`)
+              //       resolve(s)
+              //     }
 
-                } catch (err) { reject(err) }
+              //   } catch (err) { reject(err) }
 
-              // Initial slug argument to IIFE is the first part of the email
-              })( req.body.email.substring(0, req.body.email.indexOf('@')) )
+              // // Initial slug argument to IIFE is the first part of the email
+              // })( user.name )
 
-            })
+            // })
 
             // Set vehicle properties and save
-            vehicle.created = Date.now()
-            vehicle.setter = user
-            vehicle.map = map
+            // vehicle.created = Date.now()
+            // vehicle.setter = user
+            // vehicle.map = map
 
             // Set user properties and save
             user.created = Date.now()
+            user.name = req.body.email.substring(0, req.body.email.indexOf('@'))
             user.email = req.body.email
             user.sk32 = await new Promise((resolve, reject) => {
               debug('Creating sk32 for user...')
@@ -208,8 +211,8 @@ module.exports = (app, passport) => {
             await Promise.all([
               sendToken(user),
               user.save(),
-              vehicle.save(),
-              map.save(),
+              // vehicle.save(),
+              // map.save(),
             ])
 
             // Send response

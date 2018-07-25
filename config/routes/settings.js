@@ -164,10 +164,17 @@ router.route('/maps')
     debug(`Creating new map...`)
 
     try {
+      
+      // Create map
       const new_map = new Map()
-      new_map.name = xss(req.body.name)
-      new_map.admins = [req.user.email]
       new_map.created = Date.now()
+      
+      // Make current user only admin
+      new_map.admins = [req.user.email]
+
+      // Set new map name if provided
+      new_map.name = (req.body.name.length>0) ?
+        xss(req.body.name) : 'map'
 
       // Generate unique slug
       new_map.slug = await new Promise((resolve, reject) => {
@@ -179,15 +186,15 @@ router.route('/maps')
 
             // Slug in use: generate a random one and retry
             if (await Map.findOne({slug:s})) {
-              debug(`Slug ${s} is taken; generating another...`)
-              crypto.randomBytes(6, (err, buf) => {
+              debug(`Slug ${s} is taken; generating another digit...`)
+              crypto.randomBytes(1, (err, buf) => {
                 if (err) {
-                  debug('Failed to create random bytes for slug!')
+                  debug('Failed to create random byte for slug!')
                   mw.throwErr(err, req)
                   reject()
                 }
                 if (buf) {
-                  checkSlug(sanitize(buf.toString('hex')), cb)
+                  checkSlug(sanitize(s+buf.toString('hex')), cb)
                 }
               })
 
@@ -202,16 +209,20 @@ router.route('/maps')
             reject(err)
           }
 
-        // Start recursive function chain using first part of email as initial slug
+        // Start recursive function chain using map name as initial slug
         })(sanitize(slugify(new_map.name)), resolve)
       })
 
+      // Save map
       await new_map.save()
-
       debug(`Successfully created new map ${new_map.id}`)
       req.flash('success', `Created new map <i>${new_map.name}</i>`)
-    } catch (err) { mw.throwErr(err) }
-    finally { res.redirect(`/settings/maps`) }
+      res.redirect(`/settings/maps/${new_map.id}`)
+      
+    } catch (err) {
+      mw.throwErr(err)
+      res.redirect(`/settings/maps`)
+    }
 
   })
 
