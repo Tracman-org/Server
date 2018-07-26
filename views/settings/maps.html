@@ -11,9 +11,11 @@
 
 	<section class="container">
 
-		<h1>Map Settings</h1>
-		
 		<p><a href="/settings">&lt; Back to all settings</a></p>
+
+		<h1>Map Settings</h1>
+
+		<p>Type a name in the "New map name" box and click the green button to create a new map.  </p>
 
 		<form role="form" method="post">
 		<input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -22,8 +24,10 @@
 			<li><a href="/settings/maps/{{map._id}}">{{map.name}}</a></li>
 		{% endfor %}
 			<li>
-				<input id="new-map-input" name="name" type="text" maxlength="160" placeholder="New map name (optional)">
-				<a href="#" onclick="$('form').submit()" title="Click to add a new map"><i class="green fa fa-plus-circle"></i></a>
+				<input id="new-map-input" name="name" type="text" maxlength="160"
+				       placeholder="New map name (optional)">
+				<a href="#" onclick="$('form').submit()" title="Click to add a new map">
+					<i class="green fa fa-plus-circle"></i></a>
 			</li>
 		</ul></form>
 
