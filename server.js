@@ -87,6 +87,9 @@ let ready_promise_list = []
     'font-src': [
       'https://fonts.gstatic.com',
       'https://maxcdn.bootstrapcdn.com/font-awesome/*',
+      'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/fonts/fontawesome-webfont.woff',
+      'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/fonts/fontawesome-webfont.ttf',
+      'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/fonts/fontawesome-webfont.woff2',
     ],
     'img-src': ["'self'",
       'https://www.google-analytics.com',
