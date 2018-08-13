@@ -84,7 +84,10 @@ let ready_promise_list = []
       'https://fonts.googleapis.com',
       'https://maxcdn.bootstrapcdn.com',
     ],
-    'font-src': ['https://fonts.gstatic.com'],
+    'font-src': [
+      'https://fonts.gstatic.com',
+      'https://maxcdn.bootstrapcdn.com/font-awesome/*',
+    ],
     'img-src': ["'self'",
       'https://www.google-analytics.com',
       'https://maps.gstatic.com',
