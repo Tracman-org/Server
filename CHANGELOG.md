@@ -1,6 +1,12 @@
 # Tracman Server Changelog
 ### v0.9.0
 
+###### v0.9.1
+* Removed conhive
+* Fixed CSP rules
+* Improved debugging output
+* Tried to fix scrollwheel
+
 ###### v0.9.0
 * [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
 * [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication

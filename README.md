@@ -56,7 +56,11 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 
 [view full changelog](CHANGELOG.md)
 
-###### v0.9.0
+###### v0.9.x
+* Removed coinhive
+* Fixed CSP rules
+* Improved debugging output
+* Tried to fix scrollwheel
 * [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
 * [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication
 * [#120](https://github.com/Tracman-org/Server/issues/120) Split config/routes/settings.js into two files
