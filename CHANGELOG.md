@@ -3,7 +3,9 @@
 
 ###### v0.9.1
 * Removed conhive
-* Fixed scrollwheel
+* Fixed CSP rules
+* Improved debugging output
+* Tried to fix scrollwheel
 
 ###### v0.9.0
 * [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
