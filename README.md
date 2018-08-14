@@ -67,6 +67,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * Removed express validator and replaced with homegrown function
 * Fixed showing welcome message on every login
 * Removed naked domains
+* Patched [CVE-2017-16117](https://github.com/dodo/node-slug/issues/82) on [node-slug](https://github.com/dodo/node-slug)
 
 ###### v0.8.x
 * Hotfixed service worker bugs

@@ -5,10 +5,13 @@ const mail = require('../mail.js')
 const User = require('../models.js').user
 const crypto = require('crypto')
 const moment = require('moment')
-const slugify = require('slug')
 const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env.js')
+// Trim slug to patch CVE-2017-16117
+const slugify = function(s) {
+  return require('slug')(s.slice(0,99))
+}
 
 module.exports = (app, passport) => {
 

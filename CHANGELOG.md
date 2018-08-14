@@ -7,6 +7,7 @@
 * Improved debugging output
 * Tried to fix scrollwheel
 * Fixed security audited npm packages
+* Patched [CVE-2017-16117](https://github.com/dodo/node-slug/issues/82) on [node-slug](https://github.com/dodo/node-slug)
 
 ###### v0.9.0
 * [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes

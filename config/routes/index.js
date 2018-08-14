@@ -1,9 +1,12 @@
 'use strict'
 
 const router = require('express').Router()
-const slug = require('slug')
 const xss = require('xss')
 const User = require('../models.js').user
+// Trim slug to patch CVE-2017-16117
+const slug = function(s) {
+  return require('slug')(s.slice(0,99))
+}
 
 module.exports = router
 
