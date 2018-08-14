@@ -213,6 +213,7 @@ loadGoogleMapsAPI({ key: mapKey })
         lat: mapuser.last.lat,
         lng: mapuser.last.lon
       },
+      gestureHandling: 'auto', // Allows use of scroll wheel
       panControl: false,
       scrollwheel: true,
       scaleControl: !!(mapuser.settings.showScale),

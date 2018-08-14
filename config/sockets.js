@@ -27,11 +27,11 @@ module.exports = {
 
   init: (io) => {
     io.on('connection', (socket) => {
-      debug(`${socket.id} connected.`)
+      debug(`${socket.ip} connected.`)
 
       // Set a few variables
-      // socket.ip = socket.client.request.headers['x-real-ip'];
-      // socket.ua = socket.client.request.headers['user-agent'];
+      socket.ip = socket.client.request.headers['x-real-ip'];
+      socket.ua = socket.client.request.headers['user-agent'];
 
       // Log and errors
       socket.on('log', (text) => {
@@ -41,9 +41,9 @@ module.exports = {
 
       // This socket can set location (app)
       socket.on('can-set', (userId) => {
-        debug(`${socket.id} can set updates for ${userId}.`)
+        debug(`${socket.ip} can set updates for ${userId}.`)
         socket.join(userId, () => {
-          debug(`${socket.id} joined ${userId}`)
+          debug(`${socket.ip} joined ${userId} with ${socket.ua}`)
         })
         checkForUsers(io, userId)
       })
@@ -51,16 +51,16 @@ module.exports = {
       // This socket can receive location (map)
       socket.on('can-get', (userId) => {
         socket.gets = userId
-        debug(`${socket.id} can get updates for ${userId}.`)
+        debug(`${socket.ip} can get updates for ${userId}.`)
         socket.join(userId, () => {
-          debug(`${socket.id} joined ${userId}`)
+          debug(`${socket.ip} joined ${userId}`)
           socket.to(userId).emit('activate', 'true')
         })
       })
 
       // Set location
       socket.on('set', async (loc) => {
-        debug(`${socket.id} set location for ${loc.usr}`)
+        debug(`${socket.ip} set location for ${loc.usr}`)
         debug(`Location was set to: ${JSON.stringify(loc)}`)
 
         // Get android timestamp or use server timestamp
@@ -123,11 +123,11 @@ module.exports = {
 
       // Shutdown (check for remaining clients)
       socket.on('disconnect', (reason) => {
-        debug(`${socket.id} disconnected because of a ${reason}.`)
+        debug(`${socket.ip} disconnected ${socket.ua} because of a ${reason}.`)
 
         // Check if client was receiving updates
         if (socket.gets) {
-          debug(`${socket.id} left ${socket.gets}`)
+          debug(`${socket.ip} left ${socket.gets}`)
           checkForUsers(io, socket.gets)
         }
       })
