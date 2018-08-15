@@ -320,14 +320,14 @@ module.exports = (app, passport) => {
                   to: mail.to(user),
                   subject: 'Reset your Tracman password',
                   text: mail.text(
-                    `Hi, \n\nDid you request to reset your Tracman password?  \
+                    `Did you request to reset your Tracman password?  \
                     If so, follow this link to do so:\
                     \n${env.url}/account/password/${token}\n\n\
                     This link will expire at ${expiration_time_string}.  \n\n\
                     If you didn't initiate this request, just ignore this email. \n\n`
                   ),
                   html: mail.html(
-                    `<p>Hi, </p><p>Did you request to reset your Tracman password?  \
+                    `<p>Did you request to reset your Tracman password?  \
                     If so, follow this link to do so:<br>\
                     <a href="${env.url}/account/password/${token}">\
                     ${env.url}/account/password/${token}</a>.  \
