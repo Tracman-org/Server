@@ -27,7 +27,7 @@ module.exports = {
 
   init: (io) => {
     io.on('connection', (socket) => {
-      debug(`${socket.ip} connected.`)
+      debug(`${socket.ip||socket.id} connected.`)
 
       // Set a few variables
       socket.ip = socket.client.request.headers['x-real-ip'];
