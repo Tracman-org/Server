@@ -1,14 +1,16 @@
 'use strict'
 
-const slug = require('slug')
 const xss = require('xss')
 const mw = require('../middleware.js')
 const User = require('../models.js').user
 const mail = require('../mail.js')
 const env = require('../env/env.js')
-const sanitize = require('mongo-sanitize')
 const debug = require('debug')('tracman-routes-settings')
 const router = require('express').Router()
+// Trim slug to patch CVE-2017-16117
+const slug = function(s) {
+  return require('slug')(s.slice(0,99))
+}
 
 // Settings form
 router.route('/')

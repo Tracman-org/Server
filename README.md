@@ -6,7 +6,6 @@ node.js application to display a sharable map with user's location.
 [![Travis Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
 [![Coverage Status](https://coveralls.io/repos/github/Tracman-org/Server/badge.svg?branch=master)](https://coveralls.io/github/Tracman-org/Server?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![Snyk Vulnerabilities](https://snyk.io/test/github/Tracman-org/Server/badge.svg)](https://snyk.io/test/github/Tracman-org/Servr)
 
 ## Installation
 
@@ -61,12 +60,14 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 * Fixed CSP rules
 * Improved debugging output
 * Tried to fix scrollwheel
+* Fixed security audited npm packages
 * [#121](https://github.com/Tracman-org/Server/issues/121) Fixed various security holes
 * [#68](https://github.com/Tracman-org/Server/issues/68) Added tests, mostly for authentication
 * [#120](https://github.com/Tracman-org/Server/issues/120) Split config/routes/settings.js into two files
 * Removed express validator and replaced with homegrown function
 * Fixed showing welcome message on every login
 * Removed naked domains
+* Patched [CVE-2017-16117](https://github.com/dodo/node-slug/issues/82) on [node-slug](https://github.com/dodo/node-slug)
 
 ###### v0.8.x
 * Hotfixed service worker bugs

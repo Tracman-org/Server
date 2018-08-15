@@ -92,6 +92,7 @@ let ready_promise_list = []
       'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/fonts/fontawesome-webfont.woff2',
     ],
     'img-src': ["'self'",
+      'data:', // For icons on map
       'https://www.google-analytics.com',
       'https://maps.gstatic.com',
       'https://*.googleapis.com',
