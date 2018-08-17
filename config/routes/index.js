@@ -1,12 +1,15 @@
 'use strict'
 
 const router = require('express').Router()
-const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
 const User = require('../models').user
 const Map = require('../models').map
 const debug = require('debug')('tracman-routes-index')
+// Trim slug to patch CVE-2017-16117
+const slug = function(s) {
+  return require('slug')(s.slice(0,99))
+}
 
 module.exports = router
 

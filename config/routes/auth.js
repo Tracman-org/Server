@@ -1,16 +1,13 @@
-'use strict' /* global sendToken */
+'use strict'
 
 const mw = require('../middleware')
 const mail = require('../mail')
 const User = require('../models').user
-const Map = require('../models').map
-const Vehicle = require('../models').vehicle
 const crypto = require('crypto')
 const util = require('util')
 const setTimeoutPromise = util.promisify(setTimeout)
 const moment = require('moment')
 const sanitize = require('mongo-sanitize')
-const slugify = require('slug')
 const debug = require('debug')('tracman-routes-auth')
 const env = require('../env/env')
 

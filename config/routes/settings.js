@@ -4,7 +4,6 @@ const crypto = require('crypto')
 const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
-const slugify = require('slug')
 const mw = require('../middleware')
 const mail = require('../mail')
 const env = require('../env/env')
@@ -13,6 +12,10 @@ const User = require('../models').user
 const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const router = require('express').Router()
+// Trim slug to patch CVE-2017-16117
+const slugify = function(s) {
+  return require('slug')(s.slice(0,99))
+}
 
 // Check admin auth and add map to res.locals
 /* global getMap */
