@@ -99,27 +99,29 @@ module.exports = {
 
       // Set location
       socket.on('set', async (loc) => {
-        debug(`${socket.id} is setting location for ${socket.sets.length||0} maps to: ${loc.lat}, ${loc.lon}`)
+        debug(`${socket.id} is setting location for ${socket.sets||0} maps to: ${loc.lat}, ${loc.lon}`)
 
         // Get android timestamp or use server timestamp
         if (loc.ts) loc.tim = +loc.ts
         else loc.tim = Date.now()
 
         // Send location to each map
-        socket.sets.forEach( (sets) => {
-          debug(`Sending location to map ${sets.map} for vehicle ${sets.veh}...`)
-          loc.veh = sets.veh
-          io.to(sets.map).emit('get', loc)
-          // Save new location to sockets object (to save to DB on disconnect)
-          socket.last = {
-            lat: parseFloat(loc.lat || 0),
-            lon: parseFloat(loc.lon || 0),
-            dir: parseFloat(loc.dir) || null,
-            spd: parseFloat(loc.spd) || null,
-            alt: (loc.alt)? parseFloat(loc.alt): null,
-            time: loc.tim || 0,
-          }
-        })
+        if (socket.sets && socket.sets.length) {
+          socket.sets.forEach( (sets) => {
+            debug(`Sending location to map ${sets.map} for vehicle ${sets.veh}...`)
+            loc.veh = sets.veh
+            io.to(sets.map).emit('get', loc)
+            // Save new location to sockets object (to save to DB on disconnect)
+            socket.last = {
+              lat: parseFloat(loc.lat || 0),
+              lon: parseFloat(loc.lon || 0),
+              dir: parseFloat(loc.dir) || null,
+              spd: parseFloat(loc.spd) || null,
+              alt: (loc.alt)? parseFloat(loc.alt): null,
+              time: loc.tim || 0,
+            }
+          })
+        }
 
       })
 

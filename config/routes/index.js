@@ -2,9 +2,11 @@
 
 const router = require('express').Router()
 const xss = require('xss')
+const mw = require('../middleware')
 const sanitize = require('mongo-sanitize')
 const User = require('../models').user
 const Map = require('../models').map
+const Vehicle = require('../models').vehicle
 const debug = require('debug')('tracman-routes-index')
 // Trim slug to patch CVE-2017-16117
 const slug = function(s) {
@@ -22,7 +24,7 @@ module.exports = router
   .get('/demo', (req, res, next) => {
     res.redirect('/map/demo')
   })
-
+  
   // Help
   .get('/help', (req, res) => {
     res.render('help', {active: 'help'})

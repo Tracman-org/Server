@@ -1,0 +1,58 @@
+{% extends 'templates/base.html' %}
+{% block title %}{{super()}} | Maps{% endblock %}
+
+{% block head %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href="/static/css/.table.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/.form.min.css">
+{% endblock %}
+
+{% block main %}
+
+	<section class="container">
+
+		<h1>Maps</h1>
+
+		<h3>Admin maps</h3>
+
+		<p>These are the maps you administer.  To create a new map, type a name in the "New map name" box and click the green button. </p>
+
+		{% if not adminMaps.length %}
+			<p><i>You are not admin of any maps.</i></p>
+		{% endif %}
+
+		<form role="form" method="post">
+		<input type="hidden" name="_csrf" value="{{csrfToken}}">
+		<ul>
+			{% for map in adminMaps %}
+			<li>
+				<a href="/map/{{map.slug}}">{{map.name}}</a>
+				(<a href="/settings/maps/{{map._id}}">settings</a>)
+			</li>
+			{% endfor %}
+			<li>
+				<input id="new-map-input" name="name" type="text" maxlength="160"
+				       placeholder="New map name">
+				<a href="#" onclick="$('form').submit()" title="Click to add a new map">
+					<i class="green fa fa-plus-circle"></i></a>
+			</li>
+		</ul>
+		</form>
+
+		<h3>Track maps</h3>
+
+		<p>These are the maps on which you are tracked.  You must administer a map to add yourself as a tracker. </p>
+
+		{% if trackMaps.length %}
+			<ul>
+			{% for map in trackMaps %}
+				<li><a href="/map/{{map.slug}}">{{map.name}}</a></li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p><i>You are not being tracked on any maps.</i></p>
+		{% endif %}
+
+	</section>
+
+{% endblock %}

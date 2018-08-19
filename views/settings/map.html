@@ -20,7 +20,10 @@
 {% block main %}
 <div class="container">
 
-	<p><a href="/settings/maps">&lt; Back to all maps</a></p>
+	<div class="flex" style="justify-content:space-between">
+		<p><a href="/maps">&lt; Back to all maps</a></p>
+		<p><a href="/map/{{map.slug}}">View map &gt;</a></p>
+	</div>
 
 	<h1>{{map.name or 'Map'}} Settings</h1>
 
@@ -59,7 +62,7 @@
 
 			<div class="submit-group form-group flexbox">
 				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+				<a href="/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
 			</div>
 
 		</form>
@@ -183,7 +186,7 @@
 
 			<div class="submit-group form-group flexbox">
 				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+				<a href="/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
 			</div>
 
 		</form>
@@ -265,7 +268,7 @@
 
 			<div class="submit-group form-group flexbox">
 				<input class="main submit btn" type="submit" value="Save" title="Click here to save your changes. ">
-				<a href="/settings/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
+				<a href="/maps" class="btn" title="Click here to discard your changes. ">cancel</a>
 			</div>
 
 		</form>

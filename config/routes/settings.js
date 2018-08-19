@@ -1,6 +1,5 @@
 'use strict'
 
-const crypto = require('crypto')
 const slug = require('slug')
 const xss = require('xss')
 const sanitize = require('mongo-sanitize')
@@ -12,10 +11,7 @@ const User = require('../models').user
 const Map = require('../models').map
 const Vehicle = require('../models').vehicle
 const router = require('express').Router()
-// Trim slug to patch CVE-2017-16117
-const slugify = function(s) {
-  return require('slug')(s.slice(0,99))
-}
+
 
 // Check admin auth and add map to res.locals
 /* global getMap */
@@ -26,7 +22,7 @@ async function getMap(req, res, next) {
     // No such map
     if (!res.locals.map) {
       req.flash('danger', `That map does not exist!`)
-      res.redirect('/settings/maps')
+      res.redirect('/maps')
     // User not authorized to edit this map
     } else if (!res.locals.map.admins.includes(req.user.email)) {
       const auth_err = Error(`Forbidden`)
@@ -37,16 +33,8 @@ async function getMap(req, res, next) {
   } catch(err) { next(err) }
 }
 
-// Settings index
-router.get('/', mw.ensureAuth, async (req, res) => {
-  res.render('settings/index', {
-    active: 'settings',
-  })
-})
-
 // User settings
-router.route('/user')
-  .all(mw.ensureAuth)
+router.route('/').all(mw.ensureAuth)
 
   // Show user settings page
   .get( (req, res) => {
@@ -132,7 +120,7 @@ router.route('/user')
       req.flash('success', 'Settings updated. ')
 
     } catch (err) { mw.throwErr(err, req) }
-    finally { res.redirect('/settings/user') }
+    finally { res.redirect('/settings') }
 
   })
 
@@ -144,89 +132,9 @@ router.get('/user/delete', mw.ensureAuth, async (req, res) => {
     res.redirect('/')
   } catch (err) {
     mw.throwErr(err, req)
-    res.redirect('/settings/user')
+    res.redirect('/settings')
   }
 })
-
-// Maps collection
-router.route('/maps')
-  .all(mw.ensureAuth)
-
-  // List of maps
-  .get( async (req, res) => {
-    res.render('settings/maps', {
-      active: 'settings',
-      maps: await Map.find({
-        admins: req.user.email,
-      }),
-    })
-  })
-
-  // Create new map
-  .post(async (req, res) => {
-    debug(`Creating new map...`)
-
-    try {
-
-      // Create map
-      const new_map = new Map()
-      new_map.created = Date.now()
-
-      // Make current user only admin
-      new_map.admins = [req.user.email]
-
-      // Set new map name if provided
-      new_map.name = (req.body.name.length>0) ?
-        xss(req.body.name) : 'map'
-
-      // Generate unique slug
-      new_map.slug = await new Promise((resolve, reject) => {
-        debug(`Creating new slug for map...`);
-
-        (async function checkSlug (s, cb) {
-          try {
-            debug(`Checking to see if slug ${s} is taken...`)
-
-            // Slug in use: generate a random one and retry
-            if (await Map.findOne({slug:s})) {
-              debug(`Slug ${s} is taken; generating another digit...`)
-              crypto.randomBytes(1, (err, buf) => {
-                if (err) {
-                  debug('Failed to create random byte for slug!')
-                  mw.throwErr(err, req)
-                  reject()
-                }
-                if (buf)
-                  checkSlug(sanitize(s+buf.toString('hex')), cb)
-              })
-
-            // Unique slug: proceed
-            } else {
-              debug(`Slug ${s} is unique`)
-              cb(s)
-            }
-          } catch (err) {
-            debug('Failed to create slug!')
-            mw.throwErr(err, req)
-            reject(err)
-          }
-
-        // Start recursive function chain using map name as initial slug
-        })(sanitize(slugify(new_map.name)), resolve)
-      })
-
-      // Save map
-      await new_map.save()
-      debug(`Successfully created new map ${new_map.id}`)
-      req.flash('success', `Created new map <i>${new_map.name}</i>`)
-      res.redirect(`/settings/maps/${new_map.id}`)
-
-    } catch (err) {
-      mw.throwErr(err)
-      res.redirect(`/settings/maps`)
-    }
-
-  })
 
 // Map settings
 router.route('/maps/:map')
@@ -247,10 +155,7 @@ router.route('/maps/:map')
 
     // Return map settings page
     if (!found_map) next() // 404
-    else res.render('settings/map', {
-      active: 'settings',
-      map: found_map,
-    })
+    else res.render('settings/map', { map:found_map })
 
   })
 
@@ -394,7 +299,7 @@ router.get('/maps/:map/delete', mw.ensureAuth, getMap, async (req, res, next) =>
   try {
     await res.locals.map.remove()
     req.flash('success', `Map deleted`)
-    res.redirect('/settings/maps')
+    res.redirect('/maps')
   } catch (err) {
     mw.throwErr(err, req)
     res.redirect(`/settings/maps/${req.params.map}`)

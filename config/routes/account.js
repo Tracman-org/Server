@@ -39,12 +39,9 @@ router.get('/email/:token', mw.ensureAuth, async (req, res, next) => {
       // Save new user and report success
       await req.user.save()
       req.flash('success', `Your email has been set to <u>${req.user.email}</u>. `)
-      res.redirect('/settings')
 
-    } catch (err) {
-      mw.throwErr(err, req)
-      res.redirect('/settings/user')
-    }
+    } catch (err){ mw.throwErr(err, req)
+    } finally { res.redirect('/settings') }
 
   // Invalid token
   } else {

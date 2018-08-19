@@ -13,8 +13,8 @@ router.get('/', mw.ensureAuth, async (req, res) => {
   debug(`Finding a map to redirect to...`)
   const vehicle = await Vehicle.findOne({'setter':req.user.id})
   if (!vehicle) {
-    debug(`User sets for no vehicles.  Redirecting to settings/maps...`)
-    res.redirect('/settings/maps')
+    debug(`User sets for no vehicles.  Redirecting to /maps...`)
+    res.redirect('/maps')
   } else {
     debug(`Found vehicle ${vehicle.id}; searching for associated map...`)
     const map = await Map.findOne({'vehicles':{$in:[vehicle.id]}})
