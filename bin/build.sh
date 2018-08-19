@@ -52,7 +52,8 @@ else
 			echo "Minifying $oldfile to $newfile..."
 			node_modules/uglify-es/bin/uglifyjs \
 				$oldfile --output $newfile \
-				--verbose --compress --mangle 'reserved=google.maps'
+				--verbose --compress \
+				--mangle reserved=['initMap']
 		fi
 	done
 fi
