@@ -80,7 +80,6 @@ function initMap() {
 
   // Create map
   if (disp !== '1') {
-    console.log('canPan:',!!(mapData.settings.canPan))
 
     // Create map
     map = new google.maps.Map(map_element, {
