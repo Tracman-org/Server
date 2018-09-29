@@ -99,7 +99,7 @@ module.exports = {
 
       // Set location
       socket.on('set', async (loc) => {
-        debug(`${socket.id} is setting location for ${socket.sets.length||0} maps to: ${loc.lat}, ${loc.lon}`)
+        debug(`${socket.id} is setting location for ${(socket.sets)?socket.sets.length:0} maps to: ${loc.lat}, ${loc.lon}`)
 
         // Get android timestamp or use server timestamp
         if (loc.ts) loc.tim = +loc.ts
