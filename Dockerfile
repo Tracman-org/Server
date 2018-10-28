@@ -3,10 +3,8 @@
 # Node version
 FROM node:8.4.0
 
-# Install tracman from Github
-RUN git clone git@github.com:Tracman-org/Server.git /tracman
-# Copy env files
-COPY env /tracman/
+# Copy files into container
+COPY . /tracman
 WORKDIR /tracman
 
 # Install dependencies
