@@ -4,7 +4,7 @@
 FROM node:8.4.0
 
 # Install tracman from Github
-RUN git clone https://github.com/Tracman-Org/Server.git /tracman
+RUN git clone git@github.com:Tracman-org/Server.git /tracman
 # Copy env files
 COPY env /tracman/
 WORKDIR /tracman
