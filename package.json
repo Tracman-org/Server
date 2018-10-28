@@ -9,7 +9,6 @@
     "connect-flash-plus": "^0.2.1",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.2",
-    "css-loader": "^0.28.7",
     "csurf": "^1.9.0",
     "debug": "^2.6.9",
     "express": "^4.16.3",
@@ -48,6 +47,8 @@
     "chai-http": "^3.0.0",
     "coveralls": "^3.0.2",
     "istanbul": "^1.0.0-alpha.2",
+    "less": "^3.0.1",
+    "less-plugin-clean-css": "^1.5.1",
     "mocha": "^4.0.1",
     "mocha-froth": "^0.2.10",
     "nodemon": "^1.18.3",
@@ -57,16 +58,24 @@
     "supertest": "^3.1.0"
   },
   "scripts": {
-    "test": "node_modules/mocha/bin/_mocha --exit",
+    "test": "node_modules/mocha/bin/_mocha",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --exit test/*",
     "audit": "node_modules/nsp/bin/nsp audit-package ; node_modules/nsp/bin/nsp audit-shrinkwrap",
     "lint": "standard",
     "start": "node server.js",
-    "nodemon": "nodemon --ignore 'static/**/*.min.*' server.js",
-    "update": "sudo npm update && sudo npm prune",
-    "minify": "minify --template .{{filename}}.min.{{ext}} --clean static/css*",
-    "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "subuild": "sudo node_modules/.bin/webpack --config webpack.config.js"
+    "nodemon": "nodemon",
+    "update": "sudo npm prune && sudo npm update",
+    "less": "for file in static/css/*.css; do lessc --clean-css $file static/css/.$(basename ${file%.*}).min.css; done",
+    "uglify": "for file in static/js/*.js; do uglifyjs $file --output static/js/.$(basename ${file%.*}).min.js --verbose --compress --mangle 'reserved=google.maps'; done",
+    "build": "rm static/**/.*.min.* ; npm run less ; npm run uglify"
+  },
+  "nodemonConfig": {
+    "ext": "html, js, json, less, css",
+    "ignore": "['static/**/*.min.*','*.md','test/*','config/env/*']",
+    "events": {
+      "start": "npm run build",
+      "restart": "npm run build"
+    }
   },
   "repository": "Tracman-org/Server",
   "keywords": [

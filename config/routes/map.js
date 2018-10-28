@@ -36,7 +36,7 @@ router.get('/demo', (req, res, next) => {
         units: 'standard'
       }
     },
-    mapApi: env.googleMapsAPI,
+    mapKey: env.googleMapsAPI,
     user: req.user,
     noFooter: '1',
     noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,
@@ -54,12 +54,10 @@ router.get('/:slug?', async (req, res, next) => {
       let map_user = await User.findOne({slug: req.params.slug})
       if (!map_user) next() // 404
       else {
-        var active = '' // For header nav
-        if (req.user && req.user.id === map_user.id) active = 'map'
         res.render('map', {
-          active: active,
+          active: (req.user && req.user.id===map_user.id)?'map':'',
           mapuser: map_user,
-          mapApi: env.googleMapsAPI,
+          mapKey: env.googleMapsAPI,
           user: req.user,
           noFooter: '1',
           noHeader: (req.query.noheader) ? req.query.noheader.match(/\d/)[0] : 0,

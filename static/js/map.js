@@ -1,16 +1,13 @@
 'use strict'
-/* global alert mapuser userid disp noHeader mapKey navigator token */
+/* global alert io google $ mapuser userid disp noHeader mapKey navigator token */
 
-import io from 'socket.io-client'
-import $ from 'jquery'
-import loadGoogleMapsAPI from 'load-google-maps-api'
 
 // Variables
-var map, marker, elevator, newLoc
+let map, marker, elevator, newLoc
 const mapElem = document.getElementById('map')
 const socket = io('//' + window.location.hostname)
 const IDLE_TIMEOUT = 300 // 5 minutes in seconds
-var _idleSecondsCounter = 0
+let _idleSecondsCounter = 0
 
 // Idle timeout listeners
 function resetIdleSecondsCounter () {
@@ -27,12 +24,16 @@ window.setInterval( function CheckIdleTime () {
   if (_idleSecondsCounter >= IDLE_TIMEOUT) {
     if (socket.connected) {
       console.log('Disconnecting because idle for more than',IDLE_TIMEOUT,'seconds.')
+      $('#inactive-mask').show()
+      $('#inactive-message').show()
       socket.disconnect()
     }
   // Connect user if disconnected
   } else {
     if (!socket.connected) {
       console.log('Reconnecting the user because they are no longer idle.')
+      $('#inactive-mask').hide()
+      $('#inactive-message').hide()
       socket.connect()
     }
   }
@@ -79,7 +80,7 @@ $(function () {
   toggleMaps(mapuser.last)
 
   // Controls
-  var wpid, newloc
+  let wpid, newloc
 
   // Set location
   $('#set-loc').click(function () {
@@ -92,7 +93,7 @@ $(function () {
 
           // Success callback
           function (pos) {
-            var newloc = {
+            let newloc = {
               ts: Date.now(),
               tok: token,
               usr: userid,
@@ -202,13 +203,12 @@ $(function () {
 })
 
 // Load google maps API
-loadGoogleMapsAPI({ key: mapKey })
-.then(function (googlemaps) {
+function initMap() {
 
   // Create map
   if (disp !== '1') {
     // Create map and marker elements
-    map = new googlemaps.Map(mapElem, {
+    map = new google.maps.Map(mapElem, {
       center: {
         lat: mapuser.last.lat,
         lng: mapuser.last.lon
@@ -220,10 +220,10 @@ loadGoogleMapsAPI({ key: mapKey })
       draggable: false,
       zoom: mapuser.settings.defaultZoom,
       streetViewControl: false,
-      zoomControlOptions: {position: googlemaps.ControlPosition.LEFT_TOP},
-      mapTypeId: (mapuser.settings.defaultMap === 'road') ? googlemaps.MapTypeId.ROADMAP : googlemaps.MapTypeId.HYBRID
+      zoomControlOptions: {position: google.maps.ControlPosition.LEFT_TOP},
+      mapTypeId: (mapuser.settings.defaultMap === 'road') ? google.maps.MapTypeId.ROADMAP : google.maps.MapTypeId.HYBRID
     })
-    marker = new googlemaps.Marker({
+    marker = new google.maps.Marker({
       position: { lat: mapuser.last.lat, lng: mapuser.last.lon },
       title: mapuser.name,
       icon: (mapuser.settings.marker) ? '/static/img/marker/' + mapuser.settings.marker + '.png' : '/static/img/marker/red.png',
@@ -241,7 +241,7 @@ loadGoogleMapsAPI({ key: mapKey })
       logoDiv.innerHTML = '<a href="https://www.tracman.org/">' +
         '<img src="https://www.tracman.org/static/img/style/logo-28.png" alt="[]">' +
         "<span class='text'>Tracman</span></a>"
-      map.controls[googlemaps.ControlPosition.BOTTOM_LEFT].push(logoDiv)
+      map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(logoDiv)
     }
 
     // Create update time block
@@ -250,7 +250,7 @@ loadGoogleMapsAPI({ key: mapKey })
     if (mapuser.last.time) {
       timeDiv.innerHTML = 'location updated ' + new Date(mapuser.last.time).toLocaleString()
     }
-    map.controls[googlemaps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(timeDiv)
 
     // Create speed block
     if (mapuser.settings.showSpeed) {
@@ -268,12 +268,12 @@ loadGoogleMapsAPI({ key: mapKey })
       speedSign.appendChild(speedLabel)
       speedSign.appendChild(speedText)
       speedSign.appendChild(speedUnit)
-      map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(speedSign)
+      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(speedSign)
     }
 
     // Create altitude block
     if (mapuser.settings.showAlt) {
-      elevator = new googlemaps.ElevationService()
+      elevator = new google.maps.ElevationService()
       const altitudeSign = document.createElement('div')
       const altitudeLabel = document.createElement('div')
       const altitudeText = document.createElement('div')
@@ -293,7 +293,7 @@ loadGoogleMapsAPI({ key: mapKey })
       altitudeSign.appendChild(altitudeLabel)
       altitudeSign.appendChild(altitudeText)
       altitudeSign.appendChild(altitudeUnit)
-      map.controls[googlemaps.ControlPosition.TOP_RIGHT].push(altitudeSign)
+      map.controls[google.maps.ControlPosition.TOP_RIGHT].push(altitudeSign)
     }
   }
 
@@ -306,13 +306,13 @@ loadGoogleMapsAPI({ key: mapKey })
   function getAlt (loc) {
     return new Promise(function (resolve, reject) {
       // Get elevator service
-      elevator = elevator || new googlemaps.ElevationService()
+      elevator = elevator || new google.maps.ElevationService()
       // Query API
       return elevator.getElevationForLocations({
         'locations': [{ lat: loc.lat, lng: loc.lon }]
       }, function (results, status, errorMessage) {
           // Success; return altitude
-        if (status === googlemaps.ElevationStatus.OK && results[0]) {
+        if (status === google.maps.ElevationStatus.OK && results[0]) {
           console.log('Altitude was retrieved from Google Elevations API as', results[0].elevation, 'm')
           resolve(results[0].elevation)
 
@@ -370,7 +370,7 @@ loadGoogleMapsAPI({ key: mapKey })
       $('#timestamp').text('location updated ' + newLoc.tim)
 
       // Update marker and map center
-      googlemaps.event.trigger(map, 'resize')
+      google.maps.event.trigger(map, 'resize')
       map.setCenter({ lat: newLoc.lat, lng: newLoc.lon })
       marker.setPosition({ lat: newLoc.lat, lng: newLoc.lon })
 
@@ -387,6 +387,7 @@ loadGoogleMapsAPI({ key: mapKey })
           console.error(err.stack)
         })
       }
+
     }
 
     // Update street view
@@ -398,7 +399,7 @@ loadGoogleMapsAPI({ key: mapKey })
   function getStreetViewData (loc, rad, cb) {
     // Ensure that the location hasn't changed (or this is the initial setting)
     if (newLoc == null || loc.tim === newLoc.tim) {
-      if (!sv) var sv = new googlemaps.StreetViewService()
+      if (!sv) var sv = new google.maps.StreetViewService()
       sv.getPanorama({
         location: {
           lat: loc.lat,
@@ -408,11 +409,11 @@ loadGoogleMapsAPI({ key: mapKey })
       }, function (data, status) {
         switch (status) {
           // Success
-          case googlemaps.StreetViewStatus.OK: {
+          case google.maps.StreetViewStatus.OK: {
             cb(data)
             break
           // No results in that radius
-          } case googlemaps.StreetViewStatus.ZERO_RESULTS: {
+          } case google.maps.StreetViewStatus.ZERO_RESULTS: {
             // Try again with a bigger radius
             getStreetViewData(loc, rad * 2, cb)
             break
@@ -426,6 +427,7 @@ loadGoogleMapsAPI({ key: mapKey })
 
   // Update streetview
   function updateStreetView (loc) {
+
     // Calculate bearing between user and position of streetview image
     // https://stackoverflow.com/a/26609687/3006854
     function getBearing (userLoc, imageLoc) {
@@ -459,9 +461,8 @@ loadGoogleMapsAPI({ key: mapKey })
         '&key=' + mapKey
       )
     })
+
   }
 
 // Error loading gmaps API
-}).catch(function (err) {
-  console.error(err.stack)
-})
+}

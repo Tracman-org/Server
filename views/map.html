@@ -43,20 +43,24 @@
 {% endblock %}
 
 {% block main %}
+	<div id='inactive-mask' class='page-mask'></div>
+	<div id='inactive-message' class='popup' style="display:none">
+		<p>The map has been deactivated due to inactivity.  Move the mouse around the page to reactivate the map. </p>
+	</div>
 
 	{% if user and user.isNewUser %}
-	<div class='page-mask'></div>
+	<div id='welcome-mask' class='page-mask' style="display:block"></div>
 	<div id='welcome' class='popup'>
 
 		<div class='topbar'>
 			<h2>Welcome!</h2>
-			<div class='close' onclick="$('#welcome').hide();$('.page-mask').hide();">✖️</div>
+			<div class='close' onclick="$('#welcome').hide();$('#welcome-mask').hide();">✖️</div>
 		</div>
 
 		<p>This is your map.  It's publicly avaliable at <a href="{{newuserurl}}">{{newuserurl}}</a>.  You can change that URL and other settings in <b><a href="/settings">settings</a></b>.  Set your location by clicking <b>set</b> below.  Clear it by clicking <b>clear</b>.  To track your location, click <b>track</b> or download the <a href="/android">android app</a>.  For more information, see the <b><a href="/help">help</a></b> page.  </p>
 
 		<div class='buttons'>
-			<a class='btn main' onclick="$('#welcome').hide();$('.page-mask').hide();">Got it!</a>
+			<a class='btn main' onclick="$('#welcome').hide();$('#welcome-mask').hide();">Got it!</a>
 		</div>
 
 	</div>
@@ -106,18 +110,18 @@
 	<!-- Variables from server-side -->
 	<!-- TODO: Move to own script file, maybe with https://github.com/brooklynDev/JShare -->
 	<script>
-		const mapuser = JSON.parse('{{mapuser |dump|safe}}'),
-			mapKey = "{{mapApi |safe}}",
-			noHeader = "{{noHeader |safe}}",
-			disp = "{{disp |safe}}", // 0=map, 1=streetview, 2=both
-			userid = "{{user._id |safe}}",
-			token = "{{user.sk32 |safe}}";
+		const mapuser = JSON.parse('{{mapuser |dump|safe}}')
+		const mapKey = '{{mapKey|safe}}'
+		const noHeader = "{{noHeader |safe}}"
+		const disp = "{{disp |safe}}" // 0=map, 1=streetview, 2=both
+		const userid = "{{user._id |safe}}"
+		const token = "{{user.sk32 |safe}}"
 	</script>
 
-	<!-- Webpacked bundles -->
-	<script type="application/javascript" src="/static/js/.map.bun.js"></script>
-	<!--{% if user.id == mapuser.id %}-->
-		<!--<script type="application/javascript" src="/static/js/.controls.bun.js"></script>-->
-	<!--{% endif %}-->
+	<!-- Imports -->
+	<script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key={{mapKey|safe}}&callback=initMap"
+    async defer></script>
+	<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js" integrity="sha256-jniDwC1PC9OmGoyPxA9VpGvgwDYyxsMqu5Q4OrF5wNY=" crossorigin="anonymous"></script>
+	<script type="application/javascript" src="/static/js/.map.min.js"></script>
 
 {% endblock %}
