@@ -8,7 +8,6 @@ COPY . /tracman
 WORKDIR /tracman
 
 # Install dependencies
-COPY package.json package-lock.json ./
 RUN npm install
 
 # Bundle source
