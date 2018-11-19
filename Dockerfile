@@ -3,12 +3,11 @@
 # Node version
 FROM node:8.4.0
 
-# Install tracman from Github
-RUN git clone https://github.com/Tracman-Org/Server.git /tracman
+# Copy files into container
+COPY . /tracman
 WORKDIR /tracman
 
 # Install dependencies
-COPY package.json package-lock.json ./
 RUN npm install
 
 # Bundle source
