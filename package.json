@@ -38,9 +38,10 @@
     "socket.io-client": "^2.1.1",
     "style-loader": "^0.18.2",
     "uglifyjs-webpack-plugin": "^0.4.6",
-    "webpack": "^3.6.0",
+    "webpack": "^4.0.0",
     "xss": "^0.3.8",
-    "zxcvbn": "^4.4.2"
+    "zxcvbn": "^4.4.2",
+    "snyk": "^1.123.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -67,7 +68,9 @@
     "update": "sudo npm prune && sudo npm update",
     "less": "for file in static/css/*.css; do lessc --clean-css $file static/css/.$(basename ${file%.*}).min.css; done",
     "uglify": "for file in static/js/*.js; do uglifyjs $file --output static/js/.$(basename ${file%.*}).min.js --verbose --compress --mangle 'reserved=google.maps'; done",
-    "build": "rm static/**/.*.min.* ; npm run less ; npm run uglify"
+    "build": "rm static/**/.*.min.* ; npm run less ; npm run uglify",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "nodemonConfig": {
     "ext": "html, js, json, less, css",
@@ -88,5 +91,6 @@
   "license": "GPL-3.0",
   "README": "README.md",
   "bugs": "https://github.com/Tracman-org/Server/issues",
-  "homepage": "https://www.tracman.org/"
+  "homepage": "https://www.tracman.org/",
+  "snyk": true
 }
