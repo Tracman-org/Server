@@ -10,6 +10,8 @@ node.js application to display a sharable map with user's location.
 
 ## Installation
 
+Note that this version of bcrypt [doesn't work](https://github.com/kelektiv/node.bcrypt.js/issues/572) with node v10+.  Use node v9.11.1.  
+
 On unix-based systems:
 
 ```sh
@@ -57,6 +59,7 @@ Tracman will be updated according to [this branching model](http://nvie.com/post
 [view full changelog](CHANGELOG.md)
 
 ###### v0.9.x
+* Fixed bcrypt (use node v9.11.1)
 * Removed coinhive
 * Fixed CSP rules
 * Improved debugging output

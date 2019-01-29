@@ -2,6 +2,7 @@
 ### v0.9.0
 
 ###### v0.9.1
+* Fixed bcrypt (use node v9.11.1)
 * Removed conhive
 * Fixed CSP rules
 * Improved debugging output
