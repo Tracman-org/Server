@@ -32,6 +32,7 @@
     "request": "^2.88.0",
     "slug": "^0.9.3",
     "socket.io": "^2.0.3",
+    "square-connect": "^2.20190213.0",
     "uglify-es": "^3.3.9",
     "xss": "^0.3.4",
     "zxcvbn": "^4.4.2"
