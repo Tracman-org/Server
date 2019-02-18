@@ -75,6 +75,11 @@ const mapSchema = new Schema({
   },
   vehicles: [{ type:ObjectId, ref:'Vehicle' }],
   admins: [String], // Array of authorized emails
+  subscription: {
+    type: { type:String, default:'free', }, // free, basic, pro
+    
+  },
+  
 }).plugin(unique)
 
 

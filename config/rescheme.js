@@ -52,6 +52,9 @@ module.exports = function (old_user) {
           streetview: old_user_object.settings.showStreetview || false,
         },
       }
+      new_map.subscription = {
+        type: 'free',
+      },
       new_map.lastUpdate = old_user_object.last.time
       new_map.vehicles = [new_vehicle]
       new_map.admins = [old_user.email]

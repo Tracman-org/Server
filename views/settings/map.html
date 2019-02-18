@@ -32,7 +32,7 @@
 		<li class="tab btn"><a href="#display">Display</a></li>
 		<li class="tab btn"><a href="#vehicles">Vehicles</a></li>
 		<li class="tab btn"><a href="#admins">Admins</a></li>
-		<li class="tabs btn"><a href="#payments">Payments</a></li>
+		<li class="tab btn"><a href="#payments">Payments</a></li>
 	</ul>
 
 	<section id="basics">
@@ -306,7 +306,20 @@
 
 		<h2>Payments</h2>
 
-		
+		<form role="form" method="post">
+			<input type="hidden" name="_csrf" value="{{csrfToken}}">
+			<input type="hidden" name="type" value="payments">
+			
+			<div id="visibility" class="form-group" title="Choose your subscription type here">
+				<label for="subscription-select">Subscription</label>
+				<select id="subscription-select" name="subscription">
+					<option {% if map.subscription.type=='free' %}selected {% endif %}value="free">Free</option>
+					<option {% if map.subscription.type=='basic' %}selected {% endif %}value="basic">Basic</option>
+					<option {% if map.subscription.type=='pro' %}selected {% endif %}value="pro">Pro</option>
+				</select>
+			</div>
+			
+		</form>
 		
 	</section>
 
