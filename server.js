@@ -86,6 +86,7 @@ if (env.mode !== 'production')
     // ],
     'connect-src': ["'self'",
       'wss://*.tracman.org',
+      'wss://tracman-keith24.c9users.io',
       'https://www.google-analytics.com',
       // 'wss://*.coinhive.com',
     ],
