@@ -28,5 +28,7 @@ module.exports = {
 	googleClientId: process.env.GOOGLECLIENTID,
 	googleClientSecret: process.env.GOOGLECLIENTSECRET,
 	googleMapsAPI: process.env.GOOGLEMAPSAPI,
+	squareApplicationId: process.env.SQUAREAPPLICATIONID,
+	squarePersonalAccessToken: process.env.SQUAREPERSONALACCESSTOKEN,
 	
 };

@@ -41,6 +41,10 @@ module.exports = {
 
   // reCaptcha API key
   recaptchaSitekey: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-  recaptchaSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+  recaptchaSecret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  
+  // Square Payment Processor
+  squareApplicationId: 'XXXXXX-XXXXXX-XXXXXXXX-XXXXXXXXXXXXX',
+	squareAccessToken: 'XXXXXX-XXXXXX--XXXXXXXXXXXXXXXXXXXXX',
 
 }
