@@ -14,11 +14,12 @@ section > h2:first-child {
 
 .etabs {
 	padding: 0;
-	position: absolute;
-	left: 0;
+	position: relative;
+	left: -5vw;
 	border-bottom: 1px #666 solid;
-	width: 100%;
+	width: 110%;
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-around;
 	list-style-type: none;
 }

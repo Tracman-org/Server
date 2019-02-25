@@ -22,7 +22,7 @@
 			<li><a href="/contact"{% if active=='contact' %} class="active"{% endif %}>Contact</a></li>
 			<li><a href="/help"{% if active=='help' %} class="active"{% endif %}>Help</a></li>
 		{% if user %}
-			{% if user.isSiteAdmin %}<li><a href="/admin"{% if active=='admin' %} class="active"{% endif %}>Admin</a></li>{% endif %}
+			{% if user.isAdmin %}<li><a href="/admin"{% if active=='admin' %} class="active"{% endif %}>Admin</a></li>{% endif %}
 			<li><a href="/logout">Logout</a></li>
 		{% else %}
 			<li><a href="/login"{% if active=='login' %} class="active"{% endif %}>Login / join</a></li>

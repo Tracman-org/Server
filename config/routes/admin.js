@@ -7,13 +7,13 @@ const User = require('../models').user
 
 function ensureAdmin (req, res, next) {
 	debug(`ensureAdmin called at ${req.url}`)
-	if (req.user.isSiteAdmin) return next()
+	if (req.user.isAdmin) return next()
 	else {
 		const err = Error("Forbidden")
 		err.status = 403
 		next(err)
 	}
-	//TODO: test this by logging in as !isSiteAdmin and go to /admin
+	//TODO: test this by logging in as !isAdmin and go to /admin
 }
 
 router.get('/', mw.ensureAuth, ensureAdmin, async (req, res) => {

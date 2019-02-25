@@ -13,7 +13,7 @@
 			{% if user %}
 				<a class="btn" href="/map">Map<i class="fa fa-angle-right"></i></a>
 				<a class="btn" href="/settings">Settings<i class="fa fa-angle-right"></i></a>
-				{% if user.isSiteAdmin %}
+				{% if user.isAdmin %}
 					<a class="btn" href="/admin">Admin<i class="fa fa-angle-right"></i></a>
 				{% endif %}
 			{% else %}

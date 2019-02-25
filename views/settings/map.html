@@ -32,7 +32,7 @@
 		<li class="tab btn"><a href="#display">Display</a></li>
 		<li class="tab btn"><a href="#vehicles">Vehicles</a></li>
 		<li class="tab btn"><a href="#admins">Admins</a></li>
-		<li class="tab btn"><a href="#payments">Payments</a></li>
+		<li class="tab btn"><a href="#subscription">Subscription</a></li>
 	</ul>
 
 	<section id="basics">
@@ -170,19 +170,19 @@
 				<input id="show-scale-input" name="showScale" type="checkbox" {% if map.settings.display.scale %}checked{% endif %}>
 			</div>
 
-			<div id="show-speed" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a spedometer on the map.">
-				<label for="show-speed-input">Show speed{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-speed-input" name="showSpeed" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.speed %}checked{% else %}{% endif %}>
+			<div id="show-speed" class="form-group" title="{% if map.subscription.plan == 'free' %}Not available on free plan{% else %}Shows a spedometer on the map{% endif %}">
+				<label for="show-speed-input">Show speed{% if map.subscription.plan == 'free' %} (<a href="#subscription" onclick="$('.container').easytabs('select','#subscription')">upgrade</a>){% endif %}</label>
+				<input id="show-speed-input" name="showSpeed" type="checkbox" {% if map.subscription.plan == 'free' %}disabled {% elif map.settings.display.speed %}checked{% else %}{% endif %}>
 			</div>
 
-			<div id="show-altitude" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows the current elevation on the map. ">
-				<label for="show-alt-input">Show altitude{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-alt-input" name="showAlt" type="checkbox" {% if not user.isPro %}disabled {% elif map.settings.display.alt %}checked{% else %}{% endif %}>
+			<div id="show-altitude" class="form-group" title="{% if map.subscription.plan == 'free' %}Not available on free plan {% else %}Shows the current elevation on the map{% endif %}">
+				<label for="show-alt-input">Show altitude{% if map.subscription.plan == 'free' %} (<a href="#subscription" onclick="$('.container').easytabs('select','#subscription')">upgrade</a>){% endif %}</label>
+				<input id="show-alt-input" name="showAlt" type="checkbox" {% if map.subscription.plan == 'free' %}disabled {% elif map.settings.display.alt %}checked{% else %}{% endif %}>
 			</div>
 
-			<div id="show-streetview" class="form-group" title="{% if not user.isPro %}PRO ONLY! {% endif %}Shows a Google street view image at or near your current location, oriented in the direction of travel. ">
-				<label for="show-streetview-input">Show street view{% if not user.isPro %} <span class="red">(PRO)</span>{% endif %}</label>
-				<input id="show-streetview-input" name="showStreetview" type="checkbox" {% if not user.isPro %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
+			<div id="show-streetview" class="form-group" title="{% if map.subscription.plan == 'free' %}Not available on free plan {% else %}Shows a Google street view image at or near your current location, oriented in the direction of travel{% endif %}">
+				<label for="show-streetview-input">Show street view{% if map.subscription.plan == 'free' %} (<a href="#subscription" onclick="$('.container').easytabs('select','#subscription')">upgrade</a>){% endif %}</label>
+				<input id="show-streetview-input" name="showStreetview" type="checkbox" {% if map.subscription.plan == 'free' %}disabled{% elif map.settings.display.streetview %}checked{% else %}{% endif %}>
 			</div>
 
 			<div class="submit-group form-group flexbox">
@@ -302,22 +302,59 @@
 
 	</section>
 
-	<section id="payments">
+	<section id="subscription">
 
-		<h2>Payments</h2>
+		<h2>Subscription</h2>
 
 		<form role="form" method="post">
 			<input type="hidden" name="_csrf" value="{{csrfToken}}">
-			<input type="hidden" name="type" value="payments">
+			<input type="hidden" name="type" value="subscription">
 			
-			<div id="visibility" class="form-group" title="Choose your subscription type here">
+			<div id="subscription-type" class="form-group" title="Choose your subscription type here">
 				<label for="subscription-select">Subscription</label>
-				<select id="subscription-select" name="subscription">
-					<option {% if map.subscription.type=='free' %}selected {% endif %}value="free">Free</option>
-					<option {% if map.subscription.type=='basic' %}selected {% endif %}value="basic">Basic</option>
-					<option {% if map.subscription.type=='pro' %}selected {% endif %}value="pro">Pro</option>
+				<select id="subscription-select" name="plan" onchange="this.form.submit()">
+					<option {% if map.subscription.plan=='free' %}selected {% endif %}value="free">Free</option>
+					<option {% if map.subscription.plan=='basic' %}selected {% endif %}value="basic">Basic</option>
+					<option {% if map.subscription.plan=='pro' %}selected {% endif %}value="pro">Pro</option>
 				</select>
 			</div>
+			
+			<h3>Payments</h3>
+			
+			{% if map.subscription.payments.length == 0 %}
+			<p>There are no payments yet.  </p>
+			{% else %}
+			
+			<table id="payments-table">
+
+				<thead><tr>
+					<th><h4>Due</h4></th>
+					<th><h4>Subscription</h4></th>
+					<th><h4>Cost</h4></th>
+					<th><h4>Payment</h4></th>
+				</tr></thead>
+
+				<tbody>
+				{% for payment in map.subscription.payments %}
+				<tr>
+					<td>
+						<span title="Due date of this subscription payment">{{payment.dateDue}}</span>
+					</td>
+					<td>
+						<span title="Type of subscription for this payment">{{payment.subscriptionType}}{% if payment.subscriptionType == 'pro' %} with {{payment.vehiclesNumber}} vehicles{% endif %}</span>
+					</td>
+					<td>
+						<span title="Total cost of payment">{{payment.cost}}</span>
+					</td>
+					<td>
+						{% if payment.datePaid %}paid {{payment.datePaid}}{% else %}<a href="/settings/maps/{{map._id}}/payments/{{payment._id}}" class="btn">Pay now</a>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+
+			</table>
+			{% endif %}
 			
 		</form>
 		

@@ -286,6 +286,28 @@ router.route('/maps/:map')
         finally { res.redirect(`/settings/maps/${req.params.map}#vehicles`) }
         break
 
+      // Set subscription settings
+      case 'subscription':
+        try {
+
+          // Set settings
+          debug(`Setting map subscription settings... `)
+          if ( ['free','basic','pro'].includes(req.body.plan) )
+            res.locals.map.subscription.plan = req.body.plan
+
+          // Save map and send response
+          debug(`Saving new settings for map ${res.locals.map.name}...`)
+          await res.locals.map.save()
+
+          // Success
+          debug(`Done saving subscription settings for map ${res.locals.map.id}.  Redirecting...`)
+          req.flash('success', 'Map subscription settings updated. ')
+
+        } catch (err) { mw.throwErr(err, req) }
+
+        finally { res.redirect(`/settings/maps/${req.params.map}#subscription`) }
+        break
+
       default:
         next() // 404
         break

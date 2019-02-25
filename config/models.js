@@ -13,7 +13,7 @@ const ObjectId = Schema.Types.ObjectId
 
 const userSchema = new Schema({
   name: String,
-  email: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
+  email: { type:String, /*unique:true*/ }, //TODO: Make unique after rescheme, make required after manually adding missing emails with googleids
   newEmail: String,
   emailToken: String,
   auth: {
@@ -24,8 +24,7 @@ const userSchema = new Schema({
     facebook: String,
     twitter: String,
   },
-  isSiteAdmin: { type:Boolean, required:true, default:false },
-  isPro: { type:Boolean, required:true, default:false },
+  isAdmin: { type:Boolean, required:true, default:false },
   created: Date,
   lastLogin: Date,
   isNewUser: { type:Boolean, default:true },
@@ -54,12 +53,12 @@ const mapSchema = new Schema({
   lastUpdate: Date,
   slug: { type:String, required:true, /*unique:true*/ }, //TODO: Make unique after rescheme
   settings: {
-    visibility: { type:String, default:'public' }, // 'public' or 'private'
-    units: { type:String, default:'standard' }, // 'standard' or 'metric'
-    defaultMapType: { type:String, default:'road' }, // 'road' or 'sat'
+    visibility: { type:String, default:'public' }, // 'public', 'private'
+    units: { type:String, default:'standard' }, // 'standard', 'metric'
+    defaultMapType: { type:String, default:'road' }, // 'road', 'sat'
     defaultZoom: { type:Number, default:11 },
     center: {
-      type: { type:String, default:'follow' }, // 'static' or 'follow'
+      type: { type:String, default:'follow' }, // 'static', 'follow'
       follow: { type:ObjectId, ref:'Vehicle' },
       lat: { type:Number, default:0 },
       lon: { type:Number, default:0 },
@@ -76,11 +75,20 @@ const mapSchema = new Schema({
   vehicles: [{ type:ObjectId, ref:'Vehicle' }],
   admins: [String], // Array of authorized emails
   subscription: {
-    type: { type:String, default:'free', }, // free, basic, pro
-    
+    plan: { type:String, default:'free', }, // 'free', 'basic', 'pro'
+    payments: [{ type:ObjectId, ref:'Payment' }],
   },
   
 }).plugin(unique)
+
+const paymentSchema = new Schema({
+  dateDue: Date,
+  datePaid: Date, // undefined if unpaid
+  plan: { type:String, default:'free', }, // 'free', 'basic', 'pro'
+  vehiclesNumber: Number,
+  cost: Number,
+  userPaid: { type:ObjectId, ref:'user' }
+})
 
 
 /* Middleware Hooks */
@@ -214,9 +222,11 @@ userSchema.methods.validPassword = function (password) {
 const User = mongoose.model('User', userSchema)
 const Map = mongoose.model('Map', mapSchema)
 const Vehicle = mongoose.model('Vehicle', vehicleSchema)
+const Payment = mongoose.model('Payment', paymentSchema)
 
 module.exports = {
   'user': User,
   'map': Map,
   'vehicle': Vehicle,
+  'payment': Payment,
 }

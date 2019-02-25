@@ -1,3 +1,5 @@
+section { padding: 0 0 5vh; }
+
 /* Map center */
 #map-center > div {
 	margin-left: auto;

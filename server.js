@@ -23,7 +23,13 @@ const rescheme = require('./config/rescheme')
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const sockets = require('./config/sockets')
+const square = require('square-connect')
 const debug = require('debug')('tracman-server')
+
+
+// Set up square
+square.ApiClient.instance.authentications['oauth2'].accessToken = env.squareAccessToken
+const squareApi = new square.LocationsApi()
 
 // Promises marking a ready server
 const ready_promise_list = []
@@ -54,6 +60,20 @@ if (env.mode !== 'production')
     }
   }) )
 
+}
+
+/* Connect square */ {
+  
+  ready_promise_list.push( new Promise( async (resolve, reject) => {
+    try {
+      console.log(`  Square API called successfully. `)
+      resolve()
+    } catch (err) {
+      console.error(err.stack)
+      reject()
+    }
+  }) )
+  
 }
 
 /* Templates */ {
@@ -250,9 +270,13 @@ ready_promise_list.push(mail.verify())
 //TODO: Remove this after reschemed
 ready_promise_list.push( new Promise( async (resolve, reject) => {
   try {
-    ( await User.find({}) ).forEach( async (user) => {
-      await rescheme(user)
-      debug(`Finished attempted rescheme of ${user.id}`)
+    let old_users = await User.find({})
+    let old_user_ids = []
+    old_users.forEach( (old_user) => {
+      old_user_ids.push(old_user._id)
+    })
+    old_user_ids.forEach((old_user_id) => {
+      rescheme(old_user_id)
     })
     resolve()
   } catch (err) {
