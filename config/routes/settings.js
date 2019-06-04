@@ -168,17 +168,17 @@ router.route('/pro')
   })
 
   // Join Tracman pro
-  .post( async (req, res) => {
-    try {
-      await User.findByIdAndUpdate(req.user.id,
-        {$set: { isPro: true }})
-      req.flash('success', 'You have been signed up for pro. ')
-      res.redirect('/settings')
-    } catch (err) {
-      mw.throwErr(err, req)
-      res.redirect('/settings/pro')
-    }
-  })
+  //.post( async (req, res) => {
+    //try {
+      //await User.findByIdAndUpdate(req.user.id,
+        //{$set: { isPro: true }})
+      //req.flash('success', 'You have been signed up for pro. ')
+      //res.redirect('/settings')
+    //} catch (err) {
+      //mw.throwErr(err, req)
+      //res.redirect('/settings/pro')
+    //}
+  //})
 
 // Redirects for URLs that moved to /account
 router.route('/password')
