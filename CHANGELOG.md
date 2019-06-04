@@ -1,7 +1,8 @@
 # Tracman Server Changelog
-### v0.9.0
+### v0.9.1
 
 ###### v0.9.1
+* Removed Pro
 * Removed conhive
 * Fixed CSP rules
 * Improved debugging output
