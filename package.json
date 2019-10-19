@@ -20,7 +20,7 @@
     "minifier": "^0.8.1",
     "moment": "^2.22.2",
     "mongo-sanitize": "^1.0.0",
-    "mongoose": "^4.13.17",
+    "mongoose": "^5.4.10",
     "mongoose-unique-validator": "^1.0.6",
     "nodemailer": "^4.6.8",
     "nunjucks": "^3.1.4",
