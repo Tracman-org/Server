@@ -1,6 +1,8 @@
 # <img align="left" src="/static/img/icon/by/48.png" alt="T" title="The Tracman Logo">Tracman
 ###### v 0.9.0
 
+## This project is deprecated.  Since Google increased the cost of their maps API, it no longer made financial sense to keep it running.  I might revive or remix the project in the future.  
+
 node.js application to display a sharable map with user's location.
 
 [![Travis Build Status](https://travis-ci.org/Tracman-org/Server.svg?branch=develop)](https://travis-ci.org/Tracman-org/Server)
