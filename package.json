@@ -4,7 +4,7 @@
   "description": "Tracks user's GPS location",
   "main": "server.js",
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.18.3",
     "connect-flash-plus": "^0.2.1",
     "cookie-parser": "^1.4.3",
